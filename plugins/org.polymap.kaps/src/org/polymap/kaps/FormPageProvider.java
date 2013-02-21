@@ -18,18 +18,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.action.Action;
+
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.geotools.data.FeatureStore;
 import org.opengis.feature.Feature;
+
+import org.polymap.core.operation.OperationSupport;
 import org.polymap.core.project.ui.util.SimpleFormData;
+import org.polymap.core.runtime.UIJob;
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.KaufvertragComposite;
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
-import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.field.TextFormField;
 import org.polymap.rhei.form.FormEditor;
 import org.polymap.rhei.form.IFormEditorPage;
+import org.polymap.rhei.form.IFormEditorPage2;
 import org.polymap.rhei.form.IFormEditorPageSite;
 import org.polymap.rhei.form.IFormPageProvider;
 
@@ -38,7 +43,7 @@ import org.polymap.rhei.form.IFormPageProvider;
  */
 public class FormPageProvider implements IFormPageProvider {
 
-	public class BaseFormEditorPage implements IFormEditorPage {
+	public class BaseFormEditorPage implements IFormEditorPage2 {
 
 		private Feature feature;
 		private KaufvertragComposite kaufvertrag;
@@ -85,6 +90,38 @@ public class FormPageProvider implements IFormPageProvider {
 					.top(0, 0).create());
 		}
 
+		// IFormEditorPage2 *******************************
+		
+        @Override
+        public void doLoad( IProgressMonitor monitor ) throws Exception {
+        }
+
+        @Override
+        public void doSubmit( IProgressMonitor monitor ) throws Exception {
+            // nach dem Speichern des Formulars auch alle Änderungen committen;
+            // das sollte natürlich nur in einem offenen Formular passieren;
+            // 3s Verzögerung, damit alle Formulare gespeichert sind vor commit
+            new UIJob( "Speichern" ) {
+                protected void runWithException( IProgressMonitor _monitor ) throws Exception {
+                    OperationSupport.instance().saveChanges();
+                }
+            }.schedule( 3000 );
+        }
+
+        @Override
+        public void dispose() {
+        }
+
+        @Override
+        public boolean isDirty() {
+            return false;
+        }
+
+        @Override
+        public boolean isValid() {
+            return true;
+        }
+        
 	}
 
 	public FormPageProvider() {
