@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Kaps
+Bundle-SymbolicName: org.polymap.kaps;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Require-Bundle: org.polymap.core.libs;bundle-version="3.1.0",
+ org.polymap.rhei.form;bundle-version="2.0.0",
+ org.polymap.core;bundle-version="3.1.0",
+ org.polymap.core.project;bundle-version="3.1.0"
