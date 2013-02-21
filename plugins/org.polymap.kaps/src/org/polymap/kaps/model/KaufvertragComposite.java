@@ -21,6 +21,8 @@ import org.apache.commons.logging.LogFactory;
 import org.polymap.core.qi4j.QiEntity;
 import org.polymap.core.qi4j.event.ModelChangeSupport;
 import org.polymap.core.qi4j.event.PropertyChangeSupport;
+import org.polymap.kaps.importer.ImportColumn;
+import org.polymap.kaps.importer.ImportTable;
 import org.qi4j.api.common.Optional;
 import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.entity.EntityComposite;
@@ -41,53 +43,43 @@ import org.qi4j.api.property.Property;
     QiEntity.Mixin.class,
 //    JsonState.Mixin.class
 } )
+@ImportTable("K_BUCH")
 public interface KaufvertragComposite
     extends QiEntity, /*JsonState,*/ PropertyChangeSupport, ModelChangeSupport, EntityComposite {
     
-//    [INFO] MdbImportOperation -     column: TK25 - INT
-//    [INFO] MdbImportOperation -     column: Objektnummer - TEXT
-//    [INFO] MdbImportOperation -     column: Biotopname - TEXT
-//    [INFO] MdbImportOperation -     column: GSCHLNEU - LONG
-//    [INFO] MdbImportOperation -     column: GSCHLNEU2 - LONG
-//    [INFO] MdbImportOperation -     column: GSCHLNEU3 - LONG
-//    [INFO] MdbImportOperation -     column: Biotopfl�che - FLOAT
-//    [INFO] MdbImportOperation -     column: L�nge_Biotop - INT
-//    [INFO] MdbImportOperation -     column: Breite_Biotop - INT
-//    [INFO] MdbImportOperation -     column: Anzahl_Teilfl�chen - BYTE
-//    [INFO] MdbImportOperation -     column: Lage - TEXT
-//    [INFO] MdbImportOperation -     column: Forstliche_Karte - TEXT
-//    [INFO] MdbImportOperation -     column: Lage_TK25 - TEXT
-//    [INFO] MdbImportOperation -     column: Rechtswert - LONG
-//    [INFO] MdbImportOperation -     column: Hochwert - LONG
-//    [INFO] MdbImportOperation -     column: H�he_min - INT
-//    [INFO] MdbImportOperation -     column: H�he_max - INT
-//    [INFO] MdbImportOperation -     column: Nr_Kartierer - INT
-//    [INFO] MdbImportOperation -     column: Erfassung - SHORT_DATE_TIME
-//    [INFO] MdbImportOperation -     column: Eingabe - SHORT_DATE_TIME
-//    [INFO] MdbImportOperation -     column: Biotopbeschreibung - MEMO
-//    [INFO] MdbImportOperation -     column: Angrenzende_Bereiche - MEMO
-//    [INFO] MdbImportOperation -     column: Bemerkungen - MEMO
-//    [INFO] MdbImportOperation -     column: Quellen_f�r_Artangaben - MEMO
-//    [INFO] MdbImportOperation -     column: Vegetationseinheiten - MEMO
-//    [INFO] MdbImportOperation -     column: Pflege_Entwicklung - MEMO
-//    [INFO] MdbImportOperation -     column: Nr_Potentielle_Gef�hrdung - BYTE
-//    [INFO] MdbImportOperation -     column: Ausbildung - BYTE
-//    [INFO] MdbImportOperation -     column: Nr_Naturraum - BYTE
-//    [INFO] MdbImportOperation -     column: Nr_Naturraum_Flu�auen - BYTE
-//    [INFO] MdbImportOperation -     column: Nr_FA - TEXT
-//    [INFO] MdbImportOperation -     column: Nr_Revier - TEXT
-//    [INFO] MdbImportOperation -     column: Nr_im_Revier - TEXT
-//    [INFO] MdbImportOperation -     column: Nr_Eigentumsart - BYTE
-//    [INFO] MdbImportOperation -     column: Abteilung - TEXT
-//    [INFO] MdbImportOperation -     column: Teilfl�che - TEXT
-//    [INFO] MdbImportOperation -     column: Index - BYTE
-//    [INFO] MdbImportOperation -     column: WG_Nr - BYTE
-//    [INFO] MdbImportOperation -     column: WB_Nr - INT
-//    [INFO] MdbImportOperation -     column: Nr_Klimastufe - BYTE
-//    [INFO] MdbImportOperation -     column: Nr_Standort - BYTE
-//    [INFO] MdbImportOperation -     column: Nr_LBT - BYTE
-//    [INFO] MdbImportOperation -     column: Totholzstufe_liegend - BYTE
-//    [INFO] MdbImportOperation -     column: Totholzstufe_stehend - BYTE
+	// [INFO] MdbImportPage - Table: K_BUCH
+	// [INFO] MdbImportPage - column: EINGANGSNR - DOUBLE
+	// [INFO] MdbImportPage - column: VERTDATUM - SHORT_DATE_TIME
+	// [INFO] MdbImportPage - column: EINGANG - SHORT_DATE_TIME
+	// [INFO] MdbImportPage - column: VKREIS - TEXT
+	// [INFO] MdbImportPage - column: KKREIS - TEXT
+	// [INFO] MdbImportPage - column: VERTRAGART - TEXT
+	// [INFO] MdbImportPage - column: BEBAUT - TEXT
+	// [INFO] MdbImportPage - column: KAUFPREIS - DOUBLE
+	// [INFO] MdbImportPage - column: KANTZ - DOUBLE
+	// [INFO] MdbImportPage - column: KANTN - DOUBLE
+	// [INFO] MdbImportPage - column: VOLLPREIS - DOUBLE
+	// [INFO] MdbImportPage - column: VERARBKZ - TEXT
+	// [INFO] MdbImportPage - column: BEM1 - TEXT
+	// [INFO] MdbImportPage - column: BEM2 - TEXT
+	// [INFO] MdbImportPage - column: VERKAUF - TEXT
+	// [INFO] MdbImportPage - column: ANFR1 - TEXT
+	// [INFO] MdbImportPage - column: ANFR2 - TEXT
+	// [INFO] MdbImportPage - column: ANKSRSTAM - SHORT_DATE_TIME
+	// [INFO] MdbImportPage - column: ANVSRSTAM - SHORT_DATE_TIME
+	// [INFO] MdbImportPage - column: ANKEINGAM - SHORT_DATE_TIME
+	// [INFO] MdbImportPage - column: ANVEINGAM - SHORT_DATE_TIME
+	// [INFO] MdbImportPage - column: BEMKAUF - TEXT
+	// [INFO] MdbImportPage - column: BEMVKAUF - TEXT
+	// [INFO] MdbImportPage - column: KAUFPREIS_EURO - DOUBLE
+	// [INFO] MdbImportPage - column: GESFLAECHE - DOUBLE
+	// [INFO] MdbImportPage - column: verkaufbem - TEXT
+	// [INFO] MdbImportPage - column: EURO_UMSTELL - TEXT
+	// [INFO] MdbImportPage - column: GESVERKFL - DOUBLE
+	// [INFO] MdbImportPage - column: STALA_AUSG - SHORT_DATE_TIME
+	// [INFO] MdbImportPage - column: GUTACHTNR1 - TEXT
+	// [INFO] MdbImportPage - column: GESPLITTET - TEXT
+	// [INFO] MdbImportPage - column: GESPLITTET_EINGANGSNR - LONG
 //
 //    @Optional
 //    Property<MultiPolygon>      geom();
@@ -106,6 +98,7 @@ public interface KaufvertragComposite
 
     /** Eingangsnummer. */
     @Optional
+//    @ImportColumn("EINGANGSNR")
     Property<String>            eingangsNr();
 //
 //    /** Importierte Objektnummer des SBK (objnr). */
@@ -186,6 +179,7 @@ public interface KaufvertragComposite
 
     /** @see Eingangsdatum */
     @Optional
+    @ImportColumn("EINGANG")
     Property<Date>           eingangsDatum();
 
 //    /** @see Schutzstatus */
@@ -219,7 +213,8 @@ public interface KaufvertragComposite
 
     /** Leitbiotoptyp */
     @Optional
-    Property<String>            biotoptypArtNr();
+    @ImportColumn("VERTRAGART")
+    Property<String>            vertragArtNr();
 
 //    /** Nur w�hrend Import: prozent f�r den aktuellen Biotoptyp. */
 //    @Optional

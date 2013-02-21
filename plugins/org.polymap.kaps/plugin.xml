@@ -15,5 +15,13 @@
             class="org.polymap.kaps.model.KapsRepositoryAssembler">
       </assembler>
    </extension>
+   <extension
+         point="org.eclipse.ui.importWizards">
+      <wizard
+            class="org.polymap.kaps.importer.MdbImportWizard"
+            id="org.polymap.kaps.wizard"
+            name="KapsImport">
+      </wizard>
+   </extension>
 
 </plugin>

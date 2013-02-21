@@ -57,7 +57,7 @@ public class KaufvertragsEntityProvider
 //        SBK( String.class, "SBK/TK25/UNr." ), 
         eingangsNr( String.class ), 
 //        Beschreibung( String.class ), 
-        Biotoptyp( String.class );
+        vertragArtNr( String.class );
 //        Geprueft( Boolean.class, "Gepr�ft" ), 
 //        Wert( String.class ), 
 //        Archiv( Integer.class );
@@ -139,8 +139,8 @@ public class KaufvertragsEntityProvider
 //                else if (input.getPropertyName().equals( PROP.SBK.toString() )) {
 //                    throw new RuntimeException( "Das Feld ist errechnet und kann nicht durchsucht werden: " + PROP.SBK.toString() );
 //                }
-                else if (input.getPropertyName().equals( PROP.Biotoptyp.toString() )) {
-                    throw new RuntimeException( "Das Feld ist errechnet und kann nicht durchsucht werden: " + PROP.Biotoptyp.toString() );
+                else if (input.getPropertyName().equals( PROP.vertragArtNr.toString() )) {
+                    throw new RuntimeException( "Das Feld ist errechnet und kann nicht durchsucht werden: " + PROP.vertragArtNr.toString() );
                 }
 //                else if (input.getPropertyName().equals( PROP.Geprueft.toString() )) {
 //                    return getFactory( data ).property( "geprueft" );
@@ -168,7 +168,7 @@ public class KaufvertragsEntityProvider
 //                    .join( biotop.objnr_sbk().get(), biotop.tk25().get(), biotop.unr().get() ) );
             fb.set( PROP.eingangsNr.toString(), biotop.eingangsNr().get() );
 //            fb.set( PROP.Beschreibung.toString(), biotop.beschreibung().get() );
-            fb.set( PROP.Biotoptyp.toString(), biotop.biotoptypArtNr().get() );
+            fb.set( PROP.vertragArtNr.toString(), biotop.vertragArtNr().get() );
 //            fb.set( PROP.Wert.toString(), biotop.wert().get() );
 //            fb.set( PROP.Geprueft.toString(), biotop.geprueft().get() /*.booleanValue() ? "ja" : "nein"*/ );
 //            fb.set( PROP.Archiv.toString(), biotop.status().get() /*== Status.nicht_aktuell.id ? "ja" : "nein"*/ );
