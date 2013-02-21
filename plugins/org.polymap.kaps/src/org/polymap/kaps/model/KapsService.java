@@ -1,8 +1,7 @@
 /* 
  * polymap.org
- * Copyright 2011, Falko Bräutigam, and individual contributors as
- * indicated by the @authors tag. All rights reserved.
- *
+ * Copyright 2013 Polymap GmbH. All rights reserved.
+ * 
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation; either version 2.1 of
@@ -23,7 +22,7 @@ import org.polymap.rhei.data.entityfeature.catalog.EntityServiceImpl;
 /**
  * The catalog service for the biotop related features.
  *
- * @author <a href="http://www.polymap.de">Falko Bräutigam</a>
+ * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 public class KapsService
         extends EntityServiceImpl

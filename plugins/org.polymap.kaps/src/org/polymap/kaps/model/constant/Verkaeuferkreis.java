@@ -1,3 +1,17 @@
+/* 
+ * polymap.org
+ * Copyright 2013 Polymap GmbH. All rights reserved.
+ * 
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ */
 package org.polymap.kaps.model.constant;
 
 import org.polymap.rhei.model.ConstantWithSynonyms;
@@ -5,7 +19,7 @@ import org.polymap.rhei.model.ConstantWithSynonyms;
 /**
  * Provides 'Erhaltungszustand' constants.
  * 
- * @author <a href="http://www.polymap.de">Falko Bräutigam</a>
+ * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 public class Verkaeuferkreis
         extends ConstantWithSynonyms<String> {
@@ -15,11 +29,11 @@ public class Verkaeuferkreis
     
     public static final Verkaeuferkreis unbestimmt = new Verkaeuferkreis( 0, "0 - noch nicht bestimmt", "noch nicht bestimmt" );
 
-    public static final Verkaeuferkreis guenstig = new Verkaeuferkreis( 1, "1 - günstig", "günstig" );
+    public static final Verkaeuferkreis guenstig = new Verkaeuferkreis( 1, "1 - gï¿½nstig", "gï¿½nstig" );
 
-    public static final Verkaeuferkreis unzureichend = new Verkaeuferkreis( 2, "2 - ungünstig/unzureichend", "unzureichend" );
+    public static final Verkaeuferkreis unzureichend = new Verkaeuferkreis( 2, "2 - ungï¿½nstig/unzureichend", "unzureichend" );
 
-    public static final Verkaeuferkreis schlecht = new Verkaeuferkreis( 3, "3 - ungünstig/schlecht", "schlecht" );
+    public static final Verkaeuferkreis schlecht = new Verkaeuferkreis( 3, "3 - ungï¿½nstig/schlecht", "schlecht" );
 
     
     // instance *******************************************

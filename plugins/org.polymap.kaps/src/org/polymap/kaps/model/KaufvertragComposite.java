@@ -1,8 +1,7 @@
-/*
+/* 
  * polymap.org
- * Copyright 2011, Falko Bräutigam, and other contributors as
- * indicated by the @authors tag. All rights reserved.
- *
+ * Copyright 2013 Polymap GmbH. All rights reserved.
+ * 
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation; either version 2.1 of
@@ -15,32 +14,22 @@
  */
 package org.polymap.kaps.model;
 
-import java.util.Collection;
 import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.eclipse.core.runtime.Status;
 import org.polymap.core.qi4j.QiEntity;
 import org.polymap.core.qi4j.event.ModelChangeSupport;
 import org.polymap.core.qi4j.event.PropertyChangeSupport;
 import org.qi4j.api.common.Optional;
-import org.qi4j.api.common.UseDefaults;
 import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.mixin.Mixins;
-import org.qi4j.api.property.ComputedPropertyInstance;
-import org.qi4j.api.property.GenericPropertyInfo;
 import org.qi4j.api.property.Property;
-import org.qi4j.api.property.PropertyInfo;
-
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.MultiPolygon;
 
 /**
- *
- *
- * @author <a href="http://www.polymap.de">Falko Bräutigam</a>
+ * 
+ * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 @Concerns( {
     PropertyChangeSupport.Concern.class
@@ -61,36 +50,36 @@ public interface KaufvertragComposite
 //    [INFO] MdbImportOperation -     column: GSCHLNEU - LONG
 //    [INFO] MdbImportOperation -     column: GSCHLNEU2 - LONG
 //    [INFO] MdbImportOperation -     column: GSCHLNEU3 - LONG
-//    [INFO] MdbImportOperation -     column: Biotopfläche - FLOAT
-//    [INFO] MdbImportOperation -     column: Länge_Biotop - INT
+//    [INFO] MdbImportOperation -     column: Biotopflï¿½che - FLOAT
+//    [INFO] MdbImportOperation -     column: Lï¿½nge_Biotop - INT
 //    [INFO] MdbImportOperation -     column: Breite_Biotop - INT
-//    [INFO] MdbImportOperation -     column: Anzahl_Teilflächen - BYTE
+//    [INFO] MdbImportOperation -     column: Anzahl_Teilflï¿½chen - BYTE
 //    [INFO] MdbImportOperation -     column: Lage - TEXT
 //    [INFO] MdbImportOperation -     column: Forstliche_Karte - TEXT
 //    [INFO] MdbImportOperation -     column: Lage_TK25 - TEXT
 //    [INFO] MdbImportOperation -     column: Rechtswert - LONG
 //    [INFO] MdbImportOperation -     column: Hochwert - LONG
-//    [INFO] MdbImportOperation -     column: Höhe_min - INT
-//    [INFO] MdbImportOperation -     column: Höhe_max - INT
+//    [INFO] MdbImportOperation -     column: Hï¿½he_min - INT
+//    [INFO] MdbImportOperation -     column: Hï¿½he_max - INT
 //    [INFO] MdbImportOperation -     column: Nr_Kartierer - INT
 //    [INFO] MdbImportOperation -     column: Erfassung - SHORT_DATE_TIME
 //    [INFO] MdbImportOperation -     column: Eingabe - SHORT_DATE_TIME
 //    [INFO] MdbImportOperation -     column: Biotopbeschreibung - MEMO
 //    [INFO] MdbImportOperation -     column: Angrenzende_Bereiche - MEMO
 //    [INFO] MdbImportOperation -     column: Bemerkungen - MEMO
-//    [INFO] MdbImportOperation -     column: Quellen_für_Artangaben - MEMO
+//    [INFO] MdbImportOperation -     column: Quellen_fï¿½r_Artangaben - MEMO
 //    [INFO] MdbImportOperation -     column: Vegetationseinheiten - MEMO
 //    [INFO] MdbImportOperation -     column: Pflege_Entwicklung - MEMO
-//    [INFO] MdbImportOperation -     column: Nr_Potentielle_Gefährdung - BYTE
+//    [INFO] MdbImportOperation -     column: Nr_Potentielle_Gefï¿½hrdung - BYTE
 //    [INFO] MdbImportOperation -     column: Ausbildung - BYTE
 //    [INFO] MdbImportOperation -     column: Nr_Naturraum - BYTE
-//    [INFO] MdbImportOperation -     column: Nr_Naturraum_Flußauen - BYTE
+//    [INFO] MdbImportOperation -     column: Nr_Naturraum_Fluï¿½auen - BYTE
 //    [INFO] MdbImportOperation -     column: Nr_FA - TEXT
 //    [INFO] MdbImportOperation -     column: Nr_Revier - TEXT
 //    [INFO] MdbImportOperation -     column: Nr_im_Revier - TEXT
 //    [INFO] MdbImportOperation -     column: Nr_Eigentumsart - BYTE
 //    [INFO] MdbImportOperation -     column: Abteilung - TEXT
-//    [INFO] MdbImportOperation -     column: Teilfläche - TEXT
+//    [INFO] MdbImportOperation -     column: Teilflï¿½che - TEXT
 //    [INFO] MdbImportOperation -     column: Index - BYTE
 //    [INFO] MdbImportOperation -     column: WG_Nr - BYTE
 //    [INFO] MdbImportOperation -     column: WB_Nr - INT
@@ -177,13 +166,13 @@ public interface KaufvertragComposite
 //    @Optional
 //    Property<Boolean>           pflegeBedarf();
 //
-//    /** Früher in {@link BiotoptypValue}. */
+//    /** Frï¿½her in {@link BiotoptypValue}. */
 //    @Optional
 //    Property<Integer>           pflegeRueckstand();
 //
 //
 ////    @Optional
-////    @ImportColumn("Teilfläche")
+////    @ImportColumn("Teilflï¿½che")
 ////    Property<String>            teilflaeche();
 //
 //    @Optional
@@ -197,7 +186,7 @@ public interface KaufvertragComposite
 
     /** @see Eingangsdatum */
     @Optional
-    Property<Date>           eingangsdatum();
+    Property<Date>           eingangsDatum();
 
 //    /** @see Schutzstatus */
 //    @Optional
@@ -210,12 +199,12 @@ public interface KaufvertragComposite
 //    Property<Integer>           status();
 
     @Optional
-    Property<Integer>   verkaeuferkreis();
+    Property<Integer>   verkaeuferKreis();
 //
 //    @Optional
 //    Property<AktivitaetValue>   bearbeitung();
 //
-//    /** Wenn {@link #status()} <code>nicht_aktiv</code>, dann Wann, Wer, Warum gelöscht. */
+//    /** Wenn {@link #status()} <code>nicht_aktiv</code>, dann Wann, Wer, Warum gelï¿½scht. */
 //    @Optional
 //    Property<AktivitaetValue>   loeschung();
 //
@@ -223,7 +212,7 @@ public interface KaufvertragComposite
 //    @Optional
 //    Property<AktivitaetValue>   bekanntmachung();
 //
-//    /** Letzte Prüfung der Daten. */
+//    /** Letzte Prï¿½fung der Daten. */
 //    @Optional
 //    @UseDefaults
 //    Property<Boolean>           geprueft();
@@ -232,12 +221,12 @@ public interface KaufvertragComposite
     @Optional
     Property<String>            biotoptypArtNr();
 
-//    /** Nur während Import: prozent für den aktuellen Biotoptyp. */
+//    /** Nur wï¿½hrend Import: prozent fï¿½r den aktuellen Biotoptyp. */
 //    @Optional
 //    Property<Double>            biotoptypArtProzent();
 //
 //    /**
-//     * Mehrere Geometrien pro Biotop werden beim Import aufgelöst, so auch
+//     * Mehrere Geometrien pro Biotop werden beim Import aufgelï¿½st, so auch
 //     * die damit verbundenen Biotoptypen. Es gibt nur noch einen Biotoptyp
 //     * pro Biotop in {@link #biotoptypArtNr()}.
 //     * <p/>
@@ -293,7 +282,7 @@ public interface KaufvertragComposite
 //    Property<String>            naturraumNr();
 //
 //    @Optional
-//    @ImportColumn("Nr_Naturraum_Flußauen")
+//    @ImportColumn("Nr_Naturraum_Fluï¿½auen")
 //    Property<String>            naturraumFlussauenNr();
 //
 //    @Optional

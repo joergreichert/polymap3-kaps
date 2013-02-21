@@ -1,8 +1,7 @@
-/*
+/* 
  * polymap.org
- * Copyright 2011, Falko Bräutigam, and other contributors as indicated
- * by the @authors tag.
- *
+ * Copyright 2013 Polymap GmbH. All rights reserved.
+ * 
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation; either version 2.1 of
@@ -41,9 +40,8 @@ import org.polymap.rhei.data.entityfeature.DefaultEntityProvider;
 import org.polymap.rhei.data.entityfeature.EntityProvider2;
 
 /**
- *
- *
- * @author <a href="http://www.polymap.de">Falko Bräutigam</a>
+ * 
+ * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 public class KaufvertragsEntityProvider
         extends DefaultEntityProvider<KaufvertragComposite>
@@ -55,12 +53,12 @@ public class KaufvertragsEntityProvider
      * The properties (name/type) of the feature type provided. 
      */
     private enum PROP {
-        Eingangsdatum( Date.class ), 
+        eingangsDatum( Date.class ), 
 //        SBK( String.class, "SBK/TK25/UNr." ), 
-        Eingangsnummer( String.class ), 
+        eingangsNr( String.class ), 
 //        Beschreibung( String.class ), 
         Biotoptyp( String.class );
-//        Geprueft( Boolean.class, "Geprüft" ), 
+//        Geprueft( Boolean.class, "Geprï¿½ft" ), 
 //        Wert( String.class ), 
 //        Archiv( Integer.class );
         
@@ -107,7 +105,7 @@ public class KaufvertragsEntityProvider
 //        CoordinateReferenceSystem crs = getCoordinateReferenceSystem( getDefaultGeometry() );
 //        builder.add( getDefaultGeometry(), MultiPolygon.class, crs );
 //        builder.setDefaultGeometry( getDefaultGeometry() );
-        
+        // WORKAROUND use kaufvertrag.eingangsNr.qualifiedName + kaufvertrag.eingangsNr.type
         for (PROP prop : PROP.values()) {
             builder.add( prop.toString(), prop.type() );            
         }
@@ -115,7 +113,7 @@ public class KaufvertragsEntityProvider
     }
 
 
-    // benötigt für Suche in Tabellen
+    // benï¿½tigt fï¿½r Suche in Tabellen
     public Query transformQuery( Query query ) {
         Filter filter = query.getFilter();
 //        if (filter == null) {
@@ -135,8 +133,8 @@ public class KaufvertragsEntityProvider
 //                    return getFactory( data ).property( "beschreibung" );
 //                }
 //                else 
-                	if (input.getPropertyName().equals( PROP.Eingangsnummer.toString() )) {
-                    return getFactory( data ).property( PROP.Eingangsnummer.toString() );
+                	if (input.getPropertyName().equals( PROP.eingangsNr.toString() )) {
+                    return getFactory( data ).property( PROP.eingangsNr.toString() );
                 }
 //                else if (input.getPropertyName().equals( PROP.SBK.toString() )) {
 //                    throw new RuntimeException( "Das Feld ist errechnet und kann nicht durchsucht werden: " + PROP.SBK.toString() );
@@ -159,16 +157,16 @@ public class KaufvertragsEntityProvider
     }
 
 
-    // benötigt für Tabellendarstellung
+    // benÃ¶tigt fÃ¼r Tabellendarstellung
     public Feature buildFeature( Entity entity, FeatureType schema ) {
         SimpleFeatureBuilder fb = new SimpleFeatureBuilder( (SimpleFeatureType)schema );
         KaufvertragComposite biotop = (KaufvertragComposite)entity;
         try {
 //            fb.set( getDefaultGeometry(), biotop.geom().get() );
-            fb.set( PROP.Eingangsdatum.toString(), biotop.eingangsdatum().get() );
+            fb.set( PROP.eingangsDatum.toString(), biotop.eingangsDatum().get() );
 //            fb.set( PROP.SBK.toString(), Joiner.on( "/" ).useForNull( "-" )
 //                    .join( biotop.objnr_sbk().get(), biotop.tk25().get(), biotop.unr().get() ) );
-            fb.set( PROP.Eingangsnummer.toString(), biotop.eingangsNr().get() );
+            fb.set( PROP.eingangsNr.toString(), biotop.eingangsNr().get() );
 //            fb.set( PROP.Beschreibung.toString(), biotop.beschreibung().get() );
             fb.set( PROP.Biotoptyp.toString(), biotop.biotoptypArtNr().get() );
 //            fb.set( PROP.Wert.toString(), biotop.wert().get() );
@@ -208,7 +206,7 @@ public class KaufvertragsEntityProvider
 ////            biotop.status().set( value.equals( "ja" ) ? Status.nicht_aktuell.id : Status.aktuell.id );
 ////        }
 //        else {
-            throw new RuntimeException( "Unhandled property: " + propName );
+//            throw new RuntimeException( "Unhandled property: " + propName );
 //        }
     }
 

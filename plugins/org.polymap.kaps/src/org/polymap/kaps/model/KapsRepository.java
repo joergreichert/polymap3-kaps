@@ -1,8 +1,7 @@
 /* 
  * polymap.org
- * Copyright 2011, Falko Bräutigam, and individual contributors as
- * indicated by the @authors tag.
- *
+ * Copyright 2013 Polymap GmbH. All rights reserved.
+ * 
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation; either version 2.1 of
@@ -48,281 +47,296 @@ import org.qi4j.api.unitofwork.ConcurrentEntityModificationException;
 import org.qi4j.api.unitofwork.UnitOfWorkCompletionException;
 
 /**
- * 
- *
- * @author <a href="http://www.polymap.de">Falko Bräutigam</a>
+ * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
-public class KapsRepository
-        extends QiModule {
+public class KapsRepository extends QiModule {
 
-    private static Log log = LogFactory.getLog( KapsRepository.class );
+	private static Log log = LogFactory.getLog(KapsRepository.class);
 
-    public static final String              NAMESPACE = "http://polymap.org/kaps";
+	public static final String NAMESPACE = "http://polymap.org/kaps";
 
-    /**
-     * Get or create the repository for the current user session.
-     */
-    public static final KapsRepository instance() {
-        return Qi4jPlugin.Session.instance().module( KapsRepository.class );
-    }
+	/**
+	 * Get or create the repository for the current user session.
+	 */
+	public static final KapsRepository instance() {
+		return Qi4jPlugin.Session.instance().module(KapsRepository.class);
+	}
 
+	// instance *******************************************
 
-    // instance *******************************************
+	private OperationSaveListener operationListener = new OperationSaveListener();
 
-    private OperationSaveListener               operationListener = new OperationSaveListener();
-    
-//    private Map<String,VertragsArtComposite>   btNamen;
+	// private Map<String,VertragsArtComposite> btNamen;
 
-//    private Map<String,VertragsArtComposite>   btNummern;
+	// private Map<String,VertragsArtComposite> btNummern;
 
-    /** Allow direct access for operations. */
-    protected KapsService                     kapsService;
-    
-//    public ServiceReference<BiotopnummerGeneratorService> biotopnummern;
-    
-    /**
+	/** Allow direct access for operations. */
+	protected KapsService kapsService;
+
+	// public ServiceReference<BiotopnummerGeneratorService> biotopnummern;
+
+	/**
      * 
      */
-    public static class ArtEntityProvider
-            extends DefaultEntityProvider {
-        
-        public ArtEntityProvider( QiModule repo, Class entityClass, Name entityName,
-                FidsQueryProvider queryProvider ) {
-            super( repo, entityClass, entityName, queryProvider );
-        }
-        
-        public ReferencedEnvelope getBounds() {
-            return new ReferencedEnvelope( 4000000, 5000000, 5000000, 6000000, getCoordinateReferenceSystem( null ) );
-        }
-        
-        public CoordinateReferenceSystem getCoordinateReferenceSystem( String propName ) {
-            try {
-                return CRS.decode( "EPSG:31468" );
-            }
-            catch (Exception e) {
-                throw new RuntimeException( e );
-            }
-        }
-        
-        public String getDefaultGeometry() {
-            throw new RuntimeException( "not yet implemented." );
-        }
-    };
-    
+	public static class ArtEntityProvider extends DefaultEntityProvider {
 
-    public KapsRepository( final QiModuleAssembler assembler ) {
-        super( assembler );
-        log.debug( "Initializing Kaps module..." );
+		public ArtEntityProvider(QiModule repo, Class entityClass,
+				Name entityName, FidsQueryProvider queryProvider) {
+			super(repo, entityClass, entityName, queryProvider);
+		}
 
-        // for the global instance of the module (Qi4jPlugin.Session.globalInstance()) there
-        // is no request context
-        if (Polymap.getSessionDisplay() != null) {
-            OperationSupport.instance().addOperationSaveListener( operationListener );
-        }
-//        biotopnummern = assembler.getModule().serviceFinder().findService( BiotopnummerGeneratorService.class );
-    }
-    
+		public ReferencedEnvelope getBounds() {
+			return new ReferencedEnvelope(4000000, 5000000, 5000000, 6000000,
+					getCoordinateReferenceSystem(null));
+		}
 
-    public void init( final Session session ) {
-        try {            
-            // build the queryProvider
-            ServiceReference<LuceneEntityStoreService> storeService = assembler.getModule().serviceFinder().findService( LuceneEntityStoreService.class );
-            LuceneEntityStoreService luceneStore = storeService.get();
-            FidsQueryProvider queryProvider = new LuceneQueryProvider( luceneStore.getStore() );
+		public CoordinateReferenceSystem getCoordinateReferenceSystem(
+				String propName) {
+			try {
+				return CRS.decode("EPSG:31468");
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
 
-            kapsService = new KapsService(
-                    // BiotopComposite
-                    new KaufvertragsEntityProvider( this, queryProvider ),
-                    // Arten...
-                    new ArtEntityProvider( this, VertragsArtComposite.class, 
-                            new NameImpl( KapsRepository.NAMESPACE, "Biotoptyp" ), queryProvider )
-//                    new ArtEntityProvider( this, PflanzenArtComposite.class, 
-//                            new NameImpl( KapsRepository.NAMESPACE, "Pflanzenart" ), queryProvider ),
-//                    new ArtEntityProvider( this, PilzArtComposite.class, 
-//                            new NameImpl( KapsRepository.NAMESPACE, "Pilzart" ), queryProvider ),
-//                    new ArtEntityProvider( this, TierArtComposite.class, 
-//                            new NameImpl( KapsRepository.NAMESPACE, "Tierart" ), queryProvider ),
-//                    new ArtEntityProvider( this, StoerungsArtComposite.class, 
-//                            new NameImpl( KapsRepository.NAMESPACE, "Beeinträchtigungen" ), queryProvider ),
-//                    new ArtEntityProvider( this, WertArtComposite.class, 
-//                            new NameImpl( KapsRepository.NAMESPACE, "Wertbestimmend" ), queryProvider )
-                    );
-        }
-        catch (Exception e) {
-            throw new RuntimeException( e );
-        }
-        
-        // register with catalog        
-//        if (Polymap.getSessionDisplay() != null) {
-//            Polymap.getSessionDisplay().asyncExec( new Runnable() {
-//                public void run() {
-                    CatalogRepository catalogRepo = session.module( CatalogRepository.class );
-                    catalogRepo.getCatalog().addTransient( kapsService );
-//                    CatalogPluginSession.instance().getLocalCatalog().add( biotopService );
-//                }
-//            });
-//        }
-    }
+		public String getDefaultGeometry() {
+			throw new RuntimeException("not yet implemented.");
+		}
+	};
 
-    
-    protected void done() {
-        if (operationListener != null) {
-            OperationSupport.instance().removeOperationSaveListener( operationListener );
-            operationListener = null;
-        }
-        if (kapsService != null) {
-            kapsService.dispose( new NullProgressMonitor() );
-        }
-        // check ThreadLocal;
-        // code from http://blog.igorminar.com/2009/03/identifying-threadlocal-memory-leaks-in.html
-        try {
-            Thread thread = Thread.currentThread();
+	public KapsRepository(final QiModuleAssembler assembler) {
+		super(assembler);
+		log.debug("Initializing Kaps module...");
 
-            Field threadLocalsField = Thread.class.getDeclaredField( "threadLocals" );
-            threadLocalsField.setAccessible( true );
+		// for the global instance of the module
+		// (Qi4jPlugin.Session.globalInstance()) there
+		// is no request context
+		if (Polymap.getSessionDisplay() != null) {
+			OperationSupport.instance().addOperationSaveListener(
+					operationListener);
+		}
+		// biotopnummern = assembler.getModule().serviceFinder().findService(
+		// BiotopnummerGeneratorService.class );
+	}
 
-            Class threadLocalMapKlazz = Class.forName( "java.lang.ThreadLocal$ThreadLocalMap" );
-            Field tableField = threadLocalMapKlazz.getDeclaredField( "table" );
-            tableField.setAccessible( true );
+	public void init(final Session session) {
+		try {
+			// build the queryProvider
+			ServiceReference<LuceneEntityStoreService> storeService = assembler
+					.getModule().serviceFinder()
+					.findService(LuceneEntityStoreService.class);
+			LuceneEntityStoreService luceneStore = storeService.get();
+			FidsQueryProvider queryProvider = new LuceneQueryProvider(
+					luceneStore.getStore());
 
-            Object table = tableField.get( threadLocalsField.get( thread ) );
+			kapsService = new KapsService(
+			// BiotopComposite
+					new KaufvertragsEntityProvider(this, queryProvider),
+					// Arten...
+					new ArtEntityProvider(
+							this,
+							VertragsArtComposite.class,
+							new NameImpl(KapsRepository.NAMESPACE, "Biotoptyp"),
+							queryProvider)
+			// new ArtEntityProvider( this, PflanzenArtComposite.class,
+			// new NameImpl( KapsRepository.NAMESPACE, "Pflanzenart" ),
+			// queryProvider ),
+			// new ArtEntityProvider( this, PilzArtComposite.class,
+			// new NameImpl( KapsRepository.NAMESPACE, "Pilzart" ),
+			// queryProvider ),
+			// new ArtEntityProvider( this, TierArtComposite.class,
+			// new NameImpl( KapsRepository.NAMESPACE, "Tierart" ),
+			// queryProvider ),
+			// new ArtEntityProvider( this, StoerungsArtComposite.class,
+			// new NameImpl( KapsRepository.NAMESPACE, "Beeintrï¿½chtigungen" ),
+			// queryProvider ),
+			// new ArtEntityProvider( this, WertArtComposite.class,
+			// new NameImpl( KapsRepository.NAMESPACE, "Wertbestimmend" ),
+			// queryProvider )
+			);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 
-            int threadLocalCount = Array.getLength( table );
-            StringBuilder sb = new StringBuilder();
-            StringBuilder classSb = new StringBuilder();
+		// register with catalog
+		// if (Polymap.getSessionDisplay() != null) {
+		// Polymap.getSessionDisplay().asyncExec( new Runnable() {
+		// public void run() {
+		CatalogRepository catalogRepo = session.module(CatalogRepository.class);
+		catalogRepo.getCatalog().addTransient(kapsService);
+		// CatalogPluginSession.instance().getLocalCatalog().add( biotopService
+		// );
+		// }
+		// });
+		// }
+	}
 
-            int leakCount = 0;
+	protected void done() {
+		if (operationListener != null) {
+			OperationSupport.instance().removeOperationSaveListener(
+					operationListener);
+			operationListener = null;
+		}
+		if (kapsService != null) {
+			kapsService.dispose(new NullProgressMonitor());
+		}
+		// check ThreadLocal;
+		// code from
+		// http://blog.igorminar.com/2009/03/identifying-threadlocal-memory-leaks-in.html
+		try {
+			Thread thread = Thread.currentThread();
 
-            for (int i = 0; i < threadLocalCount; i++) {
-                Object entry = Array.get( table, i );
-                if (entry != null) {
-                    Field valueField = entry.getClass().getDeclaredField( "value" );
-                    valueField.setAccessible( true );
-                    Object value = valueField.get( entry );
-                    if (value != null) {
-                        classSb.append( value.getClass().getName() ).append( ", " );
-                    }
-                    else {
-                        classSb.append( "null, " );
-                    }
-                    leakCount++;
-                }
-            }
+			Field threadLocalsField = Thread.class
+					.getDeclaredField("threadLocals");
+			threadLocalsField.setAccessible(true);
 
-            sb.append( "possible ThreadLocal leaks: " ).append( leakCount ).append( " of " ).append(
-                    threadLocalCount ).append( " = [" ).append(
-                    classSb.substring( 0, classSb.length() - 2 ) ).append( "] " );
+			Class threadLocalMapKlazz = Class
+					.forName("java.lang.ThreadLocal$ThreadLocalMap");
+			Field tableField = threadLocalMapKlazz.getDeclaredField("table");
+			tableField.setAccessible(true);
 
-            log.info( sb );
-        }
-        catch (Exception e) {
-            log.warn( "", e );
-        }
-        
-        super.done();
-        
-        log.info( "Running GC ..." );
-        Runtime.getRuntime().gc();
-    }
+			Object table = tableField.get(threadLocalsField.get(thread));
 
+			int threadLocalCount = Array.getLength(table);
+			StringBuilder sb = new StringBuilder();
+			StringBuilder classSb = new StringBuilder();
 
-    public <T> Query<T> findEntities( Class<T> compositeType, BooleanExpression expression,
-            int firstResult, int maxResults ) {
-        // Lucene does not like Integer.MAX_VALUE!?
-        maxResults = Math.min( maxResults, 1000000 );
-        
-        return super.findEntities( compositeType, expression, firstResult, maxResults );
-    }
-    
+			int leakCount = 0;
 
-    public void applyChanges() 
-    throws ConcurrentModificationException, CompletionException {
-        try {
-            // save changes
-            uow.apply();
-        }
-        catch (ConcurrentEntityModificationException e) {
-            throw new ConcurrentModificationException( e );
-        }
-        catch (UnitOfWorkCompletionException e) {
-            throw new CompletionException( e );
-        }
-    }
-    
-    
-    public KaufvertragComposite newKaufvertrag( final EntityCreator<KaufvertragComposite> creator )
-    throws Exception {
-        return newEntity( KaufvertragComposite.class, null, new EntityCreator<KaufvertragComposite>() {
-            public void create( KaufvertragComposite prototype )
-            throws Exception {
-//                // objnr
-//                prototype.objnr().set( biotopnummern.get().generate() );
-//                // status
-//                prototype.status().set( Status.aktuell.id );
-//                
-//                // erfassung
-//                ValueBuilder<AktivitaetValue> builder = newValueBuilder( AktivitaetValue.class );
-//                AktivitaetValue _prototype = builder.prototype();
-//                _prototype.wann().set( new Date() );
-//                _prototype.wer().set( Polymap.instance().getUser().getName() );
-//                _prototype.bemerkung().set( "" );
-//                prototype.erfassung().set( builder.newInstance() );
-//                // bearbeitung
-//                prototype.bearbeitung().set( builder.newInstance() );
-//
-//                // biotoptyp (zufällig)
-//                String randomBt = btNamen().values().iterator().next().nummer().get();
-////                prototype.biotoptypArtNr().set( randomBt );
-                
-            	prototype.eingangsdatum().set(new Date());
-            	prototype.eingangsNr().set(System.currentTimeMillis() + "");
-            	prototype.verkaeuferkreis().set(Verkaeuferkreis.schlecht.id);
-            	
-                if (creator != null) {
-                    creator.create( prototype );
-                }
-            }
-        });
-    }
-//
-//
-//    public Map<String,VertragsArtComposite> btNamen() {
-//        if (btNamen == null) {
-//            Query<VertragsArtComposite> entities = findEntities( 
-//                    VertragsArtComposite.class, null, 0, 1000 );
-//
-//            btNamen = new HashMap();
-//            for (VertragsArtComposite entity : entities) {
-//                btNamen.put( entity.name().get(), entity );
-//            }
-//        }
-//        return btNamen;
-//    }
-//    
-//
-//    public VertragsArtComposite btForNummer( String nummer ) {
-//        if (btNummern == null) {
-//            Query<VertragsArtComposite> entities = findEntities( 
-//                    VertragsArtComposite.class, null, 0, 1000 );
-//
-//            btNummern = new HashMap();
-//            for (VertragsArtComposite entity : btNamen().values()) {
-//                btNummern.put( entity.nummer().get(), entity );
-//            }
-//        }
-//        return btNummern.get( nummer );
-//    }
-    
+			for (int i = 0; i < threadLocalCount; i++) {
+				Object entry = Array.get(table, i);
+				if (entry != null) {
+					Field valueField = entry.getClass().getDeclaredField(
+							"value");
+					valueField.setAccessible(true);
+					Object value = valueField.get(entry);
+					if (value != null) {
+						classSb.append(value.getClass().getName()).append(", ");
+					} else {
+						classSb.append("null, ");
+					}
+					leakCount++;
+				}
+			}
 
-//    public <V extends ValueComposite,A extends Entity,C extends ValueArtComposite<V,A>> 
-//            C createValueArt( 
-//                    Class<C> cl, 
-//                    V value, 
-//                    ValueArtFinder<V,A> artFinder ) {
-//        
-//        C result = assembler.getModule().transientBuilderFactory().newTransient( cl );
-//        result.init( value, artFinder );
-//        return result;
-//    }
+			sb.append("possible ThreadLocal leaks: ").append(leakCount)
+					.append(" of ").append(threadLocalCount).append(" = [")
+					.append(classSb.substring(0, classSb.length() - 2))
+					.append("] ");
+
+			log.info(sb);
+		} catch (Exception e) {
+			log.warn("", e);
+		}
+
+		super.done();
+
+		log.info("Running GC ...");
+		Runtime.getRuntime().gc();
+	}
+
+	public <T> Query<T> findEntities(Class<T> compositeType,
+			BooleanExpression expression, int firstResult, int maxResults) {
+		// Lucene does not like Integer.MAX_VALUE!?
+		maxResults = Math.min(maxResults, 1000000);
+
+		return super.findEntities(compositeType, expression, firstResult,
+				maxResults);
+	}
+
+	public void applyChanges() throws ConcurrentModificationException,
+			CompletionException {
+		try {
+			// save changes
+			uow.apply();
+		} catch (ConcurrentEntityModificationException e) {
+			throw new ConcurrentModificationException(e);
+		} catch (UnitOfWorkCompletionException e) {
+			throw new CompletionException(e);
+		}
+	}
+
+	public KaufvertragComposite newKaufvertrag(
+			final EntityCreator<KaufvertragComposite> creator) throws Exception {
+		return newEntity(KaufvertragComposite.class, null,
+				new EntityCreator<KaufvertragComposite>() {
+					public void create(KaufvertragComposite prototype)
+							throws Exception {
+						// // objnr
+						// prototype.objnr().set( biotopnummern.get().generate()
+						// );
+						// // status
+						// prototype.status().set( Status.aktuell.id );
+						//
+						// // erfassung
+						// ValueBuilder<AktivitaetValue> builder =
+						// newValueBuilder( AktivitaetValue.class );
+						// AktivitaetValue _prototype = builder.prototype();
+						// _prototype.wann().set( new Date() );
+						// _prototype.wer().set(
+						// Polymap.instance().getUser().getName() );
+						// _prototype.bemerkung().set( "" );
+						// prototype.erfassung().set( builder.newInstance() );
+						// // bearbeitung
+						// prototype.bearbeitung().set( builder.newInstance() );
+						//
+						// // biotoptyp (zufï¿½llig)
+						// String randomBt =
+						// btNamen().values().iterator().next().nummer().get();
+						// // prototype.biotoptypArtNr().set( randomBt );
+
+						prototype.eingangsDatum().set(new Date());
+						prototype.eingangsNr().set(
+								System.currentTimeMillis() + "");
+						prototype.verkaeuferKreis().set(
+								Verkaeuferkreis.schlecht.id);
+
+						if (creator != null) {
+							creator.create(prototype);
+						}
+					}
+				});
+	}
+	//
+	//
+	// public Map<String,VertragsArtComposite> btNamen() {
+	// if (btNamen == null) {
+	// Query<VertragsArtComposite> entities = findEntities(
+	// VertragsArtComposite.class, null, 0, 1000 );
+	//
+	// btNamen = new HashMap();
+	// for (VertragsArtComposite entity : entities) {
+	// btNamen.put( entity.name().get(), entity );
+	// }
+	// }
+	// return btNamen;
+	// }
+	//
+	//
+	// public VertragsArtComposite btForNummer( String nummer ) {
+	// if (btNummern == null) {
+	// Query<VertragsArtComposite> entities = findEntities(
+	// VertragsArtComposite.class, null, 0, 1000 );
+	//
+	// btNummern = new HashMap();
+	// for (VertragsArtComposite entity : btNamen().values()) {
+	// btNummern.put( entity.nummer().get(), entity );
+	// }
+	// }
+	// return btNummern.get( nummer );
+	// }
+
+	// public <V extends ValueComposite,A extends Entity,C extends
+	// ValueArtComposite<V,A>>
+	// C createValueArt(
+	// Class<C> cl,
+	// V value,
+	// ValueArtFinder<V,A> artFinder ) {
+	//
+	// C result = assembler.getModule().transientBuilderFactory().newTransient(
+	// cl );
+	// result.init( value, artFinder );
+	// return result;
+	// }
 
 }
