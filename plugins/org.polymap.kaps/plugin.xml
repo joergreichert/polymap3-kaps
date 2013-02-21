@@ -9,5 +9,11 @@
             name="KAPS Page">
       </pageProvider>
    </extension>
+   <extension
+         point="org.polymap.core.model.moduleAssemblers">
+      <assembler
+            class="org.polymap.kaps.model.KapsRepositoryAssembler">
+      </assembler>
+   </extension>
 
 </plugin>
