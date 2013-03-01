@@ -292,6 +292,12 @@ public class KapsRepository extends QiModule {
 						prototype.verkaeuferKreis().set(
 								Verkaeuferkreis.schlecht.id);
 
+						VertragsArtComposite art = newEntity( VertragsArtComposite.class, null );
+						art.name().set( "Vertragsart-" + System.currentTimeMillis() );
+						art.nummer().set( String.valueOf( System.currentTimeMillis() ) );
+						prototype.vertragArt().set( art );
+						prototype.vertragArten().add( art );
+						
 						if (creator != null) {
 							creator.create(prototype);
 						}

@@ -30,6 +30,8 @@ import org.polymap.core.project.ui.util.SimpleFormData;
 import org.polymap.core.runtime.UIJob;
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.KaufvertragComposite;
+import org.polymap.kaps.model.VertragsArtComposite;
+
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
 import org.polymap.rhei.field.TextFormField;
 import org.polymap.rhei.form.FormEditor;
@@ -84,10 +86,19 @@ public class FormPageProvider implements IFormPageProvider {
 //	                    new PropertyAdapter( biotop.name() ),
 //	                    new StringFormField(), null, "Name" ) );
 			 
-			Composite field = site.newFormField(site.getPageBody(),
-					new PropertyAdapter(kaufvertrag.eingangsNr()), new TextFormField(), null);
-			field.setLayoutData(new SimpleFormData().left(0).right(50)
-					.top(0, 0).create());
+            Composite field = site.newFormField(site.getPageBody(),
+                    new PropertyAdapter(kaufvertrag.eingangsNr()), new TextFormField(), null);
+            field.setLayoutData(new SimpleFormData().left(0).right(50).top(0).create());
+
+            Composite field2 = site.newFormField(site.getPageBody(),
+                    new PropertyAdapter(kaufvertrag.vertragArt().get().name()), 
+                    new TextFormField(), null, "Vertragsart");
+            field2.setLayoutData(new SimpleFormData().top(field).left(0).right(50).create());
+            
+            // test many-assocs
+            for (VertragsArtComposite art : kaufvertrag.vertragArten()) {
+                System.out.println( "Vertragsarten: "  + art.name().get() );
+            }
 		}
 
 		// IFormEditorPage2 *******************************

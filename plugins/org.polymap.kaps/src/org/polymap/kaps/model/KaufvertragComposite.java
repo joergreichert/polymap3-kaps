@@ -26,6 +26,8 @@ import org.polymap.kaps.importer.ImportTable;
 import org.qi4j.api.common.Optional;
 import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.entity.EntityComposite;
+import org.qi4j.api.entity.association.Association;
+import org.qi4j.api.entity.association.ManyAssociation;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.property.Property;
 
@@ -211,10 +213,15 @@ public interface KaufvertragComposite
 //    @UseDefaults
 //    Property<Boolean>           geprueft();
 
-    /** Leitbiotoptyp */
     @Optional
     @ImportColumn("VERTRAGART")
-    Property<String>            vertragArtNr();
+    Property<String>                        vertragArtNr();
+
+    @Optional
+    Association<VertragsArtComposite>       vertragArt();
+
+    @Optional
+    ManyAssociation<VertragsArtComposite>   vertragArten();
 
 //    /** Nur w�hrend Import: prozent f�r den aktuellen Biotoptyp. */
 //    @Optional
