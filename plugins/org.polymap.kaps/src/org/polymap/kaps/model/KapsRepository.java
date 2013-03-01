@@ -131,7 +131,8 @@ public class KapsRepository extends QiModule {
 
 			kapsService = new KapsService(
 			// BiotopComposite
-					new KaufvertragsEntityProvider(this, queryProvider),
+                    new KaufvertragsEntityProvider(this, queryProvider),
+                    new KaufvertragEntityProvider(this, queryProvider),
 					// Arten...
 					new ArtEntityProvider(
 							this,
