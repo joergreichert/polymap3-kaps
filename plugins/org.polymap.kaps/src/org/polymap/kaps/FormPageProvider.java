@@ -91,14 +91,9 @@ public class FormPageProvider implements IFormPageProvider {
             field.setLayoutData(new SimpleFormData().left(0).right(50).top(0).create());
 
             Composite field2 = site.newFormField(site.getPageBody(),
-                    new PropertyAdapter(kaufvertrag.vertragArt().get().name()), 
+                    new PropertyAdapter(kaufvertrag.vertragsArt().get().name()), 
                     new TextFormField(), null, "Vertragsart");
             field2.setLayoutData(new SimpleFormData().top(field).left(0).right(50).create());
-            
-            // test many-assocs
-            for (VertragsArtComposite art : kaufvertrag.vertragArten()) {
-                System.out.println( "Vertragsarten: "  + art.name().get() );
-            }
 		}
 
 		// IFormEditorPage2 *******************************

@@ -130,9 +130,9 @@ public class KapsRepository extends QiModule {
 					luceneStore.getStore());
 
 			kapsService = new KapsService(
-			// BiotopComposite
-                    new KaufvertragsEntityProvider(this, queryProvider),
-                    new KaufvertragEntityProvider(this, queryProvider),
+					// BiotopComposite
+					new KaufvertragEntityProvider(this, queryProvider),
+					new KaufvertragEntityProvider(this, queryProvider),
 					// Arten...
 					new ArtEntityProvider(
 							this,
@@ -287,17 +287,21 @@ public class KapsRepository extends QiModule {
 						// // prototype.biotoptypArtNr().set( randomBt );
 
 						prototype.eingangsDatum().set(new Date());
-						prototype.eingangsNr().set(
-								System.currentTimeMillis() + "");
-						prototype.verkaeuferKreis().set(
-								Verkaeuferkreis.schlecht.id);
+						// eingangsnummer erst beim Speichern setzen!
+						// prototype.eingangsNr().set(
+						// System.currentTimeMillis() + "");
+//						prototype.verkaeuferKreis().set(
+//								Verkaeuferkreis.schlecht.id);
 
-						VertragsArtComposite art = newEntity( VertragsArtComposite.class, null );
-						art.name().set( "Vertragsart-" + System.currentTimeMillis() );
-						art.nummer().set( String.valueOf( System.currentTimeMillis() ) );
-						prototype.vertragArt().set( art );
-						prototype.vertragArten().add( art );
-						
+//						VertragsArtComposite art = newEntity(
+//								VertragsArtComposite.class, null);
+//						art.name().set(
+//								"Vertragsart-" + System.currentTimeMillis());
+//						art.nummer().set(
+//								String.valueOf(System.currentTimeMillis()));
+//						prototype.vertragArt().set(art);
+//						prototype.vertragArten().add(art);
+
 						if (creator != null) {
 							creator.create(prototype);
 						}

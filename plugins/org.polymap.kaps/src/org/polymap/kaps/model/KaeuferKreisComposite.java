@@ -36,14 +36,14 @@ import org.qi4j.api.property.Property;
     PropertyChangeSupport.Concern.class
 } )
 @Mixins( {
-    VertragsArtComposite.Mixin.class,
+    KaeuferKreisComposite.Mixin.class,
     PropertyChangeSupport.Mixin.class,
     ModelChangeSupport.Mixin.class,
     QiEntity.Mixin.class
 //    JsonState.Mixin.class
 } )
-@ImportTable("K_VERART")
-public interface VertragsArtComposite
+@ImportTable("K_KKREIS_1")
+public interface KaeuferKreisComposite
     extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite {
 
     /** */
@@ -53,18 +53,21 @@ public interface VertragsArtComposite
 
     /** Import von: Biotoptyp */
 //    @Optional
-    @ImportColumn("TEXT")
+    @ImportColumn("TEXT1")
     Property<String>            name();
     
     @Optional
     // STALA
     Association<StalaComposite> stala();
 
+    @ImportColumn("STALA_AGRAR")
+    Property<String>            stalaAgrar();
+
     /**
      * Methods and transient fields.
      */
     public static abstract class Mixin
-            implements VertragsArtComposite {
+            implements KaeuferKreisComposite {
 
         private static Log log = LogFactory.getLog( Mixin.class );
 

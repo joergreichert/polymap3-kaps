@@ -43,7 +43,7 @@ public class KaufvertragEntityProvider
         implements EntityProvider3<KaufvertragComposite> {
 
     public KaufvertragEntityProvider( QiModule repo, FidsQueryProvider queryProvider ) {
-        super( repo, KaufvertragComposite.class, new NameImpl( KapsRepository.NAMESPACE, "Kaufvertrag2" ), queryProvider );
+        super( repo, KaufvertragComposite.class, new NameImpl( KapsRepository.NAMESPACE, "Kaufvertrag" ), queryProvider );
     }
 
     public KaufvertragComposite newEntity( final EntityCreator<KaufvertragComposite> creator )

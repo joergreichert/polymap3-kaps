@@ -35,359 +35,349 @@ import org.qi4j.api.property.Property;
  * 
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
-@Concerns( {
-    PropertyChangeSupport.Concern.class
-} )
-@Mixins( {
-    KaufvertragComposite.Mixin.class,
-    PropertyChangeSupport.Mixin.class,
-    ModelChangeSupport.Mixin.class,
-    QiEntity.Mixin.class,
-//    JsonState.Mixin.class
-} )
+@Concerns({ PropertyChangeSupport.Concern.class })
+@Mixins({ KaufvertragComposite.Mixin.class, PropertyChangeSupport.Mixin.class,
+		ModelChangeSupport.Mixin.class, QiEntity.Mixin.class,
+// JsonState.Mixin.class
+})
 @ImportTable("K_BUCH")
-public interface KaufvertragComposite
-    extends QiEntity, /*JsonState,*/ PropertyChangeSupport, ModelChangeSupport, EntityComposite {
-    
-	// [INFO] MdbImportPage - Table: K_BUCH
-	// [INFO] MdbImportPage - column: EINGANGSNR - DOUBLE
-	// [INFO] MdbImportPage - column: VERTDATUM - SHORT_DATE_TIME
-	// [INFO] MdbImportPage - column: EINGANG - SHORT_DATE_TIME
-	// [INFO] MdbImportPage - column: VKREIS - TEXT
-	// [INFO] MdbImportPage - column: KKREIS - TEXT
-	// [INFO] MdbImportPage - column: VERTRAGART - TEXT
-	// [INFO] MdbImportPage - column: BEBAUT - TEXT
-	// [INFO] MdbImportPage - column: KAUFPREIS - DOUBLE
-	// [INFO] MdbImportPage - column: KANTZ - DOUBLE
-	// [INFO] MdbImportPage - column: KANTN - DOUBLE
-	// [INFO] MdbImportPage - column: VOLLPREIS - DOUBLE
-	// [INFO] MdbImportPage - column: VERARBKZ - TEXT
-	// [INFO] MdbImportPage - column: BEM1 - TEXT
-	// [INFO] MdbImportPage - column: BEM2 - TEXT
-	// [INFO] MdbImportPage - column: VERKAUF - TEXT
-	// [INFO] MdbImportPage - column: ANFR1 - TEXT
-	// [INFO] MdbImportPage - column: ANFR2 - TEXT
-	// [INFO] MdbImportPage - column: ANKSRSTAM - SHORT_DATE_TIME
-	// [INFO] MdbImportPage - column: ANVSRSTAM - SHORT_DATE_TIME
-	// [INFO] MdbImportPage - column: ANKEINGAM - SHORT_DATE_TIME
-	// [INFO] MdbImportPage - column: ANVEINGAM - SHORT_DATE_TIME
-	// [INFO] MdbImportPage - column: BEMKAUF - TEXT
-	// [INFO] MdbImportPage - column: BEMVKAUF - TEXT
-	// [INFO] MdbImportPage - column: KAUFPREIS_EURO - DOUBLE
-	// [INFO] MdbImportPage - column: GESFLAECHE - DOUBLE
-	// [INFO] MdbImportPage - column: verkaufbem - TEXT
-	// [INFO] MdbImportPage - column: EURO_UMSTELL - TEXT
-	// [INFO] MdbImportPage - column: GESVERKFL - DOUBLE
-	// [INFO] MdbImportPage - column: STALA_AUSG - SHORT_DATE_TIME
-	// [INFO] MdbImportPage - column: GUTACHTNR1 - TEXT
-	// [INFO] MdbImportPage - column: GESPLITTET - TEXT
-	// [INFO] MdbImportPage - column: GESPLITTET_EINGANGSNR - LONG
-//
-//    @Optional
-//    Property<MultiPolygon>      geom();
-//
-//    /** Wird aus der Geometry errechnet. */
-//    @Computed
-//    Property<Double>            flaeche();
-//
-//    /** Wird aus der Geometry errechnet. */
-//    @Computed
-//    Property<Double>            umfang();
-//
-//    /** Anzahl der Teil-Geometrien. Wird aus der Geometry errechnet. */
-//    @Computed
-//    Property<Integer>           numGeom();
+public interface KaufvertragComposite extends QiEntity, /* JsonState, */
+PropertyChangeSupport, ModelChangeSupport, EntityComposite {
 
-    /** Eingangsnummer. */
-    @Optional
-//    @ImportColumn("EINGANGSNR")
-    Property<String>            eingangsNr();
-//
-//    /** Importierte Objektnummer des SBK (objnr). */
-//    @Optional
-////    @ImportColumn("Objektnummer")
-//    Property<String>            objnr_sbk();
-//
-//    /** Alte Objektnummer Landkreise. */
-//    @Optional
-//    Property<String>            objnr_landkreise();
-//
-//    @Optional
-//    @ImportColumn("TK25")
-//    Property<String>            tk25();
-//
-//    @Optional
-//    Property<String>            unr();
-//
-//    @Optional
-//    @ImportColumn("Lage_TK25")
-//    Property<String>            lage_tk25();
-//
-//    @Optional
-//    @ImportColumn("Lage")
-//    Property<String>            lage();
-//
-//    @Optional
-//    @ImportColumn("Biotopname")
-//    Property<String>            name();
-//
-//    @Optional
-//    @ImportColumn("Biotopbeschreibung")
-//    Property<String>            beschreibung();
-//
-//    @Optional
-//    @ImportColumn("Bemerkungen")
-//    Property<String>            bemerkungen();
-//
-//    @Optional
-//    @ImportColumn("Angrenzende_Bereiche")
-//    Property<String>            angrenzendeBereiche();
-//
-//    @Optional
-//    @ImportColumn("Abteilung")
-//    Property<String>            abteilung();
-//
-//    @Optional
-//    @ImportColumn("Ausbildung")
-//    Property<String>            ausbildung();
-//
-//    @Optional
-//    Property<Integer>           pflegeZustand();
-//
-//    @Optional
-//    @ImportColumn("Pflege_Entwicklung")
-//    Property<String>            pflegeEntwicklung();
-//
-//    @Optional
-//    Property<Boolean>           pflegeBedarf();
-//
-//    /** Fr�her in {@link BiotoptypValue}. */
-//    @Optional
-//    Property<Integer>           pflegeRueckstand();
-//
-//
-////    @Optional
-////    @ImportColumn("Teilfl�che")
-////    Property<String>            teilflaeche();
-//
-//    @Optional
-//    Property<String>            bt_code();
-//
-//    @Optional
-//    Property<String>            wert();
-//
-//    @Optional
-//    Property<String>            biotopkuerzel();
+	// CREATE TABLE K_BUCH (
+	// EINGANGSNR DOUBLE,
+	// VERTDATUM TIMESTAMP,
+	// EINGANG TIMESTAMP,
+	// VKREIS VARCHAR(2),
+	// KKREIS VARCHAR(2),
+	// VERTRAGART VARCHAR(2),
+	// BEBAUT VARCHAR(1),
+	// KAUFPREIS DOUBLE,
+	// KANTZ DOUBLE,
+	// KANTN DOUBLE,
+	// VOLLPREIS DOUBLE,
+	// VERARBKZ VARCHAR(1),
+	// BEM1 VARCHAR(60),
+	// BEM2 VARCHAR(60),
+	// VERKAUF VARCHAR(9),
+	// ANFR1 VARCHAR(60),
+	// ANFR2 VARCHAR(60),
+	// ANKSRSTAM TIMESTAMP,
+	// ANVSRSTAM TIMESTAMP,
+	// ANKEINGAM TIMESTAMP,
+	// ANVEINGAM TIMESTAMP,
+	// BEMKAUF VARCHAR(40),
+	// BEMVKAUF VARCHAR(40),
+	// KAUFPREIS_EURO DOUBLE DEFAULT 0,
+	// GESFLAECHE DOUBLE DEFAULT 0,
+	// verkaufbem VARCHAR(25),
+	// EURO_UMSTELL VARCHAR(1),
+	// GESVERKFL DOUBLE,
+	// STALA_AUSG TIMESTAMP,
+	// GUTACHTNR1 VARCHAR(12),
+	// GESPLITTET VARCHAR(1),
+	// GESPLITTET_EINGANGSNR INTEGER
+	// );
+	//
+	// CREATE INDEX K_KKREISK_BUCH ON K_BUCH (KKREIS ASC);
+	//
+	// CREATE INDEX K_KKREISK_BUCH1 ON K_BUCH (VKREIS ASC);
+	//
+	// CREATE INDEX Reference11 ON K_BUCH (VERTRAGART ASC);
+	//
+	// ALTER TABLE K_BUCH ADD CONSTRAINT Reference6 UNIQUE (null);
+	//
+	// ALTER TABLE K_BUCH ADD CONSTRAINT Reference3 UNIQUE (null);
+	//
+	// ALTER TABLE K_BUCH ADD CONSTRAINT K_BUCHK_BEWERTBGF95 UNIQUE (null);
+	//
+	// ALTER TABLE K_BUCH ADD CONSTRAINT Reference1 UNIQUE (null);
+	//
+	// ALTER TABLE K_BUCH ADD CONSTRAINT K_BUCHK_BEWERTBRI95 UNIQUE (null);
+	//
+	// ALTER TABLE K_BUCH ADD CONSTRAINT K_FKEY_KPZUSCHL UNIQUE (null);
+	//
+	// ALTER TABLE K_BUCH ADD CONSTRAINT Reference5 UNIQUE (null);
+	//
+	// ALTER TABLE K_BUCH ADD CONSTRAINT Reference UNIQUE (null);
+	//
+	// ALTER TABLE K_BUCH ADD CONSTRAINT Reference31 UNIQUE (null);
+	//
+	// ALTER TABLE K_BUCH ADD CONSTRAINT Reference4 UNIQUE (null);
+	//
+	// ALTER TABLE K_BUCH ADD CONSTRAINT K_BUCHK_BEVERL UNIQUE (null);
+	//
+	// ALTER TABLE K_BUCH ADD CONSTRAINT K_FKEY_KPZUSCHL_GEB UNIQUE (null);
+	//
+	// ALTER TABLE K_BUCH ADD CONSTRAINT PK_K_BUCH PRIMARY KEY (EINGANGSNR);
+	//
+	// @Optional
+	// Property<MultiPolygon> geom();
+	//
+	// /** Wird aus der Geometry errechnet. */
+	// @Computed
+	// Property<Double> flaeche();
+	//
+	// /** Wird aus der Geometry errechnet. */
+	// @Computed
+	// Property<Double> umfang();
+	//
+	// /** Anzahl der Teil-Geometrien. Wird aus der Geometry errechnet. */
+	// @Computed
+	// Property<Integer> numGeom();
 
-    /** @see Eingangsdatum */
-    @Optional
-    @ImportColumn("EINGANG")
-    Property<Date>           eingangsDatum();
+	/** Eingangsnummer. */
+	// EINGANGSNR DOUBLE,
+	@Optional
+	@ImportColumn("EINGANGSNR")
+	Property<Integer> eingangsNr();
 
-//    /** @see Schutzstatus */
-//    @Optional
-//    @UseDefaults
-//    Property<Integer>           schutzstatus();
-//
-//    /** @see Status */
-//    @Optional
-//    @UseDefaults
-//    Property<Integer>           status();
+	// VERTDATUM TIMESTAMP,
+	@ImportColumn("VERTDATUM")
+	Property<Date> vertragsDatum();
 
-    @Optional
-    Property<Integer>   verkaeuferKreis();
-//
-//    @Optional
-//    Property<AktivitaetValue>   bearbeitung();
-//
-//    /** Wenn {@link #status()} <code>nicht_aktiv</code>, dann Wann, Wer, Warum gel�scht. */
-//    @Optional
-//    Property<AktivitaetValue>   loeschung();
-//
-//    /** Letzte Bekanntmachung. */
-//    @Optional
-//    Property<AktivitaetValue>   bekanntmachung();
-//
-//    /** Letzte Pr�fung der Daten. */
-//    @Optional
-//    @UseDefaults
-//    Property<Boolean>           geprueft();
+	// EINGANG TIMESTAMP,
+	@ImportColumn("EINGANG")
+	Property<Date> eingangsDatum();
 
-    @Optional
-    @ImportColumn("VERTRAGART")
-    Property<String>                        vertragArtNr();
+	// VKREIS VARCHAR(2),
+	// @Optional
+	@ImportColumn("VKREIS")
+	Association<KaeuferKreisComposite> verkaeuferKreis();
 
-    @Optional
-    Association<VertragsArtComposite>       vertragArt();
+	// KKREIS VARCHAR(2),
+	// @Optional
+	@ImportColumn("KKREIS")
+	Association<KaeuferKreisComposite> kaeuferKreis();
 
-    @Optional
-    ManyAssociation<VertragsArtComposite>   vertragArten();
+	// VERTRAGART VARCHAR(2),
+	// @Optional
+	//@ImportColumn("VERTRAGART")
+	Association<VertragsArtComposite> vertragsArt();
 
-//    /** Nur w�hrend Import: prozent f�r den aktuellen Biotoptyp. */
-//    @Optional
-//    Property<Double>            biotoptypArtProzent();
-//
-//    /**
-//     * Mehrere Geometrien pro Biotop werden beim Import aufgel�st, so auch
-//     * die damit verbundenen Biotoptypen. Es gibt nur noch einen Biotoptyp
-//     * pro Biotop in {@link #biotoptypArtNr()}.
-//     * <p/>
-//     * Siehe auch: <a href="http://polymap.org/biotop/ticket/32">Ticket #32</a> 
-//     */
-//    @Optional
-//    @UseDefaults
-//    @Deprecated
-//    Property<Collection<BiotoptypValue>> biotoptypen();
-//
-//    /**
-//     * @see PflanzeComposite
-//     */
-//    @Optional
-//    @UseDefaults
-//    Property<Collection<PflanzeValue>> pflanzen();
-//
-//    /** Moose/Flechten/Pilze */
-//    @Optional
-//    @UseDefaults
-//    Property<Collection<PilzValue>> pilze();
-//
-//    /**
-//     * @see TierComposite
-//     */
-//    @Optional
-//    @UseDefaults
-//    Property<Collection<TierValue>> tiere();
-//
-//    /**
-//     * @see GefahrComposite
-//     */
-//    @Optional
-//    @UseDefaults
-//    Property<Collection<GefahrValue>> gefahr();
-//
-//    /**
-//     * @see StoerungComposite
-//     */
-//    @Optional
-//    @UseDefaults
-//    Property<Collection<StoerungValue>> stoerungen();
-//
-//    /**
-//     * @see GefahrComposite
-//     */
-//    @Optional
-//    @UseDefaults
-//    Property<Collection<WertValue>> werterhaltend();
-//
-//    @Optional
-//    @ImportColumn("Nr_Naturraum")
-//    Property<String>            naturraumNr();
-//
-//    @Optional
-//    @ImportColumn("Nr_Naturraum_Flu�auen")
-//    Property<String>            naturraumFlussauenNr();
-//
-//    @Optional
-//    @ImportColumn("Nr_FA")
-//    Property<String>            faNr();
-//
-//    @Optional
-//    @ImportColumn("Nr_Revier")
-//    Property<String>            revierNr();
-//
-//    @Optional
-//    @ImportColumn("Nr_im_Revier")
-//    Property<String>            imRevierNr();
-//
-//    @Optional
-//    @ImportColumn("Nr_Eigentumsart")
-//    Property<String>            eigentumsartNr();
+	// BEBAUT VARCHAR(1),
+	// wird nicht benutzt
 
-    
-    /**
-     * Methods and transient fields.
-     */
-    public static abstract class Mixin
-            implements KaufvertragComposite {
+	// KAUFPREIS DOUBLE,
+	@ImportColumn("KAUFPREIS")
+	Property<Integer> kaufpreis();
 
-        private static Log log = LogFactory.getLog( Mixin.class );
+	// KANTZ DOUBLE,
+	@ImportColumn("KANTZ")
+	Property<Integer> kaufpreisAnteilZaehler();
 
-//        private BiotopRepository    repo = BiotopRepository.instance();
-//        
-//        private PropertyInfo        flaecheInfo = new GenericPropertyInfo( KaufvertragComposite.class, "flaeche" );
-//        private PropertyInfo        umfangInfo = new GenericPropertyInfo( KaufvertragComposite.class, "umfang" );
-//        private PropertyInfo        numGeomInfo = new GenericPropertyInfo( KaufvertragComposite.class, "numGeom" );
-////        private PropertyInfo        bearbeitetInfo = new GenericPropertyInfo( BiotopComposite.class, "bearbeitet" );
-////        private PropertyInfo        bearbeiterInfo = new GenericPropertyInfo( BiotopComposite.class, "bearbeiter" );
-//
-//
-//        public Property<Double> flaeche() {
-//            return new ComputedPropertyInstance( flaecheInfo ) {
-//                public Object get() {
-//                    Geometry geom = geom().get();
-//                    return geom != null ? geom.getArea() : -1;
-//                }
-//            };
-//        }
-//
-//        public Property<Double> umfang() {
-//            return new ComputedPropertyInstance( umfangInfo ) {
-//                public Object get() {
-//                    Geometry geom = geom().get();
-//                    return geom != null ? geom.getLength() : -1;
-//                }
-//            };
-//        }
-//
-//        public Property<Integer> numGeom() {
-//            return new ComputedPropertyInstance( numGeomInfo ) {
-//                public Object get() {
-//                    Geometry geom = geom().get();
-//                    return geom != null ? geom.getNumGeometries() : -1;
-//                }
-//            };
-//        }
+	// KANTN DOUBLE,
+	@ImportColumn("KANTN")
+	Property<Integer> kaufpreisAnteilNenner();
 
-//        public void beforeCompletion()
-//        throws UnitOfWorkCompletionException {
-//            EntityState entityState = EntityInstance.getEntityInstance( composite ).entityState();
-//            //return qi4j.getEntityState( composite ).lastModified();
-//            
-//            // hope that Qi4J lets run just one UoW completion at once; otherwise we have
-//            // race consitions between check and set of lastModified property between the
-//            // threads
-//            
-//            switch (entityState.status()) {
-//                case NEW:
-//                case UPDATED:
-//            Principal user = Polymap.instance().getUser();
-//            
-//            ValueBuilder<AktivitaetValue> builder = BiotopRepository.instance().newValueBuilder( AktivitaetValue.class );
-//            AktivitaetValue prototype = builder.prototype();
-//            prototype.wann().set( new Date() );
-//            prototype.wer().set( user.getName() );
-//            prototype.bemerkung().set( "" );
-//            bearbeitung().set( builder.newInstance() );
-//        }
+	// VOLLPREIS DOUBLE,
+	@ImportColumn("VOLLPREIS")
+	Property<Integer> vollpreis();
 
-        
-//        public Property<Date> bearbeitet() {
-//            return new ComputedPropertyInstance( groesseInfo ) {
-//                public Object get() {
-//                    Long lastModified = _lastModified().get();
-//                    return new Date( lastModified != null ? lastModified : 0 );
-//                }
-//            };
-//        }
-//
-//        public Property<String> bearbeiter() {
-//            return new ComputedPropertyInstance( groesseInfo ) {
-//                public Object get() {
-//                    return _lastModifiedBy().get();
-//                }
-//            };
-//        }
+	// VERARBKZ VARCHAR(1),
+	// J oder N
+	// zur Auswertung geeignet
+	@ImportColumn("VERARBKZ")
+	Property<Boolean> zurAuswertungGeeignet();
 
-    }
+	// BEM1 VARCHAR(60),
+	@Optional
+	@ImportColumn("BEM1")
+	Property<String> bemerkungen1();
+
+	// BEM2 VARCHAR(60),
+	@Optional
+	@ImportColumn("BEM2")
+	Property<Boolean> bemerkungen2();
+
+	// VERKAUF VARCHAR(9),
+	// letzter Verkauf, Referenz auf anderen Vertrag
+	@Optional
+	@ImportColumn("VERKAUF")
+	Association<KaufvertragComposite> verkauf();
+	
+	// ANFR1 VARCHAR(60),
+	@Optional
+	@ImportColumn("ANFR1")
+	Property<String> anfragen1();
+	
+	// ANFR2 VARCHAR(60),
+	@Optional
+	@ImportColumn("ANFR2")
+	Property<String> anfragen2();
+
+	// ANKSRSTAM TIMESTAMP,
+	// Anschreiben Kaeufer erstellt am
+	@Optional
+	@ImportColumn("ANKSRSTAM")
+	Property<Date> anschreibenKaeuferErstelltAm();
+	
+	// ANVSRSTAM TIMESTAMP,
+	@Optional
+	@ImportColumn("ANVSRSTAM")
+	Property<Date> anschreibenVerkaeuferErstelltAm();
+
+	// ANKEINGAM TIMESTAMP,
+	@Optional
+	@ImportColumn("ANKEINGAM")
+	Property<Date> anschreibenKaeuferEingangAntwort();
+	
+	// ANVEINGAM TIMESTAMP,
+	@Optional
+	@ImportColumn("ANVEINGAM")
+	Property<Date> anschreibenVerkaeuferEingangAntwort();
+
+	// BEMKAUF VARCHAR(40),
+	@Optional
+	@ImportColumn("BEMKAUF")
+	Property<String> bemerkungenKaeufer();
+	
+	// BEMVKAUF VARCHAR(40),
+	@Optional
+	@ImportColumn("BEMVKAUF")
+	Property<String> bemerkungenVerkaeufer();
+
+	// KAUFPREIS_EURO DOUBLE DEFAULT 0,
+	// wird nicht benutzt
+	
+	// GESFLAECHE DOUBLE DEFAULT 0,
+	@ImportColumn("GESFLAECHE")
+	Property<Integer> gesamtFlaeche();
+	
+	// verkaufbem VARCHAR(25),
+	@Optional
+	@ImportColumn("verkaufbem")
+	Property<String> bemerkungLetzterVerkauf();
+	
+	// EURO_UMSTELL VARCHAR(1),
+	// wird nicht benutzt
+	
+	// GESVERKFL DOUBLE,
+	// korrelliert mit Zähler/Nenner
+	// bspw. N = 2, Z = 1 ergibt gesflaeche 800 und gesverkflaeche 400
+	@ImportColumn("GESVERKFL")
+	Property<Integer> gesamtVerkaufsFlaeche();
+
+	// STALA_AUSG TIMESTAMP,
+	// Schalter ob schon nach STALA exportiert
+	@Optional
+	@ImportColumn("STALA_AUSG")
+	Property<Date> stalaAusgang();
+
+	// GUTACHTNR1 VARCHAR(12),
+	@Optional
+	@ImportColumn("GUTACHTNR1")
+	Property<String> gutachtenNummer();
+	
+	// GESPLITTET VARCHAR(1),
+	// Grundstück geht über mehrere Gemeinden
+	@Optional
+	@ImportColumn("GESPLITTET")
+	Property<Boolean> gesplittet();
+	
+	// GESPLITTET_EINGANGSNR INTEGER
+	@Optional
+	@ImportColumn("GESPLITTET_EINGANGSNR")
+	Association<KaufvertragComposite> gesplittetHauptvertrag();
+
+	// neue Felder
+	@Optional
+	Property<String> urkundenNummer();
+
+	@Optional
+	Property<Boolean> fuerGewosGeeignet();
+
+	/**
+	 * Methods and transient fields.
+	 */
+	public static abstract class Mixin implements KaufvertragComposite {
+
+		private static Log log = LogFactory.getLog(Mixin.class);
+
+		// private BiotopRepository repo = BiotopRepository.instance();
+		//
+		// private PropertyInfo flaecheInfo = new GenericPropertyInfo(
+		// KaufvertragComposite.class, "flaeche" );
+		// private PropertyInfo umfangInfo = new GenericPropertyInfo(
+		// KaufvertragComposite.class, "umfang" );
+		// private PropertyInfo numGeomInfo = new GenericPropertyInfo(
+		// KaufvertragComposite.class, "numGeom" );
+		// // private PropertyInfo bearbeitetInfo = new GenericPropertyInfo(
+		// BiotopComposite.class, "bearbeitet" );
+		// // private PropertyInfo bearbeiterInfo = new GenericPropertyInfo(
+		// BiotopComposite.class, "bearbeiter" );
+		//
+		//
+		// public Property<Double> flaeche() {
+		// return new ComputedPropertyInstance( flaecheInfo ) {
+		// public Object get() {
+		// Geometry geom = geom().get();
+		// return geom != null ? geom.getArea() : -1;
+		// }
+		// };
+		// }
+		//
+		// public Property<Double> umfang() {
+		// return new ComputedPropertyInstance( umfangInfo ) {
+		// public Object get() {
+		// Geometry geom = geom().get();
+		// return geom != null ? geom.getLength() : -1;
+		// }
+		// };
+		// }
+		//
+		// public Property<Integer> numGeom() {
+		// return new ComputedPropertyInstance( numGeomInfo ) {
+		// public Object get() {
+		// Geometry geom = geom().get();
+		// return geom != null ? geom.getNumGeometries() : -1;
+		// }
+		// };
+		// }
+
+		// public void beforeCompletion()
+		// throws UnitOfWorkCompletionException {
+		// EntityState entityState = EntityInstance.getEntityInstance( composite
+		// ).entityState();
+		// //return qi4j.getEntityState( composite ).lastModified();
+		//
+		// // hope that Qi4J lets run just one UoW completion at once; otherwise
+		// we have
+		// // race consitions between check and set of lastModified property
+		// between the
+		// // threads
+		//
+		// switch (entityState.status()) {
+		// case NEW:
+		// case UPDATED:
+		// Principal user = Polymap.instance().getUser();
+		//
+		// ValueBuilder<AktivitaetValue> builder =
+		// BiotopRepository.instance().newValueBuilder( AktivitaetValue.class );
+		// AktivitaetValue prototype = builder.prototype();
+		// prototype.wann().set( new Date() );
+		// prototype.wer().set( user.getName() );
+		// prototype.bemerkung().set( "" );
+		// bearbeitung().set( builder.newInstance() );
+		// }
+
+		// public Property<Date> bearbeitet() {
+		// return new ComputedPropertyInstance( groesseInfo ) {
+		// public Object get() {
+		// Long lastModified = _lastModified().get();
+		// return new Date( lastModified != null ? lastModified : 0 );
+		// }
+		// };
+		// }
+		//
+		// public Property<String> bearbeiter() {
+		// return new ComputedPropertyInstance( groesseInfo ) {
+		// public Object get() {
+		// return _lastModifiedBy().get();
+		// }
+		// };
+		// }
+
+	}
 
 }
