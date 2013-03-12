@@ -35,7 +35,6 @@ import org.polymap.core.qi4j.QiModule;
 import org.polymap.core.qi4j.QiModuleAssembler;
 import org.polymap.core.runtime.Polymap;
 import org.polymap.core.runtime.entity.ConcurrentModificationException;
-import org.polymap.kaps.model.constant.Verkaeuferkreis;
 import org.polymap.rhei.data.entityfeature.DefaultEntityProvider;
 import org.polymap.rhei.data.entityfeature.EntityProvider.FidsQueryProvider;
 import org.polymap.rhei.data.entitystore.lucene.LuceneEntityStoreService;
@@ -131,7 +130,6 @@ public class KapsRepository extends QiModule {
 
 			kapsService = new KapsService(
 					// BiotopComposite
-					new KaufvertragEntityProvider(this, queryProvider),
 					new KaufvertragEntityProvider(this, queryProvider),
 					// Arten...
 					new ArtEntityProvider(

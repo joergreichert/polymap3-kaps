@@ -21,7 +21,6 @@ import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.FeatureType;
 
-import org.polymap.core.model.Entity;
 import org.polymap.core.qi4j.QiModule;
 import org.polymap.core.qi4j.QiModule.EntityCreator;
 
@@ -54,17 +53,29 @@ public class KaufvertragEntityProvider
     @Override
     public FeatureType buildFeatureType( FeatureType schema ) {
         // filter properties
-        return SimpleFeatureTypeBuilder.retype( (SimpleFeatureType)schema, 
+        SimpleFeatureType filtered = SimpleFeatureTypeBuilder.retype( (SimpleFeatureType)schema, 
                 new String[] {"eingangsDatum", "eingangsNr"} );
+        
+        // VertragsArt
+        // ACHTUNG! : der name darf kein existierender Name einer 
+        //            Property oder Assoziation der Entity sein!
+        SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
+        builder.init( filtered );
+        builder.add( "Vertragsart", String.class );
+        
+        return builder.buildFeatureType();
     }
 
     @Override
-    public Feature buildFeature( Entity entity, Feature feature, FeatureType schema ) {
+    public Feature buildFeature( KaufvertragComposite entity, Feature feature, FeatureType schema ) {
+        VertragsArtComposite vertragsArt = entity.vertragsArt().get();
+        feature.getProperty( "Vertragsart" ).setValue( 
+                vertragsArt != null ? vertragsArt.name().get() : "Test" );
         return feature;
     }
 
     @Override
-    public boolean modifyFeature( Entity entity, String propName, Object value ) throws Exception {
+    public boolean modifyFeature( KaufvertragComposite entity, String propName, Object value ) throws Exception {
         // apply default method
         return false;
     }
