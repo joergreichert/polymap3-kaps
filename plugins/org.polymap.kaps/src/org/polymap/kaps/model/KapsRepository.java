@@ -12,10 +12,15 @@
  */
 package org.polymap.kaps.model;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
+import static org.qi4j.api.query.QueryExpressions.orderBy;
+import static org.qi4j.api.query.QueryExpressions.templateFor;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 
@@ -30,6 +35,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.qi4j.api.query.Query;
 import org.qi4j.api.query.grammar.BooleanExpression;
+import org.qi4j.api.query.grammar.OrderBy;
 import org.qi4j.api.service.ServiceReference;
 import org.qi4j.api.unitofwork.ConcurrentEntityModificationException;
 import org.qi4j.api.unitofwork.UnitOfWorkCompletionException;
@@ -283,6 +289,8 @@ public class KapsRepository
 
                     public void create( KaufvertragComposite prototype )
                             throws Exception {
+                        
+                        prototype.eingangsNr().set( highestEingangsNummer() );
                         // // objnr
                         // prototype.objnr().set( biotopnummern.get().generate()
                         // );
@@ -306,6 +314,7 @@ public class KapsRepository
                         // btNamen().values().iterator().next().nummer().get();
                         // // prototype.biotoptypArtNr().set( randomBt );
 
+                        // 
                         prototype.eingangsDatum().set( new Date() );
                         prototype.kaufpreisAnteilZaehler().set( 1 );
                         prototype.kaufpreisAnteilNenner().set( 1 );
@@ -332,20 +341,44 @@ public class KapsRepository
                 } );
     }
 
-
+    private int highestEingangsNummer() {
+        Query<KaufvertragComposite> entities = findEntities( KaufvertragComposite.class, null, 0, 1 );
+        KaufvertragComposite template = templateFor( KaufvertragComposite.class );
+        entities.orderBy( orderBy( template.eingangsNr(), OrderBy.Order.DESCENDING) );
+//        return 1;
+        KaufvertragComposite highest = entities.iterator().next();
+        int highestEingangsNr = highest != null ? highest.eingangsNr().get() : 0;
+        
+        // minimum aktuelles Jahr * 100000 + 1
+        int currentYear = new GregorianCalendar().get( Calendar.YEAR );
+        int currentMinimumNumber = currentYear * 100000;
+        
+        return Math.max( highestEingangsNr, currentMinimumNumber ) + 1;
+    }
+    
     public <T extends Entity> Map<String, T> entitiesWithNames( Class<T> entityClass ) {
         // if (vertragsArtNamen == null) {
 
+        // TODO sortieren bei schl
         Property nameProperty = entityType( entityClass ).getProperty( "name" );
+        Property schlProperty = entityType( entityClass ).getProperty( "schl" );
         if (nameProperty == null) {
             throw new IllegalStateException( entityClass + " doesnt have an 'name' Property" );
         }
 
         Query<T> entities = findEntities( entityClass, null, 0, 1000 );
-        Map<String, T> vertragsArtNamen = new HashMap<String, T>();
+//        if (schlProperty != null) {
+//            T template = templateFor( entityClass );
+//            entities.orderBy( orderBy(template.schl(), OrderBy.Order.ASCENDING) );
+//        }
+        Map<String, T> vertragsArtNamen = new TreeMap<String, T>();
         for (T entity : entities) {
             try {
-                vertragsArtNamen.put( (String)nameProperty.getValue( entity ), entity );
+                String key = (String)nameProperty.getValue( entity );
+                if (schlProperty != null) {
+                    key = (String)schlProperty.getValue( entity ) + "  -  " + key;
+                }
+                vertragsArtNamen.put( key, entity );
             }
             catch (Exception e) {
                 throw new IllegalStateException( "Exception on name() on entity " + entity.id(), e );
@@ -354,46 +387,4 @@ public class KapsRepository
         // }
         return vertragsArtNamen;
     }
-    //
-    //
-    // public Map<String,VertragsArtComposite> btNamen() {
-    // if (btNamen == null) {
-    // Query<VertragsArtComposite> entities = findEntities(
-    // VertragsArtComposite.class, null, 0, 1000 );
-    //
-    // btNamen = new HashMap();
-    // for (VertragsArtComposite entity : entities) {
-    // btNamen.put( entity.name().get(), entity );
-    // }
-    // }
-    // return btNamen;
-    // }
-    //
-    //
-    // public VertragsArtComposite btForNummer( String nummer ) {
-    // if (btNummern == null) {
-    // Query<VertragsArtComposite> entities = findEntities(
-    // VertragsArtComposite.class, null, 0, 1000 );
-    //
-    // btNummern = new HashMap();
-    // for (VertragsArtComposite entity : btNamen().values()) {
-    // btNummern.put( entity.nummer().get(), entity );
-    // }
-    // }
-    // return btNummern.get( nummer );
-    // }
-
-    // public <V extends ValueComposite,A extends Entity,C extends
-    // ValueArtComposite<V,A>>
-    // C createValueArt(
-    // Class<C> cl,
-    // V value,
-    // ValueArtFinder<V,A> artFinder ) {
-    //
-    // C result = assembler.getModule().transientBuilderFactory().newTransient(
-    // cl );
-    // result.init( value, artFinder );
-    // return result;
-    // }
-
 }

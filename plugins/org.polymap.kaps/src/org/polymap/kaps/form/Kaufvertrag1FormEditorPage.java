@@ -12,25 +12,26 @@
  */
 package org.polymap.kaps.form;
 
+import java.util.Date;
+import java.util.Locale;
+
 import org.geotools.data.FeatureStore;
 import org.opengis.feature.Feature;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-
-import org.polymap.core.operation.OperationSupport;
 import org.polymap.core.project.ui.util.SimpleFormData;
-import org.polymap.core.runtime.UIJob;
 
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
 import org.polymap.rhei.field.DateTimeFormField;
 import org.polymap.rhei.field.IFormField;
+import org.polymap.rhei.field.IFormFieldValidator;
+import org.polymap.rhei.field.NumberValidator;
 import org.polymap.rhei.field.PicklistFormField;
 import org.polymap.rhei.field.TextFormField;
-import org.polymap.rhei.form.DefaultFormPageLayouter;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
 import org.polymap.kaps.model.KaeuferKreisComposite;
@@ -71,30 +72,51 @@ public class Kaufvertrag1FormEditorPage
 
         // Datumse
         Composite line2 = site.newFormField( parent,
-                new PropertyAdapter( kaufvertrag.vertragsDatum() ), new DateTimeFormField(), null,
-                "Vertragsdatum" );
-        line2.setLayoutData( new SimpleFormData( left ).top( eingangsNr ).create() );
+                new PropertyAdapter( kaufvertrag.vertragsDatum() ), new DateTimeFormField(),
+                new DateMustBeforeValidator( kaufvertrag.eingangsDatum(),
+                        "Das Vertragsdatum muss vor dem Eingangsdatum liegen." ), "Vertragsdatum" );
+        line2.setLayoutData( new SimpleFormData( left ).top( eingangsNr, SPACING ).create() );
 
-        site.newFormField( parent, new PropertyAdapter( kaufvertrag.eingangsDatum() ),
-                new DateTimeFormField(), null, "Eingangsdatum" ).setLayoutData(
-                new SimpleFormData( right ).top( eingangsNr ).create() );
+        site.newFormField(
+                parent,
+                new PropertyAdapter( kaufvertrag.eingangsDatum() ),
+                new DateTimeFormField(),
+                new DateMustAfterValidator( kaufvertrag.vertragsDatum(),
+                        "Das Vertragsdatum muss vor dem Eingangsdatum liegen." ), "Eingangsdatum" )
+                .setLayoutData( new SimpleFormData( right ).top( eingangsNr, SPACING ).create() );
 
         // kreise
         Composite line3 = site.newFormField( parent, new AssociationAdapter<KaeuferKreisComposite>(
                 "verkaeuferKreis", kaufvertrag.verkaeuferKreis() ), kaeuferKreise(), null,
                 "Verkäuferkreis" );
-        line3.setLayoutData( new SimpleFormData( left ).top( line2 ).create() );
+        line3.setLayoutData( new SimpleFormData( left ).top( line2, SPACING ).create() );
 
         site.newFormField(
                 parent,
                 new AssociationAdapter<KaeuferKreisComposite>( "kaeuferKreis", kaufvertrag
                         .kaeuferKreis() ), kaeuferKreise(), null, "Käuferkreis" ).setLayoutData(
-                new SimpleFormData( right ).top( line2 ).create() );
+                new SimpleFormData( right ).top( line2, SPACING ).create() );
 
         // alle Vertragsarten in PickList
         Composite line4 = site.newFormField( parent, new AssociationAdapter<VertragsArtComposite>(
                 "vertragsArt", kaufvertrag.vertragsArt() ), vertragsArten(), null, "Vertragsart" );
-        line4.setLayoutData( new SimpleFormData( left ).top( line3 ).create() );
+        line4.setLayoutData( new SimpleFormData( left ).top( line3, SPACING ).create() );
+
+        // Kaufpreis Nenner/Zähler
+        Composite line5 = site.newFormField( parent,
+                new PropertyAdapter( kaufvertrag.kaufpreis() ), new TextFormField(SWT.RIGHT),
+                new NumberValidator( Integer.class, Locale.getDefault() ), "Kaufpreis (€)" );
+        line5.setLayoutData( new SimpleFormData( left ).right( 30 ).top( line4, SPACING ).create() );
+        
+        site.newFormField( parent,
+                new PropertyAdapter( kaufvertrag.kaufpreisAnteilZaehler() ), new TextFormField(SWT.RIGHT),
+                new NumberValidator( Integer.class, Locale.getDefault(), 3, 0 ), "Anteil Zähler/Nenner" ).
+                setLayoutData( new SimpleFormData(SPACING).left(50).right( 80 ).top( line4, SPACING ).create() );
+
+        site.newFormField( parent,
+                new PropertyAdapter( kaufvertrag.kaufpreisAnteilNenner() ), new TextFormField(SWT.RIGHT),
+                new NumberValidator( Integer.class, Locale.getDefault(), 3, 0 ), "/" ).
+                setLayoutData( new SimpleFormData(SPACING).left(80).right( 100 ).top( line4, SPACING ).create() );
 
         //
         // layouter.setFieldLayoutData(site.newFormField(site.getPageBody(),

@@ -196,14 +196,14 @@ public interface KaufvertragComposite
 
     // BEM1 VARCHAR(60),
     @Optional
-    @ImportColumn("BEM1")
-    Property<String> bemerkungen1();
+    //@ImportColumn("BEM1")
+    Property<String> bemerkungen();
 
 
     // BEM2 VARCHAR(60),
-    @Optional
-    @ImportColumn("BEM2")
-    Property<Boolean> bemerkungen2();
+    //@Optional
+    //@ImportColumn("BEM2")
+    //Property<String> bemerkungen2();
 
 
     // VERKAUF VARCHAR(9),

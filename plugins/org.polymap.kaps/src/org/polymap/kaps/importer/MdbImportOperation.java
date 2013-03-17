@@ -168,7 +168,20 @@ public class MdbImportOperation
                             if (builderRow.get( "KANTN" ) == null) {
                                 entity.kaufpreisAnteilNenner().set( 1 );
                             }
-
+                            // BEM1 und BEM2 zusammenfassen
+                            String bem1 = (String)builderRow.get( "BEM1" );
+                            String bem2 = (String)builderRow.get( "BEM2" );
+                            StringBuilder bem = new StringBuilder();
+                            if (bem1 != null) {
+                                bem.append( bem1 );
+                                if (bem2 != null) {
+                                    bem.append( Character.LINE_SEPARATOR );
+                                }
+                            }
+                            if (bem2 != null) {
+                                bem.append( bem2 );
+                            }
+                            entity.bemerkungen().set( bem.toString() );
                             // find also Verkaufsverträge alt und geplittete
                             // Verträge
                             // TODO die werden aber eventuell erst später
