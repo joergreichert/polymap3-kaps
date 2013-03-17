@@ -49,7 +49,7 @@ public interface StalaComposite extends QiEntity, PropertyChangeSupport,
 	// SCHL VARCHAR(2),
 	// BEZ VARCHAR(70)
 	// );
-	
+
 	// Arten: Handbuch Seite 40
 	// 1 = Grundstücksart
 	// 2 = Art des Baugebietes
@@ -57,7 +57,6 @@ public interface StalaComposite extends QiEntity, PropertyChangeSupport,
 	// 4 = Verwandschaftsverhältnis
 	// 5 = 7 = ?
 	// 6 = unbekannt
-	
 
 	@ImportColumn("ART")
 	Property<String> art();

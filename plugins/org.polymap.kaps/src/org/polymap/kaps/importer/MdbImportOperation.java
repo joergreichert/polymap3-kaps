@@ -29,7 +29,7 @@ import com.healthmarketscience.jackcess.Table;
 /**
  * 
  * 
- * @author <a href="http://www.polymap.de">Falko Br�utigam</a>
+ * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 public class MdbImportOperation extends AbstractModelChangeOperation implements
 		IUndoableOperation {
@@ -42,7 +42,7 @@ public class MdbImportOperation extends AbstractModelChangeOperation implements
 
 	private KapsRepository repo;
 
-	protected MdbImportOperation(File dbFile, String[] tableNames) {
+	public MdbImportOperation(File dbFile, String[] tableNames) {
 		super("MS-Access-Daten importieren");
 		this.dbFile = dbFile;
 		this.tableNames = tableNames;
@@ -64,8 +64,7 @@ public class MdbImportOperation extends AbstractModelChangeOperation implements
 			final Map<String, StalaComposite> allStalas = new HashMap<String, StalaComposite>();
 			final Map<String, KaeuferKreisComposite> allKKreise = new HashMap<String, KaeuferKreisComposite>();
 			final Map<String, VertragsArtComposite> allVertragsarten = new HashMap<String, VertragsArtComposite>();
-			
-			
+
 			sub = new SubMonitor(monitor, 10);
 			importEntity(db, sub, StalaComposite.class, "K_STALA",
 					new EntityCallback<StalaComposite>() {
@@ -73,10 +72,11 @@ public class MdbImportOperation extends AbstractModelChangeOperation implements
 						@Override
 						public void fillEntity(StalaComposite entity,
 								Map<String, Object> builderRow) {
+							// collecting
 							allStalas.put(entity.schl().get(), entity);
 						}
 					});
-			
+
 			sub = new SubMonitor(monitor, 10);
 			importEntity(db, sub, VertragsArtComposite.class, "K_VERART",
 					new EntityCallback<VertragsArtComposite>() {
@@ -85,7 +85,8 @@ public class MdbImportOperation extends AbstractModelChangeOperation implements
 						public void fillEntity(VertragsArtComposite entity,
 								Map<String, Object> builderRow) {
 							// associate stala
-							// Rückfrage welche STALAS verknüpft werden sollen SCHL aus STALA ist nicht eindeutig
+							// Rückfrage welche STALAS verknüpft werden sollen
+							// SCHL aus STALA ist nicht eindeutig
 							// TODO [KAPS] #15
 							// collecting
 							allVertragsarten.put(entity.schl().get(), entity);
@@ -100,12 +101,16 @@ public class MdbImportOperation extends AbstractModelChangeOperation implements
 						public void fillEntity(KaeuferKreisComposite entity,
 								Map<String, Object> builderRow) {
 							// associate stala erstellen
-							Object stalaSchl = builderRow
-									.get("STALA");
+							Object stalaSchl = builderRow.get("STALA");
 							if (stalaSchl != null) {
-								StalaComposite stala = allStalas.get(stalaSchl.toString());
+								StalaComposite stala = allStalas.get(stalaSchl
+										.toString());
 								if (stala == null) {
-									throw new IllegalStateException("no stala found for schl '" + stalaSchl + "' in K_KREIS_1 '" + entity.schl() + "'!" );
+									throw new IllegalStateException(
+											"no stala found for schl '"
+													+ stalaSchl
+													+ "' in K_KREIS_1 '"
+													+ entity.schl() + "'!");
 								}
 								entity.stala().set(stala);
 							}
@@ -123,31 +128,64 @@ public class MdbImportOperation extends AbstractModelChangeOperation implements
 								Map<String, Object> builderRow) {
 							// mapping eingangsNr
 							// find vertragsArt
-							Object vertragsArtSchl = builderRow.get("VERTRAGART"); 
-							VertragsArtComposite vertragsArt = allVertragsarten.get(vertragsArtSchl);
-							if (vertragsArt == null) {
-								throw new IllegalStateException("no VERTRAGART found for schl '" + vertragsArtSchl + "' in K_BUCH '" + entity.eingangsNr() + "'!" );								
+							Object vertragsArtSchl = builderRow
+									.get("VERTRAGART");
+							if (vertragsArtSchl != null) {
+								VertragsArtComposite vertragsArt = allVertragsarten
+										.get(vertragsArtSchl);
+								if (vertragsArt == null) {
+									throw new IllegalStateException(
+											"no VERTRAGART found for schl '"
+													+ vertragsArtSchl
+													+ "' in K_BUCH '"
+													+ entity.eingangsNr()
+													+ "'!");
+								}
+								entity.vertragsArt().set(vertragsArt);
 							}
-							entity.vertragsArt().set(vertragsArt);
-							
+
 							// find KKreis für Käufer und Verkäufer
-							Object kkreisSchl = builderRow.get("KKREIS"); 
-							KaeuferKreisComposite kkreis = allKKreise.get(kkreisSchl);
-							if (kkreis == null) {
-								throw new IllegalStateException("no KKREIS found for schl '" + kkreisSchl + "' in K_BUCH '" + entity.eingangsNr() + "'!" );								
+							Object kkreisSchl = builderRow.get("KKREIS");
+							if (kkreisSchl != null) {
+								KaeuferKreisComposite kkreis = allKKreise
+										.get(kkreisSchl);
+								if (kkreis == null) {
+									throw new IllegalStateException(
+											"no KKREIS found for schl '"
+													+ kkreisSchl
+													+ "' in K_BUCH '"
+													+ entity.eingangsNr()
+													+ "'!");
+								}
+								entity.kaeuferKreis().set(kkreis);
 							}
-							entity.kaeuferKreis().set(kkreis);
-							
 							// find VKREIS
-							Object vkreisSchl = builderRow.get("VKREIS"); 
-							KaeuferKreisComposite vkreis = allKKreise.get(vkreisSchl);
-							if (vkreis == null) {
-								throw new IllegalStateException("no VKREIS found for schl '" + vkreisSchl + "' in K_BUCH '" + entity.eingangsNr() + "'!" );								
+							Object vkreisSchl = builderRow.get("VKREIS");
+							if (vkreisSchl != null) {
+								KaeuferKreisComposite vkreis = allKKreise
+										.get(vkreisSchl);
+								if (vkreis == null) {
+									throw new IllegalStateException(
+											"no VKREIS found for schl '"
+													+ vkreisSchl
+													+ "' in K_BUCH '"
+													+ entity.eingangsNr()
+													+ "'!");
+								}
+								entity.verkaeuferKreis().set(vkreis);
 							}
-							entity.verkaeuferKreis().set(vkreis);
-							
-							// find also Verkaufsverträge alt und geplittete Verträge
-							// TODO die werden aber eventuell erst später assoziiert
+							// fix imports
+							if (builderRow.get("KANTZ") == null) {
+								entity.kaufpreisAnteilZaehler().set(1);
+							}
+							if (builderRow.get("KANTN") == null) {
+								entity.kaufpreisAnteilNenner().set(1);
+							}
+
+							// find also Verkaufsverträge alt und geplittete
+							// Verträge
+							// TODO die werden aber eventuell erst später
+							// assoziiert
 						}
 					});
 			//
@@ -269,63 +307,64 @@ public class MdbImportOperation extends AbstractModelChangeOperation implements
 		return Status.OK_STATUS;
 	}
 
-	protected void importBiotopdaten(Table table, IProgressMonitor monitor)
-			throws Exception {
-		monitor.beginTask("Tabelle: " + table.getName(), table.getRowCount());
-		//
-		// final AnnotatedCompositeImporter importer = new
-		// AnnotatedCompositeImporter(
-		// BiotopComposite.class, table );
-		//
-		// // data rows
-		// Map<String,Object> row = null;
-		// while ((row = table.getNextRow()) != null) {
-		// for (BiotopComposite biotop : findBiotop( row )) {
-		// if (biotop != null) {
-		// importer.fillEntity( biotop, row );
-		//
-		// // Erfassung
-		// Date erfasst = (Date)row.get( "Erfassung" );
-		// if (erfasst != null) {
-		// ValueBuilder<AktivitaetValue> builder = repo.newValueBuilder(
-		// AktivitaetValue.class );
-		// AktivitaetValue prototype = builder.prototype();
-		// prototype.wann().set( erfasst );
-		// prototype.wer().set( "SBK" );
-		// prototype.bemerkung().set( "Import aus SBK" );
-		// biotop.erfassung().set( builder.newInstance() );
-		// }
-		//
-		// // Eingabe -> Bearbeitung
-		// Date eingabe = (Date)row.get( "Eingabe" );
-		// if (eingabe != null) {
-		// ValueBuilder<AktivitaetValue> builder = repo.newValueBuilder(
-		// AktivitaetValue.class );
-		// AktivitaetValue prototype = builder.prototype();
-		// prototype.wann().set( eingabe );
-		// prototype.wer().set( "SBK" );
-		// prototype.bemerkung().set( "Import aus SBK" );
-		// biotop.bearbeitung().set( builder.newInstance() );
-		// }
-		// // Bekanntmachung
-		// ValueBuilder<AktivitaetValue> builder = repo.newValueBuilder(
-		// AktivitaetValue.class );
-		// AktivitaetValue prototype = builder.prototype();
-		// prototype.wann().set( eingabe );
-		// prototype.wer().set( "SBK" );
-		// prototype.bemerkung().set( "Import aus SBK" );
-		// biotop.bekanntmachung().set( builder.newInstance() );
-		// }
-		// else {
-		// //log.warn( "No Biotop found for: " + row );
-		// }
-		// }
-		// if (monitor.isCanceled()) {
-		// throw new RuntimeException( "Operation canceled." );
-		// }
-		// monitor.worked( 1 );
-		// }
-	}
+	//
+	// protected void importBiotopdaten(Table table, IProgressMonitor monitor)
+	// throws Exception {
+	// monitor.beginTask("Tabelle: " + table.getName(), table.getRowCount());
+	// //
+	// // final AnnotatedCompositeImporter importer = new
+	// // AnnotatedCompositeImporter(
+	// // BiotopComposite.class, table );
+	// //
+	// // // data rows
+	// // Map<String,Object> row = null;
+	// // while ((row = table.getNextRow()) != null) {
+	// // for (BiotopComposite biotop : findBiotop( row )) {
+	// // if (biotop != null) {
+	// // importer.fillEntity( biotop, row );
+	// //
+	// // // Erfassung
+	// // Date erfasst = (Date)row.get( "Erfassung" );
+	// // if (erfasst != null) {
+	// // ValueBuilder<AktivitaetValue> builder = repo.newValueBuilder(
+	// // AktivitaetValue.class );
+	// // AktivitaetValue prototype = builder.prototype();
+	// // prototype.wann().set( erfasst );
+	// // prototype.wer().set( "SBK" );
+	// // prototype.bemerkung().set( "Import aus SBK" );
+	// // biotop.erfassung().set( builder.newInstance() );
+	// // }
+	// //
+	// // // Eingabe -> Bearbeitung
+	// // Date eingabe = (Date)row.get( "Eingabe" );
+	// // if (eingabe != null) {
+	// // ValueBuilder<AktivitaetValue> builder = repo.newValueBuilder(
+	// // AktivitaetValue.class );
+	// // AktivitaetValue prototype = builder.prototype();
+	// // prototype.wann().set( eingabe );
+	// // prototype.wer().set( "SBK" );
+	// // prototype.bemerkung().set( "Import aus SBK" );
+	// // biotop.bearbeitung().set( builder.newInstance() );
+	// // }
+	// // // Bekanntmachung
+	// // ValueBuilder<AktivitaetValue> builder = repo.newValueBuilder(
+	// // AktivitaetValue.class );
+	// // AktivitaetValue prototype = builder.prototype();
+	// // prototype.wann().set( eingabe );
+	// // prototype.wer().set( "SBK" );
+	// // prototype.bemerkung().set( "Import aus SBK" );
+	// // biotop.bekanntmachung().set( builder.newInstance() );
+	// // }
+	// // else {
+	// // //log.warn( "No Biotop found for: " + row );
+	// // }
+	// // }
+	// // if (monitor.isCanceled()) {
+	// // throw new RuntimeException( "Operation canceled." );
+	// // }
+	// // monitor.worked( 1 );
+	// // }
+	// }
 
 	/*
      * 

@@ -36,98 +36,88 @@ import org.qi4j.bootstrap.ModuleAssembly;
  * 
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
-public class KapsRepositoryAssembler
-        extends QiModuleAssembler {
+public class KapsRepositoryAssembler extends QiModuleAssembler {
 
-    private static Log log = LogFactory.getLog( KapsRepositoryAssembler.class );
+	private static Log log = LogFactory.getLog(KapsRepositoryAssembler.class);
 
-    private Application                 app;
+	private Application app;
 
-    private UnitOfWorkFactory           uowf;
+	private UnitOfWorkFactory uowf;
 
-    private Module                      module;
-    
+	private Module module;
 
-    public KapsRepositoryAssembler() {
-    }
+	public KapsRepositoryAssembler() {
+	}
 
+	public Module getModule() {
+		return module;
+	}
 
-    public Module getModule() {
-        return module;
-    }
+	protected void setApp(Application app) {
+		this.app = app;
+		this.module = app.findModule("application-layer", "kaps-module");
+		this.uowf = module.unitOfWorkFactory();
+	}
 
-    
-    protected void setApp( Application app ) {
-        this.app = app;
-        this.module = app.findModule( "application-layer", "kaps-module" );
-        this.uowf = module.unitOfWorkFactory();
-    }
+	public QiModule newModule() {
+		return new KapsRepository(this);
+	}
 
+	public void assemble(ApplicationAssembly _app) throws Exception {
+		log.info("Assembling: org.polymap.kaps ...");
 
-    public QiModule newModule() {
-        return new KapsRepository( this );
-    }
+		// project layer / module
+		LayerAssembly domainLayer = _app.layerAssembly("application-layer");
+		ModuleAssembly domainModule = domainLayer.moduleAssembly("kaps-module");
+		domainModule.addEntities(KaufvertragComposite.class,
+				VertragsArtComposite.class, KaeuferKreisComposite.class,
+				StalaComposite.class
+		// BiotoptypArtComposite.class,
+		// PflanzenArtComposite.class,
+		// PilzArtComposite.class,
+		// TierArtComposite.class,
+		// StoerungsArtComposite.class,
+		// WertArtComposite.class
+				);
+		// domainModule.addTransients(
+		// PflanzeComposite.class,
+		// TierComposite.class
+		// );
+		// domainModule.addValues(
+		// AktivitaetValue.class,
+		// BiotoptypValue.class,
+		// PflanzeValue.class,
+		// PilzValue.class,
+		// TierValue.class,
+		// GefahrValue.class,
+		// StoerungValue.class,
+		// WertValue.class
+		// );
 
+		// persistence: workspace/Lucene
+		File root = new File(Polymap.getWorkspacePath().toFile(), "data");
 
-    public void assemble( ApplicationAssembly _app )
-            throws Exception {
-        log.info( "Assembling: org.polymap.kaps ..." );
+		File moduleRoot = new File(root, "org.polymap.kaps");
+		moduleRoot.mkdir();
 
-        // project layer / module
-        LayerAssembly domainLayer = _app.layerAssembly( "application-layer" );
-        ModuleAssembly domainModule = domainLayer.moduleAssembly( "kaps-module" );
-        domainModule.addEntities(
-                KaufvertragComposite.class,
-                VertragsArtComposite.class
-//                BiotoptypArtComposite.class,
-//                PflanzenArtComposite.class,
-//                PilzArtComposite.class,
-//                TierArtComposite.class,
-//                StoerungsArtComposite.class,
-//                WertArtComposite.class
-        );
-//        domainModule.addTransients(
-//                PflanzeComposite.class,
-//                TierComposite.class
-//        );
-//        domainModule.addValues(
-//                AktivitaetValue.class,
-//                BiotoptypValue.class,
-//                PflanzeValue.class,
-//                PilzValue.class,
-//                TierValue.class,
-//                GefahrValue.class,
-//                StoerungValue.class,
-//                WertValue.class
-//        );
+		domainModule.addServices(LuceneEntityStoreService.class)
+				.setMetaInfo(new LuceneEntityStoreInfo(moduleRoot))
+				.instantiateOnStartup().identifiedBy("lucene-repository");
 
-        // persistence: workspace/Lucene
-        File root = new File( Polymap.getWorkspacePath().toFile(), "data" );
+		// indexer
+		domainModule.addServices(LuceneEntityStoreQueryService.class)
+		// .visibleIn( indexingVisibility )
+		// .setMetaInfo( namedQueries )
+				.instantiateOnStartup();
 
-        File moduleRoot = new File( root, "org.polymap.kaps" );
-        moduleRoot.mkdir();
+		domainModule.addServices(HRIdentityGeneratorService.class);
 
-        domainModule.addServices( LuceneEntityStoreService.class )
-                .setMetaInfo( new LuceneEntityStoreInfo( moduleRoot ) )
-                .instantiateOnStartup()
-                .identifiedBy( "lucene-repository" );
+		// additional services
+		// domainModule.addServices( BiotopnummerGeneratorService.class )
+		// .identifiedBy( "biotopnummer" );
+	}
 
-        // indexer
-        domainModule.addServices( LuceneEntityStoreQueryService.class )
-                //.visibleIn( indexingVisibility )
-                //.setMetaInfo( namedQueries )
-                .instantiateOnStartup();
-
-        domainModule.addServices( HRIdentityGeneratorService.class );
-
-        // additional services
-//        domainModule.addServices( BiotopnummerGeneratorService.class )
-//                .identifiedBy( "biotopnummer" );
-    }
-
-
-    public void createInitData()
-            throws Exception {
-    }
+	public void createInitData() throws Exception {
+	}
 
 }

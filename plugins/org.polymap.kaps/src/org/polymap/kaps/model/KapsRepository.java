@@ -14,20 +14,35 @@
  */
 package org.polymap.kaps.model;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.util.Date;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.geotools.feature.NameImpl;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.opengis.feature.type.Name;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import org.qi4j.api.query.Query;
+import org.qi4j.api.query.grammar.BooleanExpression;
+import org.qi4j.api.service.ServiceReference;
+import org.qi4j.api.unitofwork.ConcurrentEntityModificationException;
+import org.qi4j.api.unitofwork.UnitOfWorkCompletionException;
+
+import org.eclipse.core.runtime.NullProgressMonitor;
+
 import org.polymap.core.catalog.model.CatalogRepository;
 import org.polymap.core.model.CompletionException;
+import org.polymap.core.model.Entity;
+import org.polymap.core.model.EntityType;
+import org.polymap.core.model.EntityType.Property;
 import org.polymap.core.operation.OperationSupport;
 import org.polymap.core.qi4j.Qi4jPlugin;
 import org.polymap.core.qi4j.Qi4jPlugin.Session;
@@ -35,15 +50,11 @@ import org.polymap.core.qi4j.QiModule;
 import org.polymap.core.qi4j.QiModuleAssembler;
 import org.polymap.core.runtime.Polymap;
 import org.polymap.core.runtime.entity.ConcurrentModificationException;
+
 import org.polymap.rhei.data.entityfeature.DefaultEntityProvider;
 import org.polymap.rhei.data.entityfeature.EntityProvider.FidsQueryProvider;
 import org.polymap.rhei.data.entitystore.lucene.LuceneEntityStoreService;
 import org.polymap.rhei.data.entitystore.lucene.LuceneQueryProvider;
-import org.qi4j.api.query.Query;
-import org.qi4j.api.query.grammar.BooleanExpression;
-import org.qi4j.api.service.ServiceReference;
-import org.qi4j.api.unitofwork.ConcurrentEntityModificationException;
-import org.qi4j.api.unitofwork.UnitOfWorkCompletionException;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -71,6 +82,8 @@ public class KapsRepository extends QiModule {
 
 	/** Allow direct access for operations. */
 	protected KapsService kapsService;
+
+	private Map<String, VertragsArtComposite> vertragsArtNamen;
 
 	// public ServiceReference<BiotopnummerGeneratorService> biotopnummern;
 
@@ -129,13 +142,17 @@ public class KapsRepository extends QiModule {
 					luceneStore.getStore());
 
 			kapsService = new KapsService(
-					// BiotopComposite
+			// BiotopComposite
 					new KaufvertragEntityProvider(this, queryProvider),
 					// Arten...
-					new ArtEntityProvider(
-							this,
-							VertragsArtComposite.class,
-							new NameImpl(KapsRepository.NAMESPACE, "Biotoptyp"),
+					new ArtEntityProvider(this, VertragsArtComposite.class,
+							new NameImpl(KapsRepository.NAMESPACE,
+									"Vertragsart"), queryProvider),
+					new ArtEntityProvider(this, StalaComposite.class,
+							new NameImpl(KapsRepository.NAMESPACE, "Stala"),
+							queryProvider), new ArtEntityProvider(this,
+							KaeuferKreisComposite.class, new NameImpl(
+									KapsRepository.NAMESPACE, "Käuferkreis"),
 							queryProvider)
 			// new ArtEntityProvider( this, PflanzenArtComposite.class,
 			// new NameImpl( KapsRepository.NAMESPACE, "Pflanzenart" ),
@@ -285,26 +302,52 @@ public class KapsRepository extends QiModule {
 						// // prototype.biotoptypArtNr().set( randomBt );
 
 						prototype.eingangsDatum().set(new Date());
+						prototype.kaufpreisAnteilZaehler().set(1);
+						prototype.kaufpreisAnteilNenner().set(1);
+
 						// eingangsnummer erst beim Speichern setzen!
 						// prototype.eingangsNr().set(
 						// System.currentTimeMillis() + "");
-//						prototype.verkaeuferKreis().set(
-//								Verkaeuferkreis.schlecht.id);
+						// prototype.verkaeuferKreis().set(
+						// Verkaeuferkreis.schlecht.id);
 
-//						VertragsArtComposite art = newEntity(
-//								VertragsArtComposite.class, null);
-//						art.name().set(
-//								"Vertragsart-" + System.currentTimeMillis());
-//						art.nummer().set(
-//								String.valueOf(System.currentTimeMillis()));
-//						prototype.vertragArt().set(art);
-//						prototype.vertragArten().add(art);
+						// VertragsArtComposite art = newEntity(
+						// VertragsArtComposite.class, null);
+						// art.name().set(
+						// "Vertragsart-" + System.currentTimeMillis());
+						// art.nummer().set(
+						// String.valueOf(System.currentTimeMillis()));
+						// prototype.vertragArt().set(art);
+						// prototype.vertragArten().add(art);
 
 						if (creator != null) {
 							creator.create(prototype);
 						}
 					}
 				});
+	}
+
+	public <T extends Entity> Map<String, T> entitiesWithNames(
+			Class<T> entityClass) {
+		// if (vertragsArtNamen == null) {
+
+		Property nameProperty = entityType(entityClass).getProperty("name");
+		if (nameProperty == null) {
+			throw new IllegalStateException(entityClass
+					+ " doesnt have an 'name' Property");
+		}
+
+		Query<T> entities = findEntities(entityClass, null, 0, 1000);
+		Map<String, T> vertragsArtNamen = new HashMap<String, T>();
+		for (T entity : entities) {
+			try {
+				vertragsArtNamen.put((String)nameProperty.getValue(entity), entity);
+			} catch (Exception e) {
+				throw new IllegalStateException("Exception on name() on entity " + entity.id(), e);
+			}
+		}
+		// }
+		return vertragsArtNamen;
 	}
 	//
 	//

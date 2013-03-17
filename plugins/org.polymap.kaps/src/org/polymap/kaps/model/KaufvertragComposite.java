@@ -24,10 +24,10 @@ import org.polymap.core.qi4j.event.PropertyChangeSupport;
 import org.polymap.kaps.importer.ImportColumn;
 import org.polymap.kaps.importer.ImportTable;
 import org.qi4j.api.common.Optional;
+import org.qi4j.api.common.UseDefaults;
 import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.entity.association.Association;
-import org.qi4j.api.entity.association.ManyAssociation;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.property.Property;
 
@@ -41,8 +41,8 @@ import org.qi4j.api.property.Property;
 // JsonState.Mixin.class
 })
 @ImportTable("K_BUCH")
-public interface KaufvertragComposite extends QiEntity, /* JsonState, */
-PropertyChangeSupport, ModelChangeSupport, EntityComposite {
+public interface KaufvertragComposite extends QiEntity, PropertyChangeSupport,
+		ModelChangeSupport, EntityComposite {
 
 	// CREATE TABLE K_BUCH (
 	// EINGANGSNR DOUBLE,
@@ -133,32 +133,35 @@ PropertyChangeSupport, ModelChangeSupport, EntityComposite {
 	Property<Integer> eingangsNr();
 
 	// VERTDATUM TIMESTAMP,
+	@Optional
 	@ImportColumn("VERTDATUM")
 	Property<Date> vertragsDatum();
 
 	// EINGANG TIMESTAMP,
+	@Optional
 	@ImportColumn("EINGANG")
 	Property<Date> eingangsDatum();
 
 	// VKREIS VARCHAR(2),
-	// @Optional
-	@ImportColumn("VKREIS")
+	@Optional
+	// @ImportColumn("VKREIS")
 	Association<KaeuferKreisComposite> verkaeuferKreis();
 
 	// KKREIS VARCHAR(2),
-	// @Optional
-	@ImportColumn("KKREIS")
+	@Optional
+	// @ImportColumn("KKREIS")
 	Association<KaeuferKreisComposite> kaeuferKreis();
 
 	// VERTRAGART VARCHAR(2),
-	// @Optional
-	//@ImportColumn("VERTRAGART")
+	@Optional
+	// @ImportColumn("VERTRAGART")
 	Association<VertragsArtComposite> vertragsArt();
 
 	// BEBAUT VARCHAR(1),
 	// wird nicht benutzt
 
 	// KAUFPREIS DOUBLE,
+	@UseDefaults
 	@ImportColumn("KAUFPREIS")
 	Property<Integer> kaufpreis();
 
@@ -171,12 +174,14 @@ PropertyChangeSupport, ModelChangeSupport, EntityComposite {
 	Property<Integer> kaufpreisAnteilNenner();
 
 	// VOLLPREIS DOUBLE,
+	@UseDefaults
 	@ImportColumn("VOLLPREIS")
 	Property<Integer> vollpreis();
 
 	// VERARBKZ VARCHAR(1),
 	// J oder N
 	// zur Auswertung geeignet
+	@UseDefaults
 	@ImportColumn("VERARBKZ")
 	Property<Boolean> zurAuswertungGeeignet();
 
@@ -193,14 +198,14 @@ PropertyChangeSupport, ModelChangeSupport, EntityComposite {
 	// VERKAUF VARCHAR(9),
 	// letzter Verkauf, Referenz auf anderen Vertrag
 	@Optional
-	@ImportColumn("VERKAUF")
+	// @ImportColumn("VERKAUF")
 	Association<KaufvertragComposite> verkauf();
-	
+
 	// ANFR1 VARCHAR(60),
 	@Optional
 	@ImportColumn("ANFR1")
 	Property<String> anfragen1();
-	
+
 	// ANFR2 VARCHAR(60),
 	@Optional
 	@ImportColumn("ANFR2")
@@ -211,7 +216,7 @@ PropertyChangeSupport, ModelChangeSupport, EntityComposite {
 	@Optional
 	@ImportColumn("ANKSRSTAM")
 	Property<Date> anschreibenKaeuferErstelltAm();
-	
+
 	// ANVSRSTAM TIMESTAMP,
 	@Optional
 	@ImportColumn("ANVSRSTAM")
@@ -221,7 +226,7 @@ PropertyChangeSupport, ModelChangeSupport, EntityComposite {
 	@Optional
 	@ImportColumn("ANKEINGAM")
 	Property<Date> anschreibenKaeuferEingangAntwort();
-	
+
 	// ANVEINGAM TIMESTAMP,
 	@Optional
 	@ImportColumn("ANVEINGAM")
@@ -231,7 +236,7 @@ PropertyChangeSupport, ModelChangeSupport, EntityComposite {
 	@Optional
 	@ImportColumn("BEMKAUF")
 	Property<String> bemerkungenKaeufer();
-	
+
 	// BEMVKAUF VARCHAR(40),
 	@Optional
 	@ImportColumn("BEMVKAUF")
@@ -239,22 +244,24 @@ PropertyChangeSupport, ModelChangeSupport, EntityComposite {
 
 	// KAUFPREIS_EURO DOUBLE DEFAULT 0,
 	// wird nicht benutzt
-	
+
 	// GESFLAECHE DOUBLE DEFAULT 0,
+	@UseDefaults
 	@ImportColumn("GESFLAECHE")
 	Property<Integer> gesamtFlaeche();
-	
+
 	// verkaufbem VARCHAR(25),
 	@Optional
 	@ImportColumn("verkaufbem")
 	Property<String> bemerkungLetzterVerkauf();
-	
+
 	// EURO_UMSTELL VARCHAR(1),
 	// wird nicht benutzt
-	
+
 	// GESVERKFL DOUBLE,
 	// korrelliert mit Zähler/Nenner
 	// bspw. N = 2, Z = 1 ergibt gesflaeche 800 und gesverkflaeche 400
+	@UseDefaults
 	@ImportColumn("GESVERKFL")
 	Property<Integer> gesamtVerkaufsFlaeche();
 
@@ -268,16 +275,17 @@ PropertyChangeSupport, ModelChangeSupport, EntityComposite {
 	@Optional
 	@ImportColumn("GUTACHTNR1")
 	Property<String> gutachtenNummer();
-	
+
 	// GESPLITTET VARCHAR(1),
 	// Grundstück geht über mehrere Gemeinden
 	@Optional
 	@ImportColumn("GESPLITTET")
 	Property<Boolean> gesplittet();
-	
+
 	// GESPLITTET_EINGANGSNR INTEGER
 	@Optional
-	@ImportColumn("GESPLITTET_EINGANGSNR")
+	// @ImportColumn("GESPLITTET_EINGANGSNR")
+	@UseDefaults
 	Association<KaufvertragComposite> gesplittetHauptvertrag();
 
 	// neue Felder

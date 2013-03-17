@@ -14,6 +14,8 @@
  */
 package org.polymap.kaps.model;
 
+import java.util.Collection;
+
 import org.geotools.data.Query;
 import org.geotools.feature.NameImpl;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
@@ -21,68 +23,129 @@ import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.FeatureType;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import org.polymap.core.model.Composite;
+import org.polymap.core.model.EntityType;
+import org.polymap.core.model.EntityType.Association;
+import org.polymap.core.model.EntityType.Property;
 import org.polymap.core.qi4j.QiModule;
 import org.polymap.core.qi4j.QiModule.EntityCreator;
 
 import org.polymap.rhei.data.entityfeature.EntityProvider2;
 import org.polymap.rhei.data.entityfeature.EntityProvider3;
+import org.polymap.rhei.data.entityfeature.EntitySourceProcessor;
 
 /**
- * Minimale Implementation für einen EntityProvider. Alle einfachen Properties der
- * Entity werden 1:1 umgesetzt. Properties, die Collections oder komplexe Typen
- * enthalten, werden ausgelassen.
+ * Minimale Implementation für einen EntityProvider. Alle einfachen Properties
+ * der Entity werden 1:1 umgesetzt. Properties, die Collections oder komplexe
+ * Typen enthalten, werden ausgelassen.
  * <p/>
- * Bei Bedarf kann der FeatureType und die Features noch nachbearbeitet werden. Das
- * ist anders als beim {@link EntityProvider2}.
+ * Bei Bedarf kann der FeatureType und die Features noch nachbearbeitet werden.
+ * Das ist anders als beim {@link EntityProvider2}.
  * 
  * @author <a href="http://www.polymap.de">Falko Bräutigam</a>
  */
-public class KaufvertragEntityProvider
-        extends KapsEntityProvider<KaufvertragComposite>
-        implements EntityProvider3<KaufvertragComposite> {
+public class KaufvertragEntityProvider extends
+		KapsEntityProvider<KaufvertragComposite> implements
+		EntityProvider3<KaufvertragComposite> {
 
-    public KaufvertragEntityProvider( QiModule repo, FidsQueryProvider queryProvider ) {
-        super( repo, KaufvertragComposite.class, new NameImpl( KapsRepository.NAMESPACE, "Kaufvertrag" ), queryProvider );
-    }
+	private static final Log log = LogFactory
+			.getLog(EntitySourceProcessor.class);
 
-    public KaufvertragComposite newEntity( final EntityCreator<KaufvertragComposite> creator )
-            throws Exception {
-        return ((KapsRepository)repo).newKaufvertrag( creator );
-    }
+	public KaufvertragEntityProvider(QiModule repo,
+			FidsQueryProvider queryProvider) {
+		super(repo, KaufvertragComposite.class, new NameImpl(
+				KapsRepository.NAMESPACE, "Kaufvertrag"), queryProvider);
+	}
 
-    @Override
-    public FeatureType buildFeatureType( FeatureType schema ) {
-        // filter properties
-        SimpleFeatureType filtered = SimpleFeatureTypeBuilder.retype( (SimpleFeatureType)schema, 
-                new String[] {"eingangsDatum", "eingangsNr"} );
-        
-        // VertragsArt
-        // ACHTUNG! : der name darf kein existierender Name einer 
-        //            Property oder Assoziation der Entity sein!
-        SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
-        builder.init( filtered );
-        builder.add( "Vertragsart", String.class );
-        
-        return builder.buildFeatureType();
-    }
+	public KaufvertragComposite newEntity(
+			final EntityCreator<KaufvertragComposite> creator) throws Exception {
+		return ((KapsRepository) repo).newKaufvertrag(creator);
+	}
 
-    @Override
-    public Feature buildFeature( KaufvertragComposite entity, Feature feature, FeatureType schema ) {
-        VertragsArtComposite vertragsArt = entity.vertragsArt().get();
-        feature.getProperty( "Vertragsart" ).setValue( 
-                vertragsArt != null ? vertragsArt.name().get() : "Test" );
-        return feature;
-    }
+	@Override
+	public FeatureType buildFeatureType(FeatureType schema) {
+		// filter properties
+		// SimpleFeatureType filtered = SimpleFeatureTypeBuilder.retype(
+		// (SimpleFeatureType)schema,
+		// new String[] {"eingangsDatum", "eingangsNr"} );
 
-    @Override
-    public boolean modifyFeature( KaufvertragComposite entity, String propName, Object value ) throws Exception {
-        // apply default method
-        return false;
-    }
+		// VertragsArt
+		// ACHTUNG! : der name darf kein existierender Name einer
+		// Property oder Assoziation der Entity sein!
+		SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
+		builder.init((SimpleFeatureType) schema);
 
-    @Override
-    public Query transformQuery( Query query ) {
-        return query;
-    }
-    
+		// assoziationen ergänzen
+		// alle mit einem Type der ein Property Name hat
+		EntityType entityType = getEntityType();
+		Collection<EntityType.Property> p = entityType.getProperties();
+		for (EntityType.Property prop : p) {
+			Class propType = prop.getType();
+			if (prop instanceof Association) {
+				log.debug("    adding association: " + prop.getName() + " / "
+						+ propType);
+				Association association = (Association) prop;
+				EntityType associationType = repo.entityType(association
+						.getType());
+				if (associationType.getProperty("name") != null) {
+					builder.add(association.getName(), String.class);
+				}
+			}
+		}
+
+		return builder.buildFeatureType();
+	}
+
+	@Override
+	public Feature buildFeature(KaufvertragComposite entity, Feature feature,
+			FeatureType schema) {
+		// VertragsArtComposite vertragsArt = entity.vertragsArt().get();
+		// feature.getProperty("Vertragsart").setValue(
+		// vertragsArt != null ? vertragsArt.name().get() : "");
+		// assoziationen ergänzen, alle mit Name Property
+		try {
+			EntityType entityType = getEntityType();
+			Collection<EntityType.Property> p = entityType.getProperties();
+			for (EntityType.Property prop : p) {
+				Class propType = prop.getType();
+				if (prop instanceof Association) {
+					log.debug("    adding association: " + prop.getName()
+							+ " / " + propType);
+					Association association = (Association) prop;
+					EntityType associationType = repo.entityType(association
+							.getType());
+					Property nameProperty = associationType.getProperty("name");
+					if (nameProperty != null) {
+						Object associationValue = association.getValue(entity);
+						Object associatedCompositeName = "";
+						if (associationValue != null) {
+							associatedCompositeName = nameProperty
+									.getValue((Composite) associationValue);
+						}
+						feature.getProperty(association.getName()).setValue(
+								associatedCompositeName);
+					}
+				}
+			}
+		} catch (Exception e) {
+			throw new IllegalStateException(e);
+		}
+		return feature;
+	}
+
+	@Override
+	public boolean modifyFeature(KaufvertragComposite entity, String propName,
+			Object value) throws Exception {
+		// apply default method
+		return false;
+	}
+
+	@Override
+	public Query transformQuery(Query query) {
+		return query;
+	}
+
 }
