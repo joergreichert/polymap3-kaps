@@ -1,17 +1,15 @@
 /*
- * polymap.org
- * Copyright 2011, Falko Br�utigam, and other contributors as
- * indicated by the @authors tag. All rights reserved.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ * polymap.org Copyright 2011, Falko Br�utigam, and other contributors as indicated
+ * by the @authors tag. All rights reserved.
+ * 
+ * This is free software; you can redistribute it and/or modify it under the terms of
+ * the GNU Lesser General Public License as published by the Free Software
+ * Foundation; either version 2.1 of the License, or (at your option) any later
+ * version.
+ * 
+ * This software is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
  */
 package org.polymap.kaps.importer;
 
@@ -26,17 +24,17 @@ import org.polymap.core.workbench.PolymapWorkbench;
 import org.polymap.kaps.KapsPlugin;
 
 /**
- *
- *
+ * 
+ * 
  * @author <a href="http://www.polymap.de">Falko Br�utigam</a>
  */
 public class MdbImportWizard
         extends Wizard
         implements IImportWizard {
 
-    private static Log log = LogFactory.getLog( MdbImportWizard.class );
+    private static Log    log = LogFactory.getLog( MdbImportWizard.class );
 
-    private MdbImportPage           importPage;
+    private MdbImportPage importPage;
 
 
     public MdbImportWizard() {
@@ -59,12 +57,14 @@ public class MdbImportWizard
 
     public boolean performFinish() {
         try {
-            MdbImportOperation op = new MdbImportOperation( importPage.dbFile, importPage.tableNames );
+            MdbImportOperation op = new MdbImportOperation( importPage.dbFile,
+                    importPage.tableNames );
             OperationSupport.instance().execute( op, true, true );
             return true;
         }
         catch (Exception e) {
-            PolymapWorkbench.handleError( KapsPlugin.PLUGIN_ID, this, "Fehler beim importieren.", e );
+            PolymapWorkbench
+                    .handleError( KapsPlugin.PLUGIN_ID, this, "Fehler beim importieren.", e );
             return false;
         }
     }

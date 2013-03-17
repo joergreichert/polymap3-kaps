@@ -14,34 +14,40 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class KapsPlugin extends AbstractUIPlugin {
+public class KapsPlugin
+        extends AbstractUIPlugin {
 
-	// The plug-in ID
-	public static final String PLUGIN_ID = "org.polymap.kaps";
+    // The plug-in ID
+    public static final String PLUGIN_ID = "org.polymap.kaps";
 
-	// The shared instance
-	private static KapsPlugin plugin;
-	
-	
-	public KapsPlugin() {
-	}
+    // The shared instance
+    private static KapsPlugin  plugin;
 
-	public void start( BundleContext context ) throws Exception {
-		super.start( context );
-		plugin = this;
-	}
 
-	public void stop( BundleContext context ) throws Exception {
-		plugin = null;
-		super.stop(context);
-	}
+    public KapsPlugin() {
+    }
 
-	public static KapsPlugin getDefault() {
-		return plugin;
-	}
 
-	
-	public Image imageForDescriptor( ImageDescriptor imageDescriptor, String key ) {
+    public void start( BundleContext context )
+            throws Exception {
+        super.start( context );
+        plugin = this;
+    }
+
+
+    public void stop( BundleContext context )
+            throws Exception {
+        plugin = null;
+        super.stop( context );
+    }
+
+
+    public static KapsPlugin getDefault() {
+        return plugin;
+    }
+
+
+    public Image imageForDescriptor( ImageDescriptor imageDescriptor, String key ) {
         ImageRegistry images = getImageRegistry();
         Image image = images.get( key );
         if (image == null || image.isDisposed()) {
@@ -51,7 +57,7 @@ public class KapsPlugin extends AbstractUIPlugin {
         return image;
     }
 
-    
+
     public Image imageForName( String resName ) {
         ImageRegistry images = getImageRegistry();
         Image image = images.get( resName );

@@ -51,8 +51,7 @@ public class Kaufvertrag2FormEditorPage
     @Override
     public void createFormContent( IFormEditorPageSite site ) {
         super.createFormContent( site );
-        
-        
+
         KaufvertragComposite kaufvertrag = KapsRepository.instance().findEntity(
                 KaufvertragComposite.class, feature.getIdentifier().getID() );
         // Composite eingangsNr = site.newFormField( parent,
@@ -74,11 +73,13 @@ public class Kaufvertrag2FormEditorPage
         // new SimpleFormData( right ).top( eingangsNr ).create() );
         Section left = newSection( "", false, null );
 
-        Composite eingangsNr = newFormField( "eingangsNr" ).setProperty( new PropertyAdapter( kaufvertrag.eingangsNr() ) )
+        Composite eingangsNr = newFormField( "eingangsNr" )
+                .setProperty( new PropertyAdapter( kaufvertrag.eingangsNr() ) )
                 .setField( new TextFormField() ).setParent( left ).create();
 
         Section right = newSection( "", true, left );
-        right.setLayoutData( new SimpleFormData( SECTION_SPACING ).left( 50 ).right( 100 ).top( eingangsNr ).create() );
+        right.setLayoutData( new SimpleFormData( SECTION_SPACING ).left( 50 ).right( 100 )
+                .top( eingangsNr ).create() );
 
         newFormField( "vertragsDatum" )
                 .setProperty( new PropertyAdapter( kaufvertrag.vertragsDatum() ) )
@@ -86,7 +87,11 @@ public class Kaufvertrag2FormEditorPage
 
         newFormField( "eingangsDatum" )
                 .setProperty( new PropertyAdapter( kaufvertrag.eingangsDatum() ) )
-                .setField( new DateTimeFormField() ).setParent( right ).create();//.setLayoutData( new SimpleFormData().top( eingangsNr ).create());
+                .setField( new DateTimeFormField() ).setParent( right ).create();// .setLayoutData(
+                                                                                 // new
+                                                                                 // SimpleFormData().top(
+                                                                                 // eingangsNr
+                                                                                 // ).create());
     }
 
 }

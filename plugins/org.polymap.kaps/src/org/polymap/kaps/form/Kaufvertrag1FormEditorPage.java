@@ -43,23 +43,13 @@ public class Kaufvertrag1FormEditorPage
         extends KaufvertragFormEditorPage {
 
     public Kaufvertrag1FormEditorPage( Feature feature, FeatureStore featureStore ) {
-        super( feature, featureStore );
-    }
-
-
-    @Override
-    public String getTitle() {
-        // return "Kaufvertrag " + (kaufvertrag.eingangsNr().get() != null ?
-        // kaufvertrag.eingangsNr().get() : "");
-        return "Vertragsdaten";
+        super( Kaufvertrag1FormEditorPage.class.getName(), "Vertragsdaten", feature, featureStore );
     }
 
 
     @Override
     public void createFormContent( IFormEditorPageSite site ) {
-        // TODO Title von Formular entfernen und dafür nur in den Title des
-        // Editors
-        site.setFormTitle( "Kaufvertrag " );
+        super.createFormContent( site );
 
         // DefaultFormPageLayouter layouter = new DefaultFormPageLayouter();
         FormData left = new SimpleFormData( SPACING ).left( LEFT ).right( MIDDLE ).create();

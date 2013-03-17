@@ -1,16 +1,14 @@
-/* 
- * polymap.org
- * Copyright 2012, Polymap GmbH. All rights reserved.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+/*
+ * polymap.org Copyright 2012, Polymap GmbH. All rights reserved.
+ * 
+ * This is free software; you can redistribute it and/or modify it under the terms of
+ * the GNU Lesser General Public License as published by the Free Software
+ * Foundation; either version 2.1 of the License, or (at your option) any later
+ * version.
+ * 
+ * This software is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
  */
 package org.polymap.kaps.model;
 
@@ -37,42 +35,46 @@ import org.qi4j.api.value.ValueComposite;
  */
 @Concerns({ PropertyChangeSupport.Concern.class })
 @Mixins({ StalaComposite.Mixin.class, PropertyChangeSupport.Mixin.class,
-		ModelChangeSupport.Mixin.class, QiEntity.Mixin.class
+        ModelChangeSupport.Mixin.class, QiEntity.Mixin.class
 // JsonState.Mixin.class
 })
 @ImportTable("K_STALA")
-public interface StalaComposite extends QiEntity, PropertyChangeSupport,
-		ModelChangeSupport, EntityComposite {
+public interface StalaComposite
+        extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite {
 
-	// CREATE TABLE ".".K_STALA (
-	// ART VARCHAR(1),
-	// SCHL VARCHAR(2),
-	// BEZ VARCHAR(70)
-	// );
+    // CREATE TABLE ".".K_STALA (
+    // ART VARCHAR(1),
+    // SCHL VARCHAR(2),
+    // BEZ VARCHAR(70)
+    // );
 
-	// Arten: Handbuch Seite 40
-	// 1 = Grundstücksart
-	// 2 = Art des Baugebietes
-	// 3 = Veräußerer/Erwerber
-	// 4 = Verwandschaftsverhältnis
-	// 5 = 7 = ?
-	// 6 = unbekannt
+    // Arten: Handbuch Seite 40
+    // 1 = Grundstücksart
+    // 2 = Art des Baugebietes
+    // 3 = Veräußerer/Erwerber
+    // 4 = Verwandschaftsverhältnis
+    // 5 = 7 = ?
+    // 6 = unbekannt
 
-	@ImportColumn("ART")
-	Property<String> art();
+    @ImportColumn("ART")
+    Property<String> art();
 
-	@ImportColumn("SCHL")
-	Property<String> schl();
 
-	@ImportColumn("BEZ")
-	Property<String> name();
+    @ImportColumn("SCHL")
+    Property<String> schl();
 
-	/**
-	 * Methods and transient fields.
-	 */
-	public static abstract class Mixin implements VertragsArtComposite {
 
-		private static Log log = LogFactory.getLog(Mixin.class);
+    @ImportColumn("BEZ")
+    Property<String> name();
 
-	}
+
+    /**
+     * Methods and transient fields.
+     */
+    public static abstract class Mixin
+            implements VertragsArtComposite {
+
+        private static Log log = LogFactory.getLog( Mixin.class );
+
+    }
 }

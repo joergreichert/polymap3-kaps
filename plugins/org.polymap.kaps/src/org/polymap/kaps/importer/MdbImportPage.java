@@ -1,17 +1,15 @@
 /*
- * polymap.org
- * Copyright 2011, Falko Br�utigam, and other contributors as
- * indicated by the @authors tag. All rights reserved.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ * polymap.org Copyright 2011, Falko Br�utigam, and other contributors as indicated
+ * by the @authors tag. All rights reserved.
+ * 
+ * This is free software; you can redistribute it and/or modify it under the terms of
+ * the GNU Lesser General Public License as published by the Free Software
+ * Foundation; either version 2.1 of the License, or (at your option) any later
+ * version.
+ * 
+ * This software is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
  */
 package org.polymap.kaps.importer;
 
@@ -51,31 +49,31 @@ import org.polymap.core.runtime.Polymap;
 import org.polymap.core.workbench.PolymapWorkbench;
 
 /**
- *
- *
+ * 
+ * 
  * @author <a href="http://www.polymap.de">Falko Br�utigam</a>
  */
 public class MdbImportPage
         extends WizardPage
         implements IWizardPage, UploadListener {
 
-    private static Log log = LogFactory.getLog( MdbImportPage.class );
+    private static Log         log = LogFactory.getLog( MdbImportPage.class );
 
-    public static final String          ID = "MdbImportPage";
+    public static final String ID  = "MdbImportPage";
 
-    File                                dbFile;
+    File                       dbFile;
 
-    String[]                            tableNames;
+    String[]                   tableNames;
 
-    private Upload                      upload;
+    private Upload             upload;
 
-    private List                        tablesList;
+    private List               tablesList;
 
 
     protected MdbImportPage() {
         super( ID );
         setTitle( "Datenbank-Datei auswählen." );
-        setDescription( "Wählen Sie eine *.mdb Datei zum importieren aus.");
+        setDescription( "Wählen Sie eine *.mdb Datei zum importieren aus." );
     }
 
 
@@ -85,7 +83,8 @@ public class MdbImportPage
         layout.spacing = 5;
         fileSelectionArea.setLayout( layout );
 
-        upload = new Upload( fileSelectionArea, SWT.BORDER, /*Upload.SHOW_PROGRESS |*/ Upload.SHOW_UPLOAD_BUTTON );
+        upload = new Upload( fileSelectionArea, SWT.BORDER, /* Upload.SHOW_PROGRESS | */
+                Upload.SHOW_UPLOAD_BUTTON );
         upload.setBrowseButtonText( "Browse" );
         upload.setUploadButtonText( "Upload" );
         upload.addUploadListener( this );
@@ -102,9 +101,10 @@ public class MdbImportPage
         data.right = new FormAttachment( 100 );
         tablesList.setLayoutData( data );
         tablesList.addSelectionListener( new SelectionAdapter() {
+
             public void widgetSelected( SelectionEvent ev ) {
                 tableNames = tablesList.getSelection();
-                
+
                 try {
                     Database db = Database.open( dbFile );
                     for (String name : tableNames) {
@@ -118,7 +118,7 @@ public class MdbImportPage
                 }
                 checkFinish();
             }
-        });
+        } );
         tablesList.setLayoutData( data );
 
         setControl( fileSelectionArea );
@@ -145,6 +145,7 @@ public class MdbImportPage
     public void uploadInProgress( UploadEvent ev ) {
     }
 
+
     public void uploadFinished( UploadEvent ev ) {
         UploadItem item = upload.getUploadItem();
         try {
@@ -160,11 +161,12 @@ public class MdbImportPage
             log.info( "Tables: " + db.getTableNames() );
 
             TreeSet<String> sorted = new TreeSet<String>( db.getTableNames() );
-            tablesList.setItems( sorted.toArray( new String[sorted.size()]) );
+            tablesList.setItems( sorted.toArray( new String[sorted.size()] ) );
             db.close();
         }
         catch (IOException e) {
-            PolymapWorkbench.handleError( DataPlugin.PLUGIN_ID, MdbImportPage.this, "Fehler beim Upload der Daten.", e );
+            PolymapWorkbench.handleError( DataPlugin.PLUGIN_ID, MdbImportPage.this,
+                    "Fehler beim Upload der Daten.", e );
         }
         checkFinish();
     }
