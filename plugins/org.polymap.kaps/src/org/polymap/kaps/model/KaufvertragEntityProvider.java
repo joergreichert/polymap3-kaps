@@ -14,6 +14,10 @@ package org.polymap.kaps.model;
 
 import java.util.Collection;
 
+import java.text.NumberFormat;
+
+import javax.swing.text.NumberFormatter;
+
 import org.geotools.data.Query;
 import org.geotools.feature.NameImpl;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
@@ -34,6 +38,8 @@ import org.polymap.core.qi4j.QiModule.EntityCreator;
 import org.polymap.rhei.data.entityfeature.EntityProvider2;
 import org.polymap.rhei.data.entityfeature.EntityProvider3;
 import org.polymap.rhei.data.entityfeature.EntitySourceProcessor;
+
+import org.polymap.kaps.form.EingangsNummerFormatter;
 
 /**
  * Minimale Implementation für einen EntityProvider. Alle einfachen Properties der
@@ -93,7 +99,13 @@ public class KaufvertragEntityProvider
             }
         }
 
-        return builder.buildFeatureType();
+        builder.remove( "eingangsNr" );
+        builder.add( "eingangsNr", String.class );
+
+        // aussortieren für die Tabelle
+        SimpleFeatureType filtered = SimpleFeatureTypeBuilder.retype( builder.buildFeatureType(),
+                new String[] { "eingangsNr", "vertragsDatum", "vertragsArt", "eingangsDatum", "vollPreis" } );
+        return filtered;
     }
 
 
@@ -111,23 +123,42 @@ public class KaufvertragEntityProvider
                 if (prop instanceof Association) {
                     log.debug( "    adding association: " + prop.getName() + " / " + propType );
                     Association association = (Association)prop;
-                    EntityType associationType = repo.entityType( association.getType() );
-                    Property nameProperty = associationType.getProperty( "name" );
-                    if (nameProperty != null) {
-                        Object associationValue = association.getValue( entity );
-                        Object associatedCompositeName = "";
-                        if (associationValue != null) {
-                            associatedCompositeName = nameProperty
-                                    .getValue( (Composite)associationValue );
+
+                    org.opengis.feature.Property property = feature.getProperty( association
+                            .getName() );
+                    if (property != null) {
+                        EntityType associationType = repo.entityType( association.getType() );
+                        Property nameProperty = associationType.getProperty( "name" );
+                        Property schlProperty = associationType.getProperty( "schl" );
+                        if (nameProperty != null) {
+                            Object associationValue = association.getValue( entity );
+                            StringBuffer associatedCompositeName = new StringBuffer( "" );
+                            if (associationValue != null) {
+                                String name = (String)nameProperty
+                                        .getValue( (Composite)associationValue );
+                                String schl = (String)schlProperty
+                                        .getValue( (Composite)associationValue );
+                                if (schl != null) {
+                                    associatedCompositeName.append( schl ).append( "  -  " );
+                                }
+                                if (name != null) {
+                                    associatedCompositeName.append( name );
+                                }
+                            }
+                            property.setValue( associatedCompositeName );
                         }
-                        feature.getProperty( association.getName() ).setValue(
-                                associatedCompositeName );
                     }
                 }
             }
         }
         catch (Exception e) {
             throw new IllegalStateException( e );
+        }
+        // formatieren
+        // eingangsnummer
+        if (entity.eingangsNr().get() != null) {
+            feature.getProperty( "eingangsNr" ).setValue(
+                    EingangsNummerFormatter.format( entity.eingangsNr().get().toString() ) );
         }
         return feature;
     }

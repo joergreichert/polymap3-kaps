@@ -12,7 +12,6 @@
  */
 package org.polymap.kaps.form;
 
-import java.util.Date;
 import java.util.Locale;
 
 import org.geotools.data.FeatureStore;
@@ -28,7 +27,6 @@ import org.polymap.core.project.ui.util.SimpleFormData;
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
 import org.polymap.rhei.field.DateTimeFormField;
 import org.polymap.rhei.field.IFormField;
-import org.polymap.rhei.field.IFormFieldValidator;
 import org.polymap.rhei.field.NumberValidator;
 import org.polymap.rhei.field.PicklistFormField;
 import org.polymap.rhei.field.TextFormField;
@@ -65,7 +63,7 @@ public class Kaufvertrag1FormEditorPage
 
         // readonly
         Composite eingangsNr = site.newFormField( parent,
-                new PropertyAdapter( kaufvertrag.eingangsNr() ), new TextFormField(), null,
+                new PropertyAdapter( kaufvertrag.eingangsNr() ), new TextFormField(), new EingangsNummerFormatter(),
                 "Eingangsnummer" );
         eingangsNr.setEnabled( false );
         eingangsNr.setLayoutData( new SimpleFormData( left ).create() );
