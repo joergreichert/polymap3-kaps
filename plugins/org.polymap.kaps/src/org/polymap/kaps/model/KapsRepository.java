@@ -12,15 +12,15 @@
  */
 package org.polymap.kaps.model;
 
+import static org.qi4j.api.query.QueryExpressions.orderBy;
+import static org.qi4j.api.query.QueryExpressions.templateFor;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static org.qi4j.api.query.QueryExpressions.orderBy;
-import static org.qi4j.api.query.QueryExpressions.templateFor;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 
@@ -45,8 +45,8 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.polymap.core.catalog.model.CatalogRepository;
 import org.polymap.core.model.CompletionException;
 import org.polymap.core.model.Entity;
-import org.polymap.core.model.EntityType;
 import org.polymap.core.model.EntityType.Property;
+import org.polymap.core.operation.IOperationSaveListener;
 import org.polymap.core.operation.OperationSupport;
 import org.polymap.core.qi4j.Qi4jPlugin;
 import org.polymap.core.qi4j.Qi4jPlugin.Session;
@@ -80,17 +80,17 @@ public class KapsRepository
 
     // instance *******************************************
 
-    private OperationSaveListener             operationListener = new OperationSaveListener();
+    private IOperationSaveListener operationListener = new OperationSaveListener();
 
     // private Map<String,VertragsArtComposite> btNamen;
 
     // private Map<String,VertragsArtComposite> btNummern;
 
     /** Allow direct access for operations. */
-    protected KapsService                     kapsService;
+    protected KapsService          kapsService;
 
-    private Map<String, VertragsArtComposite> vertragsArtNamen;
 
+    // private Map<String, VertragsArtComposite> vertragsArtNamen;
 
     // public ServiceReference<BiotopnummerGeneratorService> biotopnummern;
 
@@ -160,7 +160,17 @@ public class KapsRepository
                     new ArtEntityProvider( this, StalaComposite.class, new NameImpl(
                             KapsRepository.NAMESPACE, "Stala" ), queryProvider ),
                     new ArtEntityProvider( this, KaeuferKreisComposite.class, new NameImpl(
-                            KapsRepository.NAMESPACE, "Käuferkreis" ), queryProvider )
+                            KapsRepository.NAMESPACE, "Käuferkreis" ), queryProvider ),
+                    new ArtEntityProvider( this, NutzungComposite.class, new NameImpl(
+                            KapsRepository.NAMESPACE, "Nutzung" ), queryProvider ),
+                    new ArtEntityProvider( this, GebaeudeArtComposite.class, new NameImpl(
+                            KapsRepository.NAMESPACE, "Gebäudeart" ), queryProvider ),
+                    new ArtEntityProvider( this, GemeindeComposite.class, new NameImpl(
+                            KapsRepository.NAMESPACE, "Gemeinde" ), queryProvider ),
+                    new ArtEntityProvider( this, StrasseComposite.class, new NameImpl(
+                            KapsRepository.NAMESPACE, "Strasse" ), queryProvider )
+                    
+                    
             // new ArtEntityProvider( this, PflanzenArtComposite.class,
             // new NameImpl( KapsRepository.NAMESPACE, "Pflanzenart" ),
             // queryProvider ),
@@ -289,50 +299,11 @@ public class KapsRepository
 
                     public void create( KaufvertragComposite prototype )
                             throws Exception {
-                        
-                        prototype.eingangsNr().set( highestEingangsNummer() );
-                        // // objnr
-                        // prototype.objnr().set( biotopnummern.get().generate()
-                        // );
-                        // // status
-                        // prototype.status().set( Status.aktuell.id );
-                        //
-                        // // erfassung
-                        // ValueBuilder<AktivitaetValue> builder =
-                        // newValueBuilder( AktivitaetValue.class );
-                        // AktivitaetValue _prototype = builder.prototype();
-                        // _prototype.wann().set( new Date() );
-                        // _prototype.wer().set(
-                        // Polymap.instance().getUser().getName() );
-                        // _prototype.bemerkung().set( "" );
-                        // prototype.erfassung().set( builder.newInstance() );
-                        // // bearbeitung
-                        // prototype.bearbeitung().set( builder.newInstance() );
-                        //
-                        // // biotoptyp (zuf�llig)
-                        // String randomBt =
-                        // btNamen().values().iterator().next().nummer().get();
-                        // // prototype.biotoptypArtNr().set( randomBt );
-
-                        // 
                         prototype.eingangsDatum().set( new Date() );
                         prototype.kaufpreisAnteilZaehler().set( 1 );
                         prototype.kaufpreisAnteilNenner().set( 1 );
 
                         // eingangsnummer erst beim Speichern setzen!
-                        // prototype.eingangsNr().set(
-                        // System.currentTimeMillis() + "");
-                        // prototype.verkaeuferKreis().set(
-                        // Verkaeuferkreis.schlecht.id);
-
-                        // VertragsArtComposite art = newEntity(
-                        // VertragsArtComposite.class, null);
-                        // art.name().set(
-                        // "Vertragsart-" + System.currentTimeMillis());
-                        // art.nummer().set(
-                        // String.valueOf(System.currentTimeMillis()));
-                        // prototype.vertragArt().set(art);
-                        // prototype.vertragArten().add(art);
 
                         if (creator != null) {
                             creator.create( prototype );
@@ -341,21 +312,23 @@ public class KapsRepository
                 } );
     }
 
-    private int highestEingangsNummer() {
+
+    public int highestEingangsNummer() {
         Query<KaufvertragComposite> entities = findEntities( KaufvertragComposite.class, null, 0, 1 );
         KaufvertragComposite template = templateFor( KaufvertragComposite.class );
-        entities.orderBy( orderBy( template.eingangsNr(), OrderBy.Order.DESCENDING) );
-//        return 1;
+        entities.orderBy( orderBy( template.eingangsNr(), OrderBy.Order.DESCENDING ) );
+        // return 1;
         KaufvertragComposite highest = entities.iterator().next();
         int highestEingangsNr = highest != null ? highest.eingangsNr().get() : 0;
-        
+
         // minimum aktuelles Jahr * 100000 + 1
         int currentYear = new GregorianCalendar().get( Calendar.YEAR );
         int currentMinimumNumber = currentYear * 100000;
-        
+
         return Math.max( highestEingangsNr, currentMinimumNumber ) + 1;
     }
-    
+
+
     public <T extends Entity> Map<String, T> entitiesWithNames( Class<T> entityClass ) {
         // if (vertragsArtNamen == null) {
 
@@ -367,10 +340,10 @@ public class KapsRepository
         }
 
         Query<T> entities = findEntities( entityClass, null, 0, 1000 );
-//        if (schlProperty != null) {
-//            T template = templateFor( entityClass );
-//            entities.orderBy( orderBy(template.schl(), OrderBy.Order.ASCENDING) );
-//        }
+        // if (schlProperty != null) {
+        // T template = templateFor( entityClass );
+        // entities.orderBy( orderBy(template.schl(), OrderBy.Order.ASCENDING) );
+        // }
         Map<String, T> vertragsArtNamen = new TreeMap<String, T>();
         for (T entity : entities) {
             try {

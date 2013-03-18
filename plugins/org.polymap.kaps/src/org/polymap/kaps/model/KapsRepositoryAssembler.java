@@ -75,7 +75,8 @@ public class KapsRepositoryAssembler
         LayerAssembly domainLayer = _app.layerAssembly( "application-layer" );
         ModuleAssembly domainModule = domainLayer.moduleAssembly( "kaps-module" );
         domainModule.addEntities( KaufvertragComposite.class, VertragsArtComposite.class,
-                KaeuferKreisComposite.class, StalaComposite.class
+                KaeuferKreisComposite.class, StalaComposite.class, GemeindeComposite.class,
+                GebaeudeArtComposite.class, NutzungComposite.class, StrasseComposite.class
         // BiotoptypArtComposite.class,
         // PflanzenArtComposite.class,
         // PilzArtComposite.class,

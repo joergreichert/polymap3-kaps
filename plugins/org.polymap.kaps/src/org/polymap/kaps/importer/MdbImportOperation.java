@@ -1,30 +1,41 @@
 package org.polymap.kaps.importer;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.eclipse.core.commands.operations.IUndoableOperation;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.polymap.core.qi4j.QiModule.EntityCreator;
-import org.polymap.core.qi4j.event.AbstractModelChangeOperation;
-import org.polymap.core.runtime.SubMonitor;
-import org.polymap.kaps.model.KaeuferKreisComposite;
-import org.polymap.kaps.model.KapsRepository;
-import org.polymap.kaps.model.KaufvertragComposite;
-import org.polymap.kaps.model.StalaComposite;
-import org.polymap.kaps.model.VertragsArtComposite;
+
 import org.qi4j.api.entity.EntityComposite;
 
 import com.healthmarketscience.jackcess.Column;
 import com.healthmarketscience.jackcess.Database;
 import com.healthmarketscience.jackcess.Table;
+
+import org.eclipse.core.commands.operations.IUndoableOperation;
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+
+import org.polymap.core.qi4j.QiModule.EntityCreator;
+import org.polymap.core.qi4j.event.AbstractModelChangeOperation;
+import org.polymap.core.runtime.SubMonitor;
+
+import org.polymap.kaps.model.GebaeudeArtComposite;
+import org.polymap.kaps.model.GemeindeComposite;
+import org.polymap.kaps.model.KaeuferKreisComposite;
+import org.polymap.kaps.model.KapsRepository;
+import org.polymap.kaps.model.KaufvertragComposite;
+import org.polymap.kaps.model.NutzungComposite;
+import org.polymap.kaps.model.StalaComposite;
+import org.polymap.kaps.model.StrasseComposite;
+import org.polymap.kaps.model.VertragsArtComposite;
 
 /**
  * 
@@ -117,7 +128,6 @@ public class MdbImportOperation
                             allKKreise.put( entity.schl().get(), entity );
                         }
                     } );
-
             sub = new SubMonitor( monitor, 10 );
             importEntity( db, sub, KaufvertragComposite.class, "K_BUCH",
                     new EntityCallback<KaufvertragComposite>() {
@@ -182,10 +192,79 @@ public class MdbImportOperation
                                 bem.append( bem2 );
                             }
                             entity.bemerkungen().set( bem.toString() );
+
+                            // ANFR1 und ANFR2 zusammenfassen
+                            String anfr1 = (String)builderRow.get( "ANFR1" );
+                            String anfr2 = (String)builderRow.get( "ANFR2" );
+                            StringBuilder anfr = new StringBuilder();
+                            if (anfr1 != null) {
+                                anfr.append( anfr1 );
+                                if (anfr2 != null) {
+                                    anfr.append( Character.LINE_SEPARATOR );
+                                }
+                            }
+                            if (anfr2 != null) {
+                                anfr.append( anfr2 );
+                            }
+                            entity.anfragen().set( anfr.toString() );
+                            
                             // find also Verkaufsverträge alt und geplittete
                             // Verträge
                             // TODO die werden aber eventuell erst später
                             // assoziiert
+                        }
+                    } );
+            sub = new SubMonitor( monitor, 10 );
+            importEntity( db, sub, NutzungComposite.class, "K_NUTZ",
+                    new EntityCallback<NutzungComposite>() {
+
+                        @Override
+                        public void fillEntity( NutzungComposite entity,
+                                Map<String, Object> builderRow ) {
+                            // associate stala erstellen
+                            Object stalaSchl = builderRow.get( "STALA" );
+                            if (stalaSchl != null) {
+                                StalaComposite stala = allStalas.get( stalaSchl.toString() );
+                                if (stala == null) {
+                                    throw new IllegalStateException( "no stala found for schl '"
+                                            + stalaSchl + "' in K_KREIS_1 '" + entity.schl() + "'!" );
+                                }
+                                entity.stala().set( stala );
+                            }
+                        }
+                    } );
+            sub = new SubMonitor( monitor, 10 );
+            importEntity( db, sub, GebaeudeArtComposite.class, "K_GEBART",null);
+            sub = new SubMonitor( monitor, 10 );
+            
+            final Map<String, GemeindeComposite> allGemeinde = new HashMap<String, GemeindeComposite>();
+            importEntity( db, sub, GemeindeComposite.class, "K_GEMEINDE",
+                    new EntityCallback<GemeindeComposite>() {
+
+                @Override
+                public void fillEntity( GemeindeComposite entity,
+                        Map<String, Object> builderRow ) {
+                    // associate stala erstellen
+                    allGemeinde.put(entity.schl().get(), entity);
+                }
+            });
+            sub = new SubMonitor( monitor, 10 );
+            importEntity( db, sub, StrasseComposite.class, "K_STRASS",
+                    new EntityCallback<StrasseComposite>() {
+
+                        @Override
+                        public void fillEntity( StrasseComposite entity,
+                                Map<String, Object> builderRow ) {
+                            // associate stala erstellen
+                            Object gemSchl = builderRow.get( "GEMEINDE" );
+                            if (gemSchl != null) {
+                                GemeindeComposite gemeinde = allGemeinde.get( gemSchl.toString() );
+                                if (gemeinde == null) {
+                                    throw new IllegalStateException( "no stala found for schl '"
+                                            + gemSchl + "' in K_KREIS_1 '" + entity.schl() + "'!" );
+                                }
+                                entity.gemeinde().set( gemeinde );
+                            }
                         }
                     } );
             //

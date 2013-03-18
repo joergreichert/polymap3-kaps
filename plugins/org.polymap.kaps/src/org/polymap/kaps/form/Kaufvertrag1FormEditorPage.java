@@ -14,6 +14,8 @@ package org.polymap.kaps.form;
 
 import java.util.Locale;
 
+import java.text.NumberFormat;
+
 import org.geotools.data.FeatureStore;
 import org.opengis.feature.Feature;
 
@@ -26,7 +28,9 @@ import org.polymap.core.project.ui.util.SimpleFormData;
 
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
 import org.polymap.rhei.field.DateTimeFormField;
+import org.polymap.rhei.field.FormFieldEvent;
 import org.polymap.rhei.field.IFormField;
+import org.polymap.rhei.field.IFormFieldListener;
 import org.polymap.rhei.field.NumberValidator;
 import org.polymap.rhei.field.PicklistFormField;
 import org.polymap.rhei.field.TextFormField;
@@ -41,13 +45,15 @@ import org.polymap.kaps.model.VertragsArtComposite;
 public class Kaufvertrag1FormEditorPage
         extends KaufvertragFormEditorPage {
 
+    private IFormFieldListener      vollpreisRefresher;
+    
     public Kaufvertrag1FormEditorPage( Feature feature, FeatureStore featureStore ) {
         super( Kaufvertrag1FormEditorPage.class.getName(), "Vertragsdaten", feature, featureStore );
     }
 
 
     @Override
-    public void createFormContent( IFormEditorPageSite site ) {
+    public void createFormContent( final IFormEditorPageSite site ) {
         super.createFormContent( site );
 
         // DefaultFormPageLayouter layouter = new DefaultFormPageLayouter();
@@ -63,8 +69,8 @@ public class Kaufvertrag1FormEditorPage
 
         // readonly
         Composite eingangsNr = site.newFormField( parent,
-                new PropertyAdapter( kaufvertrag.eingangsNr() ), new TextFormField(), new EingangsNummerFormatter(),
-                "Eingangsnummer" );
+                new PropertyAdapter( kaufvertrag.eingangsNr() ), new TextFormField(),
+                new EingangsNummerFormatter(), "Eingangsnummer" );
         eingangsNr.setEnabled( false );
         eingangsNr.setLayoutData( new SimpleFormData( left ).create() );
 
@@ -101,25 +107,29 @@ public class Kaufvertrag1FormEditorPage
         line4.setLayoutData( new SimpleFormData( left ).top( line3, SPACING ).create() );
 
         // Kaufpreis Nenner/Zähler
-        Composite line5 = site.newFormField( parent,
-                new PropertyAdapter( kaufvertrag.kaufpreis() ), new TextFormField(SWT.RIGHT),
+        final Composite line5 = site.newFormField( parent,
+                new PropertyAdapter( kaufvertrag.kaufpreis() ), new TextFormField( SWT.RIGHT ),
                 new NumberValidator( Integer.class, Locale.getDefault() ), "Kaufpreis (€)" );
         line5.setLayoutData( new SimpleFormData( left ).right( 30 ).top( line4, SPACING ).create() );
-        
-        site.newFormField( parent,
-                new PropertyAdapter( kaufvertrag.kaufpreisAnteilZaehler() ), new TextFormField(SWT.RIGHT),
-                new NumberValidator( Integer.class, Locale.getDefault(), 3, 0 ), "Anteil Zähler/Nenner" ).
-                setLayoutData( new SimpleFormData(SPACING).left(50).right( 80 ).top( line4, SPACING ).create() );
 
-        site.newFormField( parent,
-                new PropertyAdapter( kaufvertrag.kaufpreisAnteilNenner() ), new TextFormField(SWT.RIGHT),
-                new NumberValidator( Integer.class, Locale.getDefault(), 3, 0 ), "/" ).
-                setLayoutData( new SimpleFormData(SPACING).left(80).right( 100 ).top( line4, SPACING ).create() );
+        site.newFormField( parent, new PropertyAdapter(
+                kaufvertrag.kaufpreisAnteilZaehler() ), new TextFormField( SWT.RIGHT ),
+                new NumberValidator( Integer.class, Locale.getDefault(), 3, 0 ),
+                "Anteil Zähler/Nenner" ).setLayoutData( new SimpleFormData( SPACING ).left( 50 ).right( 80 )
+                .top( line4, SPACING ).create() );
 
-        //
-        // layouter.setFieldLayoutData(site.newFormField(site.getPageBody(),
-        // new PropertyAdapter(kaufvertrag.vertragsArt().get().name()),
-        // new TextFormField(), null, "Vertragsart"));
+        site.newFormField( parent, new PropertyAdapter(
+                kaufvertrag.kaufpreisAnteilNenner() ), new TextFormField( SWT.RIGHT ),
+                new NumberValidator( Integer.class, Locale.getDefault(), 3, 0 ), "/" ).setLayoutData( new SimpleFormData( SPACING ).left( 80 ).right( 100 )
+                .top( line4, SPACING ).create() );
+
+        final Composite line6 = site.newFormField( parent,
+                new PropertyAdapter( kaufvertrag.vollpreis() ), new TextFormField( SWT.RIGHT ),
+                new NumberValidator( Integer.class, Locale.getDefault() ), "Vollpreis (€)" );
+        line6.setEnabled( false );
+        line6.setLayoutData( new SimpleFormData( left ).right( 30 ).top( line5, SPACING ).create() );
+
+        site.addFieldListener( vollpreisRefresher = new VollpreisRefresher(site, kaufvertrag));
     }
 
 

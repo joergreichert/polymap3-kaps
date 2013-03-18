@@ -104,7 +104,7 @@ public class KaufvertragEntityProvider
 
         // aussortieren für die Tabelle
         SimpleFeatureType filtered = SimpleFeatureTypeBuilder.retype( builder.buildFeatureType(),
-                new String[] { "eingangsNr", "vertragsDatum", "vertragsArt", "eingangsDatum", "vollPreis" } );
+                new String[] { "eingangsNr", "vertragsDatum", "vertragsArt", "eingangsDatum", "kaufpreis" } );
         return filtered;
     }
 
@@ -145,7 +145,7 @@ public class KaufvertragEntityProvider
                                     associatedCompositeName.append( name );
                                 }
                             }
-                            property.setValue( associatedCompositeName );
+                            property.setValue( associatedCompositeName.toString() );
                         }
                     }
                 }

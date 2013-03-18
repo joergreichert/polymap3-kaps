@@ -28,6 +28,7 @@ import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.entity.association.Association;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.property.Property;
+import org.qi4j.api.unitofwork.UnitOfWorkCompletionException;
 
 /**
  * 
@@ -215,14 +216,14 @@ public interface KaufvertragComposite
 
     // ANFR1 VARCHAR(60),
     @Optional
-    @ImportColumn("ANFR1")
-    Property<String> anfragen1();
+//    @ImportColumn("ANFR1")
+    Property<String> anfragen();
 
 
     // ANFR2 VARCHAR(60),
-    @Optional
-    @ImportColumn("ANFR2")
-    Property<String> anfragen2();
+//    @Optional
+//    @ImportColumn("ANFR2")
+//    Property<String> anfragen2();
 
 
     // ANKSRSTAM TIMESTAMP,
@@ -331,6 +332,14 @@ public interface KaufvertragComposite
             implements KaufvertragComposite {
 
         private static Log log = LogFactory.getLog( Mixin.class );
+        
+        @Override
+        public void beforeCompletion()
+                throws UnitOfWorkCompletionException {
+            if (eingangsNr().get() == null) {
+                eingangsNr().set( KapsRepository.instance().highestEingangsNummer() );
+            }
+        }
 
         // private BiotopRepository repo = BiotopRepository.instance();
         //
@@ -398,7 +407,6 @@ public interface KaufvertragComposite
         // prototype.bemerkung().set( "" );
         // bearbeitung().set( builder.newInstance() );
         // }
-
         // public Property<Date> bearbeitet() {
         // return new ComputedPropertyInstance( groesseInfo ) {
         // public Object get() {
