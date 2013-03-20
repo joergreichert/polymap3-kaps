@@ -25,11 +25,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 
 import org.geotools.feature.NameImpl;
-import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.referencing.CRS;
 import org.opengis.feature.type.Name;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -55,7 +51,6 @@ import org.polymap.core.qi4j.QiModuleAssembler;
 import org.polymap.core.runtime.Polymap;
 import org.polymap.core.runtime.entity.ConcurrentModificationException;
 
-import org.polymap.rhei.data.entityfeature.DefaultEntityProvider;
 import org.polymap.rhei.data.entityfeature.EntityProvider.FidsQueryProvider;
 import org.polymap.rhei.data.entitystore.lucene.LuceneEntityStoreService;
 import org.polymap.rhei.data.entitystore.lucene.LuceneQueryProvider;
