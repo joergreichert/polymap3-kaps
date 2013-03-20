@@ -52,8 +52,7 @@ import org.polymap.kaps.form.EingangsNummerFormatter;
  * @author <a href="http://www.polymap.de">Falko Bräutigam</a>
  */
 public class KaufvertragEntityProvider
-        extends KapsEntityProvider<KaufvertragComposite>
-        implements EntityProvider3<KaufvertragComposite> {
+        extends KapsEntityProvider<KaufvertragComposite> {
 
     private static final Log log = LogFactory.getLog( EntitySourceProcessor.class );
 
@@ -72,38 +71,10 @@ public class KaufvertragEntityProvider
 
     @Override
     public FeatureType buildFeatureType( FeatureType schema ) {
-        // filter properties
-        // SimpleFeatureType filtered = SimpleFeatureTypeBuilder.retype(
-        // (SimpleFeatureType)schema,
-        // new String[] {"eingangsDatum", "eingangsNr"} );
-
-        // VertragsArt
-        // ACHTUNG! : der name darf kein existierender Name einer
-        // Property oder Assoziation der Entity sein!
-        SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
-        builder.init( (SimpleFeatureType)schema );
-
-        // assoziationen ergänzen
-        // alle mit einem Type der ein Property Name hat
-        EntityType entityType = getEntityType();
-        Collection<EntityType.Property> p = entityType.getProperties();
-        for (EntityType.Property prop : p) {
-            Class propType = prop.getType();
-            if (prop instanceof Association) {
-                log.debug( "    adding association: " + prop.getName() + " / " + propType );
-                Association association = (Association)prop;
-                EntityType associationType = repo.entityType( association.getType() );
-                if (associationType.getProperty( "name" ) != null) {
-                    builder.add( association.getName(), String.class );
-                }
-            }
-        }
-
-        builder.remove( "eingangsNr" );
-        builder.add( "eingangsNr", String.class );
+        FeatureType type = super.buildFeatureType( schema );
 
         // aussortieren für die Tabelle
-        SimpleFeatureType filtered = SimpleFeatureTypeBuilder.retype( builder.buildFeatureType(),
+        SimpleFeatureType filtered = SimpleFeatureTypeBuilder.retype( (SimpleFeatureType)type,
                 new String[] { "eingangsNr", "vertragsDatum", "vertragsArt", "eingangsDatum", "kaufpreis" } );
         return filtered;
     }
@@ -111,49 +82,8 @@ public class KaufvertragEntityProvider
 
     @Override
     public Feature buildFeature( KaufvertragComposite entity, Feature feature, FeatureType schema ) {
-        // VertragsArtComposite vertragsArt = entity.vertragsArt().get();
-        // feature.getProperty("Vertragsart").setValue(
-        // vertragsArt != null ? vertragsArt.name().get() : "");
-        // assoziationen ergänzen, alle mit Name Property
-        try {
-            EntityType entityType = getEntityType();
-            Collection<EntityType.Property> p = entityType.getProperties();
-            for (EntityType.Property prop : p) {
-                Class propType = prop.getType();
-                if (prop instanceof Association) {
-                    log.debug( "    adding association: " + prop.getName() + " / " + propType );
-                    Association association = (Association)prop;
-
-                    org.opengis.feature.Property property = feature.getProperty( association
-                            .getName() );
-                    if (property != null) {
-                        EntityType associationType = repo.entityType( association.getType() );
-                        Property nameProperty = associationType.getProperty( "name" );
-                        Property schlProperty = associationType.getProperty( "schl" );
-                        if (nameProperty != null) {
-                            Object associationValue = association.getValue( entity );
-                            StringBuffer associatedCompositeName = new StringBuffer( "" );
-                            if (associationValue != null) {
-                                String name = (String)nameProperty
-                                        .getValue( (Composite)associationValue );
-                                String schl = (String)schlProperty
-                                        .getValue( (Composite)associationValue );
-                                if (schl != null) {
-                                    associatedCompositeName.append( schl ).append( "  -  " );
-                                }
-                                if (name != null) {
-                                    associatedCompositeName.append( name );
-                                }
-                            }
-                            property.setValue( associatedCompositeName.toString() );
-                        }
-                    }
-                }
-            }
-        }
-        catch (Exception e) {
-            throw new IllegalStateException( e );
-        }
+        super.buildFeature( entity, feature, schema );
+       
         // formatieren
         // eingangsnummer
         if (entity.eingangsNr().get() != null) {
@@ -162,19 +92,4 @@ public class KaufvertragEntityProvider
         }
         return feature;
     }
-
-
-    @Override
-    public boolean modifyFeature( KaufvertragComposite entity, String propName, Object value )
-            throws Exception {
-        // apply default method
-        return false;
-    }
-
-
-    @Override
-    public Query transformQuery( Query query ) {
-        return query;
-    }
-
 }

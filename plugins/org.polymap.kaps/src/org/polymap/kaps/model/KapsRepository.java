@@ -94,36 +94,12 @@ public class KapsRepository
 
     // public ServiceReference<BiotopnummerGeneratorService> biotopnummern;
 
-    /**
-     * 
-     */
-    public static class ArtEntityProvider
-            extends DefaultEntityProvider {
+    public static class ArtEntityProvider<T extends Entity>
+            extends KapsEntityProvider<T> {
 
         public ArtEntityProvider( QiModule repo, Class entityClass, Name entityName,
                 FidsQueryProvider queryProvider ) {
             super( repo, entityClass, entityName, queryProvider );
-        }
-
-
-        public ReferencedEnvelope getBounds() {
-            return new ReferencedEnvelope( 4000000, 5000000, 5000000, 6000000,
-                    getCoordinateReferenceSystem( null ) );
-        }
-
-
-        public CoordinateReferenceSystem getCoordinateReferenceSystem( String propName ) {
-            try {
-                return CRS.decode( "EPSG:31468" );
-            }
-            catch (Exception e) {
-                throw new RuntimeException( e );
-            }
-        }
-
-
-        public String getDefaultGeometry() {
-            throw new RuntimeException( "not yet implemented." );
         }
     };
 
@@ -155,22 +131,29 @@ public class KapsRepository
                     // BiotopComposite
                     new KaufvertragEntityProvider( this, queryProvider ),
                     // Arten...
-                    new ArtEntityProvider( this, VertragsArtComposite.class, new NameImpl(
-                            KapsRepository.NAMESPACE, "Vertragsart" ), queryProvider ),
-                    new ArtEntityProvider( this, StalaComposite.class, new NameImpl(
-                            KapsRepository.NAMESPACE, "Stala" ), queryProvider ),
-                    new ArtEntityProvider( this, KaeuferKreisComposite.class, new NameImpl(
-                            KapsRepository.NAMESPACE, "Käuferkreis" ), queryProvider ),
-                    new ArtEntityProvider( this, NutzungComposite.class, new NameImpl(
-                            KapsRepository.NAMESPACE, "Nutzung" ), queryProvider ),
-                    new ArtEntityProvider( this, GebaeudeArtComposite.class, new NameImpl(
-                            KapsRepository.NAMESPACE, "Gebäudeart" ), queryProvider ),
-                    new ArtEntityProvider( this, GemeindeComposite.class, new NameImpl(
-                            KapsRepository.NAMESPACE, "Gemeinde" ), queryProvider ),
-                    new ArtEntityProvider( this, StrasseComposite.class, new NameImpl(
-                            KapsRepository.NAMESPACE, "Strasse" ), queryProvider )
-                    
-                    
+                    new ArtEntityProvider<VertragsArtComposite>( this, VertragsArtComposite.class,
+                            new NameImpl( KapsRepository.NAMESPACE, "Vertragsart" ), queryProvider ),
+                    new ArtEntityProvider<StalaComposite>( this, StalaComposite.class,
+                            new NameImpl( KapsRepository.NAMESPACE, "Stala" ), queryProvider ),
+                    new ArtEntityProvider<KaeuferKreisComposite>( this,
+                            KaeuferKreisComposite.class, new NameImpl( KapsRepository.NAMESPACE,
+                                    "Käuferkreis" ), queryProvider ),
+                    new ArtEntityProvider<NutzungComposite>( this, NutzungComposite.class,
+                            new NameImpl( KapsRepository.NAMESPACE, "Nutzung" ), queryProvider ),
+                    new ArtEntityProvider<GebaeudeArtComposite>( this, GebaeudeArtComposite.class,
+                            new NameImpl( KapsRepository.NAMESPACE, "Gebäudeart" ), queryProvider ),
+                    new ArtEntityProvider<GemeindeComposite>( this, GemeindeComposite.class,
+                            new NameImpl( KapsRepository.NAMESPACE, "Gemeinde" ), queryProvider ),
+                    new ArtEntityProvider<StrasseComposite>( this, StrasseComposite.class,
+                            new NameImpl( KapsRepository.NAMESPACE, "Strasse" ), queryProvider ),
+                    new ArtEntityProvider<GemarkungComposite>( this, GemarkungComposite.class,
+                            new NameImpl( KapsRepository.NAMESPACE, "Gemarkung" ), queryProvider ),
+                    new ArtEntityProvider<FlurComposite>( this, FlurComposite.class, new NameImpl(
+                            KapsRepository.NAMESPACE, "Flur" ), queryProvider ),
+                    new ArtEntityProvider<BodennutzungComposite>( this,
+                            BodennutzungComposite.class, new NameImpl( KapsRepository.NAMESPACE,
+                                    "Bodennutzung" ), queryProvider )
+
             // new ArtEntityProvider( this, PflanzenArtComposite.class,
             // new NameImpl( KapsRepository.NAMESPACE, "Pflanzenart" ),
             // queryProvider ),
@@ -261,8 +244,6 @@ public class KapsRepository
             log.warn( "", e );
         }
 
-        super.done();
-
         log.info( "Running GC ..." );
         Runtime.getRuntime().gc();
     }
@@ -302,6 +283,8 @@ public class KapsRepository
                         prototype.eingangsDatum().set( new Date() );
                         prototype.kaufpreisAnteilZaehler().set( 1 );
                         prototype.kaufpreisAnteilNenner().set( 1 );
+                        prototype.fuerGewosGeeignet().set( Boolean.TRUE );
+                        prototype.fuerAuswertungGeeignet().set( Boolean.TRUE );
 
                         // eingangsnummer erst beim Speichern setzen!
 

@@ -27,6 +27,7 @@ import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.entity.association.Association;
 import org.qi4j.api.mixin.Mixins;
+import org.qi4j.api.property.Computed;
 import org.qi4j.api.property.Property;
 import org.qi4j.api.unitofwork.UnitOfWorkCompletionException;
 
@@ -191,8 +192,8 @@ public interface KaufvertragComposite
     // J oder N
     // zur Auswertung geeignet
     @UseDefaults
-    @ImportColumn("VERARBKZ")
-    Property<Boolean> zurAuswertungGeeignet();
+    //@ImportColumn("VERARBKZ")
+    Property<Boolean> fuerAuswertungGeeignet();
 
 
     // BEM1 VARCHAR(60),
@@ -210,8 +211,12 @@ public interface KaufvertragComposite
     // VERKAUF VARCHAR(9),
     // letzter Verkauf, Referenz auf anderen Vertrag
     @Optional
-    // @ImportColumn("VERKAUF")
-    Association<KaufvertragComposite> verkauf();
+    @ImportColumn("VERKAUF")
+    Property<String> verkaufEingangsnr();
+    
+    @Computed
+    @Optional
+    Association<KaufvertragComposite> letzterVerkauf();
 
 
     // ANFR1 VARCHAR(60),
@@ -305,15 +310,18 @@ public interface KaufvertragComposite
     // GESPLITTET VARCHAR(1),
     // Grundstück geht über mehrere Gemeinden
     @Optional
-    @ImportColumn("GESPLITTET")
+    //@ImportColumn("GESPLITTET")
     Property<Boolean> gesplittet();
 
 
     // GESPLITTET_EINGANGSNR INTEGER
     @Optional
-    // @ImportColumn("GESPLITTET_EINGANGSNR")
-    @UseDefaults
-    Association<KaufvertragComposite> gesplittetHauptvertrag();
+    @ImportColumn("GESPLITTET_EINGANGSNR")
+    Property<String> gesplittetEingangsnr();
+    
+    @Computed
+    @Optional
+    Association<KaufvertragComposite> gesplitteterHauptvertrag();
 
 
     // neue Felder
@@ -341,6 +349,10 @@ public interface KaufvertragComposite
             }
         }
 
+        public Association<KaufvertragComposite> gesplitteterHauptvertrag() {
+            // TODO
+            return null;
+        }
         // private BiotopRepository repo = BiotopRepository.instance();
         //
         // private PropertyInfo flaecheInfo = new GenericPropertyInfo(

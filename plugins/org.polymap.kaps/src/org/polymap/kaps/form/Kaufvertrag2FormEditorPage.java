@@ -27,11 +27,15 @@ import org.polymap.core.project.ui.util.SimpleFormData;
 import org.polymap.core.runtime.UIJob;
 
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
+import org.polymap.rhei.field.CheckboxFormField;
 import org.polymap.rhei.field.DateTimeFormField;
+import org.polymap.rhei.field.IFormFieldListener;
+import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.field.TextFormField;
 import org.polymap.rhei.form.DefaultFormEditorPage;
 import org.polymap.rhei.form.DefaultFormPageLayouter;
 import org.polymap.rhei.form.IFormEditorPageSite;
+import org.polymap.rhei.form.IFormEditorToolkit;
 
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.KaufvertragComposite;
@@ -40,58 +44,74 @@ import org.polymap.kaps.model.KaufvertragComposite;
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 public class Kaufvertrag2FormEditorPage
-        extends DefaultFormEditorPage {
+        extends KaufvertragFormEditorPage {
 
     public Kaufvertrag2FormEditorPage( Feature feature, FeatureStore featureStore ) {
-        super( Kaufvertrag2FormEditorPage.class.getName(), "Bearbeitungshinweise", feature,
+        super( Kaufvertrag1FormEditorPage.class.getName(), "Bearbeitungshinweise", feature,
                 featureStore );
     }
 
 
     @Override
-    public void createFormContent( IFormEditorPageSite site ) {
+    public void createFormContent( final IFormEditorPageSite site ) {
         super.createFormContent( site );
 
-        KaufvertragComposite kaufvertrag = KapsRepository.instance().findEntity(
-                KaufvertragComposite.class, feature.getIdentifier().getID() );
-        // Composite eingangsNr = site.newFormField( parent,
-        // new PropertyAdapter( kaufvertrag.eingangsNr() ), new TextFormField(),
-        // null,
-        // "Eingangsnummer" );
-        // eingangsNr.setEnabled( false );
-        // eingangsNr.setLayoutData( new SimpleFormData( left ).create() );
-        //
-        // // Datumse
-        // site.newFormField( parent, new PropertyAdapter(
-        // kaufvertrag.vertragsDatum() ),
-        // new DateTimeFormField(), null, "Vertragsdatum" ).setLayoutData(
-        // new SimpleFormData( left ).top( eingangsNr ).create() );
-        //
-        // site.newFormField( parent, new PropertyAdapter(
-        // kaufvertrag.eingangsDatum() ),
-        // new DateTimeFormField(), null, "Eingangsdatum" ).setLayoutData(
-        // new SimpleFormData( right ).top( eingangsNr ).create() );
-        Section left = newSection( "", false, null );
+        final Composite line1 = newFormField( "Urkundennummer" )
+                .setProperty( new PropertyAdapter( kaufvertrag.urkundenNummer() ) )
+                .setField( new StringFormField() )
+                .setLayoutData( new SimpleFormData( left ).create() ).create();
 
-        Composite eingangsNr = newFormField( "eingangsNr" )
-                .setProperty( new PropertyAdapter( kaufvertrag.eingangsNr() ) )
-                .setField( new TextFormField() ).setParent( left ).create();
+        newFormField( "Gutachtennummer" )
+                .setProperty( new PropertyAdapter( kaufvertrag.gutachtenNummer() ) )
+                .setField( new StringFormField() )
+                .setLayoutData( new SimpleFormData( right ).create() ).create();
 
-        Section right = newSection( "", true, left );
-        right.setLayoutData( new SimpleFormData( SECTION_SPACING ).left( 50 ).right( 100 )
-                .top( eingangsNr ).create() );
+        final Composite line2 = newFormField( "Anfragen" )
+                .setProperty( new PropertyAdapter( kaufvertrag.anfragen() ) )
+                .setField( new TextFormField() )
+                .setLayoutData(
+                        new SimpleFormData( left ).right(100).top( line1, SPACING ).height( 100 ).create() )
+                .create();
 
-        newFormField( "vertragsDatum" )
-                .setProperty( new PropertyAdapter( kaufvertrag.vertragsDatum() ) )
-                .setField( new DateTimeFormField() ).setParent( left ).create();
+        Composite verkaeufer = newSection( line2, "Auskunft vom Verkäufer" );
+        final Composite verkaeuferLine1 = newFormField( "Versendet am" )
+                .setProperty( new PropertyAdapter( kaufvertrag.anschreibenVerkaeuferErstelltAm() ) )
+                .setField( new DateTimeFormField() )
+                .setLayoutData( new SimpleFormData( left ).create() ).setParent( verkaeufer )
+                .create();
 
-        newFormField( "eingangsDatum" )
-                .setProperty( new PropertyAdapter( kaufvertrag.eingangsDatum() ) )
-                .setField( new DateTimeFormField() ).setParent( right ).create();// .setLayoutData(
-                                                                                 // new
-                                                                                 // SimpleFormData().top(
-                                                                                 // eingangsNr
-                                                                                 // ).create());
+        newFormField( "Antwort am" )
+                .setProperty(
+                        new PropertyAdapter( kaufvertrag.anschreibenVerkaeuferEingangAntwort() ) )
+                .setField( new DateTimeFormField() )
+                .setLayoutData( new SimpleFormData( right ).create() ).setParent( verkaeufer )
+                .create();
+
+        Composite verkaeuferBemerkungen = newFormField( "Bemerkungen" )
+                .setProperty( new PropertyAdapter( kaufvertrag.bemerkungenVerkaeufer() ) )
+                .setField( new TextFormField() )
+                .setLayoutData(
+                        new SimpleFormData( left ).right( 100 ).top( verkaeuferLine1, SPACING )
+                                .height( 50 ).create() ).setParent( verkaeufer ).create();
+
+        Composite kaeufer = newSection( verkaeufer, "Auskunft vom Käufer" );
+        final Composite kaeuferLine1 = newFormField( "Versendet am" )
+                .setProperty( new PropertyAdapter( kaufvertrag.anschreibenKaeuferErstelltAm() ) )
+                .setField( new DateTimeFormField() )
+                .setLayoutData( new SimpleFormData( left ).create() ).setParent( kaeufer ).create();
+
+        newFormField( "Antwort am" )
+                .setProperty( new PropertyAdapter( kaufvertrag.anschreibenKaeuferEingangAntwort() ) )
+                .setField( new DateTimeFormField() )
+                .setLayoutData( new SimpleFormData( right ).create() ).setParent( kaeufer )
+                .create();
+
+        newFormField( "Bemerkungen" )
+                .setProperty( new PropertyAdapter( kaufvertrag.bemerkungenKaeufer() ) )
+                .setField( new TextFormField() )
+                .setLayoutData(
+                        new SimpleFormData( left ).right(100).top( kaeuferLine1, SPACING ).height( 50 )
+                                .create() ).setParent( kaeufer ).create();
     }
 
 }

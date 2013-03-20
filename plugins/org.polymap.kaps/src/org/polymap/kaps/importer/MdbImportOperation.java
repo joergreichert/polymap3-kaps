@@ -1,9 +1,7 @@
 package org.polymap.kaps.importer;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,7 +25,10 @@ import org.polymap.core.qi4j.QiModule.EntityCreator;
 import org.polymap.core.qi4j.event.AbstractModelChangeOperation;
 import org.polymap.core.runtime.SubMonitor;
 
+import org.polymap.kaps.model.BodennutzungComposite;
+import org.polymap.kaps.model.FlurComposite;
 import org.polymap.kaps.model.GebaeudeArtComposite;
+import org.polymap.kaps.model.GemarkungComposite;
 import org.polymap.kaps.model.GemeindeComposite;
 import org.polymap.kaps.model.KaeuferKreisComposite;
 import org.polymap.kaps.model.KapsRepository;
@@ -80,19 +81,17 @@ public class MdbImportOperation
             final Map<String, VertragsArtComposite> allVertragsarten = new HashMap<String, VertragsArtComposite>();
 
             sub = new SubMonitor( monitor, 10 );
-            importEntity( db, sub, StalaComposite.class, "K_STALA",
-                    new EntityCallback<StalaComposite>() {
+            importEntity( db, sub, StalaComposite.class, new EntityCallback<StalaComposite>() {
 
-                        @Override
-                        public void fillEntity( StalaComposite entity,
-                                Map<String, Object> builderRow ) {
-                            // collecting
-                            allStalas.put( entity.schl().get(), entity );
-                        }
-                    } );
+                @Override
+                public void fillEntity( StalaComposite entity, Map<String, Object> builderRow ) {
+                    // collecting
+                    allStalas.put( entity.schl().get(), entity );
+                }
+            } );
 
             sub = new SubMonitor( monitor, 10 );
-            importEntity( db, sub, VertragsArtComposite.class, "K_VERART",
+            importEntity( db, sub, VertragsArtComposite.class,
                     new EntityCallback<VertragsArtComposite>() {
 
                         @Override
@@ -108,7 +107,7 @@ public class MdbImportOperation
                     } );
 
             sub = new SubMonitor( monitor, 10 );
-            importEntity( db, sub, KaeuferKreisComposite.class, "K_KKREIS_1",
+            importEntity( db, sub, KaeuferKreisComposite.class,
                     new EntityCallback<KaeuferKreisComposite>() {
 
                         @Override
@@ -129,12 +128,18 @@ public class MdbImportOperation
                         }
                     } );
             sub = new SubMonitor( monitor, 10 );
-            importEntity( db, sub, KaufvertragComposite.class, "K_BUCH",
+            importEntity( db, sub, KaufvertragComposite.class,
                     new EntityCallback<KaufvertragComposite>() {
 
                         @Override
                         public void fillEntity( KaufvertragComposite entity,
                                 Map<String, Object> builderRow ) {
+                            // VERARBKZ
+                            entity.fuerAuswertungGeeignet().set(
+                                    getBooleanValue( builderRow, "VERARBKZ" ) );
+                            // GESPLITTET
+                            entity.gesplittet().set( getBooleanValue( builderRow, "GESPLITTET" ) );
+
                             // mapping eingangsNr
                             // find vertragsArt
                             Object vertragsArtSchl = builderRow.get( "VERTRAGART" );
@@ -207,7 +212,7 @@ public class MdbImportOperation
                                 anfr.append( anfr2 );
                             }
                             entity.anfragen().set( anfr.toString() );
-                            
+
                             // find also Verkaufsverträge alt und geplittete
                             // Verträge
                             // TODO die werden aber eventuell erst später
@@ -215,55 +220,99 @@ public class MdbImportOperation
                         }
                     } );
             sub = new SubMonitor( monitor, 10 );
-            importEntity( db, sub, NutzungComposite.class, "K_NUTZ",
-                    new EntityCallback<NutzungComposite>() {
+            importEntity( db, sub, NutzungComposite.class, new EntityCallback<NutzungComposite>() {
+
+                @Override
+                public void fillEntity( NutzungComposite entity, Map<String, Object> builderRow ) {
+                    // associate stala erstellen
+                    Object stalaSchl = builderRow.get( "STALA" );
+                    if (stalaSchl != null && !stalaSchl.equals( "" )) {
+                        StalaComposite stala = allStalas.get( stalaSchl.toString() );
+                        if (stala == null) {
+                            throw new IllegalStateException( "no stala found for schl '"
+                                    + stalaSchl + "' in K_KREIS_1 '" + entity.schl() + "'!" );
+                        }
+                        entity.stala().set( stala );
+                    }
+                }
+            } );
+            sub = new SubMonitor( monitor, 10 );
+            importEntity( db, sub, GebaeudeArtComposite.class, null );
+            sub = new SubMonitor( monitor, 10 );
+
+            final Map<String, GemeindeComposite> allGemeinde = new HashMap<String, GemeindeComposite>();
+            importEntity( db, sub, GemeindeComposite.class,
+                    new EntityCallback<GemeindeComposite>() {
 
                         @Override
-                        public void fillEntity( NutzungComposite entity,
+                        public void fillEntity( GemeindeComposite entity,
+                                Map<String, Object> builderRow ) {
+                            // associate stala erstellen
+                            allGemeinde.put( entity.schl().get(), entity );
+                        }
+                    } );
+            sub = new SubMonitor( monitor, 10 );
+            importEntity( db, sub, StrasseComposite.class, new EntityCallback<StrasseComposite>() {
+
+                @Override
+                public void fillEntity( StrasseComposite entity, Map<String, Object> builderRow ) {
+                    // associate stala erstellen
+                    Object gemSchl = builderRow.get( "GEMEINDE" );
+                    if (gemSchl != null) {
+                        GemeindeComposite gemeinde = allGemeinde.get( gemSchl.toString() );
+                        if (gemeinde == null) {
+                            throw new IllegalStateException( "no gemeinde found for schl '"
+                                    + gemSchl + "' in K_STRASS '" + entity.schl() + "'!" );
+                        }
+                        entity.gemeinde().set( gemeinde );
+                    }
+                }
+            } );
+            sub = new SubMonitor( monitor, 10 );
+            importEntity( db, sub, BodennutzungComposite.class,
+                    new EntityCallback<BodennutzungComposite>() {
+
+                        @Override
+                        public void fillEntity( BodennutzungComposite entity,
                                 Map<String, Object> builderRow ) {
                             // associate stala erstellen
                             Object stalaSchl = builderRow.get( "STALA" );
-                            if (stalaSchl != null) {
+                            if (stalaSchl != null && !stalaSchl.equals( "" )) {
                                 StalaComposite stala = allStalas.get( stalaSchl.toString() );
                                 if (stala == null) {
                                     throw new IllegalStateException( "no stala found for schl '"
-                                            + stalaSchl + "' in K_KREIS_1 '" + entity.schl() + "'!" );
+                                            + stalaSchl + "' in K_BONUTZ '" + entity.schl() + "'!" );
                                 }
                                 entity.stala().set( stala );
                             }
                         }
                     } );
-            sub = new SubMonitor( monitor, 10 );
-            importEntity( db, sub, GebaeudeArtComposite.class, "K_GEBART",null);
-            sub = new SubMonitor( monitor, 10 );
-            
-            final Map<String, GemeindeComposite> allGemeinde = new HashMap<String, GemeindeComposite>();
-            importEntity( db, sub, GemeindeComposite.class, "K_GEMEINDE",
-                    new EntityCallback<GemeindeComposite>() {
+            final FlurComposite flur = repo.newEntity( FlurComposite.class, null,
+                    new EntityCreator<FlurComposite>() {
 
-                @Override
-                public void fillEntity( GemeindeComposite entity,
-                        Map<String, Object> builderRow ) {
-                    // associate stala erstellen
-                    allGemeinde.put(entity.schl().get(), entity);
-                }
-            });
+                        public void create( FlurComposite prototype )
+                                throws Exception {
+                            prototype.schl().set( "000" );
+                            prototype.name().set( "" );
+                        }
+                    } );
             sub = new SubMonitor( monitor, 10 );
-            importEntity( db, sub, StrasseComposite.class, "K_STRASS",
-                    new EntityCallback<StrasseComposite>() {
+            importEntity( db, sub, GemarkungComposite.class,
+                    new EntityCallback<GemarkungComposite>() {
 
                         @Override
-                        public void fillEntity( StrasseComposite entity,
+                        public void fillEntity( GemarkungComposite entity,
                                 Map<String, Object> builderRow ) {
                             // associate stala erstellen
                             Object gemSchl = builderRow.get( "GEMEINDE" );
                             if (gemSchl != null) {
                                 GemeindeComposite gemeinde = allGemeinde.get( gemSchl.toString() );
                                 if (gemeinde == null) {
-                                    throw new IllegalStateException( "no stala found for schl '"
-                                            + gemSchl + "' in K_KREIS_1 '" + entity.schl() + "'!" );
+                                    throw new IllegalStateException( "no gemeinde found for schl '"
+                                            + gemSchl + "' in Gemarkung '" + entity.schl() + "'!" );
                                 }
                                 entity.gemeinde().set( gemeinde );
+                                entity.flur().set( flur );
                             }
                         }
                     } );
@@ -447,6 +496,19 @@ public class MdbImportOperation
     // // }
     // }
 
+    /**
+     * 
+     * @param fuerAuswertungGeeignet
+     * @param builderRow
+     * @param string
+     */
+    protected Boolean getBooleanValue( Map<String, Object> builderRow, String rowName ) {
+        Object value = builderRow.get( rowName );
+        return (value == null || "N".equalsIgnoreCase( value.toString() )) ? Boolean.FALSE
+                : Boolean.TRUE;
+    }
+
+
     /*
      * 
      */
@@ -457,7 +519,7 @@ public class MdbImportOperation
 
 
     protected <T extends EntityComposite> void importEntity( Database db, IProgressMonitor monitor,
-            Class<T> type, String idColumn, final EntityCallback<T> callback )
+            Class<T> type, final EntityCallback<T> callback )
             throws Exception {
         Table table = table( db, type );
         monitor.beginTask( "Tabelle: " + table.getName(), table.getRowCount() );
@@ -468,9 +530,6 @@ public class MdbImportOperation
         Map<String, Object> row = null;
         int count = 0;
         while ((row = table.getNextRow()) != null) {
-            if (idColumn != null) {
-                Object id = row.get( idColumn );
-            }
             final Map<String, Object> builderRow = row;
 
             // repo.newKaufvertrag(new EntityCreator<KaufvertragComposite>() {
