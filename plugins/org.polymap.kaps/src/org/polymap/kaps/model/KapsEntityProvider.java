@@ -35,8 +35,6 @@ import org.polymap.rhei.data.entityfeature.DefaultEntityProvider;
 import org.polymap.rhei.data.entityfeature.EntityProvider;
 import org.polymap.rhei.data.entityfeature.EntityProvider3;
 
-import org.polymap.kaps.form.EingangsNummerFormatter;
-
 /**
  * Basisklasse für alle KAPS {@link EntityProvider}. Die Klasse liefert einfache
  * Implementationen für Methoden. Die Geometrie muss immer im Property "geom" liegen.
@@ -47,9 +45,8 @@ abstract class KapsEntityProvider<T extends Entity>
         extends DefaultEntityProvider<T>
         implements EntityProvider<T>, EntityProvider3<T> {
 
-    public KapsEntityProvider( QiModule repo, Class<T> entityClass, Name entityName,
-            FidsQueryProvider queryProvider ) {
-        super( repo, entityClass, entityName, queryProvider );
+    public KapsEntityProvider( QiModule repo, Class<T> entityClass, Name entityName ) {
+        super( repo, entityClass, entityName );
     }
 
 

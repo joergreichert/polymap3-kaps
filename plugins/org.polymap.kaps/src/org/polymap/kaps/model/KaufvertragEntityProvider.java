@@ -12,13 +12,6 @@
  */
 package org.polymap.kaps.model;
 
-import java.util.Collection;
-
-import java.text.NumberFormat;
-
-import javax.swing.text.NumberFormatter;
-
-import org.geotools.data.Query;
 import org.geotools.feature.NameImpl;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.opengis.feature.Feature;
@@ -28,15 +21,10 @@ import org.opengis.feature.type.FeatureType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.polymap.core.model.Composite;
-import org.polymap.core.model.EntityType;
-import org.polymap.core.model.EntityType.Association;
-import org.polymap.core.model.EntityType.Property;
 import org.polymap.core.qi4j.QiModule;
 import org.polymap.core.qi4j.QiModule.EntityCreator;
 
 import org.polymap.rhei.data.entityfeature.EntityProvider2;
-import org.polymap.rhei.data.entityfeature.EntityProvider3;
 import org.polymap.rhei.data.entityfeature.EntitySourceProcessor;
 
 import org.polymap.kaps.form.EingangsNummerFormatter;
@@ -57,9 +45,9 @@ public class KaufvertragEntityProvider
     private static final Log log = LogFactory.getLog( EntitySourceProcessor.class );
 
 
-    public KaufvertragEntityProvider( QiModule repo, FidsQueryProvider queryProvider ) {
+    public KaufvertragEntityProvider( QiModule repo ) {
         super( repo, KaufvertragComposite.class, new NameImpl( KapsRepository.NAMESPACE,
-                "Kaufvertrag" ), queryProvider );
+                "Kaufvertrag" ) );
     }
 
 
