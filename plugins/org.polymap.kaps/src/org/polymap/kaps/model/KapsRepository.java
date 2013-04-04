@@ -48,6 +48,7 @@ import org.polymap.core.qi4j.QiModuleAssembler;
 import org.polymap.core.runtime.Polymap;
 import org.polymap.core.runtime.entity.ConcurrentModificationException;
 
+
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
@@ -108,6 +109,7 @@ public class KapsRepository
 
     public void init( final Session session ) {
         try {
+
             kapsService = new KapsService(
                     // BiotopComposite
                     new KaufvertragEntityProvider( this ),
