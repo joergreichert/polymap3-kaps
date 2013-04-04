@@ -6,6 +6,8 @@ import java.util.Map;
 import java.io.File;
 import java.io.IOException;
 
+import javax.xml.stream.events.Characters;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -183,6 +185,8 @@ public class MdbImportOperation
                             if (builderRow.get( "KANTN" ) == null) {
                                 entity.kaufpreisAnteilNenner().set( 1 );
                             }
+                            
+                            String separator = System.getProperty( "line.separator" );
                             // BEM1 und BEM2 zusammenfassen
                             String bem1 = (String)builderRow.get( "BEM1" );
                             String bem2 = (String)builderRow.get( "BEM2" );
@@ -190,7 +194,7 @@ public class MdbImportOperation
                             if (bem1 != null) {
                                 bem.append( bem1 );
                                 if (bem2 != null) {
-                                    bem.append( Character.LINE_SEPARATOR );
+                                    bem.append( separator );
                                 }
                             }
                             if (bem2 != null) {
@@ -205,7 +209,7 @@ public class MdbImportOperation
                             if (anfr1 != null) {
                                 anfr.append( anfr1 );
                                 if (anfr2 != null) {
-                                    anfr.append( Character.LINE_SEPARATOR );
+                                    anfr.append( separator );
                                 }
                             }
                             if (anfr2 != null) {

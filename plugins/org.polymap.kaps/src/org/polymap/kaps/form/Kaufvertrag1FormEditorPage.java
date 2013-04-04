@@ -137,8 +137,8 @@ public class Kaufvertrag1FormEditorPage
 
         // Bemerkungen
         final Composite line7 = site.newFormField( parent,
-                new PropertyAdapter( kaufvertrag.bemerkungen() ), new TextFormField(
-                        StringFormField.Style.ALIGN_RIGHT ), null, "Bemerkungen" );
+                new PropertyAdapter( kaufvertrag.bemerkungen() ), new TextFormField(), null,
+                "Bemerkungen" );
         line7.setLayoutData( new SimpleFormData( left ).right( RIGHT ).top( line6, SPACING )
                 .height( 100 ).create() );
 

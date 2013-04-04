@@ -23,13 +23,13 @@ import java.util.TreeMap;
 
 import org.geotools.feature.NameImpl;
 import org.opengis.feature.type.Name;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.qi4j.api.query.Query;
 import org.qi4j.api.query.grammar.BooleanExpression;
 import org.qi4j.api.query.grammar.OrderBy;
-import org.qi4j.api.service.ServiceReference;
 import org.qi4j.api.unitofwork.ConcurrentEntityModificationException;
 import org.qi4j.api.unitofwork.UnitOfWorkCompletionException;
 
@@ -47,10 +47,6 @@ import org.polymap.core.qi4j.QiModule;
 import org.polymap.core.qi4j.QiModuleAssembler;
 import org.polymap.core.runtime.Polymap;
 import org.polymap.core.runtime.entity.ConcurrentModificationException;
-
-import org.polymap.rhei.data.entityfeature.EntityProvider.FidsQueryProvider;
-import org.polymap.rhei.data.entitystore.lucene.LuceneEntityStoreService;
-import org.polymap.rhei.data.entitystore.lucene.LuceneQueryProvider;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -89,9 +85,8 @@ public class KapsRepository
     public static class ArtEntityProvider<T extends Entity>
             extends KapsEntityProvider<T> {
 
-        public ArtEntityProvider( QiModule repo, Class entityClass, Name entityName,
-                FidsQueryProvider queryProvider ) {
-            super( repo, entityClass, entityName, queryProvider );
+        public ArtEntityProvider( QiModule repo, Class entityClass, Name entityName) {
+            super( repo, entityClass, entityName );
         }
     };
 
@@ -113,38 +108,32 @@ public class KapsRepository
 
     public void init( final Session session ) {
         try {
-            // build the queryProvider
-            ServiceReference<LuceneEntityStoreService> storeService = assembler.getModule()
-                    .serviceFinder().findService( LuceneEntityStoreService.class );
-            LuceneEntityStoreService luceneStore = storeService.get();
-            FidsQueryProvider queryProvider = new LuceneQueryProvider( luceneStore.getStore() );
-
             kapsService = new KapsService(
                     // BiotopComposite
-                    new KaufvertragEntityProvider( this, queryProvider ),
+                    new KaufvertragEntityProvider( this ),
                     // Arten...
                     new ArtEntityProvider<VertragsArtComposite>( this, VertragsArtComposite.class,
-                            new NameImpl( KapsRepository.NAMESPACE, "Vertragsart" ), queryProvider ),
+                            new NameImpl( KapsRepository.NAMESPACE, "Vertragsart" ) ),
                     new ArtEntityProvider<StalaComposite>( this, StalaComposite.class,
-                            new NameImpl( KapsRepository.NAMESPACE, "Stala" ), queryProvider ),
+                            new NameImpl( KapsRepository.NAMESPACE, "Stala" ) ),
                     new ArtEntityProvider<KaeuferKreisComposite>( this,
                             KaeuferKreisComposite.class, new NameImpl( KapsRepository.NAMESPACE,
-                                    "Käuferkreis" ), queryProvider ),
+                                    "Käuferkreis" ) ),
                     new ArtEntityProvider<NutzungComposite>( this, NutzungComposite.class,
-                            new NameImpl( KapsRepository.NAMESPACE, "Nutzung" ), queryProvider ),
+                            new NameImpl( KapsRepository.NAMESPACE, "Nutzung" ) ),
                     new ArtEntityProvider<GebaeudeArtComposite>( this, GebaeudeArtComposite.class,
-                            new NameImpl( KapsRepository.NAMESPACE, "Gebäudeart" ), queryProvider ),
+                            new NameImpl( KapsRepository.NAMESPACE, "Gebäudeart" ) ),
                     new ArtEntityProvider<GemeindeComposite>( this, GemeindeComposite.class,
-                            new NameImpl( KapsRepository.NAMESPACE, "Gemeinde" ), queryProvider ),
+                            new NameImpl( KapsRepository.NAMESPACE, "Gemeinde" ) ),
                     new ArtEntityProvider<StrasseComposite>( this, StrasseComposite.class,
-                            new NameImpl( KapsRepository.NAMESPACE, "Strasse" ), queryProvider ),
+                            new NameImpl( KapsRepository.NAMESPACE, "Strasse" ) ),
                     new ArtEntityProvider<GemarkungComposite>( this, GemarkungComposite.class,
-                            new NameImpl( KapsRepository.NAMESPACE, "Gemarkung" ), queryProvider ),
+                            new NameImpl( KapsRepository.NAMESPACE, "Gemarkung" ) ),
                     new ArtEntityProvider<FlurComposite>( this, FlurComposite.class, new NameImpl(
-                            KapsRepository.NAMESPACE, "Flur" ), queryProvider ),
+                            KapsRepository.NAMESPACE, "Flur" ) ),
                     new ArtEntityProvider<BodennutzungComposite>( this,
                             BodennutzungComposite.class, new NameImpl( KapsRepository.NAMESPACE,
-                                    "Bodennutzung" ), queryProvider )
+                                    "Bodennutzung" ) )
 
             // new ArtEntityProvider( this, PflanzenArtComposite.class,
             // new NameImpl( KapsRepository.NAMESPACE, "Pflanzenart" ),
@@ -241,10 +230,51 @@ public class KapsRepository
 
 
     public int highestEingangsNummer() {
-        Query<KaufvertragComposite> entities = findEntities( KaufvertragComposite.class, null, 0, 1 );
+        // nur zum Test noch die Suche über Verkäuferkreis mit rein
+        // Query<KaeuferKreisComposite> kreise = findEntities(
+        // KaeuferKreisComposite.class, null, 0, 1 );
+        // KaeuferKreisComposite kreis1 = kreise.iterator().next();
+        // KaeuferKreisComposite kreis2 = kreise.iterator().next();
+        //
         KaufvertragComposite template = templateFor( KaufvertragComposite.class );
-        entities.orderBy( orderBy( template.eingangsNr(), OrderBy.Order.DESCENDING ) );
+
+        // QueryBuilder<KaufvertragComposite> builder =
+        // assembler.getModule().queryBuilderFactory()
+        // .newQueryBuilder( KaufvertragComposite.class );
+        // builder = builder.where( eq( template.kaeuferKreis(), kreis1 ) );
+        // Query<KaufvertragComposite> bentities = builder.newQuery( uow );
+        // bentities.orderBy( orderBy( template.eingangsNr(),
+        // OrderBy.Order.DESCENDING ) );
+        // bentities.maxResults( 1 );
+        // KaufvertragComposite next = bentities.iterator().next();
+        //
+        Query<KaufvertragComposite> entities = findEntities( KaufvertragComposite.class,
+        // eq( template.kaeuferKreis(), kreis1 ), 0, 1 );
+                null, 0, 1 );
+        entities
+                .orderBy( orderBy( template.eingangsNr(), OrderBy.Order.DESCENDING ) );
+        //
+        // entities = findEntities( KaufvertragComposite.class, eq(
+        // template.kaeuferKreis(), kreis2 ),
+        // 0, 1 );
+        // KaufvertragComposite next2 = entities
+        // .orderBy( orderBy( template.eingangsNr(), OrderBy.Order.DESCENDING )
+        // ).iterator()
+        // .next();
+        //
+        // entities = findEntities( KaufvertragComposite.class, eq(
+        // template.kaeuferKreis(), kreis1 ),
+        // 0, 1 );
+        // KaufvertragComposite next3 = entities
+        // .orderBy( orderBy( template.eingangsNr(), OrderBy.Order.DESCENDING )
+        // ).iterator()
+        // .next();
+        //
+        // assert (next1.equals( next3 ));
+        // assert (!next1.equals( next2 ));
+        //
         // return 1;
+
         KaufvertragComposite highest = entities.iterator().next();
         int highestEingangsNr = highest != null ? highest.eingangsNr().get() : 0;
 

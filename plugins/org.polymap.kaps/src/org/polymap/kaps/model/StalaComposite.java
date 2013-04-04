@@ -1,5 +1,5 @@
 /*
- * polymap.org Copyright 2012, Polymap GmbH. All rights reserved.
+ * polymap.org Copyright 2013 Polymap GmbH. All rights reserved.
  * 
  * This is free software; you can redistribute it and/or modify it under the terms of
  * the GNU Lesser General Public License as published by the Free Software
@@ -72,7 +72,7 @@ public interface StalaComposite
      * Methods and transient fields.
      */
     public static abstract class Mixin
-            implements VertragsArtComposite {
+            implements StalaComposite {
 
         private static Log log = LogFactory.getLog( Mixin.class );
 

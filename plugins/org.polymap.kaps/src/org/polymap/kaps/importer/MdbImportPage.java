@@ -143,11 +143,13 @@ public class MdbImportPage
     // UploadListener *************************************
 
     public void uploadInProgress( UploadEvent ev ) {
+        
     }
 
 
     public void uploadFinished( UploadEvent ev ) {
         UploadItem item = upload.getUploadItem();
+       
         try {
             log.info( "Uploaded: " + item.getFileName() + ", path=" + item.getFilePath() );
 

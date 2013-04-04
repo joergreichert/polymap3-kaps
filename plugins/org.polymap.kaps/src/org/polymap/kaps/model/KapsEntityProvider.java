@@ -47,15 +47,15 @@ abstract class KapsEntityProvider<T extends Entity>
         extends DefaultEntityProvider<T>
         implements EntityProvider<T>, EntityProvider3<T> {
 
-    public KapsEntityProvider( QiModule repo, Class<T> entityClass, Name entityName,
-            FidsQueryProvider queryProvider ) {
-        super( repo, entityClass, entityName, queryProvider );
+    public KapsEntityProvider( QiModule repo, Class<T> entityClass, Name entityName) {
+        super( repo, entityClass, entityName );
     }
 
 
     public CoordinateReferenceSystem getCoordinateReferenceSystem( String propName ) {
         try {
             return Geometries.crs( "EPSG:31468" );
+            // EPSG:4326
         }
         catch (Exception e) {
             throw new RuntimeException( e );
