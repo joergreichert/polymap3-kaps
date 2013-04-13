@@ -6,11 +6,10 @@ import java.util.Map;
 import java.io.File;
 import java.io.IOException;
 
-import javax.xml.stream.events.Characters;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.qi4j.api.composite.Composite;
 import org.qi4j.api.entity.EntityComposite;
 
 import com.healthmarketscience.jackcess.Column;
@@ -27,18 +26,22 @@ import org.polymap.core.qi4j.QiModule.EntityCreator;
 import org.polymap.core.qi4j.event.AbstractModelChangeOperation;
 import org.polymap.core.runtime.SubMonitor;
 
-import org.polymap.kaps.model.BodennutzungComposite;
-import org.polymap.kaps.model.FlurComposite;
-import org.polymap.kaps.model.GebaeudeArtComposite;
-import org.polymap.kaps.model.GemarkungComposite;
-import org.polymap.kaps.model.GemeindeComposite;
-import org.polymap.kaps.model.KaeuferKreisComposite;
 import org.polymap.kaps.model.KapsRepository;
-import org.polymap.kaps.model.KaufvertragComposite;
-import org.polymap.kaps.model.NutzungComposite;
-import org.polymap.kaps.model.StalaComposite;
-import org.polymap.kaps.model.StrasseComposite;
-import org.polymap.kaps.model.VertragsArtComposite;
+import org.polymap.kaps.model.data.BodenRichtwertKennungComposite;
+import org.polymap.kaps.model.data.BodennutzungComposite;
+import org.polymap.kaps.model.data.ErschliessungsBeitragComposite;
+import org.polymap.kaps.model.data.FlurComposite;
+import org.polymap.kaps.model.data.GebaeudeArtComposite;
+import org.polymap.kaps.model.data.GemarkungComposite;
+import org.polymap.kaps.model.data.GemeindeComposite;
+import org.polymap.kaps.model.data.KaeuferKreisComposite;
+import org.polymap.kaps.model.data.KaufvertragComposite;
+import org.polymap.kaps.model.data.NutzungComposite;
+import org.polymap.kaps.model.data.RichtwertZoneLageComposite;
+import org.polymap.kaps.model.data.RichtwertzoneComposite;
+import org.polymap.kaps.model.data.StalaComposite;
+import org.polymap.kaps.model.data.StrasseComposite;
+import org.polymap.kaps.model.data.VertragsArtComposite;
 
 /**
  * 
@@ -59,7 +62,7 @@ public class MdbImportOperation
 
 
     public MdbImportOperation( File dbFile, String[] tableNames ) {
-        super( "MS-Access-Daten importieren" );
+        super( "Kaufpreissammlung importieren" );
         this.dbFile = dbFile;
         this.tableNames = tableNames;
         this.repo = KapsRepository.instance();
@@ -73,14 +76,13 @@ public class MdbImportOperation
         try {
             SubMonitor sub = null;
 
-            // BiotopComposite
             sub = new SubMonitor( monitor, 10 );
-            // importBiotopdaten( db.getTable( "Biotopdaten" ), sub );
 
-            // collect all stalas during import
             final Map<String, StalaComposite> allStalas = new HashMap<String, StalaComposite>();
             final Map<String, KaeuferKreisComposite> allKKreise = new HashMap<String, KaeuferKreisComposite>();
             final Map<String, VertragsArtComposite> allVertragsarten = new HashMap<String, VertragsArtComposite>();
+            final Map<String, NutzungComposite> allNutzung = new HashMap<String, NutzungComposite>();
+            final Map<String, BodennutzungComposite> allBodennutzung = new HashMap<String, BodennutzungComposite>();
 
             sub = new SubMonitor( monitor, 10 );
             importEntity( db, sub, StalaComposite.class, new EntityCallback<StalaComposite>() {
@@ -144,17 +146,8 @@ public class MdbImportOperation
 
                             // mapping eingangsNr
                             // find vertragsArt
-                            Object vertragsArtSchl = builderRow.get( "VERTRAGART" );
-                            if (vertragsArtSchl != null) {
-                                VertragsArtComposite vertragsArt = allVertragsarten
-                                        .get( vertragsArtSchl );
-                                if (vertragsArt == null) {
-                                    throw new IllegalStateException(
-                                            "no VERTRAGART found for schl '" + vertragsArtSchl
-                                                    + "' in K_BUCH '" + entity.eingangsNr() + "'!" );
-                                }
-                                entity.vertragsArt().set( vertragsArt );
-                            }
+                            entity.vertragsArt().set(
+                                    find( allVertragsarten, builderRow, "VERTRAGART" ) );
 
                             // find KKreis für Käufer und Verkäufer
                             Object kkreisSchl = builderRow.get( "KKREIS" );
@@ -185,7 +178,7 @@ public class MdbImportOperation
                             if (builderRow.get( "KANTN" ) == null) {
                                 entity.kaufpreisAnteilNenner().set( 1 );
                             }
-                            
+
                             String separator = System.getProperty( "line.separator" );
                             // BEM1 und BEM2 zusammenfassen
                             String bem1 = (String)builderRow.get( "BEM1" );
@@ -228,16 +221,8 @@ public class MdbImportOperation
 
                 @Override
                 public void fillEntity( NutzungComposite entity, Map<String, Object> builderRow ) {
-                    // associate stala erstellen
-                    Object stalaSchl = builderRow.get( "STALA" );
-                    if (stalaSchl != null && !stalaSchl.equals( "" )) {
-                        StalaComposite stala = allStalas.get( stalaSchl.toString() );
-                        if (stala == null) {
-                            throw new IllegalStateException( "no stala found for schl '"
-                                    + stalaSchl + "' in K_KREIS_1 '" + entity.schl() + "'!" );
-                        }
-                        entity.stala().set( stala );
-                    }
+                    entity.stala().set( find( allStalas, builderRow, "STALA" ) );
+                    allNutzung.put( entity.schl().get(), entity );
                 }
             } );
             sub = new SubMonitor( monitor, 10 );
@@ -251,7 +236,6 @@ public class MdbImportOperation
                         @Override
                         public void fillEntity( GemeindeComposite entity,
                                 Map<String, Object> builderRow ) {
-                            // associate stala erstellen
                             allGemeinde.put( entity.schl().get(), entity );
                         }
                     } );
@@ -260,16 +244,7 @@ public class MdbImportOperation
 
                 @Override
                 public void fillEntity( StrasseComposite entity, Map<String, Object> builderRow ) {
-                    // associate stala erstellen
-                    Object gemSchl = builderRow.get( "GEMEINDE" );
-                    if (gemSchl != null) {
-                        GemeindeComposite gemeinde = allGemeinde.get( gemSchl.toString() );
-                        if (gemeinde == null) {
-                            throw new IllegalStateException( "no gemeinde found for schl '"
-                                    + gemSchl + "' in K_STRASS '" + entity.schl() + "'!" );
-                        }
-                        entity.gemeinde().set( gemeinde );
-                    }
+                    entity.gemeinde().set( find( allGemeinde, builderRow, "GEMEINDE" ) );
                 }
             } );
             sub = new SubMonitor( monitor, 10 );
@@ -280,15 +255,8 @@ public class MdbImportOperation
                         public void fillEntity( BodennutzungComposite entity,
                                 Map<String, Object> builderRow ) {
                             // associate stala erstellen
-                            Object stalaSchl = builderRow.get( "STALA" );
-                            if (stalaSchl != null && !stalaSchl.equals( "" )) {
-                                StalaComposite stala = allStalas.get( stalaSchl.toString() );
-                                if (stala == null) {
-                                    throw new IllegalStateException( "no stala found for schl '"
-                                            + stalaSchl + "' in K_BONUTZ '" + entity.schl() + "'!" );
-                                }
-                                entity.stala().set( stala );
-                            }
+                            entity.stala().set( find( allStalas, builderRow, "STALA" ) );
+                            allBodennutzung.put( entity.schl().get(), entity );
                         }
                     } );
             final FlurComposite flur = repo.newEntity( FlurComposite.class, null,
@@ -307,17 +275,36 @@ public class MdbImportOperation
                         @Override
                         public void fillEntity( GemarkungComposite entity,
                                 Map<String, Object> builderRow ) {
-                            // associate stala erstellen
-                            Object gemSchl = builderRow.get( "GEMEINDE" );
-                            if (gemSchl != null) {
-                                GemeindeComposite gemeinde = allGemeinde.get( gemSchl.toString() );
-                                if (gemeinde == null) {
-                                    throw new IllegalStateException( "no gemeinde found for schl '"
-                                            + gemSchl + "' in Gemarkung '" + entity.schl() + "'!" );
-                                }
-                                entity.gemeinde().set( gemeinde );
-                                entity.flur().set( flur );
-                            }
+                            entity.gemeinde().set( find( allGemeinde, builderRow, "GEMEINDE" ) );
+                            entity.flur().set( flur );
+                        }
+                    } );
+
+            // bodenrichtwertkennung laden
+            final BodenRichtwertKennungComposite zonal = repo.findSchlNamed(
+                    BodenRichtwertKennungComposite.class, "1" );
+            // erschließungsbeitrag laden
+            final Map<String, ErschliessungsBeitragComposite> allErschliessungsbeitrag = repo
+                    .entitiesWithSchl( ErschliessungsBeitragComposite.class );
+
+            // RichtwertzoneLage auf 00
+            final RichtwertZoneLageComposite richtwertZoneLageComposite = repo.findSchlNamed(
+                    RichtwertZoneLageComposite.class, "00" );
+            sub = new SubMonitor( monitor, 10 );
+            importEntity( db, sub, RichtwertzoneComposite.class,
+                    new EntityCallback<RichtwertzoneComposite>() {
+
+                        @Override
+                        public void fillEntity( RichtwertzoneComposite entity,
+                                Map<String, Object> builderRow ) {
+                            entity.gemeinde().set( find( allGemeinde, builderRow, "GEMEINDE" ) );
+                            entity.nutzung().set( find( allNutzung, builderRow, "NUART" ) );
+                            entity.bodenNutzung().set(
+                                    find( allBodennutzung, builderRow, "NUTZUNG" ) );
+                            entity.lage().set( richtwertZoneLageComposite );
+                            entity.bodenrichtwertKennung().set( zonal );
+                            entity.erschliessungsBeitrag().set(
+                                    find( allErschliessungsbeitrag, builderRow, "EB" ) );
                         }
                     } );
             //
@@ -499,6 +486,33 @@ public class MdbImportOperation
     // // monitor.worked( 1 );
     // // }
     // }
+
+    /**
+     * 
+     * @param class1
+     * @param allNutzung
+     * @param builderRow
+     * @param string
+     * @return
+     */
+    protected <T extends Composite> T find( Map<String, T> all, Map<String, Object> row,
+            String columnName ) {
+        Object schl = row.get( columnName );
+        // schl ist mal String mal Integer
+        if (schl != null) {
+            String schlStr = schl.toString();
+            if (!schlStr.isEmpty()) {
+                T obj = all.get( schlStr );
+                if (obj == null) {
+                    throw new IllegalStateException( "no " + columnName + " found for schl '"
+                            + schl + "'!" );
+                }
+                return obj;
+            }
+        }
+        return null;
+    }
+
 
     /**
      * 

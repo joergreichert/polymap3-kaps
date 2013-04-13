@@ -27,7 +27,8 @@ import org.polymap.core.qi4j.QiModule.EntityCreator;
 import org.polymap.rhei.data.entityfeature.EntityProvider2;
 import org.polymap.rhei.data.entityfeature.EntitySourceProcessor;
 
-import org.polymap.kaps.form.EingangsNummerFormatter;
+import org.polymap.kaps.model.data.KaufvertragComposite;
+import org.polymap.kaps.ui.form.EingangsNummerFormatter;
 
 /**
  * Minimale Implementation für einen EntityProvider. Alle einfachen Properties der

@@ -4,9 +4,9 @@
    <extension
          point="org.polymap.rhei.form.pageProviders">
       <pageProvider
-            class="org.polymap.kaps.FormPageProvider"
-            id="org.polymap.kaps.pageProvider"
-            name="KAPS Page">
+            class="org.polymap.kaps.ui.FormPageProvider"
+            id="org.polymap.kaps.ui.FormPageProvider"
+            name="Kaufpreissammlung">
       </pageProvider>
    </extension>
    <extension
@@ -22,6 +22,14 @@
             id="org.polymap.kaps.wizard"
             name="KapsImport">
       </wizard>
+   </extension>
+   <extension
+         point="org.polymap.rhei.form.filterProviders">
+      <filterProvider
+            class="org.polymap.kaps.ui.FilterProvider"
+            id="org.polymap.kaps.ui.FilterProvider"
+            name="org.polymap.kaps.ui.FilterProvider">
+      </filterProvider>
    </extension>
 
 </plugin>

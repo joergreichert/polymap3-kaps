@@ -18,7 +18,7 @@ import static org.qi4j.api.query.QueryExpressions.templateFor;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Map;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.geotools.feature.NameImpl;
@@ -28,6 +28,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.qi4j.api.query.Query;
+import org.qi4j.api.query.QueryExpressions;
 import org.qi4j.api.query.grammar.BooleanExpression;
 import org.qi4j.api.query.grammar.OrderBy;
 import org.qi4j.api.unitofwork.ConcurrentEntityModificationException;
@@ -48,6 +49,17 @@ import org.polymap.core.qi4j.QiModuleAssembler;
 import org.polymap.core.runtime.Polymap;
 import org.polymap.core.runtime.entity.ConcurrentModificationException;
 
+import org.polymap.kaps.model.data.BodennutzungComposite;
+import org.polymap.kaps.model.data.FlurComposite;
+import org.polymap.kaps.model.data.GebaeudeArtComposite;
+import org.polymap.kaps.model.data.GemarkungComposite;
+import org.polymap.kaps.model.data.GemeindeComposite;
+import org.polymap.kaps.model.data.KaeuferKreisComposite;
+import org.polymap.kaps.model.data.KaufvertragComposite;
+import org.polymap.kaps.model.data.NutzungComposite;
+import org.polymap.kaps.model.data.StalaComposite;
+import org.polymap.kaps.model.data.StrasseComposite;
+import org.polymap.kaps.model.data.VertragsArtComposite;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -83,10 +95,10 @@ public class KapsRepository
 
     // public ServiceReference<BiotopnummerGeneratorService> biotopnummern;
 
-    public static class ArtEntityProvider<T extends Entity>
+    public static class SimpleEntityProvider<T extends Entity>
             extends KapsEntityProvider<T> {
 
-        public ArtEntityProvider( QiModule repo, Class entityClass, Name entityName) {
+        public SimpleEntityProvider( QiModule repo, Class entityClass, Name entityName ) {
             super( repo, entityClass, entityName );
         }
     };
@@ -111,64 +123,56 @@ public class KapsRepository
         try {
 
             kapsService = new KapsService(
-                    // BiotopComposite
                     new KaufvertragEntityProvider( this ),
-                    // Arten...
-                    new ArtEntityProvider<VertragsArtComposite>( this, VertragsArtComposite.class,
-                            new NameImpl( KapsRepository.NAMESPACE, "Vertragsart" ) ),
-                    new ArtEntityProvider<StalaComposite>( this, StalaComposite.class,
+                    new RichtwertzoneEntityProvider( this ),
+
+                    new SimpleEntityProvider<VertragsArtComposite>( this,
+                            VertragsArtComposite.class, new NameImpl( KapsRepository.NAMESPACE,
+                                    "Vertragsart" ) ),
+                    new SimpleEntityProvider<StalaComposite>( this, StalaComposite.class,
                             new NameImpl( KapsRepository.NAMESPACE, "Stala" ) ),
-                    new ArtEntityProvider<KaeuferKreisComposite>( this,
+                    new SimpleEntityProvider<KaeuferKreisComposite>( this,
                             KaeuferKreisComposite.class, new NameImpl( KapsRepository.NAMESPACE,
                                     "Käuferkreis" ) ),
-                    new ArtEntityProvider<NutzungComposite>( this, NutzungComposite.class,
+                    new SimpleEntityProvider<NutzungComposite>( this, NutzungComposite.class,
                             new NameImpl( KapsRepository.NAMESPACE, "Nutzung" ) ),
-                    new ArtEntityProvider<GebaeudeArtComposite>( this, GebaeudeArtComposite.class,
-                            new NameImpl( KapsRepository.NAMESPACE, "Gebäudeart" ) ),
-                    new ArtEntityProvider<GemeindeComposite>( this, GemeindeComposite.class,
+                    new SimpleEntityProvider<GebaeudeArtComposite>( this,
+                            GebaeudeArtComposite.class, new NameImpl( KapsRepository.NAMESPACE,
+                                    "Gebäudeart" ) ),
+                    new SimpleEntityProvider<GemeindeComposite>( this, GemeindeComposite.class,
                             new NameImpl( KapsRepository.NAMESPACE, "Gemeinde" ) ),
-                    new ArtEntityProvider<StrasseComposite>( this, StrasseComposite.class,
+                    new SimpleEntityProvider<StrasseComposite>( this, StrasseComposite.class,
                             new NameImpl( KapsRepository.NAMESPACE, "Strasse" ) ),
-                    new ArtEntityProvider<GemarkungComposite>( this, GemarkungComposite.class,
+                    new SimpleEntityProvider<GemarkungComposite>( this, GemarkungComposite.class,
                             new NameImpl( KapsRepository.NAMESPACE, "Gemarkung" ) ),
-                    new ArtEntityProvider<FlurComposite>( this, FlurComposite.class, new NameImpl(
-                            KapsRepository.NAMESPACE, "Flur" ) ),
-                    new ArtEntityProvider<BodennutzungComposite>( this,
-                            BodennutzungComposite.class, new NameImpl( KapsRepository.NAMESPACE,
-                                    "Bodennutzung" ) )
+                    new SimpleEntityProvider<FlurComposite>( this, FlurComposite.class,
+                            new NameImpl( KapsRepository.NAMESPACE, "Flur" ) ),
 
-            // new ArtEntityProvider( this, PflanzenArtComposite.class,
-            // new NameImpl( KapsRepository.NAMESPACE, "Pflanzenart" ),
-            // queryProvider ),
-            // new ArtEntityProvider( this, PilzArtComposite.class,
-            // new NameImpl( KapsRepository.NAMESPACE, "Pilzart" ),
-            // queryProvider ),
-            // new ArtEntityProvider( this, TierArtComposite.class,
-            // new NameImpl( KapsRepository.NAMESPACE, "Tierart" ),
-            // queryProvider ),
-            // new ArtEntityProvider( this, StoerungsArtComposite.class,
-            // new NameImpl( KapsRepository.NAMESPACE, "Beeintr�chtigungen" ),
-            // queryProvider ),
-            // new ArtEntityProvider( this, WertArtComposite.class,
-            // new NameImpl( KapsRepository.NAMESPACE, "Wertbestimmend" ),
-            // queryProvider )
-            );
+                    // nicht änderbare Wertelisten
+                    // new SimpleEntityProvider<ErschliessungsBeitragComposite>(
+                    // this,
+                    // ErschliessungsBeitragComposite.class, new NameImpl(
+                    // KapsRepository.NAMESPACE, "Erschliessungsbeitrag" ) ),
+                    // new SimpleEntityProvider<BodenRichtwertKennungComposite>(
+                    // this,
+                    // BodenRichtwertKennungComposite.class, new NameImpl(
+                    // KapsRepository.NAMESPACE, "Bodenrichtwertkennung" ) ),
+                    // new SimpleEntityProvider<EntwicklungsZustandComposite>( this,
+                    // EntwicklungsZustandComposite.class, new NameImpl(
+                    // KapsRepository.NAMESPACE, "Entwicklungszustand" ) ) )
+                            
+                            
+                    new SimpleEntityProvider<BodennutzungComposite>( this,
+                            BodennutzungComposite.class, new NameImpl( KapsRepository.NAMESPACE,
+                                    "Bodennutzung" ) ) );
         }
         catch (Exception e) {
             throw new RuntimeException( e );
         }
 
         // register with catalog
-        // if (Polymap.getSessionDisplay() != null) {
-        // Polymap.getSessionDisplay().asyncExec( new Runnable() {
-        // public void run() {
         CatalogRepository catalogRepo = session.module( CatalogRepository.class );
         catalogRepo.getCatalog().addTransient( kapsService );
-        // CatalogPluginSession.instance().getLocalCatalog().add( biotopService
-        // );
-        // }
-        // });
-        // }
     }
 
 
@@ -183,7 +187,12 @@ public class KapsRepository
         }
     }
 
-
+    public <T extends SchlNamed> T findSchlNamed(Class<T> compositeType, String schl) {
+        Query<T> entities = findEntities( compositeType,
+                QueryExpressions.eq( templateFor( compositeType ).schl(), schl), 0, 1 );
+        return entities.find();
+    }
+    
     public <T> Query<T> findEntities( Class<T> compositeType, BooleanExpression expression,
             int firstResult, int maxResults ) {
         // Lucene does not like Integer.MAX_VALUE!?
@@ -232,6 +241,8 @@ public class KapsRepository
 
 
     public int highestEingangsNummer() {
+        // TODO umstellen auf sequenzgenerator
+
         // nur zum Test noch die Suche über Verkäuferkreis mit rein
         // Query<KaeuferKreisComposite> kreise = findEntities(
         // KaeuferKreisComposite.class, null, 0, 1 );
@@ -253,8 +264,7 @@ public class KapsRepository
         Query<KaufvertragComposite> entities = findEntities( KaufvertragComposite.class,
         // eq( template.kaeuferKreis(), kreis1 ), 0, 1 );
                 null, 0, 1 );
-        entities
-                .orderBy( orderBy( template.eingangsNr(), OrderBy.Order.DESCENDING ) );
+        entities.orderBy( orderBy( template.eingangsNr(), OrderBy.Order.DESCENDING ) );
         //
         // entities = findEntities( KaufvertragComposite.class, eq(
         // template.kaeuferKreis(), kreis2 ),
@@ -288,10 +298,25 @@ public class KapsRepository
     }
 
 
-    public <T extends Entity> Map<String, T> entitiesWithNames( Class<T> entityClass ) {
-        // if (vertragsArtNamen == null) {
+    public <T extends SchlNamed> SortedMap<String, T> entitiesWithSchl( Class<T> entityClass ) {
+        // TODO caching? if (vertragsArtNamen == null) {
 
-        // TODO sortieren bei schl
+        Query<T> entities = findEntities( entityClass, null, 0, 1000 );
+        SortedMap<String, T> schluessel = new TreeMap<String, T>();
+        for (T entity : entities) {
+            try {
+                String key = entity.schl().get();
+                schluessel.put( key, entity );
+            }
+            catch (Exception e) {
+                throw new IllegalStateException( "Exception on schl() on entity " + entity.id(), e );
+            }
+        }
+        return schluessel;
+    }
+    
+    public <T extends Named> SortedMap<String, T> entitiesWithNames( Class<T> entityClass ) {
+        // TODO caching? if (vertragsArtNamen == null) {
         Property nameProperty = entityType( entityClass ).getProperty( "name" );
         Property schlProperty = entityType( entityClass ).getProperty( "schl" );
         if (nameProperty == null) {
@@ -299,24 +324,19 @@ public class KapsRepository
         }
 
         Query<T> entities = findEntities( entityClass, null, 0, 1000 );
-        // if (schlProperty != null) {
-        // T template = templateFor( entityClass );
-        // entities.orderBy( orderBy(template.schl(), OrderBy.Order.ASCENDING) );
-        // }
-        Map<String, T> vertragsArtNamen = new TreeMap<String, T>();
+        SortedMap<String, T> namen = new TreeMap<String, T>();
         for (T entity : entities) {
             try {
                 String key = (String)nameProperty.getValue( entity );
                 if (schlProperty != null) {
                     key = (String)schlProperty.getValue( entity ) + "  -  " + key;
                 }
-                vertragsArtNamen.put( key, entity );
+                namen.put( key, entity );
             }
             catch (Exception e) {
                 throw new IllegalStateException( "Exception on name() on entity " + entity.id(), e );
             }
         }
-        // }
-        return vertragsArtNamen;
+        return namen;
     }
 }

@@ -16,19 +16,45 @@ import java.io.File;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.polymap.core.qi4j.QiModule;
-import org.polymap.core.qi4j.QiModuleAssembler;
-import org.polymap.core.qi4j.idgen.HRIdentityGeneratorService;
-import org.polymap.core.runtime.Polymap;
-import org.polymap.rhei.data.entitystore.lucene.LuceneEntityStoreInfo;
-import org.polymap.rhei.data.entitystore.lucene.LuceneEntityStoreQueryService;
-import org.polymap.rhei.data.entitystore.lucene.LuceneEntityStoreService;
+
+import org.qi4j.api.query.Query;
+import org.qi4j.api.query.QueryBuilder;
 import org.qi4j.api.structure.Application;
 import org.qi4j.api.structure.Module;
+import org.qi4j.api.unitofwork.UnitOfWork;
 import org.qi4j.api.unitofwork.UnitOfWorkFactory;
 import org.qi4j.bootstrap.ApplicationAssembly;
 import org.qi4j.bootstrap.LayerAssembly;
 import org.qi4j.bootstrap.ModuleAssembly;
+
+import org.polymap.core.qi4j.QiModule;
+import org.polymap.core.qi4j.QiModuleAssembler;
+import org.polymap.core.qi4j.idgen.HRIdentityGeneratorService;
+import org.polymap.core.runtime.Polymap;
+
+import org.polymap.rhei.data.entitystore.lucene.LuceneEntityStoreInfo;
+import org.polymap.rhei.data.entitystore.lucene.LuceneEntityStoreQueryService;
+import org.polymap.rhei.data.entitystore.lucene.LuceneEntityStoreService;
+
+import org.polymap.kaps.model.SchlNamedCreatorCallback.Impl;
+import org.polymap.kaps.model.data.BauweiseComposite;
+import org.polymap.kaps.model.data.BodenRichtwertKennungComposite;
+import org.polymap.kaps.model.data.BodennutzungComposite;
+import org.polymap.kaps.model.data.EntwicklungsZusatzComposite;
+import org.polymap.kaps.model.data.EntwicklungsZustandComposite;
+import org.polymap.kaps.model.data.ErschliessungsBeitragComposite;
+import org.polymap.kaps.model.data.FlurComposite;
+import org.polymap.kaps.model.data.GebaeudeArtComposite;
+import org.polymap.kaps.model.data.GemarkungComposite;
+import org.polymap.kaps.model.data.GemeindeComposite;
+import org.polymap.kaps.model.data.KaeuferKreisComposite;
+import org.polymap.kaps.model.data.KaufvertragComposite;
+import org.polymap.kaps.model.data.NutzungComposite;
+import org.polymap.kaps.model.data.RichtwertZoneLageComposite;
+import org.polymap.kaps.model.data.RichtwertzoneComposite;
+import org.polymap.kaps.model.data.StalaComposite;
+import org.polymap.kaps.model.data.StrasseComposite;
+import org.polymap.kaps.model.data.VertragsArtComposite;
 
 /**
  * 
@@ -76,8 +102,12 @@ public class KapsRepositoryAssembler
         ModuleAssembly domainModule = domainLayer.moduleAssembly( "kaps-module" );
         domainModule.addEntities( KaufvertragComposite.class, VertragsArtComposite.class,
                 KaeuferKreisComposite.class, StalaComposite.class, GemeindeComposite.class,
-                GebaeudeArtComposite.class, NutzungComposite.class, StrasseComposite.class, BodennutzungComposite.class, FlurComposite.class, GemarkungComposite.class
-                );
+                GebaeudeArtComposite.class, NutzungComposite.class, StrasseComposite.class,
+                BodennutzungComposite.class, FlurComposite.class, GemarkungComposite.class,
+                RichtwertzoneComposite.class, ErschliessungsBeitragComposite.class,
+                BodenRichtwertKennungComposite.class, EntwicklungsZustandComposite.class,
+                RichtwertZoneLageComposite.class, EntwicklungsZusatzComposite.class,
+                BauweiseComposite.class );
         // domainModule.addTransients(
         // PflanzeComposite.class,
         // TierComposite.class
@@ -119,6 +149,34 @@ public class KapsRepositoryAssembler
 
     public void createInitData()
             throws Exception {
+
+        // create the composites
+        final UnitOfWork uow = uowf.newUnitOfWork();
+
+        if (!isDBInitialized( uow )) {
+
+            log.info( "Create Init Data" );
+
+            final Impl schlCreator = new SchlNamedCreatorCallback.Impl( uow );
+            ErschliessungsBeitragComposite.Mixin.createInitData( schlCreator );
+            BodenRichtwertKennungComposite.Mixin.createInitData( schlCreator );
+            EntwicklungsZustandComposite.Mixin.createInitData( schlCreator );
+            RichtwertZoneLageComposite.Mixin.createInitData( schlCreator );
+            EntwicklungsZusatzComposite.Mixin.createInitData( schlCreator );
+            BauweiseComposite.Mixin.createInitData( schlCreator );
+
+        }
+        uow.complete();
+        log.info( "Create Init Data Completed" );
+    }
+
+
+    private boolean isDBInitialized( UnitOfWork uow ) {
+        QueryBuilder<ErschliessungsBeitragComposite> builder = getModule().queryBuilderFactory()
+                .newQueryBuilder( ErschliessungsBeitragComposite.class );
+        Query<ErschliessungsBeitragComposite> query = builder.newQuery( uow ).maxResults( 1 )
+                .firstResult( 0 );
+        return query.iterator().hasNext();
     }
 
 }

@@ -41,7 +41,7 @@ import org.polymap.rhei.data.entityfeature.EntityProvider3;
  * 
  * @author <a href="http://www.polymap.de">Falko Bräutigam</a>
  */
-abstract class KapsEntityProvider<T extends Entity>
+public abstract class KapsEntityProvider<T extends Entity>
         extends DefaultEntityProvider<T>
         implements EntityProvider<T>, EntityProvider3<T> {
 
@@ -78,7 +78,6 @@ abstract class KapsEntityProvider<T extends Entity>
         SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
         builder.init( (SimpleFeatureType)schema );
 
-        // assoziationen ergänzen
         // alle mit einem Type der ein Property Name hat
         EntityType entityType = getEntityType();
         Collection<EntityType.Property> p = entityType.getProperties();
@@ -86,8 +85,7 @@ abstract class KapsEntityProvider<T extends Entity>
             Class propType = prop.getType();
             if (prop instanceof Association) {
                 Association association = (Association)prop;
-                EntityType associationType = repo.entityType( association.getType() );
-                if (associationType.getProperty( "name" ) != null) {
+                if (Named.class.isAssignableFrom( association.getType() )) {
                     builder.add( association.getName(), String.class );
                 }
             }
@@ -95,7 +93,6 @@ abstract class KapsEntityProvider<T extends Entity>
 
         return builder.buildFeatureType();
     }
-
 
     @Override
     public Feature buildFeature( T entity, Feature feature, FeatureType schema ) {
@@ -107,24 +104,22 @@ abstract class KapsEntityProvider<T extends Entity>
             EntityType entityType = getEntityType();
             Collection<EntityType.Property> p = entityType.getProperties();
             for (EntityType.Property prop : p) {
-                Class propType = prop.getType();
                 if (prop instanceof Association) {
                     Association association = (Association)prop;
-
                     org.opengis.feature.Property property = feature.getProperty( association
                             .getName() );
                     if (property != null) {
-                        EntityType associationType = repo.entityType( association.getType() );
-                        Property nameProperty = associationType.getProperty( "name" );
-                        Property schlProperty = associationType.getProperty( "schl" );
-                        if (nameProperty != null) {
-                            Object associationValue = association.getValue( entity );
+                        if (Named.class.isAssignableFrom( association.getType() )) {
+                            Named associationValue = (Named)association.getValue( entity );
                             StringBuffer associatedCompositeName = new StringBuffer( "" );
                             if (associationValue != null) {
-                                String name = (String)nameProperty
-                                        .getValue( (Composite)associationValue );
-                                String schl = (String)schlProperty
-                                        .getValue( (Composite)associationValue );
+                                String name = associationValue.name().get();
+                                
+                                EntityType associationType = repo.entityType( association.getType() );
+                                Property schlProperty = associationType.getProperty( "schl" );
+                                String schl = schlProperty != null ? (String)schlProperty
+                                        .getValue( (Composite)associationValue ) : null;
+                                        
                                 if (schl != null) {
                                     associatedCompositeName.append( schl );
                                 }
@@ -146,7 +141,6 @@ abstract class KapsEntityProvider<T extends Entity>
         }
         return feature;
     }
-
 
     @Override
     public boolean modifyFeature( T entity, String propName, Object value )
