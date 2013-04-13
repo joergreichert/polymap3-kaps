@@ -22,13 +22,11 @@ import org.apache.commons.logging.LogFactory;
 
 import org.polymap.core.project.ILayer;
 
-import org.polymap.rhei.data.entityfeature.EntityProvider;
-import org.polymap.rhei.data.entityfeature.catalog.EntityGeoResourceImpl;
 import org.polymap.rhei.filter.IFilter;
 import org.polymap.rhei.filter.IFilterProvider;
 
-import org.polymap.kaps.model.KapsEntityProvider;
 import org.polymap.kaps.model.KapsRepository;
+import org.polymap.kaps.model.data.RichtwertzoneComposite;
 import org.polymap.kaps.ui.filter.RichtwertZoneFilter;
 
 /**
@@ -41,6 +39,7 @@ public class FilterProvider
 
     private ILayer     layer;
 
+
     public List<IFilter> addFilters( ILayer _layer )
             throws Exception {
         this.layer = _layer;
@@ -49,15 +48,19 @@ public class FilterProvider
         final KapsRepository repo = KapsRepository.instance();
         IGeoResource geores = layer.getGeoResource();
 
-        if (geores instanceof EntityGeoResourceImpl
-                && geores.resolve( EntityProvider.class, null ) instanceof KapsEntityProvider) {
+        List<IFilter> result = new ArrayList<IFilter>();
 
-            List<IFilter> result = new ArrayList<IFilter>();
+        // if (geores instanceof EntityGeoResourceImpl
+        // && geores.resolve( EntityProvider.class, null ) instanceof
+        // KapsEntityProvider) {
+        // TODO ist dieser Check hier korrekt? Gibt es eine andere Möglichkeit,
+        // direkt auf das Composite zu matchen
+        // bei mir benutzen mehrere Composites durchaus den gleichen EntityProvider
+        if (geores.getID().toString().contains( RichtwertzoneComposite.class.getName() )) {
 
             result.add( new RichtwertZoneFilter( layer ) );
-            
-            return result;
         }
-        return null;
+
+        return result;
     }
 }
