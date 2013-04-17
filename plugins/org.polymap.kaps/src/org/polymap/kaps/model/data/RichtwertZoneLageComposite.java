@@ -41,8 +41,6 @@ public interface RichtwertZoneLageComposite
 //    Property<String> schl();
 
 //    Property<String> name();
-
-    // TODO im import beachten
     
     /**
      * Methods and transient fields.

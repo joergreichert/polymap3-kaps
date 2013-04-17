@@ -1,6 +1,5 @@
 /*
- * polymap.org Copyright 2011, Falko Br�utigam, and other contributors as indicated
- * by the @authors tag. All rights reserved.
+ * polymap.org Copyright 2013 Polymap GmbH. All rights reserved.
  * 
  * This is free software; you can redistribute it and/or modify it under the terms of
  * the GNU Lesser General Public License as published by the Free Software
@@ -15,18 +14,22 @@ package org.polymap.kaps.importer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
+
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
+
 import org.polymap.core.operation.OperationSupport;
 import org.polymap.core.workbench.PolymapWorkbench;
+
 import org.polymap.kaps.KapsPlugin;
 
 /**
  * 
  * 
- * @author <a href="http://www.polymap.de">Falko Br�utigam</a>
+ * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 public class MdbImportWizard
         extends Wizard

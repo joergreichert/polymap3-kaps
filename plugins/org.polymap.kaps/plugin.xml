@@ -19,8 +19,9 @@
          point="org.eclipse.ui.importWizards">
       <wizard
             class="org.polymap.kaps.importer.MdbImportWizard"
-            id="org.polymap.kaps.wizard"
-            name="KapsImport">
+            icon="icons/add.gif"
+            id="org.polymap.kaps.winakpsimport"
+            name="WinAKPS Import ">
       </wizard>
    </extension>
    <extension
@@ -30,6 +31,16 @@
             id="org.polymap.kaps.ui.FilterProvider"
             name="org.polymap.kaps.ui.FilterProvider">
       </filterProvider>
+   </extension>
+   <extension
+         point="org.polymap.core.data.featureOperations">
+      <featureOperation
+            class="org.polymap.kaps.exporter.RichtwertzoneAsBorisExporter"
+            icon="icons/exportas.gif"
+            id="org.polymap.kaps.exporter.RichtwertzoneAsBorisExporter"
+            label="%BorisExportFeatureOperation_label"
+            tooltip="%BorisExportFeatureOperation_tip">
+      </featureOperation>
    </extension>
 
 </plugin>

@@ -58,6 +58,7 @@ public interface GemarkungComposite
     @Optional
     // GEMEINDE
     Association<GemeindeComposite> gemeinde();
+    
 
     /**
      * Methods and transient fields.

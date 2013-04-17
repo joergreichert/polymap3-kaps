@@ -1,6 +1,5 @@
 /*
- * polymap.org Copyright 2011, Falko Br�utigam, and other contributors as indicated
- * by the @authors tag. All rights reserved.
+ * polymap.org Copyright 2013 Polymap GmbH. All rights reserved.
  * 
  * This is free software; you can redistribute it and/or modify it under the terms of
  * the GNU Lesser General Public License as published by the Free Software
@@ -51,7 +50,7 @@ import org.polymap.core.workbench.PolymapWorkbench;
 /**
  * 
  * 
- * @author <a href="http://www.polymap.de">Falko Br�utigam</a>
+ * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 public class MdbImportPage
         extends WizardPage

@@ -12,48 +12,65 @@
  */
 package org.polymap.kaps.model.data;
 
+import java.util.Date;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.qi4j.api.common.Optional;
 import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.entity.EntityComposite;
+import org.qi4j.api.entity.association.Association;
 import org.qi4j.api.mixin.Mixins;
+import org.qi4j.api.property.Property;
 
 import org.polymap.core.qi4j.QiEntity;
 import org.polymap.core.qi4j.event.ModelChangeSupport;
 import org.polymap.core.qi4j.event.PropertyChangeSupport;
 
-import org.polymap.kaps.model.SchlNamed;
-import org.polymap.kaps.model.SchlNamedCreatorCallback;
+import org.polymap.kaps.importer.ImportColumn;
+import org.polymap.kaps.importer.ImportTable;
+import org.polymap.kaps.model.Named;
 
 /**
  * 
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 @Concerns({ PropertyChangeSupport.Concern.class })
-@Mixins({ BodenRichtwertKennungComposite.Mixin.class, PropertyChangeSupport.Mixin.class,
+@Mixins({ GemeindeFaktorComposite.Mixin.class, PropertyChangeSupport.Mixin.class,
         ModelChangeSupport.Mixin.class, QiEntity.Mixin.class
 // JsonState.Mixin.class
 })
-public interface BodenRichtwertKennungComposite
-        extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite, SchlNamed {
+@ImportTable("K_FAKTORENREG")
+public interface GemeindeFaktorComposite
+        extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite, Named {
 
-//    Property<String> schl();
+    // TODO in Editor für Gemeinde
 
-//    Property<String> name();
+    // GEMEINDE INTEGER,
+    @Optional
+    // TODO import
+    Association<GemeindeComposite> gemeinde();
     
+    // ART VARCHAR(1), ist immer G und in UI nicht zu finden
+    // GILTAB TIMESTAMP,
+    @Optional
+    @ImportColumn("GILTAB")
+    Property<Date> gueltigAb();
+    
+    // FAKTOR DOUBLE
+    @Optional
+    @ImportColumn("FAKTOR")
+    Property<Double> faktor();
+
     /**
      * Methods and transient fields.
      */
     public static abstract class Mixin
-            implements BodenRichtwertKennungComposite {
+            implements GemeindeFaktorComposite {
 
         private static Log log = LogFactory.getLog( Mixin.class );
 
-        public static void createInitData(SchlNamedCreatorCallback cb) {
-            cb.create(BodenRichtwertKennungComposite.class, "1", "zonal" );
-            cb.create(BodenRichtwertKennungComposite.class, "2", "lagetypisch" );
-        }
     }
 
 }

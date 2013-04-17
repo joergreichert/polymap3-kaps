@@ -31,11 +31,11 @@ import org.polymap.kaps.model.SchlNamedCreatorCallback;
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 @Concerns({ PropertyChangeSupport.Concern.class })
-@Mixins({ BodenRichtwertKennungComposite.Mixin.class, PropertyChangeSupport.Mixin.class,
+@Mixins({ ArtDesBaugebietsComposite.Mixin.class, PropertyChangeSupport.Mixin.class,
         ModelChangeSupport.Mixin.class, QiEntity.Mixin.class
 // JsonState.Mixin.class
 })
-public interface BodenRichtwertKennungComposite
+public interface ArtDesBaugebietsComposite
         extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite, SchlNamed {
 
 //    Property<String> schl();
@@ -46,13 +46,20 @@ public interface BodenRichtwertKennungComposite
      * Methods and transient fields.
      */
     public static abstract class Mixin
-            implements BodenRichtwertKennungComposite {
+            implements ArtDesBaugebietsComposite {
 
         private static Log log = LogFactory.getLog( Mixin.class );
 
         public static void createInitData(SchlNamedCreatorCallback cb) {
-            cb.create(BodenRichtwertKennungComposite.class, "1", "zonal" );
-            cb.create(BodenRichtwertKennungComposite.class, "2", "lagetypisch" );
+            cb.create(ArtDesBaugebietsComposite.class, "1", "Geschäftsgebiet" );
+            cb.create(ArtDesBaugebietsComposite.class, "2", "Geschäfts- und Wohngebiet gemischt" );
+            cb.create(ArtDesBaugebietsComposite.class, "3", "Wohngebiet in geschlossener Bauweise" );
+            cb.create(ArtDesBaugebietsComposite.class, "4", "Wohngebiet in offener Bauweise" );
+            cb.create(ArtDesBaugebietsComposite.class, "5", "Industriegebiet" );
+            cb.create(ArtDesBaugebietsComposite.class, "6", "Dorfgebiet" );
+            cb.create(ArtDesBaugebietsComposite.class, "7", "mit Gebäude und Inventar" );
+            cb.create(ArtDesBaugebietsComposite.class, "8", "mit Gebäude und ohne Inventar" );
+            cb.create(ArtDesBaugebietsComposite.class, "9", "ohne Gebäude und Inventar" );
         }
     }
 

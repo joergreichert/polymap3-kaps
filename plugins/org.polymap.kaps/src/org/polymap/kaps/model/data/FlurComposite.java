@@ -24,7 +24,7 @@ import org.polymap.core.qi4j.QiEntity;
 import org.polymap.core.qi4j.event.ModelChangeSupport;
 import org.polymap.core.qi4j.event.PropertyChangeSupport;
 
-import org.polymap.kaps.model.Named;
+import org.polymap.kaps.model.SchlNamed;
 
 /**
  * 
@@ -37,7 +37,7 @@ import org.polymap.kaps.model.Named;
 })
 //@ImportTable("K_FLUR")
 public interface FlurComposite
-        extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite, Named {
+        extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite, SchlNamed {
 
     // @Optional
 //    @ImportColumn("SCHL")

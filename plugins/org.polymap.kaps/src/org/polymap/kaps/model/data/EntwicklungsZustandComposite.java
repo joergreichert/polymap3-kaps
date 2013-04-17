@@ -42,8 +42,7 @@ public interface EntwicklungsZustandComposite
 //    Property<String> schl();
 
 //    Property<String> name();
-    
-    // TODO import
+
     /**
      * Methods and transient fields.
      */
