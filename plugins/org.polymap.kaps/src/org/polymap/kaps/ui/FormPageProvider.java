@@ -23,6 +23,7 @@ import org.polymap.rhei.form.IFormPageProvider;
 
 import org.polymap.kaps.ui.form.Kaufvertrag1FormEditorPage;
 import org.polymap.kaps.ui.form.Kaufvertrag2FormEditorPage;
+import org.polymap.kaps.ui.form.KaufvertragFlurstueckeFormEditorPage;
 import org.polymap.kaps.ui.form.RichtwertzoneGrunddatenFormEditorPage;
 import org.polymap.kaps.ui.form.RichtwertzoneWeitereDatenFormEditorPage;
 
@@ -39,10 +40,14 @@ public class FormPageProvider
         if (feature.getType().getName().getLocalPart().equalsIgnoreCase( "kaufvertrag" )) {
             result.add( new Kaufvertrag1FormEditorPage( feature, formEditor.getFeatureStore() ) );
             result.add( new Kaufvertrag2FormEditorPage( feature, formEditor.getFeatureStore() ) );
+            result.add( new KaufvertragFlurstueckeFormEditorPage( feature, formEditor
+                    .getFeatureStore() ) );
         }
         else if (feature.getType().getName().getLocalPart().equalsIgnoreCase( "richtwertzone" )) {
-            result.add( new RichtwertzoneGrunddatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
-            result.add( new RichtwertzoneWeitereDatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
+            result.add( new RichtwertzoneGrunddatenFormEditorPage( feature, formEditor
+                    .getFeatureStore() ) );
+            result.add( new RichtwertzoneWeitereDatenFormEditorPage( feature, formEditor
+                    .getFeatureStore() ) );
         }
         return result;
     }

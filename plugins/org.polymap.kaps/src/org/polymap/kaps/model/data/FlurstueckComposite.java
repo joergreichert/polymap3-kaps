@@ -21,7 +21,14 @@ import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.entity.association.Association;
 import org.qi4j.api.mixin.Mixins;
+import org.qi4j.api.property.Computed;
+import org.qi4j.api.property.ComputedPropertyInstance;
+import org.qi4j.api.property.GenericPropertyInfo;
 import org.qi4j.api.property.Property;
+import org.qi4j.api.property.PropertyInfo;
+import org.qi4j.api.query.Query;
+import org.qi4j.api.query.QueryExpressions;
+import org.qi4j.api.query.grammar.BooleanExpression;
 
 import org.polymap.core.qi4j.QiEntity;
 import org.polymap.core.qi4j.event.ModelChangeSupport;
@@ -29,7 +36,9 @@ import org.polymap.core.qi4j.event.PropertyChangeSupport;
 
 import org.polymap.kaps.importer.ImportColumn;
 import org.polymap.kaps.importer.ImportTable;
+import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.Named;
+import org.polymap.kaps.ui.form.EingangsNummerFormatter;
 
 /**
  * 
@@ -49,6 +58,8 @@ public interface FlurstueckComposite
     @Optional
     Association<KaufvertragComposite> vertrag();
 
+    @Computed
+    Property<String> vertragsNummer();
 
     // GEMARKUNG VARCHAR(4),
     @Optional
@@ -99,60 +110,71 @@ public interface FlurstueckComposite
     @ImportColumn("FANTN1")
     Property<Double> flaechenAnteilNenner();
 
+
     // VERKFL1 DOUBLE,
     @Optional
     @UseDefaults
     @ImportColumn("VERKFL1")
     Property<Double> verkaufteFlaeche();
-    
+
+
     // NUTZUNG VARCHAR(2),
     @Optional
     Association<NutzungComposite> nutzung();
-    
-    // LAGE VARCHAR(35), 
+
+
+    // LAGE VARCHAR(35),
     // Enthält nochmal den Strassennamen, in UI nicht zu erkennen
-    
+
     // HAUSNR INTEGER DEFAULT 0,
     @Optional
     @ImportColumn("HAUSNR")
     @UseDefaults
     Property<Integer> hausnummer();
-    
+
+
     // STRNR VARCHAR(5),
     @Optional
     Association<StrasseComposite> strasse();
-    
+
+
     // GEBART VARCHAR(3),
     @Optional
     Association<GebaeudeArtComposite> gebaeudeArt();
-    
+
+
     // KARTBLATT VARCHAR(6),
     @Optional
     @ImportColumn("KARTBLATT")
     Property<String> kartenBlatt();
-    
+
+
     // XGK DOUBLE, IGNORE, eventuell später mal als geom()
     // YGK DOUBLE,
-    
+
     // HAUPTTEIL VARCHAR(1),
     @Optional
     Property<Boolean> hauptFlurstueck();
-    
+
+
     // BEMERKUNG VARCHAR(12),
     @Optional
     @ImportColumn("BEMERKUNG")
     Property<String> bemerkung();
-    
+
+
     // KARTBLATTN VARCHAR(10),
     @Optional
     @ImportColumn("KARTBLATTN")
     Property<String> kartenBlattNummer();
-     
+
+
     // BAUGEBART VARCHAR(1),
     @Optional
     Association<ArtDesBaugebietsComposite> artDesBaugebiets();
-    
-    // FLSTNR1X VARCHAR(5), identisch FLSTNR1 
+
+
+    // FLSTNR1X VARCHAR(5), identisch FLSTNR1
     // FLSTNR1UX VARCHAR(3), identisch FLSTNR1U
     // GEM_FLUR VARCHAR(4), Link zur Gemarkung ist über Gemarkung
 
@@ -160,7 +182,8 @@ public interface FlurstueckComposite
     @Optional
     @ImportColumn("HZUSNR")
     Property<String> hausnummerZusatz();
-    
+
+
     // GEMEINDE INTEGER DEFAULT 0, Link zur Gemeinde ist schon über Gemarkung ignore?
     // RIZONE VARCHAR(7),
     // RIJAHR TIMESTAMP
@@ -176,6 +199,33 @@ public interface FlurstueckComposite
 
         private static Log log = LogFactory.getLog( Mixin.class );
 
-    }
 
+        private PropertyInfo nameProperty = new GenericPropertyInfo( FlurstueckComposite.class, "vertragsNummer" );
+
+        @Override
+        public Property<String> vertragsNummer() {
+            return new ComputedPropertyInstance<String>( nameProperty ) {
+
+                public String get() {
+                    if (vertrag().get() != null) {                       
+                        return EingangsNummerFormatter.format( vertrag().get().eingangsNr().get());
+                    }
+                    return null;
+                }
+                
+                @Override
+                public void set( String anIgnoredValue )
+                        throws IllegalArgumentException, IllegalStateException {
+                        // ignored
+                }
+            };
+        }
+        public static Iterable<FlurstueckComposite> forEntity( KaufvertragComposite kaufvertrag ) {
+            FlurstueckComposite template = QueryExpressions.templateFor( FlurstueckComposite.class );
+            BooleanExpression expr = QueryExpressions.eq( template.vertrag(), kaufvertrag );
+            Query<FlurstueckComposite> matches = KapsRepository.instance().findEntities(
+                    FlurstueckComposite.class, expr, 0, -1 );
+            return matches;
+        }
+    }
 }

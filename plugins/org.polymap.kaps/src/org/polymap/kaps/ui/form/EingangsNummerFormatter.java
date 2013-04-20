@@ -55,7 +55,13 @@ public class EingangsNummerFormatter
         return modelValue;
     }
 
-
+    public final static String format( Integer in ) {
+        if (in != null) {
+            return format( in.toString());
+        }
+        return null;
+    }
+    
     public final static String format( String in ) {
         if (in != null && in.length() > 4) {
             return in.substring( 0, 4 ) + "/" + in.substring( 4 );

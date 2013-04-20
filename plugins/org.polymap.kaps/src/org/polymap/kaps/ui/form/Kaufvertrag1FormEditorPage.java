@@ -96,7 +96,7 @@ public class Kaufvertrag1FormEditorPage
                 namedAssocationsPicklist( VertragsArtComposite.class ), null, "Vertragsart" );
         line4.setLayoutData( left().top( line3 ).create() );
 
-        // Kaufpreis Nenner/ZÃ¤hler
+        // Kaufpreis Nenner/Zähler
         final Composite line5 = site.newFormField( parent,
                 new PropertyAdapter( kaufvertrag.kaufpreis() ), new TextFormField(
                         StringFormField.Style.ALIGN_RIGHT ), new NumberValidator( Integer.class,
