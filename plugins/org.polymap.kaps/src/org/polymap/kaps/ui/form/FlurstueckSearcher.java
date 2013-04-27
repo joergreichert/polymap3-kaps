@@ -103,23 +103,23 @@ public abstract class FlurstueckSearcher
     public void run() {
         try {
 
-            FlurstueckComposite template = provider.get();
-            if (template != null) {
-                // set the search fields to the default values from the selected
-                // template
-                if (gemarkung == null) {
-                    gemarkung = template.gemarkung().get();
-                }
-                if (flur == null) {
-                    flur = template.flur().get();
-                }
-                if (nummer == null) {
-                    nummer = template.nummer().get();
-                }
-                if (unterNummer == null) {
-                    unterNummer = template.unterNummer().get();
-                }
-            }
+//            FlurstueckComposite template = provider.get();
+//            if (template != null) {
+//                // set the search fields to the default values from the selected
+//                // template
+//                if (gemarkung == null) {
+//                    gemarkung = template.gemarkung().get();
+//                }
+//                if (flur == null) {
+//                    flur = template.flur().get();
+//                }
+//                if (nummer == null) {
+//                    nummer = template.nummer().get();
+//                }
+//                if (unterNummer == null) {
+//                    unterNummer = template.unterNummer().get();
+//                }
+//            }
             content = KapsRepository.instance().findFlurstuecke( gemarkung, flur, nummer,
                     unterNummer );
 

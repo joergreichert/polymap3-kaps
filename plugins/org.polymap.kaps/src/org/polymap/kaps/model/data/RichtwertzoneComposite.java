@@ -22,7 +22,14 @@ import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.entity.association.Association;
 import org.qi4j.api.mixin.Mixins;
+import org.qi4j.api.property.Computed;
+import org.qi4j.api.property.ComputedPropertyInstance;
+import org.qi4j.api.property.GenericPropertyInfo;
 import org.qi4j.api.property.Property;
+import org.qi4j.api.property.PropertyInfo;
+import org.qi4j.api.query.Query;
+import org.qi4j.api.query.QueryExpressions;
+import org.qi4j.api.query.grammar.BooleanExpression;
 
 import org.polymap.core.qi4j.QiEntity;
 import org.polymap.core.qi4j.event.ModelChangeSupport;
@@ -30,7 +37,8 @@ import org.polymap.core.qi4j.event.PropertyChangeSupport;
 
 import org.polymap.kaps.importer.ImportColumn;
 import org.polymap.kaps.importer.ImportTable;
-import org.polymap.kaps.model.Named;
+import org.polymap.kaps.model.KapsRepository;
+import org.polymap.kaps.model.SchlNamed;
 
 /**
  * 
@@ -44,7 +52,7 @@ import org.polymap.kaps.model.Named;
 })
 @ImportTable("K_RIWE")
 public interface RichtwertzoneComposite
-        extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite, Named {
+        extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite, SchlNamed {
 
     // CREATE TABLE K_RIWE (
     //
@@ -66,6 +74,7 @@ public interface RichtwertzoneComposite
     @Optional
     Association<RichtwertZoneLageComposite> lage();
 
+
     // EB VARCHAR(1), ist O,1,2,3,Null
     // Erschließungsbeitrag/Erschließungszustand nach BauGB 1,2 oder 3 ->
     @Optional
@@ -76,7 +85,10 @@ public interface RichtwertzoneComposite
     @Optional
     @ImportColumn("RIZONE")
     Property<String> zone();
-
+    
+    @Computed
+    @Optional
+    Property<String> schl();
 
     // BEZ VARCHAR(40), Name
     @Optional
@@ -197,17 +209,19 @@ public interface RichtwertzoneComposite
     // ENTWZUSATZ VARCHAR(2), leer, nicht importiert
     @Optional
     Association<EntwicklungsZusatzComposite> entwicklungsZusatz();
-    
+
+
     // BAUWEISE VARCHAR(2), leer, nicht importiert
     @Optional
     Association<BauweiseComposite> bauweise();
-    
-    
+
+
     // WGFZ VARCHAR(11) 1 DS
     @Optional
     @ImportColumn("WGFZ")
     Property<String> geschossFlaechenZahl();
-    
+
+
     // Handbuch Seite 23, 24
 
     /**
@@ -218,5 +232,32 @@ public interface RichtwertzoneComposite
 
         private static Log log = LogFactory.getLog( Mixin.class );
 
+        private PropertyInfo schlProperty = new GenericPropertyInfo( FlurstueckComposite.class, "schl" );
+
+        @Override
+        public Property<String> schl() {
+            return new ComputedPropertyInstance<String>( schlProperty ) {
+
+                public String get() {
+                    return zone().get();
+                }
+                
+                @Override
+                public void set( String newValue )
+                        throws IllegalArgumentException, IllegalStateException {
+                        zone().set( newValue );
+                }
+            };
+        }
+        
+        public static Iterable<RichtwertzoneComposite> findZoneIn( GemeindeComposite gemeinde ) {
+            RichtwertzoneComposite template = QueryExpressions
+                    .templateFor( RichtwertzoneComposite.class );
+            BooleanExpression expr = QueryExpressions.eq( template.gemeinde(), gemeinde );
+            Query<RichtwertzoneComposite> matches = KapsRepository.instance().findEntities(
+                    RichtwertzoneComposite.class, expr, 0, -1 );
+            // filter auf letzte aktuelle Zone, darf nicht da ja auch ältere Zonen auswählbar sind
+            return matches;
+        }
     }
 }

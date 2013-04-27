@@ -64,7 +64,10 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
 
     protected CompositeProvider<T> selectedComposite = new CompositeProvider<T>();
 
-    private List<IFormField> reloadables = new ArrayList<IFormField>();
+    private List<IFormField>       reloadables       = new ArrayList<IFormField>();
+
+    private boolean                updatingElements;
+
 
     public KapsDefaultFormEditorPageWithFeatureTable( String id, String title, Feature feature,
             FeatureStore featureStore ) {
@@ -80,19 +83,22 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
 
     protected abstract EntityType addViewerColumns( FeatureTableViewer viewer );
 
-    protected void refreshReloadables() throws Exception {
+
+    protected void refreshReloadables()
+            throws Exception {
         boolean enabled = selectedComposite.get() != null;
         for (IFormField field : reloadables) {
             field.setEnabled( enabled );
             field.load();
         }
     }
-    
+
 
     protected IFormField reloadable( IFormField formField ) {
-        reloadables.add(formField);
+        reloadables.add( formField );
         return formField;
     }
+
 
     /**
      * 
@@ -105,7 +111,7 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
 
     protected Composite createTableForm( Composite parent, Control top, boolean addAllowed ) {
 
-        int TOPSPACING = 3;
+        int TOPSPACING = 20;
         viewer = new FeatureTableViewer( parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL );
         viewer.getTable().setLayoutData(
                 new SimpleFormData().fill().left( 2 ).height( 100 ).right( 90 )
@@ -137,9 +143,10 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
 
                     doLoad( new NullProgressMonitor() );
                     refreshReloadables();
-//                    pageSite.reloadEditor();
-//                    pageSite.fireEvent( this, id, IFormFieldListener.VALUE_CHANGE, null );
-//                    viewer.refresh( true );
+                    // pageSite.reloadEditor();
+                    // pageSite.fireEvent( this, id, IFormFieldListener.VALUE_CHANGE,
+                    // null );
+                    // viewer.refresh( true );
 
                 }
             };
@@ -163,13 +170,13 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
                     repository.removeEntity( toSelect );
                     selectedComposite.set( null );
 
-//                    pageSite.reloadEditor();
+                    // pageSite.reloadEditor();
                     doLoad( new NullProgressMonitor() );
                     refreshReloadables();
                     dirty = true;
-//                    pageSite.fireEvent( this, id,
-//                            IFormFieldListener.VALUE_CHANGE, null );
-//                    viewer.refresh( true );
+                    // pageSite.fireEvent( this, id,
+                    // IFormFieldListener.VALUE_CHANGE, null );
+                    // viewer.refresh( true );
 
                 }
             }
@@ -185,20 +192,19 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
 
             @Override
             public void selectionChanged( SelectionChangedEvent event ) {
-                StructuredSelection selection = (StructuredSelection)event.getSelection();
-                FeatureTableElement tableRow = (FeatureTableElement)selection.getFirstElement();
-                if (tableRow != null) {
-                    selectedComposite.set( (T)tableRow.getComposite() );
-                    try {
-//                        pageSite.reloadEditor();
-//                        pageSite.fireEvent( this, id,
-//                                IFormFieldListener.VALUE_CHANGE, null );
-//                        doLoad( new NullProgressMonitor() );
-                        refreshReloadables();
-                    }
-                    catch (Exception e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
+                if (!updatingElements) {
+                    // Felder für ausgewählten Eintrag in UI wurden geändert
+                    // keine Selektion hier                    
+                    StructuredSelection selection = (StructuredSelection)event.getSelection();
+                    FeatureTableElement tableRow = (FeatureTableElement)selection.getFirstElement();
+                    if (tableRow != null) {
+                        selectedComposite.set( (T)tableRow.getComposite() );
+                        try {
+                            refreshReloadables();
+                        }
+                        catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }
@@ -219,7 +225,9 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
 
     public void updateElements( Collection<T> coll ) {
         if (viewer != null && !viewer.isBusy()) {
+            updatingElements = true;
             viewer.refresh( true );
+            updatingElements = false;
         }
     }
 
@@ -277,8 +285,7 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
         try {
             dirty = true;
             // update dirty/valid flags of the editor
-            pageSite.fireEvent( this, id,
-                    IFormFieldListener.VALUE_CHANGE, null );
+            pageSite.fireEvent( this, id, IFormFieldListener.VALUE_CHANGE, null );
             if (!viewer.isBusy()) {
                 viewer.refresh( true );
             }

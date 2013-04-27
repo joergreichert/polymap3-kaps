@@ -16,12 +16,6 @@ import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.polymap.core.qi4j.QiEntity;
-import org.polymap.core.qi4j.event.ModelChangeSupport;
-import org.polymap.core.qi4j.event.PropertyChangeSupport;
-import org.polymap.kaps.importer.ImportColumn;
-import org.polymap.kaps.importer.ImportTable;
-import org.polymap.kaps.model.KapsRepository;
 
 import org.qi4j.api.common.Optional;
 import org.qi4j.api.common.UseDefaults;
@@ -32,6 +26,14 @@ import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.property.Computed;
 import org.qi4j.api.property.Property;
 import org.qi4j.api.unitofwork.UnitOfWorkCompletionException;
+
+import org.polymap.core.qi4j.QiEntity;
+import org.polymap.core.qi4j.event.ModelChangeSupport;
+import org.polymap.core.qi4j.event.PropertyChangeSupport;
+
+import org.polymap.kaps.importer.ImportColumn;
+import org.polymap.kaps.importer.ImportTable;
+import org.polymap.kaps.model.KapsRepository;
 
 /**
  * 
@@ -116,18 +118,7 @@ public interface KaufvertragComposite
     // @Optional
     // Property<MultiPolygon> geom();
     //
-    // /** Wird aus der Geometry errechnet. */
-    // @Computed
-    // Property<Double> flaeche();
-    //
-    // /** Wird aus der Geometry errechnet. */
-    // @Computed
-    // Property<Double> umfang();
-    //
-    // /** Anzahl der Teil-Geometrien. Wird aus der Geometry errechnet. */
-    // @Computed
-    // Property<Integer> numGeom();
-
+ 
     /** Eingangsnummer. */
     // EINGANGSNR DOUBLE,
     @Optional
@@ -355,89 +346,6 @@ public interface KaufvertragComposite
             // TODO
             return null;
         }
-        // private BiotopRepository repo = BiotopRepository.instance();
-        //
-        // private PropertyInfo flaecheInfo = new GenericPropertyInfo(
-        // KaufvertragComposite.class, "flaeche" );
-        // private PropertyInfo umfangInfo = new GenericPropertyInfo(
-        // KaufvertragComposite.class, "umfang" );
-        // private PropertyInfo numGeomInfo = new GenericPropertyInfo(
-        // KaufvertragComposite.class, "numGeom" );
-        // // private PropertyInfo bearbeitetInfo = new GenericPropertyInfo(
-        // BiotopComposite.class, "bearbeitet" );
-        // // private PropertyInfo bearbeiterInfo = new GenericPropertyInfo(
-        // BiotopComposite.class, "bearbeiter" );
-        //
-        //
-        // public Property<Double> flaeche() {
-        // return new ComputedPropertyInstance( flaecheInfo ) {
-        // public Object get() {
-        // Geometry geom = geom().get();
-        // return geom != null ? geom.getArea() : -1;
-        // }
-        // };
-        // }
-        //
-        // public Property<Double> umfang() {
-        // return new ComputedPropertyInstance( umfangInfo ) {
-        // public Object get() {
-        // Geometry geom = geom().get();
-        // return geom != null ? geom.getLength() : -1;
-        // }
-        // };
-        // }
-        //
-        // public Property<Integer> numGeom() {
-        // return new ComputedPropertyInstance( numGeomInfo ) {
-        // public Object get() {
-        // Geometry geom = geom().get();
-        // return geom != null ? geom.getNumGeometries() : -1;
-        // }
-        // };
-        // }
-
-        // public void beforeCompletion()
-        // throws UnitOfWorkCompletionException {
-        // EntityState entityState = EntityInstance.getEntityInstance( composite
-        // ).entityState();
-        // //return qi4j.getEntityState( composite ).lastModified();
-        //
-        // // hope that Qi4J lets run just one UoW completion at once; otherwise
-        // we have
-        // // race consitions between check and set of lastModified property
-        // between the
-        // // threads
-        //
-        // switch (entityState.status()) {
-        // case NEW:
-        // case UPDATED:
-        // Principal user = Polymap.instance().getUser();
-        //
-        // ValueBuilder<AktivitaetValue> builder =
-        // BiotopRepository.instance().newValueBuilder( AktivitaetValue.class );
-        // AktivitaetValue prototype = builder.prototype();
-        // prototype.wann().set( new Date() );
-        // prototype.wer().set( user.getName() );
-        // prototype.bemerkung().set( "" );
-        // bearbeitung().set( builder.newInstance() );
-        // }
-        // public Property<Date> bearbeitet() {
-        // return new ComputedPropertyInstance( groesseInfo ) {
-        // public Object get() {
-        // Long lastModified = _lastModified().get();
-        // return new Date( lastModified != null ? lastModified : 0 );
-        // }
-        // };
-        // }
-        //
-        // public Property<String> bearbeiter() {
-        // return new ComputedPropertyInstance( groesseInfo ) {
-        // public Object get() {
-        // return _lastModifiedBy().get();
-        // }
-        // };
-        // }
-
     }
 
 }

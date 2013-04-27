@@ -24,7 +24,6 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import org.polymap.core.project.ui.util.SimpleFormData;
 
-import org.polymap.rhei.field.IFormField;
 import org.polymap.rhei.field.PicklistFormField;
 import org.polymap.rhei.field.SelectlistFormField;
 import org.polymap.rhei.form.DefaultFormEditorPage;
@@ -114,12 +113,12 @@ public abstract class KapsDefaultFormEditorPage
     }
 
 
-    protected <T extends Named> IFormField namedAssocationsPicklist( Class<T> type ) {
+    protected <T extends Named> PicklistFormField namedAssocationsPicklist( Class<T> type ) {
         return namedAssocationsPicklist( type, false );
     }
 
 
-    protected <T extends Named> IFormField namedAssocationsSelectlist( Class<T> type,
+    protected <T extends Named> SelectlistFormField namedAssocationsSelectlist( Class<T> type,
             boolean multiple ) {
         SelectlistFormField list = new SelectlistFormField( repository.entitiesWithNames( type ) );
         list.setIsMultiple( multiple );
@@ -128,7 +127,7 @@ public abstract class KapsDefaultFormEditorPage
     }
 
 
-    protected <T extends Named> IFormField namedAssocationsPicklist( Class<T> type, boolean editable ) {
+    protected <T extends Named> PicklistFormField namedAssocationsPicklist( Class<T> type, boolean editable ) {
         PicklistFormField picklist = new PicklistFormField( repository.entitiesWithNames( type ) );
         picklist.setTextEditable( editable );
 

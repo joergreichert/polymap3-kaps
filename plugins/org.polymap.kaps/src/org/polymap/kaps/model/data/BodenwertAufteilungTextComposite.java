@@ -18,12 +18,8 @@ import org.apache.commons.logging.LogFactory;
 import org.qi4j.api.common.Optional;
 import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.entity.EntityComposite;
-import org.qi4j.api.entity.association.Association;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.property.Property;
-import org.qi4j.api.query.Query;
-import org.qi4j.api.query.QueryExpressions;
-import org.qi4j.api.query.grammar.BooleanExpression;
 
 import org.polymap.core.qi4j.QiEntity;
 import org.polymap.core.qi4j.event.ModelChangeSupport;
@@ -31,7 +27,6 @@ import org.polymap.core.qi4j.event.PropertyChangeSupport;
 
 import org.polymap.kaps.importer.ImportColumn;
 import org.polymap.kaps.importer.ImportTable;
-import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.Named;
 
 /**
@@ -39,42 +34,37 @@ import org.polymap.kaps.model.Named;
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 @Concerns({ PropertyChangeSupport.Concern.class })
-@Mixins({ StrasseComposite.Mixin.class, PropertyChangeSupport.Mixin.class,
+@Mixins({ BodenwertAufteilungTextComposite.Mixin.class, PropertyChangeSupport.Mixin.class,
         ModelChangeSupport.Mixin.class, QiEntity.Mixin.class
 // JsonState.Mixin.class
 })
-@ImportTable("K_STRASS")
-public interface StrasseComposite
+@ImportTable("K_BODWTEXT")
+public interface BodenwertAufteilungTextComposite
         extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite, Named {
 
     // @Optional
-    @ImportColumn("NUMMER")
+    @ImportColumn("SCHL")
     Property<String> schl();
 
+
     // @Optional
-    @ImportColumn("BEZ")
+    @ImportColumn("TEXT1")
     Property<String> name();
 
 
     @Optional
-    // GEMEINDE
-    Association<GemeindeComposite> gemeinde();
+    // STRFLAECHE
+    Property<Boolean> strflaeche();
+
 
     /**
      * Methods and transient fields.
      */
     public static abstract class Mixin
-            implements StrasseComposite {
+            implements BodenwertAufteilungTextComposite {
 
         private static Log log = LogFactory.getLog( Mixin.class );
 
-        public static Iterable<StrasseComposite> findStrasseIn( GemeindeComposite gemeinde ) {
-            StrasseComposite template = QueryExpressions.templateFor( StrasseComposite.class );
-            BooleanExpression expr = QueryExpressions.eq( template.gemeinde(), gemeinde );
-            Query<StrasseComposite> matches = KapsRepository.instance().findEntities(
-                    StrasseComposite.class, expr, 0, -1 );
-            return matches;
-        }
     }
 
 }

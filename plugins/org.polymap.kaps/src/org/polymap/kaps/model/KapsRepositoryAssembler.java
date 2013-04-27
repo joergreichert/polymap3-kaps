@@ -37,27 +37,7 @@ import org.polymap.rhei.data.entitystore.lucene.LuceneEntityStoreQueryService;
 import org.polymap.rhei.data.entitystore.lucene.LuceneEntityStoreService;
 
 import org.polymap.kaps.model.SchlNamedCreatorCallback.Impl;
-import org.polymap.kaps.model.data.ArtDesBaugebietsComposite;
-import org.polymap.kaps.model.data.BauweiseComposite;
-import org.polymap.kaps.model.data.BodenRichtwertKennungComposite;
-import org.polymap.kaps.model.data.BodennutzungComposite;
-import org.polymap.kaps.model.data.EntwicklungsZusatzComposite;
-import org.polymap.kaps.model.data.EntwicklungsZustandComposite;
-import org.polymap.kaps.model.data.ErschliessungsBeitragComposite;
-import org.polymap.kaps.model.data.FlurComposite;
-import org.polymap.kaps.model.data.FlurstueckComposite;
-import org.polymap.kaps.model.data.GebaeudeArtComposite;
-import org.polymap.kaps.model.data.GemarkungComposite;
-import org.polymap.kaps.model.data.GemeindeComposite;
-import org.polymap.kaps.model.data.GemeindeFaktorComposite;
-import org.polymap.kaps.model.data.KaeuferKreisComposite;
-import org.polymap.kaps.model.data.KaufvertragComposite;
-import org.polymap.kaps.model.data.NutzungComposite;
-import org.polymap.kaps.model.data.RichtwertZoneLageComposite;
-import org.polymap.kaps.model.data.RichtwertzoneComposite;
-import org.polymap.kaps.model.data.StalaComposite;
-import org.polymap.kaps.model.data.StrasseComposite;
-import org.polymap.kaps.model.data.VertragsArtComposite;
+import org.polymap.kaps.model.data.*;
 
 /**
  * 
@@ -112,7 +92,9 @@ public class KapsRepositoryAssembler
                 BodenRichtwertKennungComposite.class, EntwicklungsZustandComposite.class,
                 RichtwertZoneLageComposite.class, EntwicklungsZusatzComposite.class,
                 BauweiseComposite.class, ArtDesBaugebietsComposite.class,
-                FlurstueckComposite.class, GemeindeFaktorComposite.class );
+                FlurstueckComposite.class, GemeindeFaktorComposite.class,
+                BodenwertAufteilungTextComposite.class, VertragsdatenWohnungComposite.class,
+                KellerComposite.class );
         // domainModule.addTransients(
         // PflanzeComposite.class,
         // TierComposite.class
@@ -169,7 +151,8 @@ public class KapsRepositoryAssembler
             RichtwertZoneLageComposite.Mixin.createInitData( schlCreator );
             EntwicklungsZusatzComposite.Mixin.createInitData( schlCreator );
             BauweiseComposite.Mixin.createInitData( schlCreator );
-            ArtDesBaugebietsComposite.Mixin.createInitData( schlCreator );
+            ArtDesBaugebietsComposite.Mixin.createInitData( uow );
+            KellerComposite.Mixin.createInitData( schlCreator );
 
         }
         uow.complete();

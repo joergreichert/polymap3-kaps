@@ -49,10 +49,9 @@ public interface GemeindeFaktorComposite
 
     // GEMEINDE INTEGER,
     @Optional
-    // TODO import
     Association<GemeindeComposite> gemeinde();
     
-    // ART VARCHAR(1), ist immer G und in UI nicht zu finden
+    // ART VARCHAR(1), ist G und L in UI aber nicht zu finden
     // GILTAB TIMESTAMP,
     @Optional
     @ImportColumn("GILTAB")

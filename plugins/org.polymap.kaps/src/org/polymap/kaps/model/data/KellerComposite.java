@@ -15,62 +15,47 @@ package org.polymap.kaps.model.data;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.qi4j.api.common.Optional;
 import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.entity.EntityComposite;
-import org.qi4j.api.entity.association.Association;
 import org.qi4j.api.mixin.Mixins;
-import org.qi4j.api.property.Property;
 
 import org.polymap.core.qi4j.QiEntity;
 import org.polymap.core.qi4j.event.ModelChangeSupport;
 import org.polymap.core.qi4j.event.PropertyChangeSupport;
 
-import org.polymap.kaps.importer.ImportColumn;
-import org.polymap.kaps.importer.ImportTable;
-import org.polymap.kaps.model.Named;
+import org.polymap.kaps.model.SchlNamed;
+import org.polymap.kaps.model.SchlNamedCreatorCallback;
 
 /**
  * 
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 @Concerns({ PropertyChangeSupport.Concern.class })
-@Mixins({ NutzungComposite.Mixin.class, PropertyChangeSupport.Mixin.class,
+@Mixins({ KellerComposite.Mixin.class, PropertyChangeSupport.Mixin.class,
         ModelChangeSupport.Mixin.class, QiEntity.Mixin.class
 // JsonState.Mixin.class
 })
-@ImportTable("K_NUTZ")
-public interface NutzungComposite
-        extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite, Named {
+public interface KellerComposite
+        extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite, SchlNamed {
 
+//    Property<String> schl();
 
-    // @Optional
-    @ImportColumn("SCHL")
-    Property<String> schl();
-
-
-    // @Optional
-    @ImportColumn("TEXT1")
-    Property<String> name();
-
-
-    @Optional
-    // STALA
-    Association<StalaComposite> stala();
-
-    @Optional
-    //@ImportColumn("AGRAR")
-    Property<Boolean> isAgrar();
-
-
+//    Property<String> name();
+    
     /**
      * Methods and transient fields.
      */
     public static abstract class Mixin
-            implements NutzungComposite {
+            implements KellerComposite {
 
         private static Log log = LogFactory.getLog( Mixin.class );
 
+        public static void createInitData(SchlNamedCreatorCallback cb) {
+            cb.create(KellerComposite.class, "1", "Unbekannt" );
+            cb.create(KellerComposite.class, "2", "Nicht unterkellert" );
+            cb.create(KellerComposite.class, "3", "Teilweise unterkellert" );
+            cb.create(KellerComposite.class, "4", "Voll unterkellert" );
+        }
     }
 
 }

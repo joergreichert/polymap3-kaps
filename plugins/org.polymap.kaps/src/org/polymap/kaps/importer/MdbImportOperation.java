@@ -33,6 +33,7 @@ import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.ArtDesBaugebietsComposite;
 import org.polymap.kaps.model.data.BodenRichtwertKennungComposite;
 import org.polymap.kaps.model.data.BodennutzungComposite;
+import org.polymap.kaps.model.data.BodenwertAufteilungTextComposite;
 import org.polymap.kaps.model.data.ErschliessungsBeitragComposite;
 import org.polymap.kaps.model.data.FlurComposite;
 import org.polymap.kaps.model.data.FlurstueckComposite;
@@ -77,7 +78,7 @@ public class MdbImportOperation
 
     protected IStatus doExecute( IProgressMonitor monitor, IAdaptable info )
             throws Exception {
-        monitor.beginTask( getLabel(), 120 );
+        monitor.beginTask( getLabel(), 12000 );
         Database db = Database.open( dbFile );
         try {
             SubMonitor sub = null;
@@ -231,6 +232,7 @@ public class MdbImportOperation
                 @Override
                 public void fillEntity( NutzungComposite entity, Map<String, Object> builderRow ) {
                     entity.stala().set( find( allStalas, builderRow, "STALA" ) );
+                    entity.isAgrar().set( getBooleanValue( builderRow, "AGRAR" ) );
                     allNutzung.put( entity.schl().get(), entity );
                 }
             } );
@@ -288,6 +290,7 @@ public class MdbImportOperation
                             prototype.name().set( "" );
                         }
                     } );
+            repo.commitChanges();
 
             final Map<String, GemarkungComposite> allGemarkung = new HashMap<String, GemarkungComposite>();
             sub = new SubMonitor( monitor, 10 );
@@ -304,13 +307,19 @@ public class MdbImportOperation
                     } );
 
             sub = new SubMonitor( monitor, 10 );
-            importEntity( db, sub, GemeindeFaktorComposite.class, new EntityCallback<GemeindeFaktorComposite>() {
-                @Override
-                public void fillEntity( GemeindeFaktorComposite entity, Map<String, Object> builderRow ) {
-                    entity.gemeinde().set( find( allGemeinde, builderRow, "GEMEINDE" ) );
-                }
-            } );
-            
+            importEntity( db, sub, GemeindeFaktorComposite.class,
+                    new EntityCallback<GemeindeFaktorComposite>() {
+
+                        @Override
+                        public void fillEntity( GemeindeFaktorComposite entity,
+                                Map<String, Object> builderRow ) {
+                            // alte Gemeinden können ignoriert werden, Leichen in der
+                            // kaufdat.mdb
+                            entity.gemeinde()
+                                    .set( find( allGemeinde, builderRow, "GEMEINDE", true ) );
+                        }
+                    } );
+
             // bodenrichtwertkennung laden
             final BodenRichtwertKennungComposite zonal = repo.findSchlNamed(
                     BodenRichtwertKennungComposite.class, "1" );
@@ -365,11 +374,12 @@ public class MdbImportOperation
                             entity.nutzung().set( find( allNutzung, builderRow, "NUTZUNG" ) );
                             entity.strasse().set( find( allStrasse, builderRow, "STRNR" ) );
                             entity.gebaeudeArt().set( find( allGebaeudeArt, builderRow, "GEBART" ) );
+                            entity.flur().set( flur );
                             entity.artDesBaugebiets().set(
                                     find( allArtDesBaugebietes, builderRow, "BAUGEBART" ) );
 
                             Object hauptteil = builderRow.get( "HAUPTTEIL" );
-                            entity.hauptFlurstueck().set( "x".equals( hauptteil ) );
+                            entity.hauptFlurstueck().set( "×".equals( hauptteil ) );
 
                             // RIZONE
                             String zone = (String)builderRow.get( "RIZONE" );
@@ -393,6 +403,21 @@ public class MdbImportOperation
                             entity.richtwertZone().set( found );
                         }
                     } );
+
+            final Map<String, BodenwertAufteilungTextComposite> allBodenwertText = new HashMap<String, BodenwertAufteilungTextComposite>();
+
+            sub = new SubMonitor( monitor, 10 );
+            importEntity( db, sub, BodenwertAufteilungTextComposite.class,
+                    new EntityCallback<BodenwertAufteilungTextComposite>() {
+
+                        @Override
+                        public void fillEntity( BodenwertAufteilungTextComposite entity,
+                                Map<String, Object> builderRow ) {
+                            entity.strflaeche().set( getBooleanValue( builderRow, "STRFLAECHE" ) );
+                            allBodenwertText.put( entity.schl().get(), entity );
+                        }
+                    } );
+            allBodenwertText.clear();
             allArtDesBaugebietes.clear();
             allBodennutzung.clear();
             allErschliessungsbeitrag.clear();
@@ -418,6 +443,12 @@ public class MdbImportOperation
 
     protected <T extends Composite> T find( Map<String, T> all, Map<String, Object> row,
             String columnName ) {
+        return find( all, row, columnName, false );
+    }
+
+
+    protected <T extends Composite> T find( Map<String, T> all, Map<String, Object> row,
+            String columnName, boolean nullAllowed ) {
         Object schl = row.get( columnName );
 
         // schl ist mal String mal Integer und mal Double
@@ -428,7 +459,7 @@ public class MdbImportOperation
             String schlStr = schl.toString();
             if (!schlStr.isEmpty()) {
                 T obj = all.get( schlStr );
-                if (obj == null) {
+                if (obj == null && !nullAllowed) {
                     throw new IllegalStateException( "no " + columnName + " found for schl '"
                             + schl + "'!" );
                 }
