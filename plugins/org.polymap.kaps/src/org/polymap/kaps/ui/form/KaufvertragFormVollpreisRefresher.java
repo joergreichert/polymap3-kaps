@@ -26,7 +26,7 @@ import org.polymap.kaps.model.data.KaufvertragComposite;
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
-public class VollpreisRefresher
+public class KaufvertragFormVollpreisRefresher
         implements IFormFieldListener {
 
     private Integer                    kaufpreis              = null;
@@ -47,7 +47,7 @@ public class VollpreisRefresher
      * @param site
      * @param kaufvertrag
      */
-    public VollpreisRefresher( IFormEditorPageSite site, KaufvertragComposite kaufvertrag ) {
+    public KaufvertragFormVollpreisRefresher( IFormEditorPageSite site, KaufvertragComposite kaufvertrag ) {
         this.site = site;
         this.kaufvertrag = kaufvertrag;
     }
@@ -82,14 +82,14 @@ public class VollpreisRefresher
 
 
     private void refreshVollpreis() {
-        Integer kp = kaufpreis == null ? kaufvertrag.kaufpreis().get() : kaufpreis;
-        Integer n = kaufpreisAnteilNenner == null ? kaufvertrag.kaufpreisAnteilNenner().get()
+        Double kp = kaufpreis == null ? kaufvertrag.kaufpreis().get() : kaufpreis;
+        Double n = kaufpreisAnteilNenner == null ? kaufvertrag.kaufpreisAnteilNenner().get()
                 : kaufpreisAnteilNenner;
-        Integer z = kaufpreisAnteilZaehler == null ? kaufvertrag.kaufpreisAnteilZaehler().get()
+        Double z = kaufpreisAnteilZaehler == null ? kaufvertrag.kaufpreisAnteilZaehler().get()
                 : kaufpreisAnteilZaehler;
 
         if (kp != null && n != null && z != null && z != 0) {
-            Integer vollpreis = kp * n / z;
+            Double vollpreis = kp * n / z;
             site.setFieldValue( "vollpreis", getFormatter().format( vollpreis ) );
         }
     }
@@ -106,5 +106,5 @@ public class VollpreisRefresher
         return nf;
     }
 
-    private static Log log = LogFactory.getLog( VollpreisRefresher.class );
+    private static Log log = LogFactory.getLog( KaufvertragFormVollpreisRefresher.class );
 }

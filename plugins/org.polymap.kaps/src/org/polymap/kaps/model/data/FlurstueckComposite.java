@@ -58,8 +58,10 @@ public interface FlurstueckComposite
     @Optional
     Association<KaufvertragComposite> vertrag();
 
+
     @Computed
     Property<String> vertragsNummer();
+
 
     // GEMARKUNG VARCHAR(4),
     @Optional
@@ -197,35 +199,51 @@ public interface FlurstueckComposite
     public static abstract class Mixin
             implements FlurstueckComposite {
 
-        private static Log log = LogFactory.getLog( Mixin.class );
+        private static Log   log          = LogFactory.getLog( Mixin.class );
 
+        private PropertyInfo nameProperty = new GenericPropertyInfo( FlurstueckComposite.class,
+                                                  "vertragsNummer" );
 
-        private PropertyInfo nameProperty = new GenericPropertyInfo( FlurstueckComposite.class, "vertragsNummer" );
 
         @Override
         public Property<String> vertragsNummer() {
             return new ComputedPropertyInstance<String>( nameProperty ) {
 
                 public String get() {
-                    if (vertrag().get() != null) {                       
-                        return EingangsNummerFormatter.format( vertrag().get().eingangsNr().get());
+                    if (vertrag().get() != null) {
+                        return EingangsNummerFormatter.format( vertrag().get().eingangsNr().get() );
                     }
                     return null;
                 }
-                
+
+
                 @Override
                 public void set( String anIgnoredValue )
                         throws IllegalArgumentException, IllegalStateException {
-                        // ignored
+                    // ignored
                 }
             };
         }
+
+
         public static Iterable<FlurstueckComposite> forEntity( KaufvertragComposite kaufvertrag ) {
             FlurstueckComposite template = QueryExpressions.templateFor( FlurstueckComposite.class );
             BooleanExpression expr = QueryExpressions.eq( template.vertrag(), kaufvertrag );
             Query<FlurstueckComposite> matches = KapsRepository.instance().findEntities(
                     FlurstueckComposite.class, expr, 0, -1 );
             return matches;
+        }
+
+
+        public static FlurstueckComposite mainForEntity( KaufvertragComposite kaufvertrag ) {
+            FlurstueckComposite template = QueryExpressions.templateFor( FlurstueckComposite.class );
+            BooleanExpression expr = QueryExpressions.and(
+                    QueryExpressions.eq( template.vertrag(), kaufvertrag ),
+                    QueryExpressions.eq( template.hauptFlurstueck(), Boolean.TRUE ) );
+
+            Query<FlurstueckComposite> matches = KapsRepository.instance().findEntities(
+                    FlurstueckComposite.class, expr, 0, 1 );
+            return matches.find();
         }
     }
 }

@@ -28,6 +28,8 @@ import org.polymap.rhei.filter.IFilterProvider;
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.KaufvertragComposite;
 import org.polymap.kaps.model.data.RichtwertzoneComposite;
+import org.polymap.kaps.model.data.VertragsdatenBaulandComposite;
+import org.polymap.kaps.ui.filter.EinzelneVertragsdatenBaulandFilter;
 import org.polymap.kaps.ui.filter.EinzelnerVertragFilter;
 import org.polymap.kaps.ui.filter.RichtwertZoneFilter;
 
@@ -65,6 +67,10 @@ public class FilterProvider
         if (geores.getID().toString().contains( KaufvertragComposite.class.getName() )) {
 
             result.add( new EinzelnerVertragFilter( layer ) );
+        }
+        if (geores.getID().toString().contains( VertragsdatenBaulandComposite.class.getName() )) {
+
+            result.add( new EinzelneVertragsdatenBaulandFilter( layer ) );
         }
 
         return result;

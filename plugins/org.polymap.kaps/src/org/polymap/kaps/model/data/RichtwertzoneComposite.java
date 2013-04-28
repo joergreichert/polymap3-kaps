@@ -232,7 +232,7 @@ public interface RichtwertzoneComposite
 
         private static Log log = LogFactory.getLog( Mixin.class );
 
-        private PropertyInfo schlProperty = new GenericPropertyInfo( FlurstueckComposite.class, "schl" );
+        private PropertyInfo schlProperty = new GenericPropertyInfo( RichtwertzoneComposite.class, "schl" );
 
         @Override
         public Property<String> schl() {

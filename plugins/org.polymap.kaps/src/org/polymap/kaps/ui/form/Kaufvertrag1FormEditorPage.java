@@ -152,6 +152,6 @@ public class Kaufvertrag1FormEditorPage
                 right().top( line8 ).create() );
 
         // Listener
-        site.addFieldListener( vollpreisRefresher = new VollpreisRefresher( site, kaufvertrag ) );
+        site.addFieldListener( vollpreisRefresher = new KaufvertragFormVollpreisRefresher( site, kaufvertrag ) );
     }
 }

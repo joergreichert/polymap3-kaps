@@ -61,6 +61,7 @@ import org.polymap.kaps.model.data.NutzungComposite;
 import org.polymap.kaps.model.data.StalaComposite;
 import org.polymap.kaps.model.data.StrasseComposite;
 import org.polymap.kaps.model.data.VertragsArtComposite;
+import org.polymap.kaps.model.data.VertragsdatenBaulandComposite;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -143,7 +144,9 @@ public class KapsRepository
                             this, StrasseComposite.class, new NameImpl( KapsRepository.NAMESPACE,
                                     "Strasse" ) ), new SimpleEntityProvider<GemarkungComposite>(
                             this, GemarkungComposite.class, new NameImpl( KapsRepository.NAMESPACE,
-                                    "Gemarkung" ) ),
+                                    "Gemarkung" ) ),new SimpleEntityProvider<GemeindeComposite>(
+                                            this, VertragsdatenBaulandComposite.class, new NameImpl( KapsRepository.NAMESPACE,
+                                                    VertragsdatenBaulandComposite.NAME ) ),
                     new SimpleEntityProvider<FlurComposite>( this, FlurComposite.class,
                             new NameImpl( KapsRepository.NAMESPACE, "Flur" ) ),
 
@@ -225,8 +228,8 @@ public class KapsRepository
                     public void create( KaufvertragComposite prototype )
                             throws Exception {
                         prototype.eingangsDatum().set( new Date() );
-                        prototype.kaufpreisAnteilZaehler().set( 1 );
-                        prototype.kaufpreisAnteilNenner().set( 1 );
+                        prototype.kaufpreisAnteilZaehler().set( 1.0 );
+                        prototype.kaufpreisAnteilNenner().set( 1.0 );
                         prototype.fuerGewosGeeignet().set( Boolean.TRUE );
                         prototype.fuerAuswertungGeeignet().set( Boolean.TRUE );
 

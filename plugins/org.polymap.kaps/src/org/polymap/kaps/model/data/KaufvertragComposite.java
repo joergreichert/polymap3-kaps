@@ -22,6 +22,9 @@ import org.qi4j.api.common.UseDefaults;
 import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.entity.association.Association;
+import org.qi4j.api.entity.association.kaps.AssociationInfo;
+import org.qi4j.api.entity.association.kaps.ComputedAssociationInstance;
+import org.qi4j.api.entity.association.kaps.GenericAssociationInfo;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.property.Computed;
 import org.qi4j.api.property.Property;
@@ -162,23 +165,23 @@ public interface KaufvertragComposite
     // KAUFPREIS DOUBLE,
     @UseDefaults
     @ImportColumn("KAUFPREIS")
-    Property<Integer> kaufpreis();
+    Property<Double> kaufpreis();
 
 
     // KANTZ DOUBLE,
     @ImportColumn("KANTZ")
-    Property<Integer> kaufpreisAnteilZaehler();
+    Property<Double> kaufpreisAnteilZaehler();
 
 
     // KANTN DOUBLE,
     @ImportColumn("KANTN")
-    Property<Integer> kaufpreisAnteilNenner();
+    Property<Double> kaufpreisAnteilNenner();
 
 
     // VOLLPREIS DOUBLE,
     @UseDefaults
     @ImportColumn("VOLLPREIS")
-    Property<Integer> vollpreis();
+    Property<Double> vollpreis();
 
 
     // VERARBKZ VARCHAR(1),
@@ -267,7 +270,7 @@ public interface KaufvertragComposite
     // GESFLAECHE DOUBLE DEFAULT 0,
     @UseDefaults
     @ImportColumn("GESFLAECHE")
-    Property<Integer> gesamtFlaeche();
+    Property<Double> gesamtFlaeche();
 
 
     // verkaufbem VARCHAR(25),
@@ -284,7 +287,7 @@ public interface KaufvertragComposite
     // bspw. N = 2, Z = 1 ergibt gesflaeche 800 und gesverkflaeche 400
     @UseDefaults
     @ImportColumn("GESVERKFL")
-    Property<Integer> gesamtVerkaufsFlaeche();
+    Property<Double> gesamtVerkaufsFlaeche();
 
 
     // STALA_AUSG TIMESTAMP,
@@ -325,6 +328,9 @@ public interface KaufvertragComposite
     @Optional
     Property<Boolean> fuerGewosGeeignet();
 
+    @Optional
+    @Computed
+    Association<FlurstueckComposite> hauptFlurstueck();
 
     /**
      * Methods and transient fields.
@@ -345,6 +351,25 @@ public interface KaufvertragComposite
         public Association<KaufvertragComposite> gesplitteterHauptvertrag() {
             // TODO
             return null;
+        }
+        
+        private AssociationInfo KaufvertragCompositeAss = new GenericAssociationInfo( KaufvertragComposite.class, "hauptFlurstueck" );
+        private final KaufvertragComposite kc = this;
+        
+        @Override
+        public Association<FlurstueckComposite> hauptFlurstueck() {
+            return new ComputedAssociationInstance<FlurstueckComposite>( KaufvertragCompositeAss ) {
+
+                public FlurstueckComposite get() {
+                    return FlurstueckComposite.Mixin.mainForEntity( kc );
+                }
+                
+                @Override
+                public void set( FlurstueckComposite anIgnoredValue )
+                        throws IllegalArgumentException, IllegalStateException {
+                        // ignored
+                }
+            };
         }
     }
 

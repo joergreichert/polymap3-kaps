@@ -93,7 +93,7 @@ public class KapsRepositoryAssembler
                 RichtwertZoneLageComposite.class, EntwicklungsZusatzComposite.class,
                 BauweiseComposite.class, ArtDesBaugebietsComposite.class,
                 FlurstueckComposite.class, GemeindeFaktorComposite.class,
-                BodenwertAufteilungTextComposite.class, VertragsdatenWohnungComposite.class,
+                BodenwertAufteilungTextComposite.class, VertragsdatenBaulandComposite.class,
                 KellerComposite.class );
         // domainModule.addTransients(
         // PflanzeComposite.class,
