@@ -29,11 +29,11 @@ import org.polymap.kaps.model.data.VertragComposite;
 public class KaufvertragFormVollpreisRefresher
         implements IFormFieldListener {
 
-    private Integer                   kaufpreis              = null;
+    private Double                   kaufpreis              = null;
 
-    private Integer                   kaufpreisAnteilNenner  = null;
+    private Double                   kaufpreisAnteilNenner  = null;
 
-    private Integer                   kaufpreisAnteilZaehler = null;
+    private Double                   kaufpreisAnteilZaehler = null;
 
     private final IFormEditorPageSite site;
 

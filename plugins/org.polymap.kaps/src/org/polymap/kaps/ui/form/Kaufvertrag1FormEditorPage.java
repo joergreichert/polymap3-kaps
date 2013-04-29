@@ -100,18 +100,18 @@ public class Kaufvertrag1FormEditorPage
         final Composite line5 = site.newFormField( parent,
                 new PropertyAdapter( kaufvertrag.kaufpreis() ), new TextFormField(
                         StringFormField.Style.ALIGN_RIGHT ), new NumberValidator( Double.class,
-                        Locale.getDefault(), 2, 2 ), "Kaufpreis (€)" );
+                        Locale.getDefault()), "Kaufpreis (€)" );
         line5.setLayoutData( left().right( 30 ).top( line4 ).create() );
 
         site.newFormField( parent, new PropertyAdapter( kaufvertrag.kaufpreisAnteilZaehler() ),
                 new TextFormField( StringFormField.Style.ALIGN_RIGHT ),
-                new NumberValidator( Double.class, Locale.getDefault(), 3, 0 ), "Anteil Zähler" )
+                new NumberValidator( Double.class, Locale.getDefault() ), "Anteil Zähler" )
                 .setLayoutData(
                         new SimpleFormData( SPACING ).left( 60 ).right( 80 ).top( line4 ).create() );
 
         site.newFormField( parent, new PropertyAdapter( kaufvertrag.kaufpreisAnteilNenner() ),
                 new TextFormField( StringFormField.Style.ALIGN_RIGHT ),
-                new NumberValidator( Double.class, Locale.getDefault(), 3, 0 ), "/Nenner" )
+                new NumberValidator( Double.class, Locale.getDefault() ), "/Nenner" )
                 .setLayoutData(
                         new SimpleFormData( SPACING ).left( 80 ).right( RIGHT ).top( line4 )
                                 .create() );
