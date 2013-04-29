@@ -27,7 +27,7 @@ import org.polymap.core.qi4j.QiModule.EntityCreator;
 import org.polymap.rhei.data.entityfeature.EntityProvider2;
 import org.polymap.rhei.data.entityfeature.EntitySourceProcessor;
 
-import org.polymap.kaps.model.data.KaufvertragComposite;
+import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.ui.form.EingangsNummerFormatter;
 
 /**
@@ -41,18 +41,18 @@ import org.polymap.kaps.ui.form.EingangsNummerFormatter;
  * @author <a href="http://www.polymap.de">Falko Bräutigam</a>
  */
 public class KaufvertragEntityProvider
-        extends KapsEntityProvider<KaufvertragComposite> {
+        extends KapsEntityProvider<VertragComposite> {
 
     private static final Log log = LogFactory.getLog( EntitySourceProcessor.class );
 
 
     public KaufvertragEntityProvider( QiModule repo ) {
-        super( repo, KaufvertragComposite.class, new NameImpl( KapsRepository.NAMESPACE,
-                "Kaufvertrag" ) );
+        super( repo, VertragComposite.class, new NameImpl( KapsRepository.NAMESPACE,
+                VertragComposite.NAME ) );
     }
 
 
-    public KaufvertragComposite newEntity( final EntityCreator<KaufvertragComposite> creator )
+    public VertragComposite newEntity( final EntityCreator<VertragComposite> creator )
             throws Exception {
         return ((KapsRepository)repo).newKaufvertrag( creator );
     }
@@ -78,7 +78,7 @@ public class KaufvertragEntityProvider
 
 
     @Override
-    public Feature buildFeature( KaufvertragComposite entity, Feature feature, FeatureType schema ) {
+    public Feature buildFeature( VertragComposite entity, Feature feature, FeatureType schema ) {
         super.buildFeature( entity, feature, schema );
 
         // formatieren

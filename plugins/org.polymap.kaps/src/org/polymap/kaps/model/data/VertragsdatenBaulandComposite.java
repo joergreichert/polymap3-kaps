@@ -466,7 +466,7 @@ public interface VertragsdatenBaulandComposite
 
     // EINGANGSNR DOUBLE,
     @Optional
-    Association<KaufvertragComposite> kaufvertrag();
+    Association<VertragComposite> kaufvertrag();
 
 
     // TODO GRART DOUBLE,
@@ -1052,7 +1052,7 @@ public interface VertragsdatenBaulandComposite
                     new GenericAssociationInfo( VertragsdatenBaulandComposite.class, "flurstueck" ) ) {
 
                 public FlurstueckComposite get() {
-                    KaufvertragComposite kaufvertrag = kaufvertrag().get();
+                    VertragComposite kaufvertrag = kaufvertrag().get();
                     return kaufvertrag != null ? kaufvertrag.hauptFlurstueck().get() : null;
                 }
 
@@ -1153,7 +1153,7 @@ public interface VertragsdatenBaulandComposite
 
                 @Override
                 public Double get() {
-                    KaufvertragComposite kaufvertrag = kaufvertrag().get();
+                    VertragComposite kaufvertrag = kaufvertrag().get();
                     return kaufvertrag != null ? kaufvertrag.vollpreis().get() : null;
                 }
 

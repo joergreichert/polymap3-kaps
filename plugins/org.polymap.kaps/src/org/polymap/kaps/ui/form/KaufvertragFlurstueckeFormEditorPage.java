@@ -52,7 +52,7 @@ import org.polymap.kaps.model.data.FlurstueckComposite;
 import org.polymap.kaps.model.data.GebaeudeArtComposite;
 import org.polymap.kaps.model.data.GemarkungComposite;
 import org.polymap.kaps.model.data.GemeindeComposite;
-import org.polymap.kaps.model.data.KaufvertragComposite;
+import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.NutzungComposite;
 import org.polymap.kaps.model.data.RichtwertzoneComposite;
 import org.polymap.kaps.model.data.StrasseComposite;
@@ -68,7 +68,7 @@ public class KaufvertragFlurstueckeFormEditorPage
     private static Log                log    = LogFactory
                                                      .getLog( KaufvertragFlurstueckeFormEditorPage.class );
 
-    private KaufvertragComposite      kaufvertrag;
+    private VertragComposite      kaufvertrag;
 
     private final static String       prefix = KaufvertragFlurstueckeFormEditorPage.class
                                                      .getSimpleName();
@@ -90,7 +90,7 @@ public class KaufvertragFlurstueckeFormEditorPage
         super( KaufvertragFlurstueckeFormEditorPage.class.getName(), "Flurstücksdaten", feature,
                 featureStore );
 
-        kaufvertrag = repository.findEntity( KaufvertragComposite.class, feature.getIdentifier()
+        kaufvertrag = repository.findEntity( VertragComposite.class, feature.getIdentifier()
                 .getID() );
     }
 

@@ -21,6 +21,7 @@ import org.polymap.rhei.form.FormEditor;
 import org.polymap.rhei.form.IFormEditorPage;
 import org.polymap.rhei.form.IFormPageProvider;
 
+import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.VertragsdatenBaulandComposite;
 import org.polymap.kaps.ui.form.Kaufvertrag1FormEditorPage;
 import org.polymap.kaps.ui.form.Kaufvertrag2FormEditorPage;
@@ -41,7 +42,7 @@ public class FormPageProvider
         List<IFormEditorPage> result = new ArrayList<IFormEditorPage>();
         String name = feature.getType().getName().getLocalPart();
 
-        if (name.equalsIgnoreCase( "kaufvertrag" )) {
+        if (name.equalsIgnoreCase( VertragComposite.NAME )) {
             result.add( new Kaufvertrag1FormEditorPage( feature, formEditor.getFeatureStore() ) );
             result.add( new Kaufvertrag2FormEditorPage( feature, formEditor.getFeatureStore() ) );
             result.add( new KaufvertragFlurstueckeFormEditorPage( feature, formEditor

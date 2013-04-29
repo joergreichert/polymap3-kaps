@@ -56,7 +56,7 @@ public interface FlurstueckComposite
     // CREATE TABLE FLURZWI (
     // EINGANGSNR DOUBLE,
     @Optional
-    Association<KaufvertragComposite> vertrag();
+    Association<VertragComposite> vertrag();
 
 
     @Computed
@@ -226,7 +226,7 @@ public interface FlurstueckComposite
         }
 
 
-        public static Iterable<FlurstueckComposite> forEntity( KaufvertragComposite kaufvertrag ) {
+        public static Iterable<FlurstueckComposite> forEntity( VertragComposite kaufvertrag ) {
             FlurstueckComposite template = QueryExpressions.templateFor( FlurstueckComposite.class );
             BooleanExpression expr = QueryExpressions.eq( template.vertrag(), kaufvertrag );
             Query<FlurstueckComposite> matches = KapsRepository.instance().findEntities(
@@ -235,7 +235,7 @@ public interface FlurstueckComposite
         }
 
 
-        public static FlurstueckComposite mainForEntity( KaufvertragComposite kaufvertrag ) {
+        public static FlurstueckComposite mainForEntity( VertragComposite kaufvertrag ) {
             FlurstueckComposite template = QueryExpressions.templateFor( FlurstueckComposite.class );
             BooleanExpression expr = QueryExpressions.and(
                     QueryExpressions.eq( template.vertrag(), kaufvertrag ),

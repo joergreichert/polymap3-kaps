@@ -58,7 +58,7 @@ public class Kaufvertrag1FormEditorPage
 
         // readonly
         Composite eingangsNr = site.newFormField( parent,
-                new PropertyAdapter( kaufvertrag.eingangsNr() ), new TextFormField(),
+                new PropertyAdapter( kaufvertrag.eingangsNr() ), new StringFormField(),
                 new EingangsNummerFormatter(), "Eingangsnummer" );
         eingangsNr.setEnabled( false );
         eingangsNr.setLayoutData( left().create() );
@@ -99,26 +99,26 @@ public class Kaufvertrag1FormEditorPage
         // Kaufpreis Nenner/Zähler
         final Composite line5 = site.newFormField( parent,
                 new PropertyAdapter( kaufvertrag.kaufpreis() ), new TextFormField(
-                        StringFormField.Style.ALIGN_RIGHT ), new NumberValidator( Integer.class,
-                        Locale.getDefault() ), "Kaufpreis (€)" );
+                        StringFormField.Style.ALIGN_RIGHT ), new NumberValidator( Double.class,
+                        Locale.getDefault(), 2, 2 ), "Kaufpreis (€)" );
         line5.setLayoutData( left().right( 30 ).top( line4 ).create() );
 
         site.newFormField( parent, new PropertyAdapter( kaufvertrag.kaufpreisAnteilZaehler() ),
                 new TextFormField( StringFormField.Style.ALIGN_RIGHT ),
-                new NumberValidator( Integer.class, Locale.getDefault(), 3, 0 ), "Anteil Zähler" )
+                new NumberValidator( Double.class, Locale.getDefault(), 3, 0 ), "Anteil Zähler" )
                 .setLayoutData(
                         new SimpleFormData( SPACING ).left( 60 ).right( 80 ).top( line4 ).create() );
 
         site.newFormField( parent, new PropertyAdapter( kaufvertrag.kaufpreisAnteilNenner() ),
                 new TextFormField( StringFormField.Style.ALIGN_RIGHT ),
-                new NumberValidator( Integer.class, Locale.getDefault(), 3, 0 ), "/Nenner" )
+                new NumberValidator( Double.class, Locale.getDefault(), 3, 0 ), "/Nenner" )
                 .setLayoutData(
                         new SimpleFormData( SPACING ).left( 80 ).right( RIGHT ).top( line4 )
                                 .create() );
 
         final Composite line6 = site.newFormField( parent,
                 new PropertyAdapter( kaufvertrag.vollpreis() ), new TextFormField(
-                        StringFormField.Style.ALIGN_RIGHT ), new NumberValidator( Integer.class,
+                        StringFormField.Style.ALIGN_RIGHT ), new NumberValidator( Double.class,
                         Locale.getDefault() ), "Vollpreis (€)" );
         line6.setEnabled( false );
         line6.setLayoutData( left().right( 30 ).top( line5 ).create() );

@@ -43,12 +43,12 @@ import org.polymap.kaps.model.KapsRepository;
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 @Concerns({ PropertyChangeSupport.Concern.class })
-@Mixins({ KaufvertragComposite.Mixin.class, PropertyChangeSupport.Mixin.class,
+@Mixins({ VertragComposite.Mixin.class, PropertyChangeSupport.Mixin.class,
         ModelChangeSupport.Mixin.class, QiEntity.Mixin.class,
 // JsonState.Mixin.class
 })
 @ImportTable("K_BUCH")
-public interface KaufvertragComposite
+public interface VertragComposite
         extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite {
 
     // CREATE TABLE K_BUCH (
@@ -122,6 +122,8 @@ public interface KaufvertragComposite
     // Property<MultiPolygon> geom();
     //
  
+    String NAME = "Vertrag";
+
     /** Eingangsnummer. */
     // EINGANGSNR DOUBLE,
     @Optional
@@ -212,7 +214,7 @@ public interface KaufvertragComposite
     
     @Computed
     @Optional
-    Association<KaufvertragComposite> letzterVerkauf();
+    Association<VertragComposite> letzterVerkauf();
 
 
     // ANFR1 VARCHAR(60),
@@ -317,7 +319,7 @@ public interface KaufvertragComposite
     
     @Computed
     @Optional
-    Association<KaufvertragComposite> gesplitteterHauptvertrag();
+    Association<VertragComposite> gesplitteterHauptvertrag();
 
 
     // neue Felder
@@ -336,7 +338,7 @@ public interface KaufvertragComposite
      * Methods and transient fields.
      */
     public static abstract class Mixin
-            implements KaufvertragComposite {
+            implements VertragComposite {
 
         private static Log log = LogFactory.getLog( Mixin.class );
         
@@ -348,13 +350,13 @@ public interface KaufvertragComposite
             }
         }
 
-        public Association<KaufvertragComposite> gesplitteterHauptvertrag() {
+        public Association<VertragComposite> gesplitteterHauptvertrag() {
             // TODO
             return null;
         }
         
-        private AssociationInfo KaufvertragCompositeAss = new GenericAssociationInfo( KaufvertragComposite.class, "hauptFlurstueck" );
-        private final KaufvertragComposite kc = this;
+        private AssociationInfo KaufvertragCompositeAss = new GenericAssociationInfo( VertragComposite.class, "hauptFlurstueck" );
+        private final VertragComposite kc = this;
         
         @Override
         public Association<FlurstueckComposite> hauptFlurstueck() {

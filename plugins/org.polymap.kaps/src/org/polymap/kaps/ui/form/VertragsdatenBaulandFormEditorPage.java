@@ -18,7 +18,7 @@ import org.opengis.feature.Feature;
 import org.polymap.rhei.form.IFormEditorPage;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
-import org.polymap.kaps.model.data.KaufvertragComposite;
+import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.VertragsdatenBaulandComposite;
 import org.polymap.kaps.ui.KapsDefaultFormEditorPage;
 
@@ -44,7 +44,7 @@ public abstract class VertragsdatenBaulandFormEditorPage
     public void createFormContent( IFormEditorPageSite site ) {
         super.createFormContent( site );
 
-        KaufvertragComposite kaufvertrag = vb.kaufvertrag().get();
+        VertragComposite kaufvertrag = vb.kaufvertrag().get();
         String nummer = EingangsNummerFormatter.format( kaufvertrag.eingangsNr().get());
         site.setEditorTitle( formattedTitle( "Vertragsdaten Bauland", nummer, null ) );
         site.setFormTitle( formattedTitle( "erweiterte Vertragsdaten - Bauland - für Vertrag", nummer,

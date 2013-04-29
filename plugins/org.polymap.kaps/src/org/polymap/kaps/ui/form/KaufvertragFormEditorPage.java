@@ -18,7 +18,7 @@ import org.opengis.feature.Feature;
 import org.polymap.rhei.form.IFormEditorPage;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
-import org.polymap.kaps.model.data.KaufvertragComposite;
+import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.ui.KapsDefaultFormEditorPage;
 
 /**
@@ -28,13 +28,13 @@ public abstract class KaufvertragFormEditorPage
         extends KapsDefaultFormEditorPage
         implements IFormEditorPage {
 
-    protected KaufvertragComposite kaufvertrag;
+    protected VertragComposite kaufvertrag;
 
     public KaufvertragFormEditorPage( String id, String title, Feature feature,
             FeatureStore featureStore ) {
         super( id, title, feature, featureStore );
 
-        kaufvertrag = repository.findEntity( KaufvertragComposite.class, feature
+        kaufvertrag = repository.findEntity( VertragComposite.class, feature
                 .getIdentifier().getID() );
     }
 
@@ -43,8 +43,8 @@ public abstract class KaufvertragFormEditorPage
     public void createFormContent( IFormEditorPageSite site ) {
         super.createFormContent( site );
 
-        site.setEditorTitle( formattedTitle( "Kaufvertrag", kaufvertrag.eingangsNr().get(), null ) );
-        site.setFormTitle( formattedTitle( "Kaufvertrag", kaufvertrag.eingangsNr().get(),
+        site.setEditorTitle( formattedTitle( "Vertrag", kaufvertrag.eingangsNr().get(), null ) );
+        site.setFormTitle( formattedTitle( "Vertrag", kaufvertrag.eingangsNr().get(),
                 getTitle() ) );
 
     }

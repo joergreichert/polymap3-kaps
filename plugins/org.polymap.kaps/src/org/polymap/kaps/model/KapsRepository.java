@@ -56,7 +56,7 @@ import org.polymap.kaps.model.data.GebaeudeArtComposite;
 import org.polymap.kaps.model.data.GemarkungComposite;
 import org.polymap.kaps.model.data.GemeindeComposite;
 import org.polymap.kaps.model.data.KaeuferKreisComposite;
-import org.polymap.kaps.model.data.KaufvertragComposite;
+import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.NutzungComposite;
 import org.polymap.kaps.model.data.StalaComposite;
 import org.polymap.kaps.model.data.StrasseComposite;
@@ -220,12 +220,12 @@ public class KapsRepository
     }
 
 
-    public KaufvertragComposite newKaufvertrag( final EntityCreator<KaufvertragComposite> creator )
+    public VertragComposite newKaufvertrag( final EntityCreator<VertragComposite> creator )
             throws Exception {
-        return newEntity( KaufvertragComposite.class, null,
-                new EntityCreator<KaufvertragComposite>() {
+        return newEntity( VertragComposite.class, null,
+                new EntityCreator<VertragComposite>() {
 
-                    public void create( KaufvertragComposite prototype )
+                    public void create( VertragComposite prototype )
                             throws Exception {
                         prototype.eingangsDatum().set( new Date() );
                         prototype.kaufpreisAnteilZaehler().set( 1.0 );
@@ -252,35 +252,35 @@ public class KapsRepository
         // KaeuferKreisComposite kreis1 = kreise.iterator().next();
         // KaeuferKreisComposite kreis2 = kreise.iterator().next();
         //
-        KaufvertragComposite template = templateFor( KaufvertragComposite.class );
+        VertragComposite template = templateFor( VertragComposite.class );
 
-        // QueryBuilder<KaufvertragComposite> builder =
+        // QueryBuilder<VertragComposite> builder =
         // assembler.getModule().queryBuilderFactory()
-        // .newQueryBuilder( KaufvertragComposite.class );
+        // .newQueryBuilder( VertragComposite.class );
         // builder = builder.where( eq( template.kaeuferKreis(), kreis1 ) );
-        // Query<KaufvertragComposite> bentities = builder.newQuery( uow );
+        // Query<VertragComposite> bentities = builder.newQuery( uow );
         // bentities.orderBy( orderBy( template.eingangsNr(),
         // OrderBy.Order.DESCENDING ) );
         // bentities.maxResults( 1 );
-        // KaufvertragComposite next = bentities.iterator().next();
+        // VertragComposite next = bentities.iterator().next();
         //
-        Query<KaufvertragComposite> entities = findEntities( KaufvertragComposite.class,
+        Query<VertragComposite> entities = findEntities( VertragComposite.class,
         // eq( template.kaeuferKreis(), kreis1 ), 0, 1 );
                 null, 0, 1 );
         entities.orderBy( orderBy( template.eingangsNr(), OrderBy.Order.DESCENDING ) );
         //
-        // entities = findEntities( KaufvertragComposite.class, eq(
+        // entities = findEntities( VertragComposite.class, eq(
         // template.kaeuferKreis(), kreis2 ),
         // 0, 1 );
-        // KaufvertragComposite next2 = entities
+        // VertragComposite next2 = entities
         // .orderBy( orderBy( template.eingangsNr(), OrderBy.Order.DESCENDING )
         // ).iterator()
         // .next();
         //
-        // entities = findEntities( KaufvertragComposite.class, eq(
+        // entities = findEntities( VertragComposite.class, eq(
         // template.kaeuferKreis(), kreis1 ),
         // 0, 1 );
-        // KaufvertragComposite next3 = entities
+        // VertragComposite next3 = entities
         // .orderBy( orderBy( template.eingangsNr(), OrderBy.Order.DESCENDING )
         // ).iterator()
         // .next();
@@ -290,7 +290,7 @@ public class KapsRepository
         //
         // return 1;
 
-        KaufvertragComposite highest = entities.iterator().next();
+        VertragComposite highest = entities.iterator().next();
         int highestEingangsNr = highest != null ? highest.eingangsNr().get() : 0;
 
         // minimum aktuelles Jahr * 100000 + 1

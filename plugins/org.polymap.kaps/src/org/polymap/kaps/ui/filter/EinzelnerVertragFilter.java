@@ -31,7 +31,7 @@ import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.filter.IFilterEditorSite;
 
 import org.polymap.kaps.model.KapsRepository;
-import org.polymap.kaps.model.data.KaufvertragComposite;
+import org.polymap.kaps.model.data.VertragComposite;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -43,7 +43,7 @@ public class EinzelnerVertragFilter
 
 
     public EinzelnerVertragFilter( ILayer layer ) {
-        super( "__kaps--", layer, "einzelner Vertrag...", null, 100, KaufvertragComposite.class );
+        super( "__kaps--", layer, "einzelner Vertrag...", null, 10000, VertragComposite.class );
     }
 
 
@@ -64,14 +64,14 @@ public class EinzelnerVertragFilter
 
 
     protected Query<? extends Entity> createQuery( IFilterEditorSite site ) {
-        KaufvertragComposite template = QueryExpressions
-                .templateFor( KaufvertragComposite.class );
+        VertragComposite template = QueryExpressions
+                .templateFor( VertragComposite.class );
 
         Integer nummer = (Integer)site.getFieldValue( "eingangsNr" );
         BooleanExpression expr = nummer != null ? QueryExpressions.eq(
                 template.eingangsNr(), nummer ) : null;
 
-        return KapsRepository.instance().findEntities( KaufvertragComposite.class, expr, 0,
+        return KapsRepository.instance().findEntities( VertragComposite.class, expr, 0,
                 getMaxResults() );
     }
 }

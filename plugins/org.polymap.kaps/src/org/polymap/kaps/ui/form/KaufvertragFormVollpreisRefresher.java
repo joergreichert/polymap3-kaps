@@ -21,7 +21,7 @@ import org.polymap.rhei.field.FormFieldEvent;
 import org.polymap.rhei.field.IFormFieldListener;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
-import org.polymap.kaps.model.data.KaufvertragComposite;
+import org.polymap.kaps.model.data.VertragComposite;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -29,17 +29,17 @@ import org.polymap.kaps.model.data.KaufvertragComposite;
 public class KaufvertragFormVollpreisRefresher
         implements IFormFieldListener {
 
-    private Integer                    kaufpreis              = null;
+    private Integer                   kaufpreis              = null;
 
-    private Integer                    kaufpreisAnteilNenner  = null;
+    private Integer                   kaufpreisAnteilNenner  = null;
 
-    private Integer                    kaufpreisAnteilZaehler = null;
+    private Integer                   kaufpreisAnteilZaehler = null;
 
-    private final IFormEditorPageSite  site;
+    private final IFormEditorPageSite site;
 
-    private final KaufvertragComposite kaufvertrag;
+    private final VertragComposite    kaufvertrag;
 
-    private boolean                    triggeredKaufpreis     = false;
+    private boolean                   triggeredKaufpreis     = false;
 
 
     /**
@@ -47,7 +47,7 @@ public class KaufvertragFormVollpreisRefresher
      * @param site
      * @param kaufvertrag
      */
-    public KaufvertragFormVollpreisRefresher( IFormEditorPageSite site, KaufvertragComposite kaufvertrag ) {
+    public KaufvertragFormVollpreisRefresher( IFormEditorPageSite site, VertragComposite kaufvertrag ) {
         this.site = site;
         this.kaufvertrag = kaufvertrag;
     }

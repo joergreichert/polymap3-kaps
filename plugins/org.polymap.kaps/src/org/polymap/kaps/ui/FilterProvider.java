@@ -26,12 +26,13 @@ import org.polymap.rhei.filter.IFilter;
 import org.polymap.rhei.filter.IFilterProvider;
 
 import org.polymap.kaps.model.KapsRepository;
-import org.polymap.kaps.model.data.KaufvertragComposite;
+import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.RichtwertzoneComposite;
 import org.polymap.kaps.model.data.VertragsdatenBaulandComposite;
 import org.polymap.kaps.ui.filter.EinzelneVertragsdatenBaulandFilter;
 import org.polymap.kaps.ui.filter.EinzelnerVertragFilter;
 import org.polymap.kaps.ui.filter.RichtwertZoneFilter;
+import org.polymap.kaps.ui.filter.VertraegeFuerBaujahrUndGebaeudeartFilter;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -64,9 +65,10 @@ public class FilterProvider
 
             result.add( new RichtwertZoneFilter( layer ) );
         }
-        if (geores.getID().toString().contains( KaufvertragComposite.class.getName() )) {
+        if (geores.getID().toString().contains( VertragComposite.class.getName() )) {
 
             result.add( new EinzelnerVertragFilter( layer ) );
+            result.add( new VertraegeFuerBaujahrUndGebaeudeartFilter( layer ) );
         }
         if (geores.getID().toString().contains( VertragsdatenBaulandComposite.class.getName() )) {
 

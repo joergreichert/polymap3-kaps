@@ -83,7 +83,7 @@ public class MdbImportPage
         fileSelectionArea.setLayout( layout );
 
         upload = new Upload( fileSelectionArea, SWT.BORDER, /* Upload.SHOW_PROGRESS | */
-                Upload.SHOW_UPLOAD_BUTTON );
+        Upload.SHOW_UPLOAD_BUTTON );
         upload.setBrowseButtonText( "Browse" );
         upload.setUploadButtonText( "Upload" );
         upload.addUploadListener( this );
@@ -128,7 +128,10 @@ public class MdbImportPage
     public static void printSchema( Table table ) {
         log.info( "Table: " + table.getName() );
         for (Column col : table.getColumns()) {
-            log.info( "    column: " + col.getName() + " - " + col.getType() );
+            log.info( "// TODO " + col.getName() + " - " + col.getType() );
+            log.info( "@Optional" );
+            log.info( "@ImportColumn(\"" + col.getName() + "\")" );
+            log.info( "Property<" + col.getType() + "> " + col.getName() + "();" );
         }
     }
 
@@ -142,13 +145,13 @@ public class MdbImportPage
     // UploadListener *************************************
 
     public void uploadInProgress( UploadEvent ev ) {
-        
+
     }
 
 
     public void uploadFinished( UploadEvent ev ) {
         UploadItem item = upload.getUploadItem();
-       
+
         try {
             log.info( "Uploaded: " + item.getFileName() + ", path=" + item.getFilePath() );
 

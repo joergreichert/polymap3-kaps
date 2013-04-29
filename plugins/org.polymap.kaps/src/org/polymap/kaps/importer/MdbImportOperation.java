@@ -42,7 +42,7 @@ import org.polymap.kaps.model.data.GemarkungComposite;
 import org.polymap.kaps.model.data.GemeindeComposite;
 import org.polymap.kaps.model.data.GemeindeFaktorComposite;
 import org.polymap.kaps.model.data.KaeuferKreisComposite;
-import org.polymap.kaps.model.data.KaufvertragComposite;
+import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.KellerComposite;
 import org.polymap.kaps.model.data.NutzungComposite;
 import org.polymap.kaps.model.data.RichtwertZoneLageComposite;
@@ -92,7 +92,7 @@ public class MdbImportOperation
             final Map<String, VertragsArtComposite> allVertragsarten = new HashMap<String, VertragsArtComposite>();
             final Map<String, NutzungComposite> allNutzung = new HashMap<String, NutzungComposite>();
             final Map<String, BodennutzungComposite> allBodennutzung = new HashMap<String, BodennutzungComposite>();
-            final Map<String, KaufvertragComposite> allKaufvertrag = new HashMap<String, KaufvertragComposite>();
+            final Map<String, VertragComposite> allKaufvertrag = new HashMap<String, VertragComposite>();
 
             sub = new SubMonitor( monitor, 10 );
             importEntity( db, sub, StalaComposite.class, new EntityCallback<StalaComposite>() {
@@ -142,11 +142,11 @@ public class MdbImportOperation
                         }
                     } );
             sub = new SubMonitor( monitor, 10 );
-            importEntity( db, sub, KaufvertragComposite.class,
-                    new EntityCallback<KaufvertragComposite>() {
+            importEntity( db, sub, VertragComposite.class,
+                    new EntityCallback<VertragComposite>() {
 
                         @Override
-                        public void fillEntity( KaufvertragComposite entity,
+                        public void fillEntity( VertragComposite entity,
                                 Map<String, Object> builderRow ) {
                             // VERARBKZ
                             entity.fuerAuswertungGeeignet().set(
