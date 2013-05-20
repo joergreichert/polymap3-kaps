@@ -1095,9 +1095,8 @@ public interface FlurstuecksdatenBaulandComposite
 
         @Override
         public Association<RichtwertzoneComposite> richtwertZone() {
-            return new ComputedAssociationInstance<RichtwertzoneComposite>(
-                    new GenericAssociationInfo( FlurstuecksdatenBaulandComposite.class,
-                            "richtwertZone" ) ) {
+            return new ComputedAssociationInstance<RichtwertzoneComposite>( new GenericAssociationInfo(
+                    FlurstuecksdatenBaulandComposite.class, "richtwertZone" ) ) {
 
                 public RichtwertzoneComposite get() {
                     FlurstueckComposite flurstueck = flurstueck().get();
@@ -1116,9 +1115,8 @@ public interface FlurstuecksdatenBaulandComposite
 
         @Override
         public Association<GebaeudeArtComposite> gebaeudeArt() {
-            return new ComputedAssociationInstance<GebaeudeArtComposite>(
-                    new GenericAssociationInfo( FlurstuecksdatenBaulandComposite.class,
-                            "gebaeudeArt" ) ) {
+            return new ComputedAssociationInstance<GebaeudeArtComposite>( new GenericAssociationInfo(
+                    FlurstuecksdatenBaulandComposite.class, "gebaeudeArt" ) ) {
 
                 public GebaeudeArtComposite get() {
                     FlurstueckComposite flurstueck = flurstueck().get();

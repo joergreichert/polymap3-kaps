@@ -164,7 +164,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                                         return entity.nummer();
                                     }
                                 } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setLayoutData( left().right( 25 ).top( line0 ).create() )
+                .setLayoutData( left().right( 30 ).top( line0 ).create() )
                 .setValidator( new NumberValidator( Integer.class, locale ) ).create();
 
         newFormField( "/" )
@@ -177,7 +177,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                                         return entity.unterNummer();
                                     }
                                 } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setLayoutData( left().left( 25 ).right( 50 ).top( line0 ).create() ).create();
+                .setLayoutData( left().left( 30 ).right( 50 ).top( line0 ).create() ).create();
 
         // newFormField( "Hauptflurstück" )
         // .setParent( parent )
@@ -271,7 +271,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                 .setLayoutData( right().right( 75 ).top( line1 ).create() ).create();
 
         newFormField( "Zusatz" )
-                .setLabel( "Hausnummernzusatz" )
+                .setToolTipText( "Hausnummernzusatz" )
                 .setParent( parent )
                 .setProperty(
                         new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix

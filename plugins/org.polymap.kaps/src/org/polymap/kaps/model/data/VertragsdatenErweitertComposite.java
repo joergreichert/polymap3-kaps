@@ -79,13 +79,6 @@ public interface VertragsdatenErweitertComposite
     Property<Double> bereinigterVollpreis();
 
 
-    // FAKTOR DOUBLE,
-    // TODO default 1
-    @Optional
-    @ImportColumn("FAKTOR")
-    Property<Double> faktorBereinigterKaufpreis();
-
-
     // ZUBEM1 VARCHAR(100),
     @Optional
     @ImportColumn("ZUBEM1")

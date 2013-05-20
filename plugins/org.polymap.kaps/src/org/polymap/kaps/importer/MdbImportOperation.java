@@ -311,6 +311,9 @@ public class MdbImportOperation
             final Map<String, List<RichtwertzoneZeitraumComposite>> allRichtwertZoneGueltigkeit = new HashMap<String, List<RichtwertzoneZeitraumComposite>>();
 
             sub = new SubMonitor( monitor, 10 );
+            final AnnotatedCompositeImporter richtwertzoneCompositeImporter = new AnnotatedCompositeImporter(
+                    RichtwertzoneComposite.class, table( db,
+                            RichtwertzoneComposite.class ) );
             importEntity( db, sub, RichtwertzoneZeitraumComposite.class,
                     new EntityCallback<RichtwertzoneZeitraumComposite>() {
 
@@ -340,10 +343,8 @@ public class MdbImportOperation
 
                                             public void create( RichtwertzoneComposite prototype )
                                                     throws Exception {
-                                                AnnotatedCompositeImporter importer = new AnnotatedCompositeImporter(
-                                                        RichtwertzoneComposite.class, table( db,
-                                                                RichtwertzoneComposite.class ) );
-                                                importer.fillEntity( prototype, builderRow );
+                                                
+                                                richtwertzoneCompositeImporter.fillEntity( prototype, builderRow );
                                                 prototype.gemeinde()
                                                         .set( find( allGemeinde, builderRow,
                                                                 "GEMEINDE" ) );
@@ -431,6 +432,9 @@ public class MdbImportOperation
                     .entitiesWithSchl( KellerComposite.class );
 
             sub = new SubMonitor( monitor, 10 );
+            final AnnotatedCompositeImporter vertragsdatenErweitertCompositeImporter = new AnnotatedCompositeImporter(
+                    VertragsdatenErweitertComposite.class, table( db,
+                            VertragsdatenErweitertComposite.class ) );
             importEntity( db, sub, FlurstuecksdatenBaulandComposite.class,
                     new EntityCallback<FlurstuecksdatenBaulandComposite>() {
 
@@ -442,7 +446,7 @@ public class MdbImportOperation
                                     value != null && "E".equalsIgnoreCase( value.toString() ) );
                             // entity.gebaeudeArt().set( find(allGebaeudeArt,
                             // builderRow, "GEBART") );
-                            VertragComposite vertrag = find( allKaufvertrag, builderRow, "EINGANGSNR"  );
+                            VertragComposite vertrag = repo.findEntity( VertragComposite.class, find( allKaufvertrag, builderRow, "EINGANGSNR"  ).id());
                             entity.kaufvertrag().set(vertrag );
                             entity.erbbauRecht().set( getBooleanValue( builderRow, "ERBBAU" ) );
                             entity.faktorFuerMarktanpassungGeeignet().set(
@@ -509,13 +513,10 @@ public class MdbImportOperation
 
                                         public void create( VertragsdatenErweitertComposite prototype )
                                                 throws Exception {
-                                            AnnotatedCompositeImporter importer = new AnnotatedCompositeImporter(
-                                                    VertragsdatenErweitertComposite.class, table( db,
-                                                            VertragsdatenErweitertComposite.class ) );
-                                            importer.fillEntity( prototype, builderRow );
-
+                                            vertragsdatenErweitertCompositeImporter.fillEntity( prototype, builderRow );
                                         }
                                     } );
+                            vertrag.eingangsNr().get();
                             vertrag.erweiterteVertragsdaten().set( vdec );
                         }
                     } );
@@ -614,8 +615,8 @@ public class MdbImportOperation
             if (monitor.isCanceled()) {
                 throw new RuntimeException( "Operation canceled." );
             }
-            if ((++count % 500) == 0) {
-                monitor.worked( 500 );
+            if ((++count % 200) == 0) {
+                monitor.worked( 200 );
                 monitor.setTaskName( "Objekte: " + count );
                 repo.commitChanges();
             }
