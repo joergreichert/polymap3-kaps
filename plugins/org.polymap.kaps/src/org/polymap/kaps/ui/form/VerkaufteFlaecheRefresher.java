@@ -105,8 +105,9 @@ public class VerkaufteFlaecheRefresher
      */
     private NumberFormat getFormatter() {
         NumberFormat nf = NumberFormat.getInstance();
-        nf.setMaximumFractionDigits( 4 );
-        nf.setMinimumFractionDigits( 0 );
+        nf.setMaximumFractionDigits( 2 );
+        nf.setMinimumFractionDigits( 2 );
+        nf.setMinimumIntegerDigits( 1 );
         return nf;
     }
 
