@@ -41,15 +41,15 @@ import org.polymap.kaps.importer.ImportTable;
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 @Concerns({ PropertyChangeSupport.Concern.class })
-@Mixins({ VertragsdatenBaulandComposite.Mixin.class, PropertyChangeSupport.Mixin.class,
+@Mixins({ FlurstuecksdatenBaulandComposite.Mixin.class, PropertyChangeSupport.Mixin.class,
         ModelChangeSupport.Mixin.class, QiEntity.Mixin.class,
 // JsonState.Mixin.class
 })
 @ImportTable("K_BEVERW")
-public interface VertragsdatenBaulandComposite
+public interface FlurstuecksdatenBaulandComposite
         extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite {
 
-    String NAME = "Erweiterte Vertragsdaten Bauland";
+    String NAME = "Erweiterte Flurstücksdaten Bauland";
 
 
     // 16.000 Objekte
@@ -72,30 +72,6 @@ public interface VertragsdatenBaulandComposite
     @Optional
     @ImportColumn("VERARBKZ")
     Property<String> VERARBKZ();
-
-
-    // KAUFPREIS DOUBLE,
-    @Optional
-    @Computed
-    Property<Double> vollpreis();
-
-
-    // ZUSCHLAG DOUBLE,
-    @Optional
-    @ImportColumn("ZUSCHLAG")
-    Property<Double> zuschlag();
-
-
-    // ABSCHLAG DOUBLE,
-    @Optional
-    @ImportColumn("ABSCHLAG")
-    Property<Double> abschlag();
-
-
-    // BERKPREIS DOUBLE,
-    @Optional
-    @ImportColumn("BERKPREIS")
-    Property<Double> bereinigterVollpreis();
 
 
     // RIZUSCHL DOUBLE,
@@ -151,8 +127,10 @@ public interface VertragsdatenBaulandComposite
     @ImportColumn("BERBOFAKT")
     Property<Double> bebAbschlag();
 
+
     @Optional
     Property<Double> bebAbschlagBerechnet();
+
 
     // BERWEBEB DOUBLE,
     @Optional
@@ -728,12 +706,6 @@ public interface VertragsdatenBaulandComposite
     Property<String> zulaessigeVollgeschosse();
 
 
-    // ZUBEM1 VARCHAR(100),
-    @Optional
-    @ImportColumn("ZUBEM1")
-    Property<String> zuschlagBemerkung();
-
-
     // BONUTZ VARCHAR(2),
     @Optional
     // @Computed
@@ -784,14 +756,14 @@ public interface VertragsdatenBaulandComposite
 
     // RICHTWERT DOUBLE,
     @Optional
-    //@ImportColumn("RICHTWERT")
+    // @ImportColumn("RICHTWERT")
     @Computed
     Property<Double> richtwert();
 
 
     // GFZBER VARCHAR(20),
     @Optional
-    //@ImportColumn("GFZBER")
+    // @ImportColumn("GFZBER")
     @Computed
     Property<String> gfzBereich();
 
@@ -819,9 +791,13 @@ public interface VertragsdatenBaulandComposite
 
 
     // RIZONE VARCHAR(7),
+    // @Optional
+    // @Computed
+    // Association<RichtwertzoneComposite> richtwertZone();
+
     @Optional
     // @Computed
-    Association<RichtwertzoneComposite> richtwertZone();
+    Association<RichtwertzoneZeitraumComposite> richtwertZoneG();
 
 
     // SAN VARCHAR(1),
@@ -917,12 +893,6 @@ public interface VertragsdatenBaulandComposite
     @Optional
     @ImportColumn("ZUSCHLAG_NHK95BRI")
     Property<Double> ZUSCHLAG_NHK95BRI();
-
-
-    // ABBEM VARCHAR(100),
-    @Optional
-    @ImportColumn("ABBEM")
-    Property<String> abschlagBemerkung();
 
 
     // TODO ABSCHLAG_NHK2000 DOUBLE,
@@ -1021,8 +991,13 @@ public interface VertragsdatenBaulandComposite
 
 
     @Optional
-    @Computed
+    // @Computed
     Association<FlurstueckComposite> flurstueck();
+
+
+    @Optional
+    // @Computed
+    Association<RichtwertzoneComposite> richtwertZone();
 
 
     // );
@@ -1041,35 +1016,46 @@ public interface VertragsdatenBaulandComposite
      * Methods and transient fields.
      */
     public static abstract class Mixin
-            implements VertragsdatenBaulandComposite {
+            implements FlurstuecksdatenBaulandComposite {
 
         private static Log log = LogFactory.getLog( Mixin.class );
 
 
-        @Override
-        public Association<FlurstueckComposite> flurstueck() {
-            return new ComputedAssociationInstance<FlurstueckComposite>(
-                    new GenericAssociationInfo( VertragsdatenBaulandComposite.class, "flurstueck" ) ) {
+        // @Override
+        // public Association<FlurstueckComposite> flurstueck() {
+        // return new ComputedAssociationInstance<FlurstueckComposite>(
+        // new GenericAssociationInfo( FlurstuecksdatenBaulandComposite.class,
+        // "flurstueck" ) ) {
+        //
+        // public FlurstueckComposite get() {
+        // VertragComposite kaufvertrag = getKaufvertrag();
+        // return kaufvertrag != null ? kaufvertrag.hauptFlurstueck().get() : null;
+        // }
+        //
+        //
+        // @Override
+        // public void set( FlurstueckComposite anIgnoredValue )
+        // throws IllegalArgumentException, IllegalStateException {
+        // // ignored
+        // }
+        // };
+        // }
 
-                public FlurstueckComposite get() {
-                    VertragComposite kaufvertrag = kaufvertrag().get();
-                    return kaufvertrag != null ? kaufvertrag.hauptFlurstueck().get() : null;
-                }
-
-
-                @Override
-                public void set( FlurstueckComposite anIgnoredValue )
-                        throws IllegalArgumentException, IllegalStateException {
-                    // ignored
-                }
-            };
-        }
-
+        // private VertragComposite kaufvertrag = null;
+        //
+        //
+        // // AssociationCaching
+        // protected VertragComposite getKaufvertrag() {
+        // if (kaufvertrag == null) {
+        // kaufvertrag = kaufvertrag().get();
+        // }
+        // return kaufvertrag;
+        // }
 
         @Override
         public Association<NutzungComposite> nutzung() {
             return new ComputedAssociationInstance<NutzungComposite>( new GenericAssociationInfo(
-                    VertragsdatenBaulandComposite.class, "nutzung" ) ) {
+                    FlurstuecksdatenBaulandComposite.class, "nutzung" ) ) {
 
                 public NutzungComposite get() {
                     FlurstueckComposite flurstueck = flurstueck().get();
@@ -1086,40 +1072,21 @@ public interface VertragsdatenBaulandComposite
         }
 
 
-        @Override
-        public Association<GemeindeComposite> gemeinde() {
-            return new ComputedAssociationInstance<GemeindeComposite>( new GenericAssociationInfo(
-                    VertragsdatenBaulandComposite.class, "gemeinde" ) ) {
-
-                public GemeindeComposite get() {
-                    RichtwertzoneComposite rz = richtwertZone().get();
-                    return rz != null ? rz.gemeinde().get() : null;
-                }
-
-
-                @Override
-                public void set( GemeindeComposite anIgnoredValue )
-                        throws IllegalArgumentException, IllegalStateException {
-                    // ignored
-                }
-            };
-        }
-
-
-        // @Override
-        // public Association<RichtwertzoneComposite> richtwertZone() {
-        // return new ComputedAssociationInstance<RichtwertzoneComposite>(
-        // new GenericAssociationInfo( VertragsdatenBaulandComposite.class,
-        // "richtwertZone" ) ) {
         //
-        // public RichtwertzoneComposite get() {
-        // FlurstueckComposite flurstueck = flurstueck().get();
-        // return flurstueck != null ? flurstueck.richtwertZone().get() : null;
+        // @Override
+        // public Association<GemeindeComposite> gemeinde() {
+        // return new ComputedAssociationInstance<GemeindeComposite>( new
+        // GenericAssociationInfo(
+        // FlurstuecksdatenBaulandComposite.class, "gemeinde" ) ) {
+        //
+        // public GemeindeComposite get() {
+        // RichtwertzoneComposite rz = richtwertZone().get();
+        // return rz != null ? rz.gemeinde().get() : null;
         // }
         //
         //
         // @Override
-        // public void set( RichtwertzoneComposite anIgnoredValue )
+        // public void set( GemeindeComposite anIgnoredValue )
         // throws IllegalArgumentException, IllegalStateException {
         // // ignored
         // }
@@ -1127,9 +1094,31 @@ public interface VertragsdatenBaulandComposite
         // }
 
         @Override
+        public Association<RichtwertzoneComposite> richtwertZone() {
+            return new ComputedAssociationInstance<RichtwertzoneComposite>(
+                    new GenericAssociationInfo( FlurstuecksdatenBaulandComposite.class,
+                            "richtwertZone" ) ) {
+
+                public RichtwertzoneComposite get() {
+                    FlurstueckComposite flurstueck = flurstueck().get();
+                    return flurstueck != null ? flurstueck.richtwertZone().get() : null;
+                }
+
+
+                @Override
+                public void set( RichtwertzoneComposite anIgnoredValue )
+                        throws IllegalArgumentException, IllegalStateException {
+                    // ignored
+                }
+            };
+        }
+
+
+        @Override
         public Association<GebaeudeArtComposite> gebaeudeArt() {
             return new ComputedAssociationInstance<GebaeudeArtComposite>(
-                    new GenericAssociationInfo( VertragsdatenBaulandComposite.class, "gebaeudeArt" ) ) {
+                    new GenericAssociationInfo( FlurstuecksdatenBaulandComposite.class,
+                            "gebaeudeArt" ) ) {
 
                 public GebaeudeArtComposite get() {
                     FlurstueckComposite flurstueck = flurstueck().get();
@@ -1147,33 +1136,13 @@ public interface VertragsdatenBaulandComposite
 
 
         @Override
-        public Property<Double> vollpreis() {
-            return new ComputedPropertyInstance<Double>( new GenericPropertyInfo(
-                    VertragsdatenBaulandComposite.class, "vollpreis" ) ) {
-
-                @Override
-                public Double get() {
-                    VertragComposite kaufvertrag = kaufvertrag().get();
-                    return kaufvertrag != null ? kaufvertrag.vollpreis().get() : null;
-                }
-
-
-                @Override
-                public void set( Double anIgnoredValue )
-                        throws IllegalArgumentException, IllegalStateException {
-                    // ignored
-                }
-            };
-        }
-        
-        @Override
         public Property<Double> richtwert() {
             return new ComputedPropertyInstance<Double>( new GenericPropertyInfo(
-                    VertragsdatenBaulandComposite.class, "richtwert" ) ) {
+                    FlurstuecksdatenBaulandComposite.class, "richtwert" ) ) {
 
                 @Override
                 public Double get() {
-                    RichtwertzoneComposite rz = richtwertZone().get();
+                    RichtwertzoneZeitraumComposite rz = richtwertZoneG().get();
                     return rz != null ? rz.euroQm().get() : null;
                 }
 
@@ -1185,14 +1154,16 @@ public interface VertragsdatenBaulandComposite
                 }
             };
         }
+
+
         @Override
         public Property<String> gfzBereich() {
             return new ComputedPropertyInstance<String>( new GenericPropertyInfo(
-                    VertragsdatenBaulandComposite.class, "gfzBereich" ) ) {
+                    FlurstuecksdatenBaulandComposite.class, "gfzBereich" ) ) {
 
                 @Override
                 public String get() {
-                    RichtwertzoneComposite rz = richtwertZone().get();
+                    RichtwertzoneComposite rz = flurstueck().get().richtwertZone().get();
                     return rz != null ? rz.gfzBereich().get() : null;
                 }
 
@@ -1207,7 +1178,7 @@ public interface VertragsdatenBaulandComposite
         // @Override
         // public Association<BodennutzungComposite> bodennutzung() {
         // return new ComputedAssociationInstance<BodennutzungComposite>(
-        // new GenericAssociationInfo( VertragsdatenBaulandComposite.class,
+        // new GenericAssociationInfo( FlurstuecksdatenBaulandComposite.class,
         // "bodennutzung" ) ) {
         //
         // public BodennutzungComposite get() {

@@ -39,7 +39,7 @@ import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.FlurstueckComposite;
 import org.polymap.kaps.model.data.GebaeudeArtComposite;
 import org.polymap.kaps.model.data.VertragComposite;
-import org.polymap.kaps.model.data.VertragsdatenBaulandComposite;
+import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
 
 /**
  * 
@@ -94,8 +94,8 @@ public class VertraegeFuerBaujahrUndGebaeudeartFilter
                 FlurstueckComposite.class, expr, 0, -1 );
 
         Object[] jahre = (Object[])site.getFieldValue( "date" );
-        VertragsdatenBaulandComposite dateTemplate = QueryExpressions
-                .templateFor( VertragsdatenBaulandComposite.class );
+        FlurstuecksdatenBaulandComposite dateTemplate = QueryExpressions
+                .templateFor( FlurstuecksdatenBaulandComposite.class );
         BooleanExpression expr2 = null;
         if (jahre != null) {
             expr2 = QueryExpressions.and(
@@ -104,12 +104,12 @@ public class VertraegeFuerBaujahrUndGebaeudeartFilter
                     QueryExpressions.le( dateTemplate.baujahr(),
                             Integer.parseInt( (String)jahre[1] ) ) );
         }
-        Query<VertragsdatenBaulandComposite> daten = KapsRepository.instance().findEntities(
-                VertragsdatenBaulandComposite.class, expr2, 0, -1 );
+        Query<FlurstuecksdatenBaulandComposite> daten = KapsRepository.instance().findEntities(
+                FlurstuecksdatenBaulandComposite.class, expr2, 0, -1 );
 
         VertragComposite template = QueryExpressions.templateFor( VertragComposite.class );
         BooleanExpression dExpr = null;
-        for (VertragsdatenBaulandComposite kv : daten) {
+        for (FlurstuecksdatenBaulandComposite kv : daten) {
             BooleanExpression newExpr = QueryExpressions.eq( template.eingangsNr(), kv
                     .kaufvertrag().get().eingangsNr().get() );
             if (dExpr == null) {

@@ -101,8 +101,9 @@ public class KaufvertragFormVollpreisRefresher
      */
     private NumberFormat getFormatter() {
         NumberFormat nf = NumberFormat.getInstance();
-        nf.setMaximumFractionDigits( 0 );
-        nf.setMinimumFractionDigits( 0 );
+        nf.setMaximumFractionDigits( 2 );
+        nf.setMinimumFractionDigits( 2 );
+        nf.setMinimumIntegerDigits( 1 );
         return nf;
     }
 

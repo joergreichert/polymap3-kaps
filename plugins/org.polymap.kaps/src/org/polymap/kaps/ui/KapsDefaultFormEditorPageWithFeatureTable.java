@@ -14,9 +14,7 @@ package org.polymap.kaps.ui;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import java.beans.PropertyChangeEvent;
 
@@ -60,7 +58,7 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
 
     private boolean                dirty;
 
-    private Map<String, T>         model             = new HashMap<String, T>();
+    private List<T>                model             = new ArrayList<T>();
 
     protected CompositeProvider<T> selectedComposite = new CompositeProvider<T>();
 
@@ -114,8 +112,7 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
         int TOPSPACING = 20;
         viewer = new FeatureTableViewer( parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL );
         viewer.getTable().setLayoutData(
-                new SimpleFormData().fill().left( 2 ).height( 100 ).right( 90 )
-                        .top( top, TOPSPACING ).create() );
+                new SimpleFormData().fill().left( 2 ).height( 100 ).right( 90 ).top( top, TOPSPACING ).create() );
 
         // columns
         EntityType<T> type = addViewerColumns( viewer );
@@ -139,20 +136,20 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
                     dirty = true;
                     T newComposite = createNewComposite();
                     selectedComposite.set( newComposite );
-                    model.put( newComposite.id(), newComposite );
+                    model.add( 0, newComposite );
 
                     doLoad( new NullProgressMonitor() );
-                    refreshReloadables();
-                    // pageSite.reloadEditor();
-                    // pageSite.fireEvent( this, id, IFormFieldListener.VALUE_CHANGE,
-                    // null );
-                    // viewer.refresh( true );
-
+                    viewer.getTable().deselectAll();
+                    viewer.getTable().select(
+                            ((NamedCompositesFeatureContentProvider)viewer.getContentProvider())
+                                    .getIndicesForElements( newComposite ) );
+                    //refreshReloadables();
+                    // refreshReloadables is triggered bei selection event();
                 }
             };
             addBtn = new ActionButton( parent, addAction );
-            addBtn.setLayoutData( new SimpleFormData().left( viewer.getTable(), SPACING )
-                    .top( top, TOPSPACING ).right( 98, -SPACING ).height( 30 ).create() );
+            addBtn.setLayoutData( new SimpleFormData().left( viewer.getTable(), SPACING ).top( top, TOPSPACING )
+                    .right( 98, -SPACING ).height( 30 ).create() );
         }
 
         DeleteCompositeAction<T> deleteAction = new DeleteCompositeAction<T>() {
@@ -173,6 +170,7 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
                     // pageSite.reloadEditor();
                     doLoad( new NullProgressMonitor() );
                     refreshReloadables();
+
                     dirty = true;
                     // pageSite.fireEvent( this, id,
                     // IFormFieldListener.VALUE_CHANGE, null );
@@ -183,8 +181,8 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
         };
         ActionButton delBtn = new ActionButton( parent, deleteAction );
         delBtn.setLayoutData( new SimpleFormData().left( viewer.getTable(), SPACING )
-                .top( addBtn != null ? addBtn : top, addBtn != null ? SPACING : TOPSPACING )
-                .right( 98, -SPACING ).height( 30 ).create() );
+                .top( addBtn != null ? addBtn : top, addBtn != null ? SPACING : TOPSPACING ).right( 98, -SPACING )
+                .height( 30 ).create() );
 
         parent.layout( true );
 
@@ -194,7 +192,7 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
             public void selectionChanged( SelectionChangedEvent event ) {
                 if (!updatingElements) {
                     // Felder für ausgewählten Eintrag in UI wurden geändert
-                    // keine Selektion hier                    
+                    // keine Selektion hier
                     StructuredSelection selection = (StructuredSelection)event.getSelection();
                     FeatureTableElement tableRow = (FeatureTableElement)selection.getFirstElement();
                     if (tableRow != null) {
@@ -217,7 +215,8 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
      * 
      * @return
      */
-    protected T createNewComposite() {
+    protected T createNewComposite()
+            throws Exception {
         // must only be implemented if add-action on table is enabled
         throw new RuntimeException( "not yet implemented." );
     }
@@ -240,14 +239,18 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
         if (viewer != null && !viewer.isBusy()) {
             // model = new HashMap();
             for (T elm : getElements()) {
-                if (!model.containsKey( elm.id() )) {
+                if (!model.contains( elm )) {
                     // TODO wie wird der EventHandler registriert?
                     // elm.addPropertyChangeListener( this );
-                    model.put( elm.id(), elm );
+                    model.add( elm );
                 }
             }
-            viewer.setInput( model.values() );
+            // transform to list
+
+            viewer.setInput( model );
+            // viewer.refresh( true );
         }
+
         if (pageSite != null) {
             refreshReloadables();
         }
@@ -258,7 +261,7 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
     public void doSubmit( IProgressMonitor monitor )
             throws Exception {
         if (model != null) {
-            updateElements( model.values() );
+            updateElements( model );
         }
         dirty = false;
     }

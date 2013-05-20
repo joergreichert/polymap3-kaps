@@ -47,7 +47,7 @@ public class RichtwertzoneEntityProvider
 
         // aussortieren
         SimpleFeatureType filtered = SimpleFeatureTypeBuilder.retype( (SimpleFeatureType)type,
-                new String[] { "gemeinde", "zone", "name", "gueltigAb", "stichtag", "euroQm",
+                new String[] { "gemeinde", "schl", "name", /*"gueltigAb", "stichtag", "euroQm",*/
                         "gfzBereich" } );
         return filtered;
     }

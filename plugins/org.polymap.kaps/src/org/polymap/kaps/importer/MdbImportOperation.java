@@ -30,27 +30,7 @@ import org.polymap.core.qi4j.event.AbstractModelChangeOperation;
 import org.polymap.core.runtime.SubMonitor;
 
 import org.polymap.kaps.model.KapsRepository;
-import org.polymap.kaps.model.data.ArtDesBaugebietsComposite;
-import org.polymap.kaps.model.data.BodenRichtwertKennungComposite;
-import org.polymap.kaps.model.data.BodennutzungComposite;
-import org.polymap.kaps.model.data.BodenwertAufteilungTextComposite;
-import org.polymap.kaps.model.data.ErschliessungsBeitragComposite;
-import org.polymap.kaps.model.data.FlurComposite;
-import org.polymap.kaps.model.data.FlurstueckComposite;
-import org.polymap.kaps.model.data.GebaeudeArtComposite;
-import org.polymap.kaps.model.data.GemarkungComposite;
-import org.polymap.kaps.model.data.GemeindeComposite;
-import org.polymap.kaps.model.data.GemeindeFaktorComposite;
-import org.polymap.kaps.model.data.KaeuferKreisComposite;
-import org.polymap.kaps.model.data.VertragComposite;
-import org.polymap.kaps.model.data.KellerComposite;
-import org.polymap.kaps.model.data.NutzungComposite;
-import org.polymap.kaps.model.data.RichtwertZoneLageComposite;
-import org.polymap.kaps.model.data.RichtwertzoneComposite;
-import org.polymap.kaps.model.data.StalaComposite;
-import org.polymap.kaps.model.data.StrasseComposite;
-import org.polymap.kaps.model.data.VertragsArtComposite;
-import org.polymap.kaps.model.data.VertragsdatenBaulandComposite;
+import org.polymap.kaps.model.data.*;
 
 /**
  * 
@@ -81,7 +61,7 @@ public class MdbImportOperation
     protected IStatus doExecute( IProgressMonitor monitor, IAdaptable info )
             throws Exception {
         monitor.beginTask( getLabel(), 12000 );
-        Database db = Database.open( dbFile );
+        final Database db = Database.open( dbFile );
         try {
             SubMonitor sub = null;
 
@@ -142,92 +122,86 @@ public class MdbImportOperation
                         }
                     } );
             sub = new SubMonitor( monitor, 10 );
-            importEntity( db, sub, VertragComposite.class,
-                    new EntityCallback<VertragComposite>() {
+            importEntity( db, sub, VertragComposite.class, new EntityCallback<VertragComposite>() {
 
-                        @Override
-                        public void fillEntity( VertragComposite entity,
-                                Map<String, Object> builderRow ) {
-                            // VERARBKZ
-                            entity.fuerAuswertungGeeignet().set(
-                                    getBooleanValue( builderRow, "VERARBKZ" ) );
-                            // GESPLITTET
-                            entity.gesplittet().set( getBooleanValue( builderRow, "GESPLITTET" ) );
+                @Override
+                public void fillEntity( VertragComposite entity, Map<String, Object> builderRow ) {
+                    // VERARBKZ
+                    entity.fuerAuswertungGeeignet().set( getBooleanValue( builderRow, "VERARBKZ" ) );
+                    // GESPLITTET
+                    entity.gesplittet().set( getBooleanValue( builderRow, "GESPLITTET" ) );
 
-                            // mapping eingangsNr
-                            // find vertragsArt
-                            entity.vertragsArt().set(
-                                    find( allVertragsarten, builderRow, "VERTRAGART" ) );
+                    // mapping eingangsNr
+                    // find vertragsArt
+                    entity.vertragsArt().set( find( allVertragsarten, builderRow, "VERTRAGART" ) );
 
-                            // find KKreis für Käufer und Verkäufer
-                            Object kkreisSchl = builderRow.get( "KKREIS" );
-                            if (kkreisSchl != null) {
-                                KaeuferKreisComposite kkreis = allKKreise.get( kkreisSchl );
-                                if (kkreis == null) {
-                                    throw new IllegalStateException( "no KKREIS found for schl '"
-                                            + kkreisSchl + "' in K_BUCH '" + entity.eingangsNr()
-                                            + "'!" );
-                                }
-                                entity.kaeuferKreis().set( kkreis );
-                            }
-                            // find VKREIS
-                            Object vkreisSchl = builderRow.get( "VKREIS" );
-                            if (vkreisSchl != null) {
-                                KaeuferKreisComposite vkreis = allKKreise.get( vkreisSchl );
-                                if (vkreis == null) {
-                                    throw new IllegalStateException( "no VKREIS found for schl '"
-                                            + vkreisSchl + "' in K_BUCH '" + entity.eingangsNr()
-                                            + "'!" );
-                                }
-                                entity.verkaeuferKreis().set( vkreis );
-                            }
-                            // fix imports
-                            if (builderRow.get( "KANTZ" ) == null) {
-                                entity.kaufpreisAnteilZaehler().set( 1.0 );
-                            }
-                            if (builderRow.get( "KANTN" ) == null) {
-                                entity.kaufpreisAnteilNenner().set( 1.0 );
-                            }
-
-                            String separator = System.getProperty( "line.separator" );
-                            // BEM1 und BEM2 zusammenfassen
-                            String bem1 = (String)builderRow.get( "BEM1" );
-                            String bem2 = (String)builderRow.get( "BEM2" );
-                            StringBuilder bem = new StringBuilder();
-                            if (bem1 != null) {
-                                bem.append( bem1 );
-                                if (bem2 != null) {
-                                    bem.append( separator );
-                                }
-                            }
-                            if (bem2 != null) {
-                                bem.append( bem2 );
-                            }
-                            entity.bemerkungen().set( bem.toString() );
-
-                            // ANFR1 und ANFR2 zusammenfassen
-                            String anfr1 = (String)builderRow.get( "ANFR1" );
-                            String anfr2 = (String)builderRow.get( "ANFR2" );
-                            StringBuilder anfr = new StringBuilder();
-                            if (anfr1 != null) {
-                                anfr.append( anfr1 );
-                                if (anfr2 != null) {
-                                    anfr.append( separator );
-                                }
-                            }
-                            if (anfr2 != null) {
-                                anfr.append( anfr2 );
-                            }
-                            entity.anfragen().set( anfr.toString() );
-
-                            // find also Verkaufsverträge alt und geplittete
-                            // Verträge
-                            // TODO die werden aber eventuell erst später
-                            // assoziiert
-
-                            allKaufvertrag.put( entity.eingangsNr().get().toString(), entity );
+                    // find KKreis für Käufer und Verkäufer
+                    Object kkreisSchl = builderRow.get( "KKREIS" );
+                    if (kkreisSchl != null) {
+                        KaeuferKreisComposite kkreis = allKKreise.get( kkreisSchl );
+                        if (kkreis == null) {
+                            throw new IllegalStateException( "no KKREIS found for schl '"
+                                    + kkreisSchl + "' in K_BUCH '" + entity.eingangsNr() + "'!" );
                         }
-                    } );
+                        entity.kaeuferKreis().set( kkreis );
+                    }
+                    // find VKREIS
+                    Object vkreisSchl = builderRow.get( "VKREIS" );
+                    if (vkreisSchl != null) {
+                        KaeuferKreisComposite vkreis = allKKreise.get( vkreisSchl );
+                        if (vkreis == null) {
+                            throw new IllegalStateException( "no VKREIS found for schl '"
+                                    + vkreisSchl + "' in K_BUCH '" + entity.eingangsNr() + "'!" );
+                        }
+                        entity.verkaeuferKreis().set( vkreis );
+                    }
+                    // fix imports
+                    if (builderRow.get( "KANTZ" ) == null) {
+                        entity.kaufpreisAnteilZaehler().set( 1.0 );
+                    }
+                    if (builderRow.get( "KANTN" ) == null) {
+                        entity.kaufpreisAnteilNenner().set( 1.0 );
+                    }
+
+                    String separator = System.getProperty( "line.separator" );
+                    // BEM1 und BEM2 zusammenfassen
+                    String bem1 = (String)builderRow.get( "BEM1" );
+                    String bem2 = (String)builderRow.get( "BEM2" );
+                    StringBuilder bem = new StringBuilder();
+                    if (bem1 != null) {
+                        bem.append( bem1 );
+                        if (bem2 != null) {
+                            bem.append( separator );
+                        }
+                    }
+                    if (bem2 != null) {
+                        bem.append( bem2 );
+                    }
+                    entity.bemerkungen().set( bem.toString() );
+
+                    // ANFR1 und ANFR2 zusammenfassen
+                    String anfr1 = (String)builderRow.get( "ANFR1" );
+                    String anfr2 = (String)builderRow.get( "ANFR2" );
+                    StringBuilder anfr = new StringBuilder();
+                    if (anfr1 != null) {
+                        anfr.append( anfr1 );
+                        if (anfr2 != null) {
+                            anfr.append( separator );
+                        }
+                    }
+                    if (anfr2 != null) {
+                        anfr.append( anfr2 );
+                    }
+                    entity.anfragen().set( anfr.toString() );
+
+                    // find also Verkaufsverträge alt und geplittete
+                    // Verträge
+                    // TODO die werden aber eventuell erst später
+                    // assoziiert
+
+                    allKaufvertrag.put( entity.eingangsNr().get().toString(), entity );
+                }
+            } );
             sub = new SubMonitor( monitor, 10 );
             importEntity( db, sub, NutzungComposite.class, new EntityCallback<NutzungComposite>() {
 
@@ -333,37 +307,66 @@ public class MdbImportOperation
             final RichtwertZoneLageComposite richtwertZoneLageComposite = repo.findSchlNamed(
                     RichtwertZoneLageComposite.class, "00" );
 
-            final Map<String, List<RichtwertzoneComposite>> allRichtwertZone = new HashMap<String, List<RichtwertzoneComposite>>();
+            final Map<String, RichtwertzoneComposite> allRichtwertZone = new HashMap<String, RichtwertzoneComposite>();
+            final Map<String, List<RichtwertzoneZeitraumComposite>> allRichtwertZoneGueltigkeit = new HashMap<String, List<RichtwertzoneZeitraumComposite>>();
 
             sub = new SubMonitor( monitor, 10 );
-            importEntity( db, sub, RichtwertzoneComposite.class,
-                    new EntityCallback<RichtwertzoneComposite>() {
+            importEntity( db, sub, RichtwertzoneZeitraumComposite.class,
+                    new EntityCallback<RichtwertzoneZeitraumComposite>() {
 
                         @Override
-                        public void fillEntity( RichtwertzoneComposite entity,
-                                Map<String, Object> builderRow ) {
-                            entity.gemeinde().set( find( allGemeinde, builderRow, "GEMEINDE" ) );
-                            entity.nutzung().set( find( allNutzung, builderRow, "NUART" ) );
-                            entity.bodenNutzung().set(
-                                    find( allBodennutzung, builderRow, "NUTZUNG" ) );
-                            entity.lage().set( richtwertZoneLageComposite );
-                            entity.bodenrichtwertKennung().set( zonal );
+                        public void fillEntity( RichtwertzoneZeitraumComposite entity,
+                                final Map<String, Object> builderRow )
+                                throws Exception {
+
                             entity.erschliessungsBeitrag().set(
                                     find( allErschliessungsbeitrag, builderRow, "EB" ) );
 
-                            List<RichtwertzoneComposite> list = allRichtwertZone.get( entity.zone()
-                                    .get() );
+                            String gemeinde = builderRow.get( "GEMEINDE" ).toString();
+                            List<RichtwertzoneZeitraumComposite> list = allRichtwertZoneGueltigkeit
+                                    .get( gemeinde );
                             if (list == null) {
-                                list = new ArrayList<RichtwertzoneComposite>();
-                                allRichtwertZone.put( entity.zone().get(), list );
+                                list = new ArrayList<RichtwertzoneZeitraumComposite>();
+                                allRichtwertZoneGueltigkeit.put( gemeinde, list );
                             }
                             list.add( entity );
+                            
+                            // subcreate Richtwertzone
+                            RichtwertzoneComposite zone = allRichtwertZone
+                                    .get( entity.schl().get() );
+                            if (zone == null) {
+                                zone = repo.newEntity( RichtwertzoneComposite.class, null,
+                                        new EntityCreator<RichtwertzoneComposite>() {
+
+                                            public void create( RichtwertzoneComposite prototype )
+                                                    throws Exception {
+                                                AnnotatedCompositeImporter importer = new AnnotatedCompositeImporter(
+                                                        RichtwertzoneComposite.class, table( db,
+                                                                RichtwertzoneComposite.class ) );
+                                                importer.fillEntity( prototype, builderRow );
+                                                prototype.gemeinde()
+                                                        .set( find( allGemeinde, builderRow,
+                                                                "GEMEINDE" ) );
+                                                prototype.nutzung().set(
+                                                        find( allNutzung, builderRow, "NUART" ) );
+                                                prototype.bodenNutzung().set(
+                                                        find( allBodennutzung, builderRow,
+                                                                "NUTZUNG" ) );
+                                                prototype.lage().set( richtwertZoneLageComposite );
+                                                prototype.bodenrichtwertKennung().set( zonal );
+                                            }
+                                        } );
+                                allRichtwertZone.put( zone.schl().get(), zone );
+                            }
+//                            zone.gueltigkeiten().add( entity );
+                            entity.zone().set( zone );
                         }
                     } );
 
             final Map<String, ArtDesBaugebietsComposite> allArtDesBaugebietes = repo
                     .entitiesWithSchl( ArtDesBaugebietsComposite.class );
-
+            final Map<VertragComposite, FlurstueckComposite> allHauptflurstuecke = new HashMap<VertragComposite, FlurstueckComposite>();
+            
             sub = new SubMonitor( monitor, 10 );
             importEntity( db, sub, FlurstueckComposite.class,
                     new EntityCallback<FlurstueckComposite>() {
@@ -381,17 +384,20 @@ public class MdbImportOperation
                                     find( allArtDesBaugebietes, builderRow, "BAUGEBART" ) );
 
                             Object hauptteil = builderRow.get( "HAUPTTEIL" );
-                            entity.hauptFlurstueck().set( "×".equals( hauptteil ) );
+                            if ( "×".equals( hauptteil ) ) {
+                                allHauptflurstuecke.put(entity.vertrag().get(), entity);
+                            }
 
-                            // RIZONE
+                            // RIZONE Zone und Jahr sind eindeutig
                             String zone = (String)builderRow.get( "RIZONE" );
                             String gemeinde = builderRow.get( "GEMEINDE" ).toString();
                             Date jahr = (Date)builderRow.get( "RIJAHR" );
                             //
-                            RichtwertzoneComposite found = null;
-                            List<RichtwertzoneComposite> zonen = allRichtwertZone.get( zone );
-                            for (RichtwertzoneComposite richtwertzone : zonen) {
-                                if (richtwertzone.gemeinde().get().schl().get().equals( gemeinde )
+                            RichtwertzoneZeitraumComposite found = null;
+                            List<RichtwertzoneZeitraumComposite> zonen = allRichtwertZoneGueltigkeit
+                                    .get( gemeinde );
+                            for (RichtwertzoneZeitraumComposite richtwertzone : zonen) {
+                                if (richtwertzone.schl().get().equals( zone )
                                         && richtwertzone.gueltigAb().get().equals( jahr )) {
                                     found = richtwertzone;
                                     break;
@@ -402,7 +408,8 @@ public class MdbImportOperation
                                         "no richtwertzone found for %s, %s, %s in %s", zone,
                                         gemeinde, jahr, entity.vertrag().get().eingangsNr().get() ) );
                             }
-                            entity.richtwertZone().set( found );
+                            entity.richtwertZone().set( found.zone().get() );
+//                            entity.richtwertZoneG().set( found );
                         }
                     } );
 
@@ -419,44 +426,58 @@ public class MdbImportOperation
                             allBodenwertText.put( entity.schl().get(), entity );
                         }
                     } );
-            
+
             final Map<String, KellerComposite> allKeller = repo
                     .entitiesWithSchl( KellerComposite.class );
 
             sub = new SubMonitor( monitor, 10 );
-            importEntity( db, sub, VertragsdatenBaulandComposite.class,
-                    new EntityCallback<VertragsdatenBaulandComposite>() {
+            importEntity( db, sub, FlurstuecksdatenBaulandComposite.class,
+                    new EntityCallback<FlurstuecksdatenBaulandComposite>() {
 
                         @Override
-                        public void fillEntity( VertragsdatenBaulandComposite entity,
-                                Map<String, Object> builderRow ) {
+                        public void fillEntity( FlurstuecksdatenBaulandComposite entity,
+                                final Map<String, Object> builderRow ) throws Exception {
                             Object value = builderRow.get( "SANANFEND" );
-                            entity.sanierungAnfangswert().set( value != null && "E".equalsIgnoreCase( value.toString() ) );
-                            //entity.gebaeudeArt().set( find(allGebaeudeArt, builderRow, "GEBART") );
-                            entity.kaufvertrag().set( find(allKaufvertrag, builderRow, "EINGANGSNR") );
+                            entity.sanierungAnfangswert().set(
+                                    value != null && "E".equalsIgnoreCase( value.toString() ) );
+                            // entity.gebaeudeArt().set( find(allGebaeudeArt,
+                            // builderRow, "GEBART") );
+                            VertragComposite vertrag = find( allKaufvertrag, builderRow, "EINGANGSNR"  );
+                            entity.kaufvertrag().set(vertrag );
                             entity.erbbauRecht().set( getBooleanValue( builderRow, "ERBBAU" ) );
-                            entity.faktorFuerMarktanpassungGeeignet().set(getBooleanValue( builderRow, "MARKTANP" ));
-                            entity.gfzBereinigtenBodenpreisVerwenden().set( getBooleanValue( builderRow, "GFZVERWENDEN" ) );
-                            entity.denkmalschutz().set( getBooleanValue( builderRow, "Denkmalschutz" ) );
-                            entity.bodenwertAufteilung1().set( find(allBodenwertText, builderRow, "BODWTEXT1", true ) );
-                            entity.bodenwertAufteilung2().set( find(allBodenwertText, builderRow, "BODWTEXT2", true) );
-                            entity.bodenwertAufteilung3().set( find(allBodenwertText, builderRow, "BODWTEXT3", true) );
-                            entity.bodennutzung().set( find(allBodennutzung, builderRow, "BONUTZ") );
-                            entity.erschliessungsBeitrag().set(find(allErschliessungsbeitrag, builderRow, "EB"));
-                            entity.fuerBodenwertaufteilungNichtGeeignet().set( getBooleanValue( builderRow, "BODWNICHT" ) );
+                            entity.faktorFuerMarktanpassungGeeignet().set(
+                                    getBooleanValue( builderRow, "MARKTANP" ) );
+                            entity.gfzBereinigtenBodenpreisVerwenden().set(
+                                    getBooleanValue( builderRow, "GFZVERWENDEN" ) );
+                            entity.denkmalschutz().set(
+                                    getBooleanValue( builderRow, "Denkmalschutz" ) );
+                            entity.bodenwertAufteilung1().set(
+                                    find( allBodenwertText, builderRow, "BODWTEXT1", true ) );
+                            entity.bodenwertAufteilung2().set(
+                                    find( allBodenwertText, builderRow, "BODWTEXT2", true ) );
+                            entity.bodenwertAufteilung3().set(
+                                    find( allBodenwertText, builderRow, "BODWTEXT3", true ) );
+                            entity.bodennutzung()
+                                    .set( find( allBodennutzung, builderRow, "BONUTZ" ) );
+                            entity.erschliessungsBeitrag().set(
+                                    find( allErschliessungsbeitrag, builderRow, "EB" ) );
+                            entity.fuerBodenwertaufteilungNichtGeeignet().set(
+                                    getBooleanValue( builderRow, "BODWNICHT" ) );
                             entity.sanierung().set( getBooleanValue( builderRow, "SAN" ) );
-                            entity.bereinigterBodenpreisMitNachkommastellen().set( getBooleanValue( builderRow, "GFZKOMMA" ) );
-                            entity.keller().set( find(allKeller, builderRow, "KELLER") );
-                            
+                            entity.bereinigterBodenpreisMitNachkommastellen().set(
+                                    getBooleanValue( builderRow, "GFZKOMMA" ) );
+                            entity.keller().set( find( allKeller, builderRow, "KELLER" ) );
+
                             // RIZONE
                             String zone = (String)builderRow.get( "RIZONE" );
                             String gemeinde = builderRow.get( "GEMEINDE" ).toString();
                             Date jahr = (Date)builderRow.get( "RIJAHR" );
                             //
-                            RichtwertzoneComposite found = null;
-                            List<RichtwertzoneComposite> zonen = allRichtwertZone.get( zone );
-                            for (RichtwertzoneComposite richtwertzone : zonen) {
-                                if (richtwertzone.gemeinde().get().schl().get().equals( gemeinde )
+                            RichtwertzoneZeitraumComposite found = null;
+                            List<RichtwertzoneZeitraumComposite> zonen = allRichtwertZoneGueltigkeit
+                                    .get( gemeinde );
+                            for (RichtwertzoneZeitraumComposite richtwertzone : zonen) {
+                                if (richtwertzone.schl().get().equals( zone )
                                         && richtwertzone.gueltigAb().get().equals( jahr )) {
                                     found = richtwertzone;
                                     break;
@@ -465,12 +486,40 @@ public class MdbImportOperation
                             if (found == null) {
                                 throw new IllegalStateException( String.format(
                                         "no richtwertzone found for %s, %s, %s in %s", zone,
-                                        gemeinde, jahr, entity.kaufvertrag().get().eingangsNr().get() ) );
+                                        gemeinde, jahr, entity.kaufvertrag().get().eingangsNr()
+                                                .get() ) );
                             }
-                            entity.richtwertZone().set( found );
+//                            entity.richtwertZone().set( found.zone().get() );
+                            entity.richtwertZoneG().set( found );
+                            
+                            // Flurstück setzen, bisher Hauptflurstück, ab jetzt je Flurstück einmal
+                            // erweiterte Daten
+                            FlurstueckComposite flurstueck = allHauptflurstuecke.get( entity.kaufvertrag().get() );
+                            if (flurstueck == null) {
+                                throw new IllegalStateException( String.format(
+                                        "no flurstueck found for FlurstuecksdatenBauland for vertrag %s", entity.kaufvertrag().get().eingangsNr()
+                                                .get() ) );
+                            }
+                            entity.flurstueck().set( flurstueck );
+                            
+                            // subcreate VertragsdatenErweitert
+                            // in der Tabelle K_BEVERW sind Vertrags- und Flurstücksdaten, letztere werden hier separate erzeugt
+                            VertragsdatenErweitertComposite vdec = repo.newEntity( VertragsdatenErweitertComposite.class, null,
+                                    new EntityCreator<VertragsdatenErweitertComposite>() {
+
+                                        public void create( VertragsdatenErweitertComposite prototype )
+                                                throws Exception {
+                                            AnnotatedCompositeImporter importer = new AnnotatedCompositeImporter(
+                                                    VertragsdatenErweitertComposite.class, table( db,
+                                                            VertragsdatenErweitertComposite.class ) );
+                                            importer.fillEntity( prototype, builderRow );
+
+                                        }
+                                    } );
+                            vertrag.erweiterteVertragsdaten().set( vdec );
                         }
                     } );
-            
+
             allKeller.clear();
             allBodenwertText.clear();
             allArtDesBaugebietes.clear();
@@ -482,14 +531,13 @@ public class MdbImportOperation
             allKaufvertrag.clear();
             allKKreise.clear();
             allNutzung.clear();
-            allRichtwertZone.clear();
+            allRichtwertZoneGueltigkeit.clear();
             allStalas.clear();
             allStrasse.clear();
             allVertragsarten.clear();
         }
         finally {
             db.close();
-            db = null;
         }
 
         return Status.OK_STATUS;
@@ -527,14 +575,15 @@ public class MdbImportOperation
 
     protected Boolean getBooleanValue( Map<String, Object> builderRow, String rowName ) {
         Object value = builderRow.get( rowName );
-        return (value == null || "N".equalsIgnoreCase( value.toString() )) ? Boolean.FALSE
+        return (value == null || "".equals( value ) || "N".equalsIgnoreCase( value.toString() )) ? Boolean.FALSE
                 : Boolean.TRUE;
     }
 
 
     interface EntityCallback<T extends EntityComposite> {
 
-        void fillEntity( T prototype, Map<String, Object> builderRow );
+        void fillEntity( T prototype, Map<String, Object> builderRow )
+                throws Exception;
     }
 
 

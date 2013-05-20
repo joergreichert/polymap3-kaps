@@ -28,7 +28,7 @@ import org.polymap.rhei.filter.IFilterProvider;
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.RichtwertzoneComposite;
-import org.polymap.kaps.model.data.VertragsdatenBaulandComposite;
+import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
 import org.polymap.kaps.ui.filter.EinzelneVertragsdatenBaulandFilter;
 import org.polymap.kaps.ui.filter.EinzelnerVertragFilter;
 import org.polymap.kaps.ui.filter.RichtwertZoneFilter;
@@ -70,7 +70,7 @@ public class FilterProvider
             result.add( new EinzelnerVertragFilter( layer ) );
             result.add( new VertraegeFuerBaujahrUndGebaeudeartFilter( layer ) );
         }
-        if (geores.getID().toString().contains( VertragsdatenBaulandComposite.class.getName() )) {
+        if (geores.getID().toString().contains( FlurstuecksdatenBaulandComposite.class.getName() )) {
 
             result.add( new EinzelneVertragsdatenBaulandFilter( layer ) );
         }

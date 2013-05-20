@@ -45,11 +45,6 @@ public class VerkaufteFlaecheRefresher
     private final String                                 prefix;
 
 
-    /**
-     * 
-     * @param site
-     * @param kaufvertrag
-     */
     public VerkaufteFlaecheRefresher( IFormEditorPageSite site,
             CompositeProvider<FlurstueckComposite> flurstueck, String prefix ) {
         this.site = site;
@@ -96,7 +91,7 @@ public class VerkaufteFlaecheRefresher
                     : flaecheAnteilZaehler;
 
             if (kp != null && n != null && z != null && z != 0) {
-                Double verkaufteFlaeche = kp * n / z;
+                Double verkaufteFlaeche = kp * z / n;
                 site.setFieldValue( prefix + "verkaufteFlaeche",
                         getFormatter().format( verkaufteFlaeche ) );
             }

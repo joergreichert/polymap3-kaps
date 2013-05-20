@@ -21,6 +21,8 @@ import java.util.GregorianCalendar;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import java.text.SimpleDateFormat;
+
 import org.geotools.feature.NameImpl;
 import org.opengis.feature.type.Name;
 
@@ -52,16 +54,16 @@ import org.polymap.core.runtime.entity.ConcurrentModificationException;
 import org.polymap.kaps.model.data.BodennutzungComposite;
 import org.polymap.kaps.model.data.FlurComposite;
 import org.polymap.kaps.model.data.FlurstueckComposite;
+import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
 import org.polymap.kaps.model.data.GebaeudeArtComposite;
 import org.polymap.kaps.model.data.GemarkungComposite;
 import org.polymap.kaps.model.data.GemeindeComposite;
 import org.polymap.kaps.model.data.KaeuferKreisComposite;
-import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.NutzungComposite;
 import org.polymap.kaps.model.data.StalaComposite;
 import org.polymap.kaps.model.data.StrasseComposite;
+import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.VertragsArtComposite;
-import org.polymap.kaps.model.data.VertragsdatenBaulandComposite;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -72,6 +74,9 @@ public class KapsRepository
     private static Log         log       = LogFactory.getLog( KapsRepository.class );
 
     public static final String NAMESPACE = "http://polymap.org/kaps";
+
+
+    public final static SimpleDateFormat SHORT_DATE = new SimpleDateFormat("dd.MM.yyyy");
 
 
     /**
@@ -126,7 +131,9 @@ public class KapsRepository
 
             kapsService = new KapsService( new KaufvertragEntityProvider( this ),
                     new RichtwertzoneEntityProvider( this ),
-
+//                    new SimpleEntityProvider<RichtwertzoneZeitraumComposite>( this,
+//                            RichtwertzoneZeitraumComposite.class, new NameImpl( KapsRepository.NAMESPACE,
+//                                    "Richtwertzone - Gültigkeit" ) ),
                     new SimpleEntityProvider<VertragsArtComposite>( this,
                             VertragsArtComposite.class, new NameImpl( KapsRepository.NAMESPACE,
                                     "Vertragsart" ) ), new SimpleEntityProvider<StalaComposite>(
@@ -145,8 +152,8 @@ public class KapsRepository
                                     "Strasse" ) ), new SimpleEntityProvider<GemarkungComposite>(
                             this, GemarkungComposite.class, new NameImpl( KapsRepository.NAMESPACE,
                                     "Gemarkung" ) ),new SimpleEntityProvider<GemeindeComposite>(
-                                            this, VertragsdatenBaulandComposite.class, new NameImpl( KapsRepository.NAMESPACE,
-                                                    VertragsdatenBaulandComposite.NAME ) ),
+                                            this, FlurstuecksdatenBaulandComposite.class, new NameImpl( KapsRepository.NAMESPACE,
+                                                    FlurstuecksdatenBaulandComposite.NAME ) ),
                     new SimpleEntityProvider<FlurComposite>( this, FlurComposite.class,
                             new NameImpl( KapsRepository.NAMESPACE, "Flur" ) ),
 

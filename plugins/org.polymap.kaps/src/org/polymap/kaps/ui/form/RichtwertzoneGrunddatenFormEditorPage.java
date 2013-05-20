@@ -14,123 +14,116 @@ package org.polymap.kaps.ui.form;
 
 import org.geotools.data.FeatureStore;
 import org.opengis.feature.Feature;
+import org.opengis.feature.type.PropertyDescriptor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.qi4j.api.entity.association.Association;
+import org.qi4j.api.property.Property;
+
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+
+import org.polymap.core.data.ui.featuretable.DefaultFeatureTableColumn;
+import org.polymap.core.data.ui.featuretable.FeatureTableViewer;
+import org.polymap.core.model.EntityType;
+import org.polymap.core.qi4j.QiModule.EntityCreator;
 
 import org.polymap.rhei.data.entityfeature.AssociationAdapter;
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
+import org.polymap.rhei.data.entityfeature.PropertyDescriptorAdapter;
+import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter;
+import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter.AssociationCallback;
+import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter.PropertyCallback;
 import org.polymap.rhei.field.DateTimeFormField;
 import org.polymap.rhei.field.NumberValidator;
 import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
+import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.BodennutzungComposite;
 import org.polymap.kaps.model.data.ErschliessungsBeitragComposite;
 import org.polymap.kaps.model.data.GemeindeComposite;
 import org.polymap.kaps.model.data.NutzungComposite;
 import org.polymap.kaps.model.data.RichtwertZoneLageComposite;
+import org.polymap.kaps.model.data.RichtwertzoneComposite;
+import org.polymap.kaps.model.data.RichtwertzoneZeitraumComposite;
+import org.polymap.kaps.ui.KapsDefaultFormEditorPageWithFeatureTable;
 import org.polymap.kaps.ui.NotNullValidator;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 public class RichtwertzoneGrunddatenFormEditorPage
-        extends RichtwertZoneFormEditorPage {
+        extends KapsDefaultFormEditorPageWithFeatureTable<RichtwertzoneZeitraumComposite> {
 
-    private static Log log = LogFactory.getLog( RichtwertzoneGrunddatenFormEditorPage.class );
+    private static Log               log    = LogFactory.getLog( RichtwertzoneGrunddatenFormEditorPage.class );
 
+    private final static String      prefix = RichtwertzoneGrunddatenFormEditorPage.class.getSimpleName();
 
-    // private IFormFieldListener gemeindeListener;
+    protected RichtwertzoneComposite richtwertzone;
+
 
     public RichtwertzoneGrunddatenFormEditorPage( Feature feature, FeatureStore featureStore ) {
-        super( RichtwertzoneGrunddatenFormEditorPage.class.getName(), "Grunddaten", feature,
-                featureStore );
+        super( RichtwertzoneGrunddatenFormEditorPage.class.getName(), "Grunddaten", feature, featureStore );
+
+        richtwertzone = repository.findEntity( RichtwertzoneComposite.class, feature.getIdentifier().getID() );
     }
 
 
     @Override
     public void createFormContent( final IFormEditorPageSite site ) {
         super.createFormContent( site );
+        site.setEditorTitle( formattedTitle( "Richtwertzone", richtwertzone.schl().get(), null ) );
+        site.setFormTitle( formattedTitle( "Richtwertzone", richtwertzone.schl().get(), getTitle() ) );
 
+        Composite parent = site.getPageBody();
+        Control top = createGrunddatenForm( parent );
+        top = createZeitraumForm( parent, top );
+        createTableForm( parent, top, true );
+    }
+
+
+    private Control createGrunddatenForm( Composite parent ) {
         GemeindeComposite gemeinde = richtwertzone.gemeinde().get();
 
         Composite newLine, lastLine = null;
 
-        newLine = newFormField( "Gemeinde" )
-                .setEnabled( richtwertzone.gemeinde().get() == null )
-                .setProperty(
-                        new AssociationAdapter<GemeindeComposite>( "gemeinde", richtwertzone
-                                .gemeinde() ) )
-                .setField( namedAssocationsPicklist( GemeindeComposite.class ) )
-                .setValidator( new NotNullValidator() )
+        newLine = newFormField( "Gemeinde" ).setEnabled( richtwertzone.gemeinde().get() == null )
+                .setProperty( new AssociationAdapter<GemeindeComposite>( "gemeinde", richtwertzone.gemeinde() ) )
+                .setField( namedAssocationsPicklist( GemeindeComposite.class ) ).setValidator( new NotNullValidator() )
                 .setLayoutData( left().top( lastLine ).create() ).create();
 
         newFormField( "Bezeichnung" ).setProperty( new PropertyAdapter( richtwertzone.name() ) )
-                .setField( new StringFormField() ).setLayoutData( right().top( lastLine ).create() )
-                .create();
+                .setField( new StringFormField() ).setLayoutData( right().top( lastLine ).create() ).create();
 
         lastLine = newLine;
-        newLine = newFormField( "Zone" ).setEnabled( richtwertzone.zone().get() == null )
-                .setProperty( new PropertyAdapter( richtwertzone.zone() ) )
-                .setValidator( new NotNullValidator() ).setField( new StringFormField() )
-                .setLayoutData( left().top( lastLine ).create() ).create();
+        newLine = newFormField( "Zone" ).setEnabled( richtwertzone.schl().get() == null )
+                .setProperty( new PropertyAdapter( richtwertzone.schl() ) ).setValidator( new NotNullValidator() )
+                .setField( new StringFormField() ).setLayoutData( left().top( lastLine ).create() ).create();
         // TODO einfach immer anlassen ist wohl am einfachsten oder?
         // boolean lageEnabled = (gemeinde != null && gemeinde.einwohner().get() >
         // 50000);
         final Composite lage = newFormField( "Lage (STALA)" )
-                /* .setEnabled( lageEnabled ) */
-                .setProperty(
-                        new AssociationAdapter<RichtwertZoneLageComposite>( "lage", richtwertzone
-                                .lage() ) )
+        /* .setEnabled( lageEnabled ) */
+        .setProperty( new AssociationAdapter<RichtwertZoneLageComposite>( "lage", richtwertzone.lage() ) )
                 .setField( namedAssocationsPicklist( RichtwertZoneLageComposite.class ) )
                 .setLayoutData( right().top( lastLine ).create() ).create();
 
         lastLine = newLine;
-        newLine = newFormField( "Gültig ab" ).setEnabled( richtwertzone.gueltigAb().get() == null )
-                .setProperty( new PropertyAdapter( richtwertzone.gueltigAb() ) )
-                .setField( new DateTimeFormField() ).setValidator( new NotNullValidator() )
-                .setLayoutData( left().top( lastLine ).create() ).create();
-
-        newFormField( "Stichtag" ).setProperty( new PropertyAdapter( richtwertzone.stichtag() ) )
-                .setField( new DateTimeFormField() ).setValidator( new NotNullValidator() )
-                .setLayoutData( right().top( lastLine ).create() ).create();
-
-        lastLine = newLine;
-        newLine = newFormField( "GFZ-Bereich" )
-                .setProperty( new PropertyAdapter( richtwertzone.gfzBereich() ) )
-                .setField( new StringFormField() ).setLayoutData( right().top( lastLine ).create() )
-                .create();
-
-        lastLine = newLine;
-        newLine = newFormField( "€ pro qm" )
-                .setProperty( new PropertyAdapter( richtwertzone.euroQm() ) )
-                .setField( new StringFormField() )
-                .setValidator( new NumberValidator( Double.class, locale, 2, 2 ) )
-                .setLayoutData( left().top( lastLine ).create() ).create();
-
-        lastLine = newLine;
-        newLine = newFormField( "EB" )
-                .setProperty(
-                        new AssociationAdapter<ErschliessungsBeitragComposite>(
-                                "erschliessungsBeitrag", richtwertzone.erschliessungsBeitrag() ) )
-                .setField( namedAssocationsPicklist( ErschliessungsBeitragComposite.class ) )
-                .setLayoutData( left().top( lastLine ).create() ).create();
+        newLine = newFormField( "GFZ-Bereich" ).setProperty( new PropertyAdapter( richtwertzone.gfzBereich() ) )
+                .setField( new StringFormField() ).setLayoutData( right().top( lastLine ).create() ).create();
 
         lastLine = newLine;
         newLine = newFormField( "Nutzung" )
-                .setProperty(
-                        new AssociationAdapter<NutzungComposite>( "nutzung", richtwertzone
-                                .nutzung() ) )
+                .setProperty( new AssociationAdapter<NutzungComposite>( "nutzung", richtwertzone.nutzung() ) )
                 .setField( namedAssocationsPicklist( NutzungComposite.class ) )
                 .setLayoutData( left().top( lastLine ).create() ).create();
 
         newFormField( "Bodennutzung" )
                 .setProperty(
-                        new AssociationAdapter<BodennutzungComposite>( "bodenNutzung",
-                                richtwertzone.bodenNutzung() ) )
+                        new AssociationAdapter<BodennutzungComposite>( "bodenNutzung", richtwertzone.bodenNutzung() ) )
                 .setField( namedAssocationsPicklist( BodennutzungComposite.class ) )
                 .setLayoutData( right().top( lastLine ).create() ).create();
 
@@ -144,5 +137,129 @@ public class RichtwertzoneGrunddatenFormEditorPage
         // }
         // }
         // } );
+
+        lastLine = newLine;
+        return newLine;
+    }
+
+
+    private Control createZeitraumForm( Composite parent, Control top ) {
+        Composite newLine, lastLine = null;
+
+        newLine = newFormField( "Bezeichnung" )
+                .setParent( parent )
+                .setProperty(
+                        new ReloadablePropertyAdapter<RichtwertzoneZeitraumComposite>( selectedComposite, prefix
+                                + "name", new PropertyCallback<RichtwertzoneZeitraumComposite>() {
+
+                            @Override
+                            public Property get( RichtwertzoneZeitraumComposite entity ) {
+                                return entity.name();
+                            }
+
+                        } ) ).setField( reloadable( new StringFormField() ) )
+                .setLayoutData( left().top( top ).create() ).create();
+
+        lastLine = newLine;
+        newLine = newFormField( "Gültig ab" )
+                .setParent( parent )
+                .setProperty(
+                        new ReloadablePropertyAdapter<RichtwertzoneZeitraumComposite>( selectedComposite, prefix
+                                + "gueltigAb", new PropertyCallback<RichtwertzoneZeitraumComposite>() {
+
+                            @Override
+                            public Property get( RichtwertzoneZeitraumComposite entity ) {
+                                return entity.gueltigAb();
+                            }
+
+                        } ) ).setField( reloadable( new DateTimeFormField() ) )//.setValidator( new NotNullValidator() )
+                .setLayoutData( left().top( lastLine ).create() ).create();
+        newFormField( "Stichtag" )
+                .setParent( parent )
+                .setProperty(
+                        new ReloadablePropertyAdapter<RichtwertzoneZeitraumComposite>( selectedComposite, prefix
+                                + "stichtag", new PropertyCallback<RichtwertzoneZeitraumComposite>() {
+
+                            @Override
+                            public Property get( RichtwertzoneZeitraumComposite entity ) {
+                                return entity.stichtag();
+                            }
+
+                        } ) ).setField( reloadable( new DateTimeFormField() ) )//.setValidator( new NotNullValidator() )
+                .setLayoutData( right().top( lastLine ).create() ).create();
+
+        lastLine = newLine;
+        newLine = newFormField( "€ pro m²" )
+                .setParent( parent )
+                .setProperty(
+                        new ReloadablePropertyAdapter<RichtwertzoneZeitraumComposite>( selectedComposite, prefix
+                                + "euroQm", new PropertyCallback<RichtwertzoneZeitraumComposite>() {
+
+                            @Override
+                            public Property get( RichtwertzoneZeitraumComposite entity ) {
+                                return entity.euroQm();
+                            }
+
+                        } ) ).setField( reloadable( new StringFormField(StringFormField.Style.ALIGN_RIGHT) ) )
+                .setValidator( new NumberValidator( Double.class, locale, 12, 2, 1, 2 ) )
+                .setLayoutData( left().top( lastLine ).create() ).create();
+
+        lastLine = newLine;
+        newLine = newFormField( "EB" )
+                .setParent( parent )
+                .setProperty(
+                        new ReloadablePropertyAdapter<RichtwertzoneZeitraumComposite>( selectedComposite, prefix
+                                + "erschliessungsBeitrag", new AssociationCallback<RichtwertzoneZeitraumComposite>() {
+
+                            @Override
+                            public Association get( RichtwertzoneZeitraumComposite entity ) {
+                                return entity.erschliessungsBeitrag();
+                            }
+
+                        } ) ).setField( reloadable( namedAssocationsPicklist( ErschliessungsBeitragComposite.class ) ) )
+                .setLayoutData( left().top( lastLine ).create() ).create();
+
+        return newLine;
+    }
+
+
+    @Override
+    protected EntityType addViewerColumns( FeatureTableViewer viewer ) {
+        final KapsRepository repo = KapsRepository.instance();
+        final EntityType<RichtwertzoneZeitraumComposite> type = repo.entityType( RichtwertzoneZeitraumComposite.class );
+
+        PropertyDescriptor prop = null;
+        prop = new PropertyDescriptorAdapter( type.getProperty( "name" ) );
+        viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader( "Bezeichnung" ) );
+        prop = new PropertyDescriptorAdapter( type.getProperty( "gueltigAb" ) );
+        viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader( "Gültig ab" ) );
+        prop = new PropertyDescriptorAdapter( type.getProperty( "stichtag" ) );
+        viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader( "Stichtag" ) );
+        prop = new PropertyDescriptorAdapter( type.getProperty( "euroQm" ) );
+        viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader( "€ pro m²" ) );
+
+        return type;
+    }
+
+
+    @Override
+    protected Iterable<RichtwertzoneZeitraumComposite> getElements() {
+        return RichtwertzoneZeitraumComposite.Mixin.forZone( richtwertzone );
+    }
+
+
+    @Override
+    protected RichtwertzoneZeitraumComposite createNewComposite()
+            throws Exception {
+        return repository.newEntity( RichtwertzoneZeitraumComposite.class, null,
+                new EntityCreator<RichtwertzoneZeitraumComposite>() {
+
+                    public void create( RichtwertzoneZeitraumComposite prototype )
+                            throws Exception {
+                        prototype.zone().set( richtwertzone );
+                        prototype.schl().set( richtwertzone.schl().get() );
+                        prototype.name().set( richtwertzone.name().get() );
+                    }
+                } );
     }
 }

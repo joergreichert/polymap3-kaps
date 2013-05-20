@@ -32,7 +32,7 @@ import org.polymap.rhei.filter.IFilterEditorSite;
 
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.VertragComposite;
-import org.polymap.kaps.model.data.VertragsdatenBaulandComposite;
+import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -74,8 +74,8 @@ public class EinzelneVertragsdatenBaulandFilter
         Query<VertragComposite> kaufvertraege = KapsRepository.instance().findEntities(
                 VertragComposite.class, expr, 0, getMaxResults() );
 
-        VertragsdatenBaulandComposite templateB = QueryExpressions
-                .templateFor( VertragsdatenBaulandComposite.class );
+        FlurstuecksdatenBaulandComposite templateB = QueryExpressions
+                .templateFor( FlurstuecksdatenBaulandComposite.class );
         BooleanExpression inExpr = null;
         for (VertragComposite kv : kaufvertraege) {
             BooleanExpression newExpr = QueryExpressions.eq( templateB.kaufvertrag(), kv );
@@ -86,7 +86,7 @@ public class EinzelneVertragsdatenBaulandFilter
                 inExpr = QueryExpressions.or( inExpr, newExpr );
             }
         }
-        return KapsRepository.instance().findEntities( VertragsdatenBaulandComposite.class, inExpr,
+        return KapsRepository.instance().findEntities( FlurstuecksdatenBaulandComposite.class, inExpr,
                 0, getMaxResults() );
 
     }

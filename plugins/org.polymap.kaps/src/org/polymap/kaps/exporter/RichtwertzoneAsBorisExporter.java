@@ -62,6 +62,7 @@ import org.polymap.kaps.model.data.EntwicklungsZustandComposite;
 import org.polymap.kaps.model.data.ErschliessungsBeitragComposite;
 import org.polymap.kaps.model.data.GemeindeComposite;
 import org.polymap.kaps.model.data.RichtwertzoneComposite;
+import org.polymap.kaps.model.data.RichtwertzoneZeitraumComposite;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -201,8 +202,8 @@ public class RichtwertzoneAsBorisExporter
                     noHeaderYet = false;
                 }
 
-                RichtwertzoneComposite richtwertzone = repo.findEntity(
-                        RichtwertzoneComposite.class, feature.getIdentifier().getID() );
+                RichtwertzoneZeitraumComposite richtwertzone = repo.findEntity(
+                        RichtwertzoneZeitraumComposite.class, feature.getIdentifier().getID() );
 
                 // all properties
                 csvWriter.write( getRow( richtwertzone ) );
@@ -227,7 +228,8 @@ public class RichtwertzoneAsBorisExporter
     }
 
 
-    private List getRow( RichtwertzoneComposite richtwertzone ) {
+    private List getRow( RichtwertzoneZeitraumComposite richtwertzoneG ) {
+        RichtwertzoneComposite richtwertzone = richtwertzoneG.zone().get();
         List result = new ArrayList( 41 ) {
 
             @Override
@@ -333,7 +335,7 @@ public class RichtwertzoneAsBorisExporter
         // -
         // Nummer des Bodenrichtwerts gemäß Landesschlüssel
         // Pflicht
-        result.add( richtwertzone.zone().get() );
+        result.add( richtwertzone.schl().get() );
         // 9
         // Bodenrichtwert
         // bodenrichtwert
@@ -343,7 +345,7 @@ public class RichtwertzoneAsBorisExporter
         // ja
         // Bodenrichtwertangabe in €/m², auch bei Stichtagen vor 2002
         // Pflicht
-        result.add( euroFormat.format( richtwertzone.euroQm().get() ) );
+        result.add( euroFormat.format( richtwertzoneG.euroQm().get() ) );
         // 10
         // Stichtag des Bodenrichtwerts
         // stichtag
@@ -354,7 +356,7 @@ public class RichtwertzoneAsBorisExporter
         // ja
         // Stichtag des Bodenrichtwerts
         // Pflicht
-        result.add( dateFormat.format( richtwertzone.stichtag().get() ) );
+        result.add( dateFormat.format( richtwertzoneG.stichtag().get() ) );
         // 11
         // Bodenrichtwertkennung
         // bodenrichtwertArt
@@ -488,7 +490,7 @@ public class RichtwertzoneAsBorisExporter
         // abgabenpflichtig nach Kommunalabgabengesetz
         // Pflicht falls
         // 19=B
-        ErschliessungsBeitragComposite erschliessungsBeitrag = richtwertzone
+        ErschliessungsBeitragComposite erschliessungsBeitrag = richtwertzoneG
                 .erschliessungsBeitrag().get();
         result.add( erschliessungsBeitrag != null ? erschliessungsBeitrag.schl().get() : null );
 

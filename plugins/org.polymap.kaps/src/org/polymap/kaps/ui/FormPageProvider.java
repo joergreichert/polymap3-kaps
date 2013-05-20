@@ -21,14 +21,16 @@ import org.polymap.rhei.form.FormEditor;
 import org.polymap.rhei.form.IFormEditorPage;
 import org.polymap.rhei.form.IFormPageProvider;
 
+import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
+import org.polymap.kaps.model.data.RichtwertzoneComposite;
 import org.polymap.kaps.model.data.VertragComposite;
-import org.polymap.kaps.model.data.VertragsdatenBaulandComposite;
+import org.polymap.kaps.ui.form.FlurstuecksdatenBaulandGrunddatenFormEditorPage;
 import org.polymap.kaps.ui.form.Kaufvertrag1FormEditorPage;
 import org.polymap.kaps.ui.form.Kaufvertrag2FormEditorPage;
+import org.polymap.kaps.ui.form.KaufvertragErweitertFormEditorPage;
 import org.polymap.kaps.ui.form.KaufvertragFlurstueckeFormEditorPage;
 import org.polymap.kaps.ui.form.RichtwertzoneGrunddatenFormEditorPage;
 import org.polymap.kaps.ui.form.RichtwertzoneWeitereDatenFormEditorPage;
-import org.polymap.kaps.ui.form.VertragsdatenBaulandGrunddatenFormEditorPage;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -47,15 +49,16 @@ public class FormPageProvider
             result.add( new Kaufvertrag2FormEditorPage( feature, formEditor.getFeatureStore() ) );
             result.add( new KaufvertragFlurstueckeFormEditorPage( feature, formEditor
                     .getFeatureStore() ) );
+            result.add( new KaufvertragErweitertFormEditorPage( feature, formEditor.getFeatureStore() ) );
         }
-        else if (name.equalsIgnoreCase( "richtwertzone" )) {
+        else if (name.equalsIgnoreCase( RichtwertzoneComposite.NAME)) {
             result.add( new RichtwertzoneGrunddatenFormEditorPage( feature, formEditor
                     .getFeatureStore() ) );
             result.add( new RichtwertzoneWeitereDatenFormEditorPage( feature, formEditor
                     .getFeatureStore() ) );
         }
-        else if (name.equalsIgnoreCase( VertragsdatenBaulandComposite.NAME )) {
-            result.add( new VertragsdatenBaulandGrunddatenFormEditorPage( feature, formEditor
+        else if (name.equalsIgnoreCase( FlurstuecksdatenBaulandComposite.NAME )) {
+            result.add( new FlurstuecksdatenBaulandGrunddatenFormEditorPage( feature, formEditor
                     .getFeatureStore() ) );
         }
         return result;

@@ -22,9 +22,6 @@ import org.qi4j.api.common.UseDefaults;
 import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.entity.association.Association;
-import org.qi4j.api.entity.association.kaps.AssociationInfo;
-import org.qi4j.api.entity.association.kaps.ComputedAssociationInstance;
-import org.qi4j.api.entity.association.kaps.GenericAssociationInfo;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.property.Computed;
 import org.qi4j.api.property.Property;
@@ -329,10 +326,13 @@ public interface VertragComposite
 
     @Optional
     Property<Boolean> fuerGewosGeeignet();
-
+    
     @Optional
-    @Computed
-    Association<FlurstueckComposite> hauptFlurstueck();
+    Association<VertragsdatenErweitertComposite> erweiterteVertragsdaten();
+
+//    @Optional
+//    @Computed
+//    Association<FlurstueckComposite> hauptFlurstueck();
 
     /**
      * Methods and transient fields.
@@ -355,24 +355,24 @@ public interface VertragComposite
             return null;
         }
         
-        private AssociationInfo KaufvertragCompositeAss = new GenericAssociationInfo( VertragComposite.class, "hauptFlurstueck" );
-        private final VertragComposite kc = this;
-        
-        @Override
-        public Association<FlurstueckComposite> hauptFlurstueck() {
-            return new ComputedAssociationInstance<FlurstueckComposite>( KaufvertragCompositeAss ) {
-
-                public FlurstueckComposite get() {
-                    return FlurstueckComposite.Mixin.mainForEntity( kc );
-                }
-                
-                @Override
-                public void set( FlurstueckComposite anIgnoredValue )
-                        throws IllegalArgumentException, IllegalStateException {
-                        // ignored
-                }
-            };
-        }
+//        private AssociationInfo KaufvertragCompositeAss = new GenericAssociationInfo( VertragComposite.class, "hauptFlurstueck" );
+//        private final VertragComposite kc = this;
+//        
+//        @Override
+//        public Association<FlurstueckComposite> hauptFlurstueck() {
+//            return new ComputedAssociationInstance<FlurstueckComposite>( KaufvertragCompositeAss ) {
+//
+//                public FlurstueckComposite get() {
+//                    return FlurstueckComposite.Mixin.mainForEntity( kc );
+//                }
+//                
+//                @Override
+//                public void set( FlurstueckComposite anIgnoredValue )
+//                        throws IllegalArgumentException, IllegalStateException {
+//                        // ignored
+//                }
+//            };
+//        }
     }
 
 }

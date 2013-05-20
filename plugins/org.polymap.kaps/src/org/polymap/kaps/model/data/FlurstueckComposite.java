@@ -76,7 +76,6 @@ public interface FlurstueckComposite
     // FLSTNR1 INTEGER DEFAULT 0,
     @Optional
     @ImportColumn("FLSTNR1")
-    @UseDefaults
     Property<Integer> nummer();
 
 
@@ -131,7 +130,6 @@ public interface FlurstueckComposite
     // HAUSNR INTEGER DEFAULT 0,
     @Optional
     @ImportColumn("HAUSNR")
-    @UseDefaults
     Property<Integer> hausnummer();
 
 
@@ -155,8 +153,9 @@ public interface FlurstueckComposite
     // YGK DOUBLE,
 
     // HAUPTTEIL VARCHAR(1),
-    @Optional
-    Property<Boolean> hauptFlurstueck();
+    // wird nicht mehr benötigt, da Semantik unklar, bzw. Modellierung verkehrt
+    //@Optional
+    //Property<Boolean> hauptFlurstueck();
 
 
     // BEMERKUNG VARCHAR(12),
@@ -189,8 +188,13 @@ public interface FlurstueckComposite
     // GEMEINDE INTEGER DEFAULT 0, Link zur Gemeinde ist schon über Gemarkung ignore?
     // RIZONE VARCHAR(7),
     // RIJAHR TIMESTAMP
+    // Auswahl erfolgt zweistufig, erst nur die Zone und dann darin die Gültigkeit
+    // ähnlich einer Kategorie - Unterkategorie auswahl
     @Optional
     Association<RichtwertzoneComposite> richtwertZone();
+    
+//    @Optional
+//    Association<RichtwertzoneZeitraumComposite> richtwertZoneG();
 
 
     /**
@@ -234,16 +238,16 @@ public interface FlurstueckComposite
             return matches;
         }
 
-
-        public static FlurstueckComposite mainForEntity( VertragComposite kaufvertrag ) {
-            FlurstueckComposite template = QueryExpressions.templateFor( FlurstueckComposite.class );
-            BooleanExpression expr = QueryExpressions.and(
-                    QueryExpressions.eq( template.vertrag(), kaufvertrag ),
-                    QueryExpressions.eq( template.hauptFlurstueck(), Boolean.TRUE ) );
-
-            Query<FlurstueckComposite> matches = KapsRepository.instance().findEntities(
-                    FlurstueckComposite.class, expr, 0, 1 );
-            return matches.find();
-        }
+//
+//        public static FlurstueckComposite mainForEntity( VertragComposite kaufvertrag ) {
+//            FlurstueckComposite template = QueryExpressions.templateFor( FlurstueckComposite.class );
+//            BooleanExpression expr = QueryExpressions.and(
+//                    QueryExpressions.eq( template.vertrag(), kaufvertrag ),
+//                    QueryExpressions.eq( template.hauptFlurstueck(), Boolean.TRUE ) );
+//
+//            Query<FlurstueckComposite> matches = KapsRepository.instance().findEntities(
+//                    FlurstueckComposite.class, expr, 0, 1 );
+//            return matches.find();
+//        }
     }
 }

@@ -98,28 +98,28 @@ public class Kaufvertrag1FormEditorPage
 
         // Kaufpreis Nenner/Zähler
         final Composite line5 = site.newFormField( parent,
-                new PropertyAdapter( kaufvertrag.kaufpreis() ), new TextFormField(
+                new PropertyAdapter( kaufvertrag.kaufpreis() ), new StringFormField(
                         StringFormField.Style.ALIGN_RIGHT ), new NumberValidator( Double.class,
-                        Locale.getDefault()), "Kaufpreis (€)" );
+                        Locale.getDefault(), 12, 2, 1, 2), "Kaufpreis (€)" );
         line5.setLayoutData( left().right( 30 ).top( line4 ).create() );
 
         site.newFormField( parent, new PropertyAdapter( kaufvertrag.kaufpreisAnteilZaehler() ),
-                new TextFormField( StringFormField.Style.ALIGN_RIGHT ),
-                new NumberValidator( Double.class, Locale.getDefault() ), "Anteil Zähler" )
+                new StringFormField( StringFormField.Style.ALIGN_RIGHT ),
+                new NumberValidator( Double.class, Locale.getDefault(), 12, 2, 1, 2 ), "Anteil Zähler" )
                 .setLayoutData(
                         new SimpleFormData( SPACING ).left( 60 ).right( 80 ).top( line4 ).create() );
 
         site.newFormField( parent, new PropertyAdapter( kaufvertrag.kaufpreisAnteilNenner() ),
-                new TextFormField( StringFormField.Style.ALIGN_RIGHT ),
-                new NumberValidator( Double.class, Locale.getDefault() ), "/Nenner" )
+                new StringFormField( StringFormField.Style.ALIGN_RIGHT ),
+                new NumberValidator( Double.class, Locale.getDefault(), 12, 2, 1, 2 ), "/Nenner" )
                 .setLayoutData(
                         new SimpleFormData( SPACING ).left( 80 ).right( RIGHT ).top( line4 )
                                 .create() );
 
         final Composite line6 = site.newFormField( parent,
-                new PropertyAdapter( kaufvertrag.vollpreis() ), new TextFormField(
+                new PropertyAdapter( kaufvertrag.vollpreis() ), new StringFormField(
                         StringFormField.Style.ALIGN_RIGHT ), new NumberValidator( Double.class,
-                        Locale.getDefault() ), "Vollpreis (€)" );
+                        Locale.getDefault(), 12, 2, 1, 2 ), "Vollpreis (€)" );
         line6.setEnabled( false );
         line6.setLayoutData( left().right( 30 ).top( line5 ).create() );
 

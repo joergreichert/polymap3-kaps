@@ -12,6 +12,9 @@
  */
 package org.polymap.kaps.ui.form;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.opengis.feature.type.PropertyDescriptor;
 
 import org.apache.commons.logging.Log;
@@ -62,10 +65,9 @@ public abstract class FlurstueckSearcher
         extends Action
         implements ISelectionChangedListener, IFormFieldListener {
 
-    private static Log                                   log = LogFactory
-                                                                     .getLog( FlurstueckSearcher.class );
+    private static Log                                   log = LogFactory.getLog( FlurstueckSearcher.class );
 
-    private Iterable<FlurstueckComposite>                content;
+    private List<FlurstueckComposite>                    content;
 
     private final CompositeProvider<FlurstueckComposite> provider;
 
@@ -103,25 +105,28 @@ public abstract class FlurstueckSearcher
     public void run() {
         try {
 
-//            FlurstueckComposite template = provider.get();
-//            if (template != null) {
-//                // set the search fields to the default values from the selected
-//                // template
-//                if (gemarkung == null) {
-//                    gemarkung = template.gemarkung().get();
-//                }
-//                if (flur == null) {
-//                    flur = template.flur().get();
-//                }
-//                if (nummer == null) {
-//                    nummer = template.nummer().get();
-//                }
-//                if (unterNummer == null) {
-//                    unterNummer = template.unterNummer().get();
-//                }
-//            }
-            content = KapsRepository.instance().findFlurstuecke( gemarkung, flur, nummer,
-                    unterNummer );
+            // FlurstueckComposite template = provider.get();
+            // if (template != null) {
+            // // set the search fields to the default values from the selected
+            // // template
+            // if (gemarkung == null) {
+            // gemarkung = template.gemarkung().get();
+            // }
+            // if (flur == null) {
+            // flur = template.flur().get();
+            // }
+            // if (nummer == null) {
+            // nummer = template.nummer().get();
+            // }
+            // if (unterNummer == null) {
+            // unterNummer = template.unterNummer().get();
+            // }
+            // }
+            content = new ArrayList();
+            for (FlurstueckComposite fc : KapsRepository.instance().findFlurstuecke( gemarkung, flur, nummer,
+                    unterNummer )) {
+                content.add( fc );
+            }
 
             FlurstueckTableDialog dialog = new FlurstueckTableDialog();
             dialog.setBlockOnOpen( true );
@@ -138,8 +143,7 @@ public abstract class FlurstueckSearcher
             }
         }
         catch (Exception e) {
-            PolymapWorkbench.handleError( KapsPlugin.PLUGIN_ID, this,
-                    "Fehler beim Öffnen der Flurstückstabelle.", e );
+            PolymapWorkbench.handleError( KapsPlugin.PLUGIN_ID, this, "Fehler beim Öffnen der Flurstückstabelle.", e );
         }
     }
 
@@ -183,8 +187,7 @@ public abstract class FlurstueckSearcher
 
             // entity types
             final KapsRepository repo = KapsRepository.instance();
-            final EntityType<FlurstueckComposite> type = repo
-                    .entityType( FlurstueckComposite.class );
+            final EntityType<FlurstueckComposite> type = repo.entityType( FlurstueckComposite.class );
 
             // columns
             PropertyDescriptor prop = null;
@@ -198,8 +201,10 @@ public abstract class FlurstueckSearcher
             viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader( "Flurstück" ) );
             prop = new PropertyDescriptorAdapter( type.getProperty( "unterNummer" ) );
             viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader( "Unternummer" ) );
-            prop = new PropertyDescriptorAdapter( type.getProperty( "hauptFlurstueck" ) );
-            viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader( "Hauptflurstück" ) );
+            // prop = new PropertyDescriptorAdapter( type.getProperty(
+            // "hauptFlurstueck" ) );
+            // viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader(
+            // "Hauptflurstück" ) );
             prop = new PropertyDescriptorAdapter( type.getProperty( "strasse" ) );
             viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader( "Straße" ) );
             prop = new PropertyDescriptorAdapter( type.getProperty( "hausnummer" ) );

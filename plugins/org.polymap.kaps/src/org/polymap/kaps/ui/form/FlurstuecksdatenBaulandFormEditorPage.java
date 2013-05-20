@@ -18,23 +18,24 @@ import org.opengis.feature.Feature;
 import org.polymap.rhei.form.IFormEditorPage;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
-import org.polymap.kaps.model.data.RichtwertzoneComposite;
+import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
+import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.ui.KapsDefaultFormEditorPage;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
-public abstract class RichtwertZoneFormEditorPage
+public abstract class FlurstuecksdatenBaulandFormEditorPage
         extends KapsDefaultFormEditorPage
         implements IFormEditorPage {
 
-    protected RichtwertzoneComposite richtwertzone;
+    protected FlurstuecksdatenBaulandComposite vb;
 
-    public RichtwertZoneFormEditorPage( String id, String title, Feature feature,
+    public FlurstuecksdatenBaulandFormEditorPage( String id, String title, Feature feature,
             FeatureStore featureStore ) {
         super( id, title, feature, featureStore );
 
-        richtwertzone = repository.findEntity( RichtwertzoneComposite.class, feature
+        vb = repository.findEntity( FlurstuecksdatenBaulandComposite.class, feature
                 .getIdentifier().getID() );
     }
 
@@ -43,8 +44,10 @@ public abstract class RichtwertZoneFormEditorPage
     public void createFormContent( IFormEditorPageSite site ) {
         super.createFormContent( site );
 
-        site.setEditorTitle( formattedTitle( "Richtwertzone", richtwertzone.zone().get(), null ) );
-        site.setFormTitle( formattedTitle( "Richtwertzone", richtwertzone.zone().get(),
+        VertragComposite kaufvertrag = vb.kaufvertrag().get();
+        String nummer = EingangsNummerFormatter.format( kaufvertrag.eingangsNr().get());
+        site.setEditorTitle( formattedTitle( "Flurstücksdaten Bauland", nummer, null ) );
+        site.setFormTitle( formattedTitle( "erweiterte Flurstücksdaten - Bauland - für Vertrag", nummer,
                 getTitle() ) );
 
     }

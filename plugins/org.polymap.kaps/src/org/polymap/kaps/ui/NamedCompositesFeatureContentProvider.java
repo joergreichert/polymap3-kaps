@@ -18,6 +18,8 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.google.common.primitives.Ints;
+
 import org.eclipse.jface.viewers.Viewer;
 
 import org.polymap.core.data.ui.featuretable.IFeatureContentProvider;
@@ -25,8 +27,6 @@ import org.polymap.core.data.ui.featuretable.IFeatureTableElement;
 import org.polymap.core.model.Composite;
 import org.polymap.core.model.Entity;
 import org.polymap.core.model.EntityType;
-
-import org.polymap.rhei.data.entityfeature.CompositesFeatureContentProvider;
 
 import org.polymap.kaps.model.Named;
 
@@ -38,42 +38,62 @@ import org.polymap.kaps.model.Named;
 public class NamedCompositesFeatureContentProvider
         implements IFeatureContentProvider {
 
-    private static Log                    log = LogFactory
-                                                      .getLog( CompositesFeatureContentProvider.class );
+    private static Log                       log    = LogFactory.getLog( NamedCompositesFeatureContentProvider.class );
 
-    private Iterable<? extends Composite> composites;
+    private List<? extends Composite>        composites;
 
-    private EntityType                    compositeType;
+    private EntityType                       compositeType;
+
+    private final List<IFeatureTableElement> result = new ArrayList<IFeatureTableElement>();
 
 
     public NamedCompositesFeatureContentProvider() {
     }
 
 
-    public NamedCompositesFeatureContentProvider( Iterable<? extends Composite> composites,
+    public NamedCompositesFeatureContentProvider( List<? extends Composite> composites,
             EntityType<? extends Composite> compositeType ) {
         assert compositeType != null;
         this.composites = composites;
         this.compositeType = compositeType;
+        result.clear();
     }
 
 
     public void inputChanged( Viewer viewer, Object oldInput, Object newInput ) {
-        this.composites = (Iterable<? extends Composite>)newInput;
+        this.composites = (List<? extends Composite>)newInput;
+        result.clear();
     }
 
 
     public Object[] getElements( Object input ) {
         log.debug( "getElements(): input=" + input.getClass().getName() );
-        List<IFeatureTableElement> result = new ArrayList();
-        for (final Composite composite : composites) {
-            result.add( new FeatureTableElement( composite ) );
+        if (result.isEmpty()) {
+            for (final Composite composite : composites) {
+                result.add( new FeatureTableElement( composite ) );
+            }
         }
         return result.toArray();
     }
 
 
+    public int[] getIndicesForElements( Composite... input ) {
+        List<Integer> indices = new ArrayList<Integer>();
+        log.debug( "getIndicesForElements()" );
+        if (!result.isEmpty()) {
+            for (final Composite composite : input) {
+                int index = composites.indexOf( composite );
+                if (index != -1) {
+                    indices.add( index );
+                }
+            }
+        }
+        return Ints.toArray( indices );
+    }
+
+
     public void dispose() {
+        result.clear();
     }
 
 
@@ -99,6 +119,9 @@ public class NamedCompositesFeatureContentProvider
                 if (value != null && value instanceof Named) {
                     return ((Named)value).name().get();
                 }
+//                if (value != null && value instanceof Date) {
+//                    return KapsRepository.SHORT_DATE.format( (Date)value );
+//                }
                 return value;
             }
             catch (Exception e) {
