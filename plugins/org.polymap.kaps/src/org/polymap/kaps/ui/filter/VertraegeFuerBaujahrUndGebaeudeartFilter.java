@@ -37,9 +37,9 @@ import org.polymap.rhei.filter.IFilterEditorSite;
 
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.FlurstueckComposite;
+import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
 import org.polymap.kaps.model.data.GebaeudeArtComposite;
 import org.polymap.kaps.model.data.VertragComposite;
-import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
 
 /**
  * 
@@ -52,8 +52,7 @@ public class VertraegeFuerBaujahrUndGebaeudeartFilter
 
 
     public VertraegeFuerBaujahrUndGebaeudeartFilter( ILayer layer ) {
-        super( "__kaps--", layer, "Verträge nach Gebäudeart und Baujahr...", null, 10000,
-                VertragComposite.class );
+        super( "__kaps--", layer, "Verträge nach Gebäudeart und Baujahr...", null, 10000, VertragComposite.class );
     }
 
 
@@ -68,16 +67,12 @@ public class VertraegeFuerBaujahrUndGebaeudeartFilter
         Map<String, GebaeudeArtComposite> typen = KapsRepository.instance().entitiesWithNames(
                 GebaeudeArtComposite.class );
 
-        site.addStandardLayout( site.newFormField( result, "gebart", GebaeudeArtComposite.class,
-                new PicklistFormField( typen ), null, "Gebäudeart" ) );
+        site.addStandardLayout( site.newFormField( result, "gebart", GebaeudeArtComposite.class, new PicklistFormField(
+                typen ), null, "Gebäudeart" ) );
 
-        site.addStandardLayout( site.newFormField(
-                result,
-                "date",
-                Integer.class,
-                new BetweenFormField( new StringFormField(), new StringFormField() ),
-                new BetweenValidator( new NumberValidator( Integer.class, Polymap
-                        .getSessionLocale() ) ), "Baujahr" ) );
+        site.addStandardLayout( site.newFormField( result, "date", Integer.class, new BetweenFormField(
+                new StringFormField(), new StringFormField() ), new BetweenValidator( new NumberValidator(
+                Integer.class, Polymap.getSessionLocale() ) ), "Baujahr" ) );
 
         return result;
     }
@@ -86,63 +81,74 @@ public class VertraegeFuerBaujahrUndGebaeudeartFilter
     protected Query<? extends Entity> createQuery( IFilterEditorSite site ) {
 
         GebaeudeArtComposite gebaeude = (GebaeudeArtComposite)site.getFieldValue( "gebart" );
-        FlurstueckComposite flurTemplate = QueryExpressions.templateFor( FlurstueckComposite.class );
-        BooleanExpression expr = gebaeude != null ? QueryExpressions.eq(
-                flurTemplate.gebaeudeArt(), gebaeude ) : null;
+        BooleanExpression fExpr = null;
+        VertragComposite template = QueryExpressions.templateFor( VertragComposite.class );
 
-        Query<FlurstueckComposite> flurstuecke = KapsRepository.instance().findEntities(
-                FlurstueckComposite.class, expr, 0, -1 );
+        if (gebaeude != null) {
+            FlurstueckComposite flurTemplate = QueryExpressions.templateFor( FlurstueckComposite.class );
+            BooleanExpression expr = QueryExpressions.eq( flurTemplate.gebaeudeArt(), gebaeude );
+
+            Query<FlurstueckComposite> flurstuecke = KapsRepository.instance().findEntities( FlurstueckComposite.class,
+                    expr, 0, -1 );
+            for (FlurstueckComposite fc : flurstuecke) {
+                BooleanExpression newExpr = QueryExpressions.eq( template.eingangsNr(), fc.vertrag().get().eingangsNr()
+                        .get() );
+                if (fExpr == null) {
+                    fExpr = newExpr;
+                }
+                else {
+                    fExpr = QueryExpressions.or( fExpr, newExpr );
+                }
+            }
+        }
 
         Object[] jahre = (Object[])site.getFieldValue( "date" );
-        FlurstuecksdatenBaulandComposite dateTemplate = QueryExpressions
-                .templateFor( FlurstuecksdatenBaulandComposite.class );
-        BooleanExpression expr2 = null;
-        if (jahre != null) {
-            expr2 = QueryExpressions.and(
-                    QueryExpressions.ge( dateTemplate.baujahr(),
-                            Integer.parseInt( (String)jahre[0] ) ),
-                    QueryExpressions.le( dateTemplate.baujahr(),
-                            Integer.parseInt( (String)jahre[1] ) ) );
-        }
-        Query<FlurstuecksdatenBaulandComposite> daten = KapsRepository.instance().findEntities(
-                FlurstuecksdatenBaulandComposite.class, expr2, 0, -1 );
-
-        VertragComposite template = QueryExpressions.templateFor( VertragComposite.class );
         BooleanExpression dExpr = null;
-        for (FlurstuecksdatenBaulandComposite kv : daten) {
-            BooleanExpression newExpr = QueryExpressions.eq( template.eingangsNr(), kv
-                    .kaufvertrag().get().eingangsNr().get() );
-            if (dExpr == null) {
-                dExpr = newExpr;
-            }
-            else {
-                dExpr = QueryExpressions.or( dExpr, newExpr );
-            }
-        }
-        BooleanExpression fExpr = null;
-        for (FlurstueckComposite fc : flurstuecke) {
-            BooleanExpression newExpr = QueryExpressions.eq( template.eingangsNr(), fc.vertrag()
-                    .get().eingangsNr().get() );
-            if (fExpr == null) {
-                fExpr = newExpr;
-            }
-            else {
-                fExpr = QueryExpressions.or( fExpr, newExpr );
-            }
-        }
+        if (jahre != null) {
+            FlurstuecksdatenBaulandComposite dateTemplate = QueryExpressions
+                    .templateFor( FlurstuecksdatenBaulandComposite.class );
+            BooleanExpression expr2 = null;
 
+            BooleanExpression ge = jahre[0] != null ? QueryExpressions.ge( dateTemplate.baujahr(),
+                    Integer.parseInt( (String)jahre[0] ) ) : null;
+
+            BooleanExpression le = jahre[1] != null ? QueryExpressions.le( dateTemplate.baujahr(),
+                    Integer.parseInt( (String)jahre[1] ) ) : null;
+
+            if (ge != null) {
+                expr2 = ge;
+            }
+            if (le != null) {
+                expr2 = expr2 == null ? le : QueryExpressions.and( ge, le );
+            }
+            if (expr2 != null) {
+                Query<FlurstuecksdatenBaulandComposite> daten = KapsRepository.instance().findEntities(
+                        FlurstuecksdatenBaulandComposite.class, expr2, 0, -1 );
+
+                for (FlurstuecksdatenBaulandComposite kv : daten) {
+                    BooleanExpression newExpr = QueryExpressions.eq( template.eingangsNr(), kv.kaufvertrag().get()
+                            .eingangsNr().get() );
+                    if (dExpr == null) {
+                        dExpr = newExpr;
+                    }
+                    else {
+                        dExpr = QueryExpressions.or( dExpr, newExpr );
+                    }
+                }
+            }
+        }
+        
         BooleanExpression allExpr = dExpr;
         if (allExpr != null) {
-            if (dExpr != null) {
-                allExpr = QueryExpressions.and( allExpr, dExpr );
+            if (fExpr != null) {
+                allExpr = QueryExpressions.and( allExpr, fExpr );
             }
         }
         else {
             allExpr = fExpr;
         }
 
-        return KapsRepository.instance().findEntities( VertragComposite.class, allExpr, 0,
-                getMaxResults() );
+        return KapsRepository.instance().findEntities( VertragComposite.class, allExpr, 0, getMaxResults() );
 
     }
 }

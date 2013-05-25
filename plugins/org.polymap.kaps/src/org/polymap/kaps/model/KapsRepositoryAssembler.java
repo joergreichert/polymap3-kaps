@@ -35,6 +35,7 @@ import org.polymap.core.runtime.Polymap;
 import org.polymap.rhei.data.entitystore.lucene.LuceneEntityStoreInfo;
 import org.polymap.rhei.data.entitystore.lucene.LuceneEntityStoreQueryService;
 import org.polymap.rhei.data.entitystore.lucene.LuceneEntityStoreService;
+import org.polymap.rhei.filter.FilterFactory;
 
 import org.polymap.kaps.model.SchlNamedCreatorCallback.Impl;
 import org.polymap.kaps.model.data.*;
@@ -96,20 +97,6 @@ public class KapsRepositoryAssembler
                 GemeindeFaktorComposite.class, BodenwertAufteilungTextComposite.class,
                 FlurstuecksdatenBaulandComposite.class, VertragsdatenErweitertComposite.class,
                 KellerComposite.class );
-        // domainModule.addTransients(
-        // PflanzeComposite.class,
-        // TierComposite.class
-        // );
-        // domainModule.addValues(
-        // AktivitaetValue.class,
-        // BiotoptypValue.class,
-        // PflanzeValue.class,
-        // PilzValue.class,
-        // TierValue.class,
-        // GefahrValue.class,
-        // StoerungValue.class,
-        // WertValue.class
-        // );
 
         // persistence: workspace/Lucene
         File root = new File( Polymap.getWorkspacePath().toFile(), "data" );
@@ -123,8 +110,6 @@ public class KapsRepositoryAssembler
 
         // indexer
         domainModule.addServices( LuceneEntityStoreQueryService.class )
-        // .visibleIn( indexingVisibility )
-        // .setMetaInfo( namedQueries )
                 .instantiateOnStartup();
 
         domainModule.addServices( HRIdentityGeneratorService.class );
@@ -132,6 +117,8 @@ public class KapsRepositoryAssembler
         // additional services
         // domainModule.addServices( BiotopnummerGeneratorService.class )
         // .identifiedBy( "biotopnummer" );
+
+        FilterFactory.instance().disableStandardFilter();
     }
 
 
