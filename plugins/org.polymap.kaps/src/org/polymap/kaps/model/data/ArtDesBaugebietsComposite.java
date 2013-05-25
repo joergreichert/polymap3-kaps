@@ -15,6 +15,7 @@ package org.polymap.kaps.model.data;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.qi4j.api.common.Optional;
 import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.entity.EntityBuilder;
 import org.qi4j.api.entity.EntityComposite;
@@ -48,6 +49,7 @@ public interface ArtDesBaugebietsComposite
 
     // Property<String> name();
 
+    @Optional
     Property<Boolean> isAgrar();
 
 

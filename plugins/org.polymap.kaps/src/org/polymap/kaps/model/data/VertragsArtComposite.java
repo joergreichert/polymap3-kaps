@@ -28,7 +28,7 @@ import org.polymap.core.qi4j.event.PropertyChangeSupport;
 
 import org.polymap.kaps.importer.ImportColumn;
 import org.polymap.kaps.importer.ImportTable;
-import org.polymap.kaps.model.Named;
+import org.polymap.kaps.model.SchlNamed;
 
 /**
  * 
@@ -41,16 +41,14 @@ import org.polymap.kaps.model.Named;
 })
 @ImportTable("K_VERART")
 public interface VertragsArtComposite
-        extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite, Named {
+        extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite, SchlNamed {
 
-    /** */
-    // @Optional
+    @Optional
     @ImportColumn("SCHL")
     Property<String> schl();
 
 
-    /** Import von: Biotoptyp */
-    // @Optional
+    @Optional
     @ImportColumn("TEXT")
     Property<String> name();
 

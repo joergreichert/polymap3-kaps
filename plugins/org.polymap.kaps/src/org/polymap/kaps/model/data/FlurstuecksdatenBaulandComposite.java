@@ -28,6 +28,8 @@ import org.qi4j.api.property.Computed;
 import org.qi4j.api.property.ComputedPropertyInstance;
 import org.qi4j.api.property.GenericPropertyInfo;
 import org.qi4j.api.property.Property;
+import org.qi4j.api.query.QueryExpressions;
+import org.qi4j.api.query.grammar.BooleanExpression;
 
 import org.polymap.core.qi4j.QiEntity;
 import org.polymap.core.qi4j.event.ModelChangeSupport;
@@ -35,6 +37,7 @@ import org.polymap.core.qi4j.event.PropertyChangeSupport;
 
 import org.polymap.kaps.importer.ImportColumn;
 import org.polymap.kaps.importer.ImportTable;
+import org.polymap.kaps.model.KapsRepository;
 
 /**
  * 
@@ -1019,6 +1022,14 @@ public interface FlurstuecksdatenBaulandComposite
             implements FlurstuecksdatenBaulandComposite {
 
         private static Log log = LogFactory.getLog( Mixin.class );
+
+
+        public static FlurstuecksdatenBaulandComposite forFlurstueck( FlurstueckComposite flurstueck ) {
+            FlurstuecksdatenBaulandComposite template = QueryExpressions
+                    .templateFor( FlurstuecksdatenBaulandComposite.class );
+            BooleanExpression expr = QueryExpressions.eq( template.flurstueck(), flurstueck );
+            return KapsRepository.instance().findEntities( FlurstuecksdatenBaulandComposite.class, expr, 0, 1 ).find();
+        }
 
 
         // @Override

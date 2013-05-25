@@ -28,6 +28,8 @@ import org.qi4j.api.property.Property;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
+import org.eclipse.jface.action.Action;
+
 import org.polymap.core.data.ui.featuretable.DefaultFeatureTableColumn;
 import org.polymap.core.data.ui.featuretable.FeatureTableViewer;
 import org.polymap.core.model.EntityType;
@@ -45,10 +47,12 @@ import org.polymap.rhei.field.PicklistFormField;
 import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
+import org.polymap.kaps.KapsPlugin;
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.ArtDesBaugebietsComposite;
 import org.polymap.kaps.model.data.FlurComposite;
 import org.polymap.kaps.model.data.FlurstueckComposite;
+import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
 import org.polymap.kaps.model.data.GebaeudeArtComposite;
 import org.polymap.kaps.model.data.GemarkungComposite;
 import org.polymap.kaps.model.data.GemeindeComposite;
@@ -85,6 +89,8 @@ public class KaufvertragFlurstueckeFormEditorPage
 
     private ActionButton searchFlurstueckeButton;
 
+    private ActionButton openErweiterteDaten;
+
 
     public KaufvertragFlurstueckeFormEditorPage( Feature feature, FeatureStore featureStore ) {
         super( KaufvertragFlurstueckeFormEditorPage.class.getName(), "Flurstücksdaten", feature, featureStore );
@@ -108,14 +114,16 @@ public class KaufvertragFlurstueckeFormEditorPage
 
     protected void refreshReloadables()
             throws Exception {
-        selectedGemarkung = selectedComposite.get() != null ? selectedComposite.get().gemarkung().get() : null;
+        boolean compositeSelected = selectedComposite.get() != null;
+        selectedGemarkung = compositeSelected ? selectedComposite.get().gemarkung().get() : null;
 
-        selectedNutzung = selectedComposite.get() != null ? selectedComposite.get().nutzung().get() : null;
+        selectedNutzung = compositeSelected ? selectedComposite.get().nutzung().get() : null;
 
         super.refreshReloadables();
         if (sfAction != null) {
             sfAction.refresh();
-            searchFlurstueckeButton.setEnabled( selectedComposite.get() != null );
+            searchFlurstueckeButton.setEnabled( compositeSelected );
+            openErweiterteDaten.setEnabled( compositeSelected );
         }
         // das muss disabled bleiben
         pageSite.setFieldEnabled( prefix + "verkaufteFlaeche", false );
@@ -481,7 +489,34 @@ public class KaufvertragFlurstueckeFormEditorPage
 
         pageSite.addFieldListener( verkaufteFlaecheRefresher = new VerkaufteFlaecheRefresher( pageSite,
                 selectedComposite, prefix ) );
-        return line6;
+        
+        openErweiterteDaten = new ActionButton(parent, new Action("Flurstück bewerten") {
+            @Override
+            public void run() {
+                FlurstueckComposite flurstueck = selectedComposite.get();
+                if (flurstueck != null) {
+                    NutzungComposite nutzung = flurstueck.nutzung().get();
+                    if (nutzung.isAgrar().get()) {
+                        // TODO
+                        throw new RuntimeException("erweiterte Daten AGRAR implementieren");
+                    } else {
+                        FlurstuecksdatenBaulandComposite bauland = FlurstuecksdatenBaulandComposite.Mixin.forFlurstueck( flurstueck );
+                        if (bauland == null) {
+                            bauland = repository.newEntity( FlurstuecksdatenBaulandComposite.class, null );
+                            bauland.flurstueck().set( flurstueck );
+                            bauland.kaufvertrag().set( flurstueck.vertrag().get() );
+                        }
+                        KapsPlugin.openEditor( fs, FlurstuecksdatenBaulandComposite.NAME, bauland );
+                    }
+                }
+            }
+        });
+        openErweiterteDaten.setLayoutData( left().right( 20 ).height( 25 ).top( line6 ).create() );
+        openErweiterteDaten.setEnabled(false);
+        
+        Control line7 = openErweiterteDaten;
+        // return the last line
+        return line7;
     }
 
 

@@ -30,37 +30,39 @@ import org.polymap.core.qi4j.event.PropertyChangeSupport;
 
 import org.polymap.kaps.importer.ImportColumn;
 import org.polymap.kaps.importer.ImportTable;
-import org.polymap.kaps.model.Named;
 
 /**
  * 
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 @Concerns({ PropertyChangeSupport.Concern.class })
-@Mixins({ GemeindeFaktorComposite.Mixin.class, PropertyChangeSupport.Mixin.class,
-        ModelChangeSupport.Mixin.class, QiEntity.Mixin.class
+@Mixins({ GemeindeFaktorComposite.Mixin.class, PropertyChangeSupport.Mixin.class, ModelChangeSupport.Mixin.class,
+        QiEntity.Mixin.class
 // JsonState.Mixin.class
 })
 @ImportTable("K_FAKTORENREG")
 public interface GemeindeFaktorComposite
-        extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite, Named {
+        extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite {
 
     // TODO in Editor für Gemeinde
 
     // GEMEINDE INTEGER,
     @Optional
     Association<GemeindeComposite> gemeinde();
-    
+
+
     // ART VARCHAR(1), ist G und L in UI aber nicht zu finden
     // GILTAB TIMESTAMP,
     @Optional
     @ImportColumn("GILTAB")
     Property<Date> gueltigAb();
-    
+
+
     // FAKTOR DOUBLE
     @Optional
     @ImportColumn("FAKTOR")
     Property<Double> faktor();
+
 
     /**
      * Methods and transient fields.
@@ -69,7 +71,6 @@ public interface GemeindeFaktorComposite
             implements GemeindeFaktorComposite {
 
         private static Log log = LogFactory.getLog( Mixin.class );
-
     }
 
 }

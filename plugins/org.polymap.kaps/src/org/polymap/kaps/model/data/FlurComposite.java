@@ -18,7 +18,6 @@ import org.apache.commons.logging.LogFactory;
 import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.mixin.Mixins;
-import org.qi4j.api.property.Property;
 
 import org.polymap.core.qi4j.QiEntity;
 import org.polymap.core.qi4j.event.ModelChangeSupport;
@@ -41,12 +40,12 @@ public interface FlurComposite
 
     // @Optional
 //    @ImportColumn("SCHL")
-    Property<String> schl();
+//    Property<String> schl();
 
 
     // @Optional
 //    @ImportColumn("TEXT1")
-    Property<String> name();
+//    Property<String> name();
 
 
     /**

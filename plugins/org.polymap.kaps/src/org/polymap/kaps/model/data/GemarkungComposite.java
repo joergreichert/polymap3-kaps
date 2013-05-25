@@ -28,7 +28,7 @@ import org.polymap.core.qi4j.event.PropertyChangeSupport;
 
 import org.polymap.kaps.importer.ImportColumn;
 import org.polymap.kaps.importer.ImportTable;
-import org.polymap.kaps.model.Named;
+import org.polymap.kaps.model.SchlNamed;
 
 /**
  * 
@@ -41,13 +41,13 @@ import org.polymap.kaps.model.Named;
 })
 @ImportTable("K_GEMFLU")
 public interface GemarkungComposite
-        extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite, Named {
+        extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite, SchlNamed {
 
-    // @Optional
+    @Optional
     @ImportColumn("SCHL")
     Property<String> schl();
 
-    // @Optional
+    @Optional
     @ImportColumn("TEXT")
     Property<String> name();
 

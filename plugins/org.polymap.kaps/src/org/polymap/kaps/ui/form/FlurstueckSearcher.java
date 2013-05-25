@@ -63,7 +63,7 @@ import org.polymap.kaps.ui.NamedCompositesFeatureContentProvider;
  */
 public abstract class FlurstueckSearcher
         extends Action
-        implements ISelectionChangedListener, IFormFieldListener {
+        implements IFormFieldListener {
 
     private static Log                                   log = LogFactory.getLog( FlurstueckSearcher.class );
 
@@ -91,10 +91,6 @@ public abstract class FlurstueckSearcher
         // setImageDescriptor( BiotopPlugin.imageDescriptorFromPlugin(
         // BiotopPlugin.PLUGIN_ID, "icons/add.gif" ) );
         setEnabled( false );
-    }
-
-
-    public void selectionChanged( SelectionChangedEvent ev ) {
     }
 
 

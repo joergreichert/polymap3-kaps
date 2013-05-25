@@ -15,6 +15,7 @@ package org.polymap.kaps.model.data;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.qi4j.api.common.Optional;
 import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.mixin.Mixins;
@@ -26,7 +27,7 @@ import org.polymap.core.qi4j.event.PropertyChangeSupport;
 
 import org.polymap.kaps.importer.ImportColumn;
 import org.polymap.kaps.importer.ImportTable;
-import org.polymap.kaps.model.Named;
+import org.polymap.kaps.model.SchlNamed;
 
 /**
  * 
@@ -39,14 +40,14 @@ import org.polymap.kaps.model.Named;
 })
 @ImportTable("K_GEBART")
 public interface GebaeudeArtComposite
-        extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite, Named {
+        extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite, SchlNamed {
 
-    // @Optional
+    @Optional
     @ImportColumn("SCHL")
     Property<String> schl();
 
 
-    // @Optional
+    @Optional
     @ImportColumn("TEXT1")
     Property<String> name();
 
