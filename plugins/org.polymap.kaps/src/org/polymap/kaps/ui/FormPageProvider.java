@@ -65,7 +65,6 @@ public class FormPageProvider
                     .getFeatureStore() );
             
             result.add( editorPage );
-            formEditor.setActivePage( editorPage.getId() );
         }
         return result;
     }
