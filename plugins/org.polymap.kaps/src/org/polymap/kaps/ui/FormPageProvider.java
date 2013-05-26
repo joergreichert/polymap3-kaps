@@ -63,7 +63,6 @@ public class FormPageProvider
                     .getFeatureStore() ) );
             FlurstuecksdatenBaulandBodenwertFormEditorPage editorPage = new FlurstuecksdatenBaulandBodenwertFormEditorPage( feature, formEditor
                     .getFeatureStore() );
-            
             result.add( editorPage );
         }
         return result;
