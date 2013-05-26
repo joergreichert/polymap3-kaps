@@ -17,6 +17,8 @@ import org.opengis.feature.Feature;
 
 import org.eclipse.swt.widgets.Composite;
 
+import org.eclipse.ui.forms.widgets.Section;
+
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
 import org.polymap.rhei.field.DateTimeFormField;
 import org.polymap.rhei.field.StringFormField;
@@ -52,7 +54,9 @@ public class Kaufvertrag2FormEditorPage
                 .setField( new TextFormField() )
                 .setLayoutData( left().right( 100 ).top( line1 ).height( 100 ).create() ).create();
 
-        Composite verkaeufer = newSection( line2, "Auskunft vom Verkäufer" );
+        Section section = newSection( line2, "Auskunft vom Verkäufer" );
+        Composite verkaeufer = (Composite)section.getClient();
+        
         final Composite verkaeuferLine1 = newFormField( "Versendet am" )
                 .setProperty( new PropertyAdapter( kaufvertrag.anschreibenVerkaeuferErstelltAm() ) )
                 .setField( new DateTimeFormField() ).setLayoutData( left().create() )
@@ -64,13 +68,15 @@ public class Kaufvertrag2FormEditorPage
                 .setField( new DateTimeFormField() ).setLayoutData( right().create() )
                 .setParent( verkaeufer ).create();
 
-        Composite verkaeuferBemerkungen = newFormField( "Bemerkungen" )
+        newFormField( "Bemerkungen" )
                 .setProperty( new PropertyAdapter( kaufvertrag.bemerkungenVerkaeufer() ) )
                 .setField( new TextFormField() )
-                .setLayoutData( left().right( 100 ).top( verkaeuferLine1 ).height( 50 ).create() )
+                .setLayoutData( left().right( 100 ).top( verkaeuferLine1 ).bottom( 100 ).height( 50 ).create() )
                 .setParent( verkaeufer ).create();
 
-        Composite kaeufer = newSection( verkaeufer, "Auskunft vom Käufer" );
+        section = newSection( section, "Auskunft vom Käufer" );
+        Composite kaeufer = (Composite)section.getClient();
+
         final Composite kaeuferLine1 = newFormField( "Versendet am" )
                 .setProperty( new PropertyAdapter( kaufvertrag.anschreibenKaeuferErstelltAm() ) )
                 .setField( new DateTimeFormField() ).setLayoutData( left().create() )
@@ -84,7 +90,7 @@ public class Kaufvertrag2FormEditorPage
         newFormField( "Bemerkungen" )
                 .setProperty( new PropertyAdapter( kaufvertrag.bemerkungenKaeufer() ) )
                 .setField( new TextFormField() )
-                .setLayoutData( left().right( 100 ).top( kaeuferLine1 ).height( 50 ).create() )
+                .setLayoutData( left().right( 100 ).top( kaeuferLine1 ).height( 50 ).bottom( 100 ).create() )
                 .setParent( kaeufer ).create();
     }
 

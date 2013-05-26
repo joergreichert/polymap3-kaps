@@ -24,6 +24,7 @@ import org.polymap.rhei.form.IFormPageProvider;
 import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
 import org.polymap.kaps.model.data.RichtwertzoneComposite;
 import org.polymap.kaps.model.data.VertragComposite;
+import org.polymap.kaps.ui.form.FlurstuecksdatenBaulandBodenwertFormEditorPage;
 import org.polymap.kaps.ui.form.FlurstuecksdatenBaulandGrunddatenFormEditorPage;
 import org.polymap.kaps.ui.form.Kaufvertrag1FormEditorPage;
 import org.polymap.kaps.ui.form.Kaufvertrag2FormEditorPage;
@@ -60,6 +61,11 @@ public class FormPageProvider
         else if (name.equalsIgnoreCase( FlurstuecksdatenBaulandComposite.NAME )) {
             result.add( new FlurstuecksdatenBaulandGrunddatenFormEditorPage( feature, formEditor
                     .getFeatureStore() ) );
+            FlurstuecksdatenBaulandBodenwertFormEditorPage editorPage = new FlurstuecksdatenBaulandBodenwertFormEditorPage( feature, formEditor
+                    .getFeatureStore() );
+            
+            result.add( editorPage );
+            formEditor.setActivePage( editorPage.getId() );
         }
         return result;
     }

@@ -75,7 +75,7 @@ public class FilterProvider
                 }
                 else if (type.isAssignableFrom( FlurstuecksdatenBaulandComposite.class )) {
                     result.add( new EinzelneVertragsdatenBaulandFilter( layer ) );
-                    result.add( new DefaultEntityFilter( layer, type, repo ) );
+//                    result.add( new DefaultEntityFilter( layer, type, repo ) );
                 }
                 else {
                     // standard to all other entitytypes

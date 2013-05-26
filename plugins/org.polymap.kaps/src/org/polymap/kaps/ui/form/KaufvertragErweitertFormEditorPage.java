@@ -17,6 +17,8 @@ import org.opengis.feature.Feature;
 
 import org.eclipse.swt.widgets.Composite;
 
+import org.eclipse.ui.forms.widgets.Section;
+
 import org.polymap.core.runtime.Polymap;
 
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
@@ -53,37 +55,38 @@ public class KaufvertragErweitertFormEditorPage
         Composite newLine, lastLine = null;
         Composite parent = pageSite.getPageBody();
         
-        parent = newSection( parent, "Vollpreisberechnung" );
+        Section section = newSection( parent, "Vollpreisberechnung" );
+        Composite client = (Composite)section.getClient();
         newLine = newFormField( "Vollpreis" ).setEnabled( false )
                 .setProperty( new PropertyAdapter( erweiterteVertragsdaten.vollpreis() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
-                .setLayoutData( left().top( lastLine ).create() ).setParent( parent )
+                .setLayoutData( left().top( lastLine ).create() ).setParent( client )
                 .create();
 
         lastLine = newLine;
         newLine = newFormField( "Zuschlag" ).setProperty( new PropertyAdapter( erweiterteVertragsdaten.zuschlag() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
-                .setLayoutData( left().top( lastLine ).create() ).setParent( parent )
+                .setLayoutData( left().top( lastLine ).create() ).setParent( client )
                 .create();
 
         newFormField( "Bemerkung Zuschlag" )
                 .setProperty( new PropertyAdapter( erweiterteVertragsdaten.zuschlagBemerkung() ) )
                 .setField( new StringFormField() ).setLayoutData( right().top( lastLine ).create() )
-                .setParent( parent ).create();
+                .setParent( client ).create();
 
         lastLine = newLine;
         newLine = newFormField( "Abschlag" ).setProperty( new PropertyAdapter( erweiterteVertragsdaten.abschlag() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
-                .setLayoutData( left().top( lastLine ).create() ).setParent( parent )
+                .setLayoutData( left().top( lastLine ).create() ).setParent( client )
                 .create();
 
         newFormField( "Bemerkung Abschlag" )
                 .setProperty( new PropertyAdapter( erweiterteVertragsdaten.abschlagBemerkung() ) )
                 .setField( new StringFormField() ).setLayoutData( right().top( lastLine ).create() )
-                .setParent( parent ).create();
+                .setParent( client ).create();
 
         lastLine = newLine;
         // TODO Refresher
@@ -91,7 +94,7 @@ public class KaufvertragErweitertFormEditorPage
                 .setProperty( new PropertyAdapter( erweiterteVertragsdaten.bereinigterVollpreis() ) ).setEnabled( false )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
-                .setLayoutData( left().top( lastLine ).create() ).setParent( parent )
+                .setLayoutData( left().top( lastLine ).bottom( 100 ).create() ).setParent( client )
                 .create();
         
         

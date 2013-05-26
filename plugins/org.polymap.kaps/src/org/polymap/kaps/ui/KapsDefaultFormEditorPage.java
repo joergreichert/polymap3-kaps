@@ -85,13 +85,13 @@ public abstract class KapsDefaultFormEditorPage
     }
 
 
-    protected Composite newSection( final Composite top, final String title ) {
+    protected Section newSection( final Composite top, final String title ) {
         Composite parent = pageSite.getPageBody();
         IFormEditorToolkit tk = pageSite.getToolkit();
-        Section section = tk.createSection( parent, Section.TITLE_BAR );
+        Section section = tk.createSection( parent, Section.TITLE_BAR | Section.FOCUS_TITLE | Section.TWISTIE | Section.CLIENT_INDENT );
         section.setText( title );
         section.setExpanded( true );
-        section.setLayoutData( new SimpleFormData().left( 0 ).right( 100 ).top( top, SPACING )
+        section.setLayoutData( new SimpleFormData().left( 0 ).right( 100 ).top( top, 20 )
                 .create() );
         Composite client = tk.createComposite( section );
         client.setLayout( new FormLayout() );

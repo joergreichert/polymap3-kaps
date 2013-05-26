@@ -55,7 +55,7 @@ public class KaufvertragFormVollpreisRefresher
 
     @Override
     public void fieldChange( FormFieldEvent ev ) {
-        if (ev.getNewValue() == null) {
+        if (ev.getNewValue() == null || ev.getEventCode() != IFormFieldListener.VALUE_CHANGE) {
             return;
         }
         String fieldName = ev.getFieldName();
