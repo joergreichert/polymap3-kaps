@@ -28,6 +28,8 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import org.polymap.core.project.ui.util.SimpleFormData;
 import org.polymap.core.runtime.Polymap;
+import org.polymap.core.runtime.event.EventFilter;
+import org.polymap.core.runtime.event.EventManager;
 
 import org.polymap.rhei.data.entityfeature.AssociationAdapter;
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
@@ -113,7 +115,11 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
 
     private FieldMultiplication               line6multiplicator2;
 
-    private IFormFieldListener bodenpreis;
+    private IFormFieldListener                bodenpreis;
+
+    protected Double                          bodenpreisBebaut;
+
+    private IFormFieldListener                bodenpreisListener;
 
 
     // private IFormFieldListener gemeindeListener;
@@ -121,6 +127,20 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
     public FlurstuecksdatenBaulandBodenwertFormEditorPage( Feature feature, FeatureStore featureStore ) {
         super( FlurstuecksdatenBaulandBodenwertFormEditorPage.class.getName(), "Boden- und Gebäudewert", feature,
                 featureStore );
+
+        EventManager.instance().subscribe( bodenpreisListener = new IFormFieldListener() {
+
+            @Override
+            public void fieldChange( FormFieldEvent ev ) {
+                bodenpreisBebaut = (Double)ev.getNewValue();
+            }
+        }, new EventFilter<FormFieldEvent>() {
+
+            public boolean apply( FormFieldEvent ev ) {
+                return ev.getEventCode() == IFormFieldListener.VALUE_CHANGE
+                        && ev.getFieldName().equals( vb.bodenpreisBebaut().qualifiedName().name() );
+            }
+        } );
     }
 
 
@@ -173,18 +193,14 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
         lastLine = newLine;
         newLine = createLabel( client, "anrechenbare Baulandfläche", one().top( lastLine ), SWT.RIGHT );
         createFlaecheField( vb.flaeche1(), two().top( lastLine ), client, true );
-        createPreisField( vb.bodenpreisQm1(), three().top( lastLine ), client, false );
-        // refresher and setter
-        if (vb.bodenpreisQm1().get() != vb.bodenpreisBebaut().get()) {
-            site.setFieldValue( vb.bodenpreisQm1().qualifiedName().name(), vb.bodenpreisBebaut().get() == null ? ""
-                    : getFormatter( 2 ).format( vb.bodenpreisBebaut().get() ) );
-        }
+        createPreisField( vb.bodenpreisQm1(), three().top( lastLine ), client, false );        
         // wenn die seite bereits an ist dann per refresher
         site.addFieldListener( bodenpreis = new IFormFieldListener() {
-            
+
             @Override
             public void fieldChange( FormFieldEvent ev ) {
-                if (ev.getEventCode() == IFormFieldListener.VALUE_CHANGE && ev.getFieldName().equals( vb.bodenpreisBebaut().qualifiedName().name() )) {
+                if (ev.getEventCode() == IFormFieldListener.VALUE_CHANGE
+                        && ev.getFieldName().equals( vb.bodenpreisBebaut().qualifiedName().name() )) {
                     Double preis = (Double)ev.getNewValue();
                     site.setFieldValue( vb.bodenpreisQm1().qualifiedName().name(), preis == null ? ""
                             : getFormatter( 2 ).format( preis ) );
@@ -373,6 +389,15 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
         newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Faktor für Marktanpassung geeignet?" )
                 .setProperty( new PropertyAdapter( vb.faktorFuerMarktanpassungGeeignet() ) )
                 .setLayoutData( two().top( lastLine ).bottom( 100 ).create() ).setParent( client ).create();
+
+        // bodenpreis vom 1. tab könnte sich geändert haben, also neu berechnen
+        if (bodenpreisBebaut == null) {
+            bodenpreisBebaut = vb.bodenpreisBebaut().get();
+        }
+        if (bodenpreisBebaut != null && bodenpreisBebaut != vb.bodenpreisQm1().get()) {
+            vb.bodenpreisQm1().set( bodenpreisBebaut );
+            site.setFieldValue( vb.bodenpreisQm1().qualifiedName().name(), getFormatter( 2 ).format( bodenpreisBebaut ) );
+        }
     }
 
 
