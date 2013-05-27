@@ -10,12 +10,12 @@
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
  * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
  */
-package org.polymap.kaps.ui.form;
+package org.polymap.kaps.ui;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import java.text.NumberFormat;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import org.qi4j.api.property.Property;
 
@@ -26,33 +26,34 @@ import org.polymap.rhei.form.IFormEditorPageSite;
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
-public class FieldMultiplication
+public class FieldSummation
         implements IFormFieldListener {
 
-    private static Log                log = LogFactory.getLog( FieldMultiplication.class );
+    private final IFormEditorPageSite           site;
 
-    private final IFormEditorPageSite site;
+    private final Property<Double>              result;
 
-    private final Property<Double>    factor1;
+    private Double                              factor1Value;
 
-    private final Property<Double>    factor2;
+    private Double                              factor2Value;
 
-    private final Property<Double>    result;
+    private final int                           fractionDigits;
 
-    private Double                    factor1Value;
+    private final Map<String, Property<Double>> terms;
 
-    private Double                    factor2Value;
-
-    private final int                 fractionDigits;
+    private final Map<String, Double>           values;
 
 
-    public FieldMultiplication( IFormEditorPageSite site, int fractionDigits, final Property<Double> factor1,
-            final Property<Double> factor2, Property<Double> result ) {
+    public FieldSummation( IFormEditorPageSite site, int fractionDigits, Property<Double> result,
+            Property<Double>... summand ) {
         this.site = site;
         this.fractionDigits = fractionDigits;
-        this.factor1 = factor1;
-        this.factor2 = factor2;
         this.result = result;
+        terms = new HashMap<String, Property<Double>>();
+        for (Property<Double> term : summand) {
+            terms.put( term.qualifiedName().name(), term );
+        }
+        values = new HashMap<String, Double>();
     }
 
 
@@ -62,22 +63,27 @@ public class FieldMultiplication
             return;
         }
         String fieldName = ev.getFieldName();
-        if (fieldName.equals( factor1.qualifiedName().name() )) {
-            factor1Value = ev.getNewValue();
-            refreshResult();
-        }
-        else if (fieldName.equals( factor2.qualifiedName().name() )) {
-            factor2Value = ev.getNewValue();
+        if (terms.keySet().contains( fieldName )) {
+            values.put( fieldName, (Double)ev.getNewValue() );
             refreshResult();
         }
     }
 
 
     private void refreshResult() {
-        Double f1 = factor1Value == null ? factor1.get() : factor1Value;
-        Double f2 = factor2Value == null ? factor2.get() : factor2Value;
+        Double resultValue = 0.0;
 
-        Double resultValue = (f1 == null ? 0 : f1) * (f2 == null ? 0 : f2);
+        for (String term : terms.keySet()) {
+            // value changed, then look here
+            Double termValue = values.get( term );
+            if (termValue == null) {
+                // value unchanged then look in the base entity
+                termValue = terms.get( term ).get();
+            }
+            if (termValue != null) {
+                resultValue += termValue;
+            }
+        }
         site.setFieldValue( result.qualifiedName().name(), getFormatter().format( resultValue ) );
     }
 

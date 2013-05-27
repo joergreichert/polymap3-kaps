@@ -31,6 +31,7 @@ import org.polymap.core.runtime.Polymap;
 
 import org.polymap.rhei.data.entityfeature.AssociationAdapter;
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
+import org.polymap.rhei.field.FormFieldEvent;
 import org.polymap.rhei.field.IFormFieldLabel;
 import org.polymap.rhei.field.IFormFieldListener;
 import org.polymap.rhei.field.NumberValidator;
@@ -40,6 +41,9 @@ import org.polymap.rhei.form.IFormEditorPageSite;
 import org.polymap.kaps.model.data.BodenwertAufteilungTextComposite;
 import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.VertragsdatenErweitertComposite;
+import org.polymap.kaps.ui.FieldCalculation;
+import org.polymap.kaps.ui.FieldMultiplication;
+import org.polymap.kaps.ui.FieldSummation;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -97,17 +101,19 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
 
     private FaktorOhneStrassenplatzCalculator faktorStrassenplatz;
 
-    private FieldMultiplication line1multiplicator2;
+    private FieldMultiplication               line1multiplicator2;
 
-    private FieldMultiplication line2multiplicator2;
+    private FieldMultiplication               line2multiplicator2;
 
-    private FieldMultiplication line3multiplicator2;
+    private FieldMultiplication               line3multiplicator2;
 
-    private FieldMultiplication line4multiplicator2;
+    private FieldMultiplication               line4multiplicator2;
 
-    private FieldMultiplication line5multiplicator2;
+    private FieldMultiplication               line5multiplicator2;
 
-    private FieldMultiplication line6multiplicator2;
+    private FieldMultiplication               line6multiplicator2;
+
+    private IFormFieldListener bodenpreis;
 
 
     // private IFormFieldListener gemeindeListener;
@@ -167,12 +173,30 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
         lastLine = newLine;
         newLine = createLabel( client, "anrechenbare Baulandfläche", one().top( lastLine ), SWT.RIGHT );
         createFlaecheField( vb.flaeche1(), two().top( lastLine ), client, true );
-        createPreisField( vb.bodenpreisBebaut(), three().top( lastLine ), client, false );
+        createPreisField( vb.bodenpreisQm1(), three().top( lastLine ), client, false );
+        // refresher and setter
+        if (vb.bodenpreisQm1().get() != vb.bodenpreisBebaut().get()) {
+            site.setFieldValue( vb.bodenpreisQm1().qualifiedName().name(), vb.bodenpreisBebaut().get() == null ? ""
+                    : getFormatter( 2 ).format( vb.bodenpreisBebaut().get() ) );
+        }
+        // wenn die seite bereits an ist dann per refresher
+        site.addFieldListener( bodenpreis = new IFormFieldListener() {
+            
+            @Override
+            public void fieldChange( FormFieldEvent ev ) {
+                if (ev.getEventCode() == IFormFieldListener.VALUE_CHANGE && ev.getFieldName().equals( vb.bodenpreisBebaut().qualifiedName().name() )) {
+                    Double preis = (Double)ev.getNewValue();
+                    site.setFieldValue( vb.bodenpreisQm1().qualifiedName().name(), preis == null ? ""
+                            : getFormatter( 2 ).format( preis ) );
+                }
+            }
+        } );
+
         createPreisField( vb.bodenwert1(), four().top( lastLine ), client, false );
         createPreisField( vb.bodenwertBereinigt1(), five().top( lastLine ), client, false );
-        site.addFieldListener( line1multiplicator = new FieldMultiplication( site, 2, vb.flaeche1(), vb
-                .bodenpreisBebaut(), vb.bodenwert1() ) );
-        site.addFieldListener( line1multiplicator2 = new FieldMultiplication( site, 2, vb.bodenpreisBebaut(), vb
+        site.addFieldListener( line1multiplicator = new FieldMultiplication( site, 2, vb.flaeche1(),
+                vb.bodenpreisQm1(), vb.bodenwert1() ) );
+        site.addFieldListener( line1multiplicator2 = new FieldMultiplication( site, 2, vb.bodenpreisQm1(), vb
                 .faktorBereinigterKaufpreis(), vb.bodenwertBereinigt1() ) );
 
         lastLine = newLine;
@@ -271,7 +295,7 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
 
         lastLine = newLine;
         newLine = createLabel( client, "Bewertungsmethode", one().top( lastLine, 12 ), SWT.RIGHT );
-                newFormField( IFormFieldLabel.NO_LABEL ).setEnabled( false )
+        newFormField( IFormFieldLabel.NO_LABEL ).setEnabled( false )
                 .setProperty( new PropertyAdapter( vb.bewertungsMethode() ) )
                 .setLayoutData( two().top( lastLine ).create() ).setParent( client ).create();
 
@@ -295,17 +319,17 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
 
         lastLine = newLine;
         newLine = createLabel( client, "Faktor", one().top( lastLine, 12 ), SWT.RIGHT );
-        newFormField(IFormFieldLabel.NO_LABEL ).setToolTipText( "Faktor bereinigter Kaufpreis/Sachwert" )
+        newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Faktor bereinigter Kaufpreis/Sachwert" )
                 .setProperty( new PropertyAdapter( vb.faktorBereinigterKaufpreis() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 4, 1, 4 ) )
                 .setLayoutData( two().top( lastLine ).create() ).setParent( client ).setEnabled( false ).create();
 
-        site.addFieldListener( bereinCalculator = new FieldCalculator( site, 4, vb.faktorBereinigterKaufpreis(), vb
+        site.addFieldListener( bereinCalculator = new FieldCalculation( site, 4, vb.faktorBereinigterKaufpreis(), vb
                 .bodenwertGesamt() ) {
 
             @Override
-            Double calculate( org.polymap.kaps.ui.form.FieldCalculator.ValueProvider values ) {
+            protected Double calculate( org.polymap.kaps.ui.FieldCalculation.ValueProvider values ) {
                 VertragComposite vertrag = vb.kaufvertrag().get();
                 Double kaufpreis = vertrag.vollpreis().get();
                 VertragsdatenErweitertComposite vertragsdatenErweitertComposite = vb.kaufvertrag().get()
@@ -326,7 +350,8 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
 
         // kaufpreis / (bodenwert - Wert aller strflaechen)
         createLabel( client, "ohne Straßenplatz", three().top( lastLine, 12 ), SWT.RIGHT );
-        newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Faktor bereinigter Kaufpreis/Sachwert ohne Straßenplatz" )
+        newFormField( IFormFieldLabel.NO_LABEL )
+                .setToolTipText( "Faktor bereinigter Kaufpreis/Sachwert ohne Straßenplatz" )
                 .setProperty( new PropertyAdapter( vb.faktorOhneStrassenplatz() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 4, 1, 4 ) )

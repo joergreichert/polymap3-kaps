@@ -160,10 +160,9 @@ public interface FlurstuecksdatenBaulandComposite
 
 
     // DMQM1 DOUBLE,
-//    @Optional
-//    @ImportColumn("DMQM1")
-//    Property<Double> bodenpreisQm1();
-    // deprecated entspricht bodenpreisBebaut()  
+    @Optional
+    @ImportColumn("DMQM1")
+    Property<Double> bodenpreisQm1();
 
 
 

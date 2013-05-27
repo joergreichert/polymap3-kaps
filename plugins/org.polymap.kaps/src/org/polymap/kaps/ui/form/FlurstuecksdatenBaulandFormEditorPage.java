@@ -12,6 +12,8 @@
  */
 package org.polymap.kaps.ui.form;
 
+import java.text.NumberFormat;
+
 import org.geotools.data.FeatureStore;
 import org.opengis.feature.Feature;
 
@@ -52,4 +54,11 @@ public abstract class FlurstuecksdatenBaulandFormEditorPage
 
     }
 
+    protected NumberFormat getFormatter(int fractionDigits) {
+        NumberFormat nf = NumberFormat.getInstance();
+        nf.setMaximumFractionDigits( fractionDigits );
+        nf.setMinimumFractionDigits( fractionDigits );
+        nf.setMinimumIntegerDigits( 1 );
+        return nf;
+    }
 }

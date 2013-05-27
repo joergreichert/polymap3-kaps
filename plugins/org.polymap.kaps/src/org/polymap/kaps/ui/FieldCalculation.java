@@ -10,7 +10,7 @@
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
  * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
  */
-package org.polymap.kaps.ui.form;
+package org.polymap.kaps.ui;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +26,7 @@ import org.polymap.rhei.form.IFormEditorPageSite;
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
-public abstract class FieldCalculator
+public abstract class FieldCalculation
         implements IFormFieldListener {
 
     /**
@@ -58,7 +58,7 @@ public abstract class FieldCalculator
     private final ValueProvider         values;
 
 
-    public FieldCalculator( IFormEditorPageSite site, int fractionDigits, Property<Double> result, Property<Double>... operators ) {
+    public FieldCalculation( IFormEditorPageSite site, int fractionDigits, Property<Double> result, Property<Double>... operators ) {
         this.site = site;
         this.fractionDigits = fractionDigits;
         this.result = result;
@@ -86,7 +86,7 @@ public abstract class FieldCalculator
     }
 
 
-    abstract Double calculate( ValueProvider values );
+    protected abstract Double calculate( ValueProvider values );
 
 
     private void refreshResult() {
