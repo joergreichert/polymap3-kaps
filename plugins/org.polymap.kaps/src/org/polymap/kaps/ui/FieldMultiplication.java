@@ -58,16 +58,24 @@ public class FieldMultiplication
 
     @Override
     public void fieldChange( FormFieldEvent ev ) {
-        if (ev.getNewValue() == null || ev.getEventCode() != IFormFieldListener.VALUE_CHANGE) {
+        if (ev.getEventCode() != IFormFieldListener.VALUE_CHANGE) {
             return;
         }
         String fieldName = ev.getFieldName();
         if (fieldName.equals( factor1.qualifiedName().name() )) {
-            factor1Value = ev.getNewValue();
+            Double newValue = (Double)ev.getNewValue(); //explizitely deleting this value
+            if (newValue == null) {
+                newValue = Double.valueOf( 0.0d );
+            }
+            factor1Value = newValue;
             refreshResult();
         }
         else if (fieldName.equals( factor2.qualifiedName().name() )) {
-            factor2Value = ev.getNewValue();
+            Double newValue = (Double)ev.getNewValue(); //explizitely deleting this value
+            if (newValue == null) {
+                newValue = Double.valueOf( 0.0d );
+            }
+            factor2Value = newValue;
             refreshResult();
         }
     }

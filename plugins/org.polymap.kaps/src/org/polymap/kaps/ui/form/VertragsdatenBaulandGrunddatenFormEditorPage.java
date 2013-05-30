@@ -179,7 +179,7 @@
 //                .setProperty(
 //                        new AssociationAdapter<RichtwertzoneComposite>( "richtwertZone", vb
 //                                .richtwertZone() ) )
-//                .setField( new PicklistFormField( zonen.descendingMap() ) )
+//                .setField( new BooleanFormField( zonen.descendingMap() ) )
 //                .setLayoutData( left().top( lastLine ).create() ).setParent( parent ).create();
 //        newFormField( "Gültig ab" ).set TODO hier Gültigkeit als Association mit Reload Enabled( true )
 //                .setProperty( new PropertyAdapter( vb.richtwertzoneJahr() ) )

@@ -54,12 +54,16 @@ public class FieldListener
 
     @Override
     public void fieldChange( FormFieldEvent ev ) {
-        if (ev.getNewValue() == null || ev.getEventCode() != IFormFieldListener.VALUE_CHANGE) {
+        if (ev.getEventCode() != IFormFieldListener.VALUE_CHANGE) {
             return;
         }
         String fieldName = ev.getFieldName();
         if (terms.keySet().contains( fieldName )) {
-            put( terms.get( fieldName ), ev.getNewValue() );
+            Double newValue = (Double)ev.getNewValue(); //explizitely deleting this value
+            if (newValue == null) {
+                newValue = Double.valueOf( 0.0d );
+            }
+            put( terms.get( fieldName ), newValue );
         }
     }
 }

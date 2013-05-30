@@ -27,6 +27,7 @@ import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.ui.form.FlurstuecksdatenBaulandBodenwertFormEditorPage;
 import org.polymap.kaps.ui.form.FlurstuecksdatenBaulandGrunddatenFormEditorPage;
 import org.polymap.kaps.ui.form.FlurstuecksdatenBaulandRichtwertFormEditorPage;
+import org.polymap.kaps.ui.form.FlurstuecksdatenBaulandSonstigesFormEditorPage;
 import org.polymap.kaps.ui.form.Kaufvertrag1FormEditorPage;
 import org.polymap.kaps.ui.form.Kaufvertrag2FormEditorPage;
 import org.polymap.kaps.ui.form.KaufvertragErweitertFormEditorPage;
@@ -66,6 +67,8 @@ public class FormPageProvider
                     .getFeatureStore() );
             result.add( editorPage );
             result.add( new FlurstuecksdatenBaulandRichtwertFormEditorPage( feature, formEditor
+                    .getFeatureStore() ) );
+            result.add( new FlurstuecksdatenBaulandSonstigesFormEditorPage( feature, formEditor
                     .getFeatureStore() ) );
         }
         return result;

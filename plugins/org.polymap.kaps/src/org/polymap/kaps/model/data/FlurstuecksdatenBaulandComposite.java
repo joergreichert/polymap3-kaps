@@ -527,7 +527,8 @@ public interface FlurstuecksdatenBaulandComposite
 
     // ERBBAU VARCHAR(1),
     @Optional
-    Property<Boolean> erbbauRecht();
+    @ImportColumn("ERBBAU")
+    Property<String> erbbaurecht();
 
 
     // TODO WERT1 DOUBLE,
@@ -680,7 +681,8 @@ public interface FlurstuecksdatenBaulandComposite
 
     // Denkmalschutz VARCHAR(1),
     @Optional
-    Property<Boolean> denkmalschutz();
+    @ImportColumn("Denkmalschutz")
+    Property<String> denkmalschutz();
 
 
     // BEREINBEM VARCHAR(40),
@@ -808,13 +810,15 @@ public interface FlurstuecksdatenBaulandComposite
 
     // SAN VARCHAR(1),
     @Optional
-    Property<Boolean> sanierung();
+    @ImportColumn("SAN")
+    Property<String> sanierung();
 
 
     // SANANFEND VARCHAR(1),
     @Optional
-    // A oder E
-    Property<Boolean> sanierungAnfangswert();
+    @ImportColumn("SANANFEND")
+    // A oder E oder null
+    Property<String> sanierungswert();
 
 
     // TODO VKWABFAKT_GB DOUBLE,
