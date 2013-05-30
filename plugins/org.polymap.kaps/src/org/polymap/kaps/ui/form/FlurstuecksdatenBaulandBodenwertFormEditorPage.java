@@ -18,8 +18,6 @@ import org.opengis.feature.Feature;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.qi4j.api.property.Property;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -291,12 +289,16 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
                 .faktorBereinigterKaufpreis(), vb.bodenwertBereinigt6() ) );
 
         lastLine = newLine;
-        newLine = newFormField( "Fläche Flurstück" ).setEnabled( false )
+        newLine = createFlaecheField( vb.verkaufteFlaecheGesamt(), two().top( lastLine ), client, false );
+
+        lastLine = newLine;
+        newLine = createLabel( client, "Fläche Flurstück", one().top( lastLine ), SWT.RIGHT );
+        newFormField( IFormFieldLabel.NO_LABEL ).setEnabled( false )
                 .setProperty( new PropertyAdapter( vb.flurstueck().get().verkaufteFlaeche() ) )
                 .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
-                .setField( new StringFormField() ).setLayoutData( one().top( lastLine ).bottom( 100 ).create() )
+                .setField( new StringFormField() ).setLayoutData( two().top( lastLine ).bottom( 100 ).create() )
                 .setParent( client ).create();
-        createFlaecheField( vb.verkaufteFlaecheGesamt(), two().top( lastLine ), client, false );
+        
         // createPreisField( vb.bodenwertGesamt(), four().top( lastLine ), client,
         // false );
 
@@ -398,36 +400,5 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
             vb.bodenpreisQm1().set( bodenpreisBebaut );
             site.setFieldValue( vb.bodenpreisQm1().qualifiedName().name(), getFormatter( 2 ).format( bodenpreisBebaut ) );
         }
-    }
-
-
-    private Composite createPreisField( Property<Double> property, SimpleFormData data, Composite parent,
-            boolean editable ) {
-        return createNumberField( property, data, parent, editable, 2 );
-    }
-
-
-    private Composite createFlaecheField( Property<Double> property, SimpleFormData data, Composite parent,
-            boolean editable ) {
-        return createNumberField( property, data, parent, editable, 0 );
-    }
-
-
-    private Composite createNumberField( Property<Double> property, SimpleFormData data, Composite parent,
-            boolean editable, int fractionDigits ) {
-        return newFormField( IFormFieldLabel.NO_LABEL )
-                .setProperty( new PropertyAdapter( property ) )
-                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator(
-                        new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, fractionDigits, 1,
-                                fractionDigits ) ).setLayoutData( data.create() ).setParent( parent )
-                .setEnabled( editable ).create();
-    }
-
-
-    private Control createLabel( Composite parent, String text, SimpleFormData data, int style ) {
-        Control label = pageSite.getToolkit().createLabel( parent, text, style );
-        label.setLayoutData( data.create() );
-        return label;
     }
 }

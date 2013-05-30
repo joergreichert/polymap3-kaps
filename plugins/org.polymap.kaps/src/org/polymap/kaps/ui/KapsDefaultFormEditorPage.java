@@ -22,12 +22,15 @@ import org.eclipse.swt.widgets.Composite;
 
 import org.eclipse.ui.forms.widgets.Section;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+
 import org.polymap.core.project.ui.util.SimpleFormData;
 
 import org.polymap.rhei.field.PicklistFormField;
 import org.polymap.rhei.field.SelectlistFormField;
 import org.polymap.rhei.form.DefaultFormEditorPage;
 import org.polymap.rhei.form.IFormEditorPage;
+import org.polymap.rhei.form.IFormEditorPage2;
 import org.polymap.rhei.form.IFormEditorPageSite;
 import org.polymap.rhei.form.IFormEditorToolkit;
 
@@ -39,7 +42,7 @@ import org.polymap.kaps.model.Named;
  */
 public abstract class KapsDefaultFormEditorPage
         extends DefaultFormEditorPage
-        implements IFormEditorPage {
+        implements IFormEditorPage, IFormEditorPage2 {
 
     protected static final int SPACING = 6;
 
@@ -54,8 +57,7 @@ public abstract class KapsDefaultFormEditorPage
     protected Locale           locale  = Locale.GERMAN;
 
 
-    public KapsDefaultFormEditorPage( String id, String title, Feature feature,
-            FeatureStore featureStore ) {
+    public KapsDefaultFormEditorPage( String id, String title, Feature feature, FeatureStore featureStore ) {
         super( id, title, feature, featureStore );
 
         repository = KapsRepository.instance();
@@ -80,23 +82,21 @@ public abstract class KapsDefaultFormEditorPage
 
 
     protected String formattedTitle( String type, Object name, String pageTitle ) {
-        return type + ": " + (name != null ? name.toString() : "-")
-                + (pageTitle != null ? " - " + pageTitle + "" : "");
+        return type + ": " + (name != null ? name.toString() : "-") + (pageTitle != null ? " - " + pageTitle + "" : "");
     }
 
 
     protected Section newSection( final Composite top, final String title ) {
         Composite parent = pageSite.getPageBody();
         IFormEditorToolkit tk = pageSite.getToolkit();
-        Section section = tk.createSection( parent, Section.TITLE_BAR | Section.FOCUS_TITLE | Section.TWISTIE | Section.CLIENT_INDENT );
+        Section section = tk.createSection( parent, Section.TITLE_BAR | Section.FOCUS_TITLE | Section.TWISTIE
+                | Section.CLIENT_INDENT );
         section.setText( title );
         section.setExpanded( true );
-        section.setLayoutData( new SimpleFormData().left( 0 ).right( 100 ).top( top, 20 )
-                .create() );
+        section.setLayoutData( new SimpleFormData().left( 0 ).right( 100 ).top( top, 20 ).create() );
         Composite client = tk.createComposite( section );
         client.setLayout( new FormLayout() );
-        client.setLayoutData( new SimpleFormData( SPACING ).left( 0 ).right( 100 ).top( 0, 0 )
-                .create() );
+        client.setLayoutData( new SimpleFormData( SPACING ).left( 0 ).right( 100 ).top( 0, 0 ).create() );
 
         section.setClient( client );
         return section;
@@ -118,8 +118,7 @@ public abstract class KapsDefaultFormEditorPage
     }
 
 
-    protected <T extends Named> SelectlistFormField namedAssocationsSelectlist( Class<T> type,
-            boolean multiple ) {
+    protected <T extends Named> SelectlistFormField namedAssocationsSelectlist( Class<T> type, boolean multiple ) {
         SelectlistFormField list = new SelectlistFormField( repository.entitiesWithNames( type ) );
         list.setIsMultiple( multiple );
 
@@ -133,4 +132,34 @@ public abstract class KapsDefaultFormEditorPage
 
         return picklist;
     }
+
+
+    @Override
+    public void doLoad( IProgressMonitor monitor )
+            throws Exception {
+    }
+
+
+    @Override
+    public void dispose() {
+    }
+
+
+    @Override
+    public void doSubmit( IProgressMonitor monitor )
+            throws Exception {
+    }
+
+
+    @Override
+    public boolean isDirty() {
+        return false;
+    }
+
+
+    @Override
+    public boolean isValid() {
+        return true;
+    }
+
 }

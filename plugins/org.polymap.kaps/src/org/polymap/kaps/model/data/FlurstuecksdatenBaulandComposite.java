@@ -373,7 +373,9 @@ public interface FlurstuecksdatenBaulandComposite
     @ImportColumn("VKWABFAKT")
     Property<Double> verkehrswertFaktor();
 
-
+    @Optional
+    Property<Double> zwischensummeVerkehrswertfaktor();
+    
     // ZWSUEK DOUBLE,
     @Optional
     @ImportColumn("ZWSUEK")
@@ -1003,7 +1005,10 @@ public interface FlurstuecksdatenBaulandComposite
     // @Computed
     Association<RichtwertzoneComposite> richtwertZone();
 
-
+    
+    // schalter hab ich vorher nicht gefunden
+    @Optional
+    Property<Boolean> zurRichtwertermittlungGeeignet();
     // );
     //
     // CREATE INDEX K_BEVERW_RIWE ON K_BEVERW (GEMEINDE ASC, RIZONE ASC, RIJAHR ASC);
@@ -1205,5 +1210,4 @@ public interface FlurstuecksdatenBaulandComposite
         // };
         // }
     }
-
 }

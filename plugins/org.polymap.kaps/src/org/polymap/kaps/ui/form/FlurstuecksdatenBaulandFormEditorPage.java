@@ -17,6 +17,18 @@ import java.text.NumberFormat;
 import org.geotools.data.FeatureStore;
 import org.opengis.feature.Feature;
 
+import org.qi4j.api.property.Property;
+
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+
+import org.polymap.core.project.ui.util.SimpleFormData;
+import org.polymap.core.runtime.Polymap;
+
+import org.polymap.rhei.data.entityfeature.PropertyAdapter;
+import org.polymap.rhei.field.IFormFieldLabel;
+import org.polymap.rhei.field.NumberValidator;
+import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.form.IFormEditorPage;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
@@ -33,12 +45,11 @@ public abstract class FlurstuecksdatenBaulandFormEditorPage
 
     protected FlurstuecksdatenBaulandComposite vb;
 
-    public FlurstuecksdatenBaulandFormEditorPage( String id, String title, Feature feature,
-            FeatureStore featureStore ) {
+
+    public FlurstuecksdatenBaulandFormEditorPage( String id, String title, Feature feature, FeatureStore featureStore ) {
         super( id, title, feature, featureStore );
 
-        vb = repository.findEntity( FlurstuecksdatenBaulandComposite.class, feature
-                .getIdentifier().getID() );
+        vb = repository.findEntity( FlurstuecksdatenBaulandComposite.class, feature.getIdentifier().getID() );
     }
 
 
@@ -47,18 +58,61 @@ public abstract class FlurstuecksdatenBaulandFormEditorPage
         super.createFormContent( site );
 
         VertragComposite kaufvertrag = vb.kaufvertrag().get();
-        String nummer = EingangsNummerFormatter.format( kaufvertrag.eingangsNr().get());
+        String nummer = EingangsNummerFormatter.format( kaufvertrag.eingangsNr().get() );
         site.setEditorTitle( formattedTitle( "Flurstücksdaten Bauland", nummer, null ) );
-        site.setFormTitle( formattedTitle( "erweiterte Flurstücksdaten - Bauland - für Vertrag", nummer,
-                getTitle() ) );
+        site.setFormTitle( formattedTitle( "erweiterte Flurstücksdaten - Bauland - für Vertrag", nummer, getTitle() ) );
 
     }
 
-    protected NumberFormat getFormatter(int fractionDigits) {
+
+    protected NumberFormat getFormatter( int fractionDigits ) {
         NumberFormat nf = NumberFormat.getInstance();
         nf.setMaximumFractionDigits( fractionDigits );
         nf.setMinimumFractionDigits( fractionDigits );
         nf.setMinimumIntegerDigits( 1 );
         return nf;
+    }
+
+
+    protected Composite createPreisField( Property<Double> property, SimpleFormData data, Composite parent,
+            boolean editable ) {
+        return createPreisField( IFormFieldLabel.NO_LABEL, property, data, parent, editable );
+    }
+
+
+    protected Composite createPreisField( String label, Property<Double> property, SimpleFormData data,
+            Composite parent, boolean editable ) {
+        return createNumberField( label, property, data, parent, editable, 2 );
+    }
+
+
+    protected Composite createFlaecheField( Property<Double> property, SimpleFormData data, Composite parent,
+            boolean editable ) {
+        return createFlaecheField( IFormFieldLabel.NO_LABEL, property, data, parent, editable );
+    }
+
+
+    protected Composite createFlaecheField( String label, Property<Double> property, SimpleFormData data,
+            Composite parent, boolean editable ) {
+        return createNumberField( label, property, data, parent, editable, 0 );
+    }
+
+
+    private Composite createNumberField( String label, Property<Double> property, SimpleFormData data,
+            Composite parent, boolean editable, int fractionDigits ) {
+        return newFormField( label )
+                .setProperty( new PropertyAdapter( property ) )
+                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
+                .setValidator(
+                        new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, fractionDigits, 1,
+                                fractionDigits ) ).setLayoutData( data.create() ).setParent( parent )
+                .setEnabled( editable ).create();
+    }
+
+
+    protected Control createLabel( Composite parent, String text, SimpleFormData data, int style ) {
+        Control label = pageSite.getToolkit().createLabel( parent, text, style );
+        label.setLayoutData( data.create() );
+        return label;
     }
 }
