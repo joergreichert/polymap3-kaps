@@ -126,7 +126,7 @@ public class VertraegeFuerBaujahrUndGebaeudeartFilter
                         FlurstuecksdatenBaulandComposite.class, expr2, 0, -1 );
 
                 for (FlurstuecksdatenBaulandComposite kv : daten) {
-                    BooleanExpression newExpr = QueryExpressions.eq( template.eingangsNr(), kv.kaufvertrag().get()
+                    BooleanExpression newExpr = QueryExpressions.eq( template.eingangsNr(), kv.vertrag().get()
                             .eingangsNr().get() );
                     if (dExpr == null) {
                         dExpr = newExpr;

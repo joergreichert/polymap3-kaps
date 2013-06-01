@@ -187,7 +187,7 @@ public abstract class FlurstueckSearcher
 
             // columns
             PropertyDescriptor prop = null;
-            prop = new PropertyDescriptorAdapter( type.getProperty( "vertragsNummer" ) );
+            prop = new PropertyDescriptorAdapter( type.getProperty( "name" ) );
             viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader( "Vertragsnummer" ) );
             prop = new PropertyDescriptorAdapter( type.getProperty( "gemarkung" ) );
             viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader( "Gemarkung" ) );

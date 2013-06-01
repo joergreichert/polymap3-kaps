@@ -26,8 +26,6 @@ import org.eclipse.swt.widgets.Control;
 
 import org.eclipse.ui.forms.widgets.Section;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-
 import org.polymap.rhei.data.entityfeature.AssociationAdapter;
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
 import org.polymap.rhei.field.PicklistFormField;
@@ -42,66 +40,13 @@ import org.polymap.kaps.ui.BooleanFormField;
 public class FlurstuecksdatenBaulandSonstigesFormEditorPage
         extends FlurstuecksdatenBaulandFormEditorPage {
 
-    // private static final int ONE = 0;
-    //
-    // private static final int TWO = 25;
-    //
-    // private static final int THREE = 50;
-    //
-    // private static final int FOUR = 75;
-    //
-    // private static final int FIVE = 100;
+
 
     private static Log log = LogFactory.getLog( FlurstuecksdatenBaulandSonstigesFormEditorPage.class );
-
-
-    // private IFormFieldListener gemeindeListener;
 
     public FlurstuecksdatenBaulandSonstigesFormEditorPage( Feature feature, FeatureStore featureStore ) {
         super( FlurstuecksdatenBaulandSonstigesFormEditorPage.class.getName(), "Sonstiges", feature, featureStore );
     }
-
-
-    //
-    // protected SimpleFormData one() {
-    // return new SimpleFormData( SPACING ).left( ONE ).right( TWO );
-    // }
-    //
-    //
-    // protected SimpleFormData two() {
-    // return new SimpleFormData( SPACING ).left( TWO ).right( THREE );
-    // }
-    //
-    //
-    // protected SimpleFormData three() {
-    // return new SimpleFormData( SPACING ).left( THREE ).right( FOUR );
-    // }
-    //
-    //
-    // protected SimpleFormData four() {
-    // return new SimpleFormData( SPACING ).left( FOUR ).right( FIVE );
-    // }
-    //
-    //
-    // protected SimpleFormData onetwo() {
-    // return new SimpleFormData( SPACING ).left( ONE ).right( THREE );
-    // }
-
-    //
-    // protected SimpleFormData three() {
-    // return new SimpleFormData( SPACING ).left( THREE ).right( FOUR );
-    // }
-    //
-    //
-    // protected SimpleFormData four() {
-    // return new SimpleFormData( SPACING ).left( FOUR ).right( FIVE );
-    // }
-    //
-    //
-    // protected SimpleFormData five() {
-    // return new SimpleFormData( SPACING ).left( FIVE ).right( SIX );
-    // }
-    //
 
     @SuppressWarnings("unchecked")
     @Override
@@ -171,16 +116,8 @@ public class FlurstuecksdatenBaulandSonstigesFormEditorPage
 
         lastLine = newLine;
         newLine = newFormField( "Keller" )
-                .setProperty( new AssociationAdapter<KellerComposite>( "keller", vb.keller() ) )
+                .setProperty( new AssociationAdapter<KellerComposite>( vb.keller() ) )
                 .setField( namedAssocationsPicklist( KellerComposite.class ) )
                 .setLayoutData( left().top( lastLine ).bottom( 100 ).create() ).setParent( client ).create();
-    }
-
-
-    @Override
-    public void doLoad( IProgressMonitor monitor )
-            throws Exception {
-        super.doLoad( monitor );
-
     }
 }

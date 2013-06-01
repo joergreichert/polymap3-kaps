@@ -21,11 +21,9 @@ import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.entity.association.Association;
 import org.qi4j.api.mixin.Mixins;
-import org.qi4j.api.property.Computed;
 import org.qi4j.api.property.ComputedPropertyInstance;
 import org.qi4j.api.property.GenericPropertyInfo;
 import org.qi4j.api.property.Property;
-import org.qi4j.api.property.PropertyInfo;
 import org.qi4j.api.query.Query;
 import org.qi4j.api.query.QueryExpressions;
 import org.qi4j.api.query.grammar.BooleanExpression;
@@ -45,8 +43,8 @@ import org.polymap.kaps.ui.form.EingangsNummerFormatter;
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 @Concerns({ PropertyChangeSupport.Concern.class })
-@Mixins({ FlurstueckComposite.Mixin.class, PropertyChangeSupport.Mixin.class,
-        ModelChangeSupport.Mixin.class, QiEntity.Mixin.class
+@Mixins({ FlurstueckComposite.Mixin.class, PropertyChangeSupport.Mixin.class, ModelChangeSupport.Mixin.class,
+        QiEntity.Mixin.class
 // JsonState.Mixin.class
 })
 @ImportTable("FLURZWI")
@@ -57,10 +55,6 @@ public interface FlurstueckComposite
     // EINGANGSNR DOUBLE,
     @Optional
     Association<VertragComposite> vertrag();
-
-
-    @Computed
-    Property<String> vertragsNummer();
 
 
     // GEMARKUNG VARCHAR(4),
@@ -154,9 +148,8 @@ public interface FlurstueckComposite
 
     // HAUPTTEIL VARCHAR(1),
     // wird nicht mehr benötigt, da Semantik unklar, bzw. Modellierung verkehrt
-    //@Optional
-    //Property<Boolean> hauptFlurstueck();
-
+    // @Optional
+    // Property<Boolean> hauptFlurstueck();
 
     // BEMERKUNG VARCHAR(12),
     @Optional
@@ -192,10 +185,10 @@ public interface FlurstueckComposite
     // ähnlich einer Kategorie - Unterkategorie auswahl
     @Optional
     Association<RichtwertzoneComposite> richtwertZone();
-    
-//    @Optional
-//    Association<RichtwertzoneZeitraumComposite> richtwertZoneG();
 
+
+    // @Optional
+    // Association<RichtwertzoneZeitraumComposite> richtwertZoneG();
 
     /**
      * Methods and transient fields.
@@ -203,28 +196,18 @@ public interface FlurstueckComposite
     public static abstract class Mixin
             implements FlurstueckComposite {
 
-        private static Log   log          = LogFactory.getLog( Mixin.class );
-
-        private PropertyInfo nameProperty = new GenericPropertyInfo( FlurstueckComposite.class,
-                                                  "vertragsNummer" );
+        private static Log log = LogFactory.getLog( Mixin.class );
 
 
         @Override
-        public Property<String> vertragsNummer() {
-            return new ComputedPropertyInstance<String>( nameProperty ) {
+        public Property<String> name() {
+            return new ComputedPropertyInstance<String>( new GenericPropertyInfo( FlurstueckComposite.class, "name" ) ) {
 
                 public String get() {
                     if (vertrag().get() != null) {
                         return EingangsNummerFormatter.format( vertrag().get().eingangsNr().get() );
                     }
                     return null;
-                }
-
-
-                @Override
-                public void set( String anIgnoredValue )
-                        throws IllegalArgumentException, IllegalStateException {
-                    // ignored
                 }
             };
         }
@@ -233,21 +216,24 @@ public interface FlurstueckComposite
         public static Iterable<FlurstueckComposite> forEntity( VertragComposite kaufvertrag ) {
             FlurstueckComposite template = QueryExpressions.templateFor( FlurstueckComposite.class );
             BooleanExpression expr = QueryExpressions.eq( template.vertrag(), kaufvertrag );
-            Query<FlurstueckComposite> matches = KapsRepository.instance().findEntities(
-                    FlurstueckComposite.class, expr, 0, -1 );
+            Query<FlurstueckComposite> matches = KapsRepository.instance().findEntities( FlurstueckComposite.class,
+                    expr, 0, -1 );
             return matches;
         }
 
-//
-//        public static FlurstueckComposite mainForEntity( VertragComposite kaufvertrag ) {
-//            FlurstueckComposite template = QueryExpressions.templateFor( FlurstueckComposite.class );
-//            BooleanExpression expr = QueryExpressions.and(
-//                    QueryExpressions.eq( template.vertrag(), kaufvertrag ),
-//                    QueryExpressions.eq( template.hauptFlurstueck(), Boolean.TRUE ) );
-//
-//            Query<FlurstueckComposite> matches = KapsRepository.instance().findEntities(
-//                    FlurstueckComposite.class, expr, 0, 1 );
-//            return matches.find();
-//        }
+        //
+        // public static FlurstueckComposite mainForEntity( VertragComposite
+        // kaufvertrag ) {
+        // FlurstueckComposite template = QueryExpressions.templateFor(
+        // FlurstueckComposite.class );
+        // BooleanExpression expr = QueryExpressions.and(
+        // QueryExpressions.eq( template.vertrag(), kaufvertrag ),
+        // QueryExpressions.eq( template.hauptFlurstueck(), Boolean.TRUE ) );
+        //
+        // Query<FlurstueckComposite> matches =
+        // KapsRepository.instance().findEntities(
+        // FlurstueckComposite.class, expr, 0, 1 );
+        // return matches.find();
+        // }
     }
 }

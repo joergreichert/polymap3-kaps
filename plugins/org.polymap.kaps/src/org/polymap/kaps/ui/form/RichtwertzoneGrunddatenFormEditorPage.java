@@ -91,7 +91,7 @@ public class RichtwertzoneGrunddatenFormEditorPage
         Composite newLine, lastLine = null;
 
         newLine = newFormField( "Gemeinde" ).setEnabled( richtwertzone.gemeinde().get() == null )
-                .setProperty( new AssociationAdapter<GemeindeComposite>( "gemeinde", richtwertzone.gemeinde() ) )
+                .setProperty( new AssociationAdapter<GemeindeComposite>( richtwertzone.gemeinde() ) )
                 .setField( namedAssocationsPicklist( GemeindeComposite.class ) ).setValidator( new NotNullValidator() )
                 .setLayoutData( left().top( lastLine ).create() ).create();
 
@@ -107,7 +107,7 @@ public class RichtwertzoneGrunddatenFormEditorPage
         // 50000);
         final Composite lage = newFormField( "Lage (STALA)" )
         /* .setEnabled( lageEnabled ) */
-        .setProperty( new AssociationAdapter<RichtwertZoneLageComposite>( "lage", richtwertzone.lage() ) )
+        .setProperty( new AssociationAdapter<RichtwertZoneLageComposite>( richtwertzone.lage() ) )
                 .setField( namedAssocationsPicklist( RichtwertZoneLageComposite.class ) )
                 .setLayoutData( right().top( lastLine ).create() ).create();
 
@@ -117,13 +117,12 @@ public class RichtwertzoneGrunddatenFormEditorPage
 
         lastLine = newLine;
         newLine = newFormField( "Nutzung" )
-                .setProperty( new AssociationAdapter<NutzungComposite>( "nutzung", richtwertzone.nutzung() ) )
+                .setProperty( new AssociationAdapter<NutzungComposite>( richtwertzone.nutzung() ) )
                 .setField( namedAssocationsPicklist( NutzungComposite.class ) )
                 .setLayoutData( left().top( lastLine ).create() ).create();
 
         newFormField( "Bodennutzung" )
-                .setProperty(
-                        new AssociationAdapter<BodennutzungComposite>( "bodenNutzung", richtwertzone.bodenNutzung() ) )
+                .setProperty( new AssociationAdapter<BodennutzungComposite>( richtwertzone.bodenNutzung() ) )
                 .setField( namedAssocationsPicklist( BodennutzungComposite.class ) )
                 .setLayoutData( right().top( lastLine ).create() ).create();
 
@@ -172,7 +171,10 @@ public class RichtwertzoneGrunddatenFormEditorPage
                                 return entity.gueltigAb();
                             }
 
-                        } ) ).setField( reloadable( new DateTimeFormField() ) )//.setValidator( new NotNullValidator() )
+                        } ) ).setField( reloadable( new DateTimeFormField() ) )// .setValidator(
+                                                                               // new
+                                                                               // NotNullValidator()
+                                                                               // )
                 .setLayoutData( left().top( lastLine ).create() ).create();
         newFormField( "Stichtag" )
                 .setParent( parent )
@@ -185,7 +187,10 @@ public class RichtwertzoneGrunddatenFormEditorPage
                                 return entity.stichtag();
                             }
 
-                        } ) ).setField( reloadable( new DateTimeFormField() ) )//.setValidator( new NotNullValidator() )
+                        } ) ).setField( reloadable( new DateTimeFormField() ) )// .setValidator(
+                                                                               // new
+                                                                               // NotNullValidator()
+                                                                               // )
                 .setLayoutData( right().top( lastLine ).create() ).create();
 
         lastLine = newLine;
@@ -200,7 +205,7 @@ public class RichtwertzoneGrunddatenFormEditorPage
                                 return entity.euroQm();
                             }
 
-                        } ) ).setField( reloadable( new StringFormField(StringFormField.Style.ALIGN_RIGHT) ) )
+                        } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
                 .setValidator( new NumberValidator( Double.class, locale, 12, 2, 1, 2 ) )
                 .setLayoutData( left().top( lastLine ).create() ).create();
 

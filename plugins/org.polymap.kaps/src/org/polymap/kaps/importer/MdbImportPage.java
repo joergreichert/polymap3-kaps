@@ -128,7 +128,7 @@ public class MdbImportPage
     public static void printSchema( Table table ) {
         log.info( "Table: " + table.getName() );
         for (Column col : table.getColumns()) {
-            log.info( "// TODO " + col.getName() + " - " + col.getType() );
+            log.info( "\n\n// TODO " + col.getName() + " - " + col.getType() );
             log.info( "@Optional" );
             log.info( "@ImportColumn(\"" + col.getName() + "\")" );
             log.info( "Property<" + col.getType() + "> " + col.getName() + "();" );

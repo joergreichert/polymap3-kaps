@@ -29,11 +29,11 @@ import org.polymap.kaps.model.data.VertragComposite;
 public class KaufvertragFormVollpreisRefresher
         implements IFormFieldListener {
 
-    private Double                   kaufpreis              = null;
+    private Double                    kaufpreis              = null;
 
-    private Double                   kaufpreisAnteilNenner  = null;
+    private Double                    kaufpreisAnteilNenner  = null;
 
-    private Double                   kaufpreisAnteilZaehler = null;
+    private Double                    kaufpreisAnteilZaehler = null;
 
     private final IFormEditorPageSite site;
 
@@ -59,22 +59,22 @@ public class KaufvertragFormVollpreisRefresher
             return;
         }
         String fieldName = ev.getFieldName();
-        if (fieldName.equalsIgnoreCase( "kaufpreis" )) {
+        if (fieldName.equalsIgnoreCase( kaufvertrag.kaufpreis().qualifiedName().name() )) {
             if (triggeredKaufpreis) {
                 triggeredKaufpreis = false;
             }
             else {
                 triggeredKaufpreis = true;
                 kaufpreis = ev.getNewValue();
-                site.setFieldValue( "kaufpreis", getFormatter().format( kaufpreis ) );
+                site.setFieldValue( kaufvertrag.kaufpreis().qualifiedName().name(), getFormatter().format( kaufpreis ) );
                 refreshVollpreis();
             }
         }
-        else if (fieldName.equalsIgnoreCase( "kaufpreisAnteilNenner" )) {
+        else if (fieldName.equalsIgnoreCase( kaufvertrag.kaufpreisAnteilNenner().qualifiedName().name() )) {
             kaufpreisAnteilNenner = ev.getNewValue();
             refreshVollpreis();
         }
-        else if (fieldName.equalsIgnoreCase( "kaufpreisAnteilZaehler" )) {
+        else if (fieldName.equalsIgnoreCase( kaufvertrag.kaufpreisAnteilZaehler().qualifiedName().name() )) {
             kaufpreisAnteilZaehler = ev.getNewValue();
             refreshVollpreis();
         }
@@ -83,10 +83,8 @@ public class KaufvertragFormVollpreisRefresher
 
     private void refreshVollpreis() {
         Double kp = kaufpreis == null ? kaufvertrag.kaufpreis().get() : kaufpreis;
-        Double n = kaufpreisAnteilNenner == null ? kaufvertrag.kaufpreisAnteilNenner().get()
-                : kaufpreisAnteilNenner;
-        Double z = kaufpreisAnteilZaehler == null ? kaufvertrag.kaufpreisAnteilZaehler().get()
-                : kaufpreisAnteilZaehler;
+        Double n = kaufpreisAnteilNenner == null ? kaufvertrag.kaufpreisAnteilNenner().get() : kaufpreisAnteilNenner;
+        Double z = kaufpreisAnteilZaehler == null ? kaufvertrag.kaufpreisAnteilZaehler().get() : kaufpreisAnteilZaehler;
 
         if (kp != null && n != null && z != null && z != 0) {
             Double vollpreis = kp * n / z;

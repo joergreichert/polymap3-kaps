@@ -41,79 +41,73 @@ public class RichtwertzoneWeitereDatenFormEditorPage
         extends KapsDefaultFormEditorPage
         implements IFormEditorPage {
 
-    private static Log log = LogFactory.getLog( RichtwertzoneWeitereDatenFormEditorPage.class );
+    private static Log                   log = LogFactory.getLog( RichtwertzoneWeitereDatenFormEditorPage.class );
 
     private final RichtwertzoneComposite richtwertzone;
 
+
     public RichtwertzoneWeitereDatenFormEditorPage( Feature feature, FeatureStore featureStore ) {
-        super( RichtwertzoneWeitereDatenFormEditorPage.class.getName(), "weitere Daten", feature,
-                featureStore );
-        richtwertzone = repository.findEntity( RichtwertzoneComposite.class, feature
-                .getIdentifier().getID() );
+        super( RichtwertzoneWeitereDatenFormEditorPage.class.getName(), "weitere Daten", feature, featureStore );
+        richtwertzone = repository.findEntity( RichtwertzoneComposite.class, feature.getIdentifier().getID() );
     }
 
 
     @Override
     public void createFormContent( final IFormEditorPageSite site ) {
         super.createFormContent( site );
-        
+
         site.setEditorTitle( formattedTitle( "Richtwertzone", richtwertzone.schl().get(), null ) );
-        site.setFormTitle( formattedTitle( "Richtwertzone", richtwertzone.schl().get(),
-                getTitle() ) );
-        
+        site.setFormTitle( formattedTitle( "Richtwertzone", richtwertzone.schl().get(), getTitle() ) );
+
         Composite newLine, lastLine = null;
 
         newLine = newFormField( "Bodenrichtwertkennung" )
                 .setProperty(
-                        new AssociationAdapter<BodenRichtwertKennungComposite>(
-                                "bodenrichtwertKennung", richtwertzone.bodenrichtwertKennung() ) )
+                        new AssociationAdapter<BodenRichtwertKennungComposite>( richtwertzone.bodenrichtwertKennung() ) )
                 .setField( namedAssocationsPicklist( BodenRichtwertKennungComposite.class ) )
                 .setLayoutData( left().top( lastLine ).create() ).create();
 
-//        lastLine = newLine;
-//        newLine = newFormField( "Basiskarte" )
-//                .setProperty( new PropertyAdapter( richtwertzone.basisKarte() ) )
-//                .setField( new StringFormField() ).setLayoutData( left().top( lastLine ).create() )
-//                .create();
-//
-//        newFormField( "Maßstab     1:" )
-//                .setProperty( new PropertyAdapter( richtwertzone.massstab() ) )
-//                .setField( new StringFormField() )
-//                .setValidator( new NumberValidator( Integer.class, locale ) )
-//                .setLayoutData( right().top( lastLine ).create() ).create();
-//
-//        lastLine = newLine;
-//        newLine = newFormField( "Rechtswert" )
-//                .setProperty( new PropertyAdapter( richtwertzone.rechtsWert() ) )
-//                .setField( new StringFormField() )
-//                .setValidator( new NumberValidator( Double.class, locale ) )
-//                .setLayoutData( left().top( lastLine ).create() ).create();
-//
-//        newFormField( "Hochwert" ).setProperty( new PropertyAdapter( richtwertzone.hochWert() ) )
-//                .setField( new StringFormField() )
-//                .setValidator( new NumberValidator( Double.class, locale ) )
-//                .setLayoutData( right().top( lastLine ).create() ).create();
+        // lastLine = newLine;
+        // newLine = newFormField( "Basiskarte" )
+        // .setProperty( new PropertyAdapter( richtwertzone.basisKarte() ) )
+        // .setField( new StringFormField() ).setLayoutData( left().top( lastLine
+        // ).create() )
+        // .create();
+        //
+        // newFormField( "Maßstab     1:" )
+        // .setProperty( new PropertyAdapter( richtwertzone.massstab() ) )
+        // .setField( new StringFormField() )
+        // .setValidator( new NumberValidator( Integer.class, locale ) )
+        // .setLayoutData( right().top( lastLine ).create() ).create();
+        //
+        // lastLine = newLine;
+        // newLine = newFormField( "Rechtswert" )
+        // .setProperty( new PropertyAdapter( richtwertzone.rechtsWert() ) )
+        // .setField( new StringFormField() )
+        // .setValidator( new NumberValidator( Double.class, locale ) )
+        // .setLayoutData( left().top( lastLine ).create() ).create();
+        //
+        // newFormField( "Hochwert" ).setProperty( new PropertyAdapter(
+        // richtwertzone.hochWert() ) )
+        // .setField( new StringFormField() )
+        // .setValidator( new NumberValidator( Double.class, locale ) )
+        // .setLayoutData( right().top( lastLine ).create() ).create();
 
         lastLine = newLine;
         newLine = newFormField( "Entwicklungszustand" )
                 .setProperty(
-                        new AssociationAdapter<EntwicklungsZustandComposite>(
-                                "entwicklungsZustand", richtwertzone.entwicklungsZustand() ) )
+                        new AssociationAdapter<EntwicklungsZustandComposite>( richtwertzone.entwicklungsZustand() ) )
                 .setField( namedAssocationsPicklist( EntwicklungsZustandComposite.class ) )
                 .setLayoutData( left().top( lastLine ).create() ).create();
 
         newFormField( "Entwicklungszusatz" )
-                .setProperty(
-                        new AssociationAdapter<EntwicklungsZusatzComposite>( "entwicklungsZusatz",
-                                richtwertzone.entwicklungsZusatz() ) )
+                .setProperty( new AssociationAdapter<EntwicklungsZusatzComposite>( richtwertzone.entwicklungsZusatz() ) )
                 .setField( namedAssocationsPicklist( EntwicklungsZusatzComposite.class ) )
                 .setLayoutData( right().top( lastLine ).create() ).create();
 
         lastLine = newLine;
         newLine = newFormField( "Bauweise" )
-                .setProperty(
-                        new AssociationAdapter<BauweiseComposite>( "bauweise", richtwertzone
-                                .bauweise() ) )
+                .setProperty( new AssociationAdapter<BauweiseComposite>( richtwertzone.bauweise() ) )
                 .setField( namedAssocationsPicklist( BauweiseComposite.class ) )
                 .setLayoutData( left().top( lastLine ).create() ).create();
 
@@ -124,8 +118,7 @@ public class RichtwertzoneWeitereDatenFormEditorPage
                 .setValidator( new NumberValidator( Double.class, locale, 12, 2, 1, 2 ) )
                 .setLayoutData( left().top( lastLine ).create() ).create();
 
-        newFormField( "Grundstückstiefe in m" )
-                .setProperty( new PropertyAdapter( richtwertzone.grundstuecksTiefe() ) )
+        newFormField( "Grundstückstiefe in m" ).setProperty( new PropertyAdapter( richtwertzone.grundstuecksTiefe() ) )
                 .setField( new StringFormField() )
                 .setValidator( new NumberValidator( Double.class, locale, 12, 2, 1, 2 ) )
                 .setLayoutData( right().top( lastLine ).create() ).create();
@@ -137,42 +130,33 @@ public class RichtwertzoneWeitereDatenFormEditorPage
                 .setValidator( new NumberValidator( Double.class, locale, 12, 2, 1, 2 ) )
                 .setLayoutData( left().top( lastLine ).create() ).create();
 
-        newFormField( "Grundflächenzahl" )
-                .setProperty( new PropertyAdapter( richtwertzone.grundflaechenZahl() ) )
+        newFormField( "Grundflächenzahl" ).setProperty( new PropertyAdapter( richtwertzone.grundflaechenZahl() ) )
                 .setField( new StringFormField() )
                 .setValidator( new NumberValidator( Double.class, locale, 12, 2, 1, 2 ) )
                 .setLayoutData( right().top( lastLine ).create() ).create();
 
         lastLine = newLine;
-        newLine = newFormField( "Geschoßzahl" )
-                .setProperty( new PropertyAdapter( richtwertzone.geschossZahl() ) )
+        newLine = newFormField( "Geschoßzahl" ).setProperty( new PropertyAdapter( richtwertzone.geschossZahl() ) )
                 .setField( new StringFormField() )
                 .setValidator( new NumberValidator( Double.class, locale, 12, 2, 1, 2 ) )
                 .setLayoutData( left().top( lastLine ).create() ).create();
 
-        newFormField( "Geschoßflächenzahl" )
-                .setProperty( new PropertyAdapter( richtwertzone.geschossFlaechenZahl() ) )
-                .setField( new StringFormField() ).setLayoutData( right().top( lastLine ).create() )
-                .create();
+        newFormField( "Geschoßflächenzahl" ).setProperty( new PropertyAdapter( richtwertzone.geschossFlaechenZahl() ) )
+                .setField( new StringFormField() ).setLayoutData( right().top( lastLine ).create() ).create();
 
         lastLine = newLine;
-        newLine = newFormField( "Baumassenzahl" )
-                .setProperty( new PropertyAdapter( richtwertzone.baumassenZahl() ) )
+        newLine = newFormField( "Baumassenzahl" ).setProperty( new PropertyAdapter( richtwertzone.baumassenZahl() ) )
                 .setField( new StringFormField() )
                 .setValidator( new NumberValidator( Double.class, locale, 12, 2, 1, 2 ) )
                 .setLayoutData( left().top( lastLine ).create() ).create();
 
         lastLine = newLine;
-        newLine = newFormField( "Ackerzahl" )
-                .setProperty( new PropertyAdapter( richtwertzone.ackerZahl() ) )
-                .setField( new StringFormField() )
-                .setValidator( new NumberValidator( Integer.class, locale ) )
+        newLine = newFormField( "Ackerzahl" ).setProperty( new PropertyAdapter( richtwertzone.ackerZahl() ) )
+                .setField( new StringFormField() ).setValidator( new NumberValidator( Integer.class, locale ) )
                 .setLayoutData( left().top( lastLine ).create() ).create();
 
-        newFormField( "Grünlandzahl" )
-                .setProperty( new PropertyAdapter( richtwertzone.gruenLandZahl() ) )
-                .setField( new StringFormField() )
-                .setValidator( new NumberValidator( Integer.class, locale ) )
+        newFormField( "Grünlandzahl" ).setProperty( new PropertyAdapter( richtwertzone.gruenLandZahl() ) )
+                .setField( new StringFormField() ).setValidator( new NumberValidator( Integer.class, locale ) )
                 .setLayoutData( right().top( lastLine ).create() ).create();
 
     }

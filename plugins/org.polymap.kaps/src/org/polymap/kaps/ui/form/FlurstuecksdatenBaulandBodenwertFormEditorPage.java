@@ -191,7 +191,7 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
         lastLine = newLine;
         newLine = createLabel( client, "anrechenbare Baulandfläche", one().top( lastLine ), SWT.RIGHT );
         createFlaecheField( vb.flaeche1(), two().top( lastLine ), client, true );
-        createPreisField( vb.bodenpreisQm1(), three().top( lastLine ), client, false );        
+        createPreisField( vb.bodenpreisQm1(), three().top( lastLine ), client, false );
         // wenn die seite bereits an ist dann per refresher
         site.addFieldListener( bodenpreis = new IFormFieldListener() {
 
@@ -225,11 +225,8 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
                 .faktorBereinigterKaufpreis(), vb.bodenwertBereinigt2() ) );
 
         lastLine = newLine;
-        newLine = newFormField( IFormFieldLabel.NO_LABEL )
-                .setEnabled( true )
-                .setProperty(
-                        new AssociationAdapter<BodenwertAufteilungTextComposite>( "bodenwertAufteilung1", vb
-                                .bodenwertAufteilung1() ) )
+        newLine = newFormField( IFormFieldLabel.NO_LABEL ).setEnabled( true )
+                .setProperty( new AssociationAdapter<BodenwertAufteilungTextComposite>( vb.bodenwertAufteilung1() ) )
                 .setField( namedAssocationsPicklist( BodenwertAufteilungTextComposite.class ) )
                 .setLayoutData( one().top( lastLine, 12 ).create() ).setParent( client ).create();
         createFlaecheField( vb.flaeche3(), two().top( lastLine, 12 ), client, true );
@@ -242,11 +239,8 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
                 .faktorBereinigterKaufpreis(), vb.bodenwertBereinigt3() ) );
 
         lastLine = newLine;
-        newLine = newFormField( IFormFieldLabel.NO_LABEL )
-                .setEnabled( true )
-                .setProperty(
-                        new AssociationAdapter<BodenwertAufteilungTextComposite>( "bodenwertAufteilung2", vb
-                                .bodenwertAufteilung2() ) )
+        newLine = newFormField( IFormFieldLabel.NO_LABEL ).setEnabled( true )
+                .setProperty( new AssociationAdapter<BodenwertAufteilungTextComposite>( vb.bodenwertAufteilung2() ) )
                 .setField( namedAssocationsPicklist( BodenwertAufteilungTextComposite.class ) )
                 .setLayoutData( one().top( lastLine ).create() ).setParent( client ).create();
         createFlaecheField( vb.flaeche4(), two().top( lastLine ), client, true );
@@ -259,11 +253,8 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
                 .faktorBereinigterKaufpreis(), vb.bodenwertBereinigt4() ) );
 
         lastLine = newLine;
-        newLine = newFormField( IFormFieldLabel.NO_LABEL )
-                .setEnabled( true )
-                .setProperty(
-                        new AssociationAdapter<BodenwertAufteilungTextComposite>( "bodenwertAufteilung3", vb
-                                .bodenwertAufteilung3() ) )
+        newLine = newFormField( IFormFieldLabel.NO_LABEL ).setEnabled( true )
+                .setProperty( new AssociationAdapter<BodenwertAufteilungTextComposite>( vb.bodenwertAufteilung3() ) )
                 .setField( namedAssocationsPicklist( BodenwertAufteilungTextComposite.class ) )
                 .setLayoutData( one().top( lastLine ).create() ).setParent( client ).create();
         createFlaecheField( vb.flaeche5(), two().top( lastLine ), client, true );
@@ -298,7 +289,7 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
                 .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
                 .setField( new StringFormField() ).setLayoutData( two().top( lastLine ).bottom( 100 ).create() )
                 .setParent( client ).create();
-        
+
         // createPreisField( vb.bodenwertGesamt(), four().top( lastLine ), client,
         // false );
 
@@ -348,9 +339,9 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
 
             @Override
             protected Double calculate( org.polymap.kaps.ui.FieldCalculation.ValueProvider values ) {
-                VertragComposite vertrag = vb.kaufvertrag().get();
+                VertragComposite vertrag = vb.vertrag().get();
                 Double kaufpreis = vertrag.vollpreis().get();
-                VertragsdatenErweitertComposite vertragsdatenErweitertComposite = vb.kaufvertrag().get()
+                VertragsdatenErweitertComposite vertragsdatenErweitertComposite = vb.vertrag().get()
                         .erweiterteVertragsdaten().get();
                 if (vertragsdatenErweitertComposite != null) {
                     Double bereinigt = vertragsdatenErweitertComposite.bereinigterVollpreis().get();

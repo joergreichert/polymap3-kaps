@@ -107,9 +107,9 @@ public class FaktorOhneStrassenplatzCalculator
                 bodenwert -= line5;
             }
 
-            VertragComposite vertrag = vb.kaufvertrag().get();
+            VertragComposite vertrag = vb.vertrag().get();
             Double kaufpreis = vertrag.vollpreis().get();
-            VertragsdatenErweitertComposite vertragsdatenErweitertComposite = vb.kaufvertrag().get()
+            VertragsdatenErweitertComposite vertragsdatenErweitertComposite = vb.vertrag().get()
                     .erweiterteVertragsdaten().get();
             if (vertragsdatenErweitertComposite != null) {
                 Double bereinigt = vertragsdatenErweitertComposite.bereinigterVollpreis().get();

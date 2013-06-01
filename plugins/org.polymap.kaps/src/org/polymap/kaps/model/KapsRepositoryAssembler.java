@@ -96,7 +96,7 @@ public class KapsRepositoryAssembler
                 ArtDesBaugebietsComposite.class, FlurstueckComposite.class,
                 GemeindeFaktorComposite.class, BodenwertAufteilungTextComposite.class,
                 FlurstuecksdatenBaulandComposite.class, VertragsdatenErweitertComposite.class,
-                KellerComposite.class );
+                KellerComposite.class, FlurstuecksdatenAgrarComposite.class );
 
         // persistence: workspace/Lucene
         File root = new File( Polymap.getWorkspacePath().toFile(), "data" );

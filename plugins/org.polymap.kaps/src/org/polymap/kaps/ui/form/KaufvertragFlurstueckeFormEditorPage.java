@@ -52,6 +52,7 @@ import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.ArtDesBaugebietsComposite;
 import org.polymap.kaps.model.data.FlurComposite;
 import org.polymap.kaps.model.data.FlurstueckComposite;
+import org.polymap.kaps.model.data.FlurstuecksdatenAgrarComposite;
 import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
 import org.polymap.kaps.model.data.GebaeudeArtComposite;
 import org.polymap.kaps.model.data.GemarkungComposite;
@@ -497,14 +498,21 @@ public class KaufvertragFlurstueckeFormEditorPage
                 if (flurstueck != null) {
                     NutzungComposite nutzung = flurstueck.nutzung().get();
                     if (nutzung.isAgrar().get()) {
-                        // TODO
-                        throw new RuntimeException("erweiterte Daten AGRAR implementieren");
+                        FlurstuecksdatenAgrarComposite agrar = FlurstuecksdatenAgrarComposite.Mixin.forFlurstueck( flurstueck );
+                        if (agrar == null) {
+                            agrar = repository.newEntity( FlurstuecksdatenAgrarComposite.class, null );
+                            agrar.flurstueck().set( flurstueck );
+                            agrar.vertrag().set( flurstueck.vertrag().get() );
+//                            agrar.richtwertZone1().set( flurstueck.richtwertZone().get() );
+                        }
+                        KapsPlugin.openEditor( fs, FlurstuecksdatenAgrarComposite.NAME, agrar );
                     } else {
                         FlurstuecksdatenBaulandComposite bauland = FlurstuecksdatenBaulandComposite.Mixin.forFlurstueck( flurstueck );
                         if (bauland == null) {
                             bauland = repository.newEntity( FlurstuecksdatenBaulandComposite.class, null );
                             bauland.flurstueck().set( flurstueck );
-                            bauland.kaufvertrag().set( flurstueck.vertrag().get() );
+                            bauland.vertrag().set( flurstueck.vertrag().get() );
+//                            bauland.richtwertZone().set( flurstueck.richtwertZone().get() );
                         }
                         KapsPlugin.openEditor( fs, FlurstuecksdatenBaulandComposite.NAME, bauland );
                     }

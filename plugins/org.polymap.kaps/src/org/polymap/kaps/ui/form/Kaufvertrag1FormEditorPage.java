@@ -80,19 +80,19 @@ public class Kaufvertrag1FormEditorPage
 
         // kreise
         Composite line3 = site.newFormField( parent, new AssociationAdapter<KaeuferKreisComposite>(
-                "verkaeuferKreis", kaufvertrag.verkaeuferKreis() ),
+                kaufvertrag.verkaeuferKreis() ),
                 namedAssocationsPicklist( KaeuferKreisComposite.class ), null, "Verkäuferkreis" );
         line3.setLayoutData( left().top( line2 ).create() );
 
         site.newFormField(
                 parent,
-                new AssociationAdapter<KaeuferKreisComposite>( "kaeuferKreis", kaufvertrag
+                new AssociationAdapter<KaeuferKreisComposite>(  kaufvertrag
                         .kaeuferKreis() ), namedAssocationsPicklist( KaeuferKreisComposite.class ),
                 null, "Käuferkreis" ).setLayoutData( right().top( line2 ).create() );
 
         // alle Vertragsarten in PickList
         Composite line4 = site.newFormField( parent, new AssociationAdapter<VertragsArtComposite>(
-                "vertragsArt", kaufvertrag.vertragsArt() ),
+                 kaufvertrag.vertragsArt() ),
                 namedAssocationsPicklist( VertragsArtComposite.class ), null, "Vertragsart" );
         line4.setLayoutData( left().top( line3 ).create() );
 

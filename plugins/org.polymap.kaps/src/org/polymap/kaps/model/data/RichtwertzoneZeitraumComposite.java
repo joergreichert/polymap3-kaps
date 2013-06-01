@@ -61,28 +61,33 @@ public interface RichtwertzoneZeitraumComposite
     Property<Double> euroQm();
 
 
-    @Optional  
+    @Optional
     Association<RichtwertzoneComposite> zone();
+
 
     // RIZONE VARCHAR(7), Nummer PK, scheint keine Referenz zu sein
     @Optional
     @ImportColumn("RIZONE")
     Property<String> schl();
 
+
     // BEZ VARCHAR(40), Name
     @Optional
     @ImportColumn("BEZ")
     Property<String> name();
+
 
     // JAHR TIMESTAMP, Gültig ab, immer Jahresbeginn
     @Optional
     @ImportColumn("JAHR")
     Property<Date> gueltigAb();
 
+
     // STICHTAG TIMESTAMP, 1 Tag vor JAHR
     @Optional
     @ImportColumn("STICHTAG")
     Property<Date> stichtag();
+
 
     // EB VARCHAR(1), ist O,1,2,3,Null
     // Erschließungsbeitrag/Erschließungszustand nach BauGB 1,2 oder 3 ->
@@ -99,41 +104,71 @@ public interface RichtwertzoneZeitraumComposite
             implements RichtwertzoneZeitraumComposite {
 
         private static Log log = LogFactory.getLog( Mixin.class );
-        
+
+
         public static Iterable<RichtwertzoneZeitraumComposite> forZone( RichtwertzoneComposite zone ) {
-            RichtwertzoneZeitraumComposite template = QueryExpressions.templateFor( RichtwertzoneZeitraumComposite.class );
+            RichtwertzoneZeitraumComposite template = QueryExpressions
+                    .templateFor( RichtwertzoneZeitraumComposite.class );
             BooleanExpression expr = QueryExpressions.eq( template.zone(), zone );
             Query<RichtwertzoneZeitraumComposite> matches = KapsRepository.instance().findEntities(
                     RichtwertzoneZeitraumComposite.class, expr, 0, -1 );
             matches = matches.orderBy( orderBy( template.gueltigAb(), OrderBy.Order.DESCENDING ) );
             return matches;
         }
-//        private PropertyInfo schlProperty = new GenericPropertyInfo( RichtwertzoneZeitraumComposite.class, "schl" );
-//
+
+
+        // private PropertyInfo schlProperty = new GenericPropertyInfo(
+        // RichtwertzoneZeitraumComposite.class, "schl" );
+        //
+        // @Override
+        // public Property<String> schl() {
+        // return new ComputedPropertyInstance<String>( schlProperty ) {
+        //
+        // public String get() {
+        // return zone().get();
+        // }
+        //
+        // @Override
+        // public void set( String newValue )
+        // throws IllegalArgumentException, IllegalStateException {
+        // zone().set( newValue );
+        // }
+        // };
+        // }
+
+        public static RichtwertzoneZeitraumComposite findZeitraumFor( RichtwertzoneComposite zone, Date date ) {
+            for (RichtwertzoneZeitraumComposite zeitraum : forZone( zone )) {
+                // zeiträume sind nach Datum sortiert, neueste zu erst,
+                // deshalb ersten nehmen, dessen gültigkeitsbeginn vor dem zieldatum
+                // liegt
+                if (zeitraum.gueltigAb().get().compareTo( date ) < 0) {
+                    return zeitraum;
+                }
+            }
+            return null;
+        }
+
+
+        // public static Iterable<RichtwertzoneZeitraumComposite> findZoneIn(
+        // GemeindeComposite gemeinde ) {
+        // RichtwertzoneZeitraumComposite template = QueryExpressions
+        // .templateFor( RichtwertzoneZeitraumComposite.class );
+        // BooleanExpression expr = QueryExpressions.eq( template.gemeinde(),
+        // gemeinde );
+        // Query<RichtwertzoneZeitraumComposite> matches =
+        // KapsRepository.instance().findEntities(
+        // RichtwertzoneZeitraumComposite.class, expr, 0, -1 );
+        // // filter auf letzte aktuelle Zone, darf nicht da ja auch ältere Zonen
+        // auswählbar sind
+        // return matches;
+        // }
+
 //        @Override
-//        public Property<String> schl() {
-//            return new ComputedPropertyInstance<String>( schlProperty ) {
-//
-//                public String get() {
-//                    return zone().get();
-//                }
-//                
-//                @Override
-//                public void set( String newValue )
-//                        throws IllegalArgumentException, IllegalStateException {
-//                        zone().set( newValue );
-//                }
-//            };
-//        }
-        
-//        public static Iterable<RichtwertzoneZeitraumComposite> findZoneIn( GemeindeComposite gemeinde ) {
-//            RichtwertzoneZeitraumComposite template = QueryExpressions
-//                    .templateFor( RichtwertzoneZeitraumComposite.class );
-//            BooleanExpression expr = QueryExpressions.eq( template.gemeinde(), gemeinde );
-//            Query<RichtwertzoneZeitraumComposite> matches = KapsRepository.instance().findEntities(
-//                    RichtwertzoneZeitraumComposite.class, expr, 0, -1 );
-//            // filter auf letzte aktuelle Zone, darf nicht da ja auch ältere Zonen auswählbar sind
-//            return matches;
+//        public boolean equals( Object arg0 ) {
+//            if (arg0 != null && arg0 instanceof RichtwertzoneZeitraumComposite) {
+//                return id().equals( ((RichtwertzoneZeitraumComposite)arg0).id() );
+//            }
+//            return false;
 //        }
     }
 }

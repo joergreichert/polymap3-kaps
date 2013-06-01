@@ -14,23 +14,32 @@ package org.polymap.kaps.ui;
 
 import java.util.Locale;
 
+import java.text.NumberFormat;
+
 import org.geotools.data.FeatureStore;
 import org.opengis.feature.Feature;
 
+import org.qi4j.api.property.Property;
+
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 
 import org.eclipse.ui.forms.widgets.Section;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.polymap.core.project.ui.util.SimpleFormData;
+import org.polymap.core.runtime.Polymap;
 
+import org.polymap.rhei.data.entityfeature.PropertyAdapter;
+import org.polymap.rhei.field.IFormFieldLabel;
+import org.polymap.rhei.field.NumberValidator;
 import org.polymap.rhei.field.PicklistFormField;
 import org.polymap.rhei.field.SelectlistFormField;
+import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.form.DefaultFormEditorPage;
-import org.polymap.rhei.form.IFormEditorPage;
-import org.polymap.rhei.form.IFormEditorPage2;
+import org.polymap.rhei.form.IFormEditorPage3;
 import org.polymap.rhei.form.IFormEditorPageSite;
 import org.polymap.rhei.form.IFormEditorToolkit;
 
@@ -42,7 +51,7 @@ import org.polymap.kaps.model.Named;
  */
 public abstract class KapsDefaultFormEditorPage
         extends DefaultFormEditorPage
-        implements IFormEditorPage, IFormEditorPage2 {
+        implements IFormEditorPage3 {
 
     protected static final int SPACING = 6;
 
@@ -138,7 +147,11 @@ public abstract class KapsDefaultFormEditorPage
     public void doLoad( IProgressMonitor monitor )
             throws Exception {
     }
-
+    
+    @Override
+    public void afterDoLoad( IProgressMonitor monitor )
+            throws Exception {
+    }
 
     @Override
     public void dispose() {
@@ -162,4 +175,75 @@ public abstract class KapsDefaultFormEditorPage
         return true;
     }
 
+
+    protected NumberFormat getFormatter( int fractionDigits ) {
+        NumberFormat nf = NumberFormat.getInstance();
+        nf.setMaximumFractionDigits( fractionDigits );
+        nf.setMinimumFractionDigits( fractionDigits );
+        nf.setMinimumIntegerDigits( 1 );
+        return nf;
+    }
+
+
+    protected Composite createPreisField( Property<Double> property, SimpleFormData data, Composite parent,
+            boolean editable ) {
+        return createPreisField( IFormFieldLabel.NO_LABEL, property, data, parent, editable );
+    }
+
+
+    protected Composite createPreisField( String label, Property<Double> property, SimpleFormData data,
+            Composite parent, boolean editable ) {
+        return createPreisField( label, null, property, data, parent, editable );
+    }
+
+
+    protected Composite createPreisField( String label, String tooltip, Property<Double> property, SimpleFormData data,
+            Composite parent, boolean editable ) {
+        return createNumberField( label, tooltip, property, data, parent, editable, 2 );
+    }
+
+
+    protected Composite createFlaecheField( Property<Double> property, SimpleFormData data, Composite parent,
+            boolean editable ) {
+        return createFlaecheField( IFormFieldLabel.NO_LABEL, property, data, parent, editable );
+    }
+
+
+    protected Composite createFlaecheField( String label, Property<Double> property, SimpleFormData data,
+            Composite parent, boolean editable ) {
+        return createFlaecheField( label, null, property, data, parent, editable );
+    }
+
+
+    protected Composite createFlaecheField( String label, String tooltip, Property<Double> property,
+            SimpleFormData data, Composite parent, boolean editable ) {
+        return createNumberField( label, tooltip, property, data, parent, editable, 0 );
+    }
+
+
+    private Composite createNumberField( String label, String tooltip, Property<Double> property, SimpleFormData data,
+            Composite parent, boolean editable, int fractionDigits ) {
+        return newFormField( label )
+                .setProperty( new PropertyAdapter( property ) )
+                .setToolTipText( tooltip )
+                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
+                .setValidator(
+                        new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, fractionDigits, 1,
+                                fractionDigits ) ).setLayoutData( data.create() ).setParent( parent )
+                .setEnabled( editable ).create();
+    }
+
+
+    protected Control createLabel( Composite parent, String text, SimpleFormData data, int style ) {
+        return createLabel( parent, text, text, data, style );
+    }
+
+
+    protected Control createLabel( Composite parent, String text, String tooltip, SimpleFormData data, int style ) {
+        Control label = pageSite.getToolkit().createLabel( parent, text, style );
+        label.setToolTipText( tooltip );
+        // label.setForeground( FormEditorToolkit.labelForeground );
+        label.setLayoutData( data.create() );
+        return label;
+    }
 }

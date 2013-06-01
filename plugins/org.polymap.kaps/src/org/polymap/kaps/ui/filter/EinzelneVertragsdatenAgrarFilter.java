@@ -31,20 +31,20 @@ import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.filter.IFilterEditorSite;
 
 import org.polymap.kaps.model.KapsRepository;
-import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
+import org.polymap.kaps.model.data.FlurstuecksdatenAgrarComposite;
 import org.polymap.kaps.model.data.VertragComposite;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
-public class EinzelneVertragsdatenBaulandFilter
+public class EinzelneVertragsdatenAgrarFilter
         extends AbstractEntityFilter {
 
-    private static Log log = LogFactory.getLog( EinzelneVertragsdatenBaulandFilter.class );
+    private static Log log = LogFactory.getLog( EinzelneVertragsdatenAgrarFilter.class );
 
 
-    public EinzelneVertragsdatenBaulandFilter( ILayer layer ) {
-        super( "__kaps--", layer, "einzelner Vertrag...", null, 10000, FlurstuecksdatenBaulandComposite.class );
+    public EinzelneVertragsdatenAgrarFilter( ILayer layer ) {
+        super( "__kaps--", layer, "einzelner Vertrag...", null, 10000, FlurstuecksdatenAgrarComposite.class );
     }
 
 
@@ -74,8 +74,8 @@ public class EinzelneVertragsdatenBaulandFilter
         Query<VertragComposite> kaufvertraege = KapsRepository.instance().findEntities(
                 VertragComposite.class, expr, 0, getMaxResults() );
 
-        FlurstuecksdatenBaulandComposite templateB = QueryExpressions
-                .templateFor( FlurstuecksdatenBaulandComposite.class );
+        FlurstuecksdatenAgrarComposite templateB = QueryExpressions
+                .templateFor( FlurstuecksdatenAgrarComposite.class );
         BooleanExpression inExpr = null;
         for (VertragComposite kv : kaufvertraege) {
             BooleanExpression newExpr = QueryExpressions.eq( templateB.vertrag(), kv );
@@ -86,7 +86,7 @@ public class EinzelneVertragsdatenBaulandFilter
                 inExpr = QueryExpressions.or( inExpr, newExpr );
             }
         }
-        return KapsRepository.instance().findEntities( FlurstuecksdatenBaulandComposite.class, inExpr,
+        return KapsRepository.instance().findEntities( FlurstuecksdatenAgrarComposite.class, inExpr,
                 0, getMaxResults() );
 
     }

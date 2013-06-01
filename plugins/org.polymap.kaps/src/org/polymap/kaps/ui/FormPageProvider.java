@@ -21,9 +21,12 @@ import org.polymap.rhei.form.FormEditor;
 import org.polymap.rhei.form.IFormEditorPage;
 import org.polymap.rhei.form.IFormPageProvider;
 
+import org.polymap.kaps.model.data.FlurstuecksdatenAgrarComposite;
 import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
 import org.polymap.kaps.model.data.RichtwertzoneComposite;
 import org.polymap.kaps.model.data.VertragComposite;
+import org.polymap.kaps.ui.form.FlurstuecksdatenAgrarBodenwertFormEditorPage;
+import org.polymap.kaps.ui.form.FlurstuecksdatenAgrarGrunddatenFormEditorPage;
 import org.polymap.kaps.ui.form.FlurstuecksdatenBaulandBodenwertFormEditorPage;
 import org.polymap.kaps.ui.form.FlurstuecksdatenBaulandGrunddatenFormEditorPage;
 import org.polymap.kaps.ui.form.FlurstuecksdatenBaulandRichtwertFormEditorPage;
@@ -43,33 +46,28 @@ public class FormPageProvider
 
     @Override
     public List<IFormEditorPage> addPages( FormEditor formEditor, Feature feature ) {
-        // log.debug("addPages(): feature= " + feature);
         List<IFormEditorPage> result = new ArrayList<IFormEditorPage>();
         String name = feature.getType().getName().getLocalPart();
 
         if (name.equalsIgnoreCase( VertragComposite.NAME )) {
             result.add( new Kaufvertrag1FormEditorPage( feature, formEditor.getFeatureStore() ) );
             result.add( new Kaufvertrag2FormEditorPage( feature, formEditor.getFeatureStore() ) );
-            result.add( new KaufvertragFlurstueckeFormEditorPage( feature, formEditor
-                    .getFeatureStore() ) );
+            result.add( new KaufvertragFlurstueckeFormEditorPage( feature, formEditor.getFeatureStore() ) );
             result.add( new KaufvertragErweitertFormEditorPage( feature, formEditor.getFeatureStore() ) );
         }
-        else if (name.equalsIgnoreCase( RichtwertzoneComposite.NAME)) {
-            result.add( new RichtwertzoneGrunddatenFormEditorPage( feature, formEditor
-                    .getFeatureStore() ) );
-            result.add( new RichtwertzoneWeitereDatenFormEditorPage( feature, formEditor
-                    .getFeatureStore() ) );
+        else if (name.equalsIgnoreCase( RichtwertzoneComposite.NAME )) {
+            result.add( new RichtwertzoneGrunddatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
+            result.add( new RichtwertzoneWeitereDatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
         }
         else if (name.equalsIgnoreCase( FlurstuecksdatenBaulandComposite.NAME )) {
-            result.add( new FlurstuecksdatenBaulandGrunddatenFormEditorPage( feature, formEditor
-                    .getFeatureStore() ) );
-            FlurstuecksdatenBaulandBodenwertFormEditorPage editorPage = new FlurstuecksdatenBaulandBodenwertFormEditorPage( feature, formEditor
-                    .getFeatureStore() );
-            result.add( editorPage );
-            result.add( new FlurstuecksdatenBaulandRichtwertFormEditorPage( feature, formEditor
-                    .getFeatureStore() ) );
-            result.add( new FlurstuecksdatenBaulandSonstigesFormEditorPage( feature, formEditor
-                    .getFeatureStore() ) );
+            result.add( new FlurstuecksdatenBaulandGrunddatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
+            result.add( new FlurstuecksdatenBaulandBodenwertFormEditorPage( feature, formEditor.getFeatureStore() ) );
+            result.add( new FlurstuecksdatenBaulandRichtwertFormEditorPage( feature, formEditor.getFeatureStore() ) );
+            result.add( new FlurstuecksdatenBaulandSonstigesFormEditorPage( feature, formEditor.getFeatureStore() ) );
+        }
+        else if (name.equalsIgnoreCase( FlurstuecksdatenAgrarComposite.NAME )) {
+            result.add( new FlurstuecksdatenAgrarGrunddatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
+            result.add( new FlurstuecksdatenAgrarBodenwertFormEditorPage( feature, formEditor.getFeatureStore() ) );
         }
         return result;
     }

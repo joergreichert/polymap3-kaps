@@ -29,10 +29,12 @@ import org.polymap.rhei.filter.IFilterProvider;
 
 import org.polymap.kaps.model.KapsEntityProvider;
 import org.polymap.kaps.model.KapsRepository;
+import org.polymap.kaps.model.data.FlurstuecksdatenAgrarComposite;
 import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
 import org.polymap.kaps.model.data.RichtwertzoneComposite;
 import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.ui.filter.DefaultEntityFilter;
+import org.polymap.kaps.ui.filter.EinzelneVertragsdatenAgrarFilter;
 import org.polymap.kaps.ui.filter.EinzelneVertragsdatenBaulandFilter;
 import org.polymap.kaps.ui.filter.EinzelnerVertragFilter;
 import org.polymap.kaps.ui.filter.RichtwertZoneFilter;
@@ -75,7 +77,10 @@ public class FilterProvider
                 }
                 else if (type.isAssignableFrom( FlurstuecksdatenBaulandComposite.class )) {
                     result.add( new EinzelneVertragsdatenBaulandFilter( layer ) );
-//                    result.add( new DefaultEntityFilter( layer, type, repo ) );
+                    // result.add( new DefaultEntityFilter( layer, type, repo ) );
+                }
+                else if (type.isAssignableFrom( FlurstuecksdatenAgrarComposite.class )) {
+                    result.add( new EinzelneVertragsdatenAgrarFilter( layer ) );
                 }
                 else {
                     // standard to all other entitytypes

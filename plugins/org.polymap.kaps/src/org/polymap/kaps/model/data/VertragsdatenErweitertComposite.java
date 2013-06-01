@@ -33,7 +33,6 @@ import org.polymap.core.qi4j.event.ModelChangeSupport;
 import org.polymap.core.qi4j.event.PropertyChangeSupport;
 
 import org.polymap.kaps.importer.ImportColumn;
-import org.polymap.kaps.importer.ImportTable;
 import org.polymap.kaps.model.KapsRepository;
 
 /**
@@ -45,11 +44,11 @@ import org.polymap.kaps.model.KapsRepository;
         ModelChangeSupport.Mixin.class, QiEntity.Mixin.class,
 // JsonState.Mixin.class
 })
-@ImportTable("K_BEVERW")
+//@ImportTable("K_BEVERW")
 public interface VertragsdatenErweitertComposite
         extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite {
 
-    String NAME = "Erweiterte Vertragsdaten Bauland";
+    String NAME = "Erweiterte Vertragsdaten";
 
 
     // KAUFPREIS DOUBLE,

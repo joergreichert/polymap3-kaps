@@ -450,7 +450,7 @@ public interface FlurstuecksdatenBaulandComposite
 
     // EINGANGSNR DOUBLE,
     @Optional
-    Association<VertragComposite> kaufvertrag();
+    Association<VertragComposite> vertrag();
 
 
     // TODO GRART DOUBLE,

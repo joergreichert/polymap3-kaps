@@ -334,14 +334,14 @@ public class FlurstuecksdatenBaulandRichtwertFormEditorPage
 
 
     @Override
-    public void doLoad( IProgressMonitor monitor )
+    public void afterDoLoad( IProgressMonitor monitor )
             throws Exception {
-        super.doLoad( monitor );
+        super.afterDoLoad( monitor );
 
         // bodenpreis vom 1. tab könnte sich geändert haben, also neu berechnen
         Double bodenpreisBebaut = fieldListener.get( vb.bodenwertBereinigt1() );
         if (bodenpreisBebaut != null && bodenpreisBebaut != vb.bodenpreisAbgleichAufBaupreisBebaut().get()) {
-            vb.bodenpreisAbgleichAufBaupreisBebaut().set( bodenpreisBebaut );
+            //vb.bodenpreisAbgleichAufBaupreisBebaut().set( bodenpreisBebaut );
             pageSite.setFieldValue( vb.bodenpreisAbgleichAufBaupreisBebaut().qualifiedName().name(), getFormatter( 2 )
                     .format( bodenpreisBebaut ) );
         }
