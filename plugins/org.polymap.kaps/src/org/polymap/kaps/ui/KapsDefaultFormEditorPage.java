@@ -53,7 +53,7 @@ public abstract class KapsDefaultFormEditorPage
         extends DefaultFormEditorPage
         implements IFormEditorPage3 {
 
-    protected static final int SPACING = 6;
+    protected static final int SPACING = 12;
 
     protected static final int LEFT    = 0;
 
@@ -219,8 +219,7 @@ public abstract class KapsDefaultFormEditorPage
             SimpleFormData data, Composite parent, boolean editable ) {
         return createNumberField( label, tooltip, property, data, parent, editable, 0 );
     }
-
-
+    
     private Composite createNumberField( String label, String tooltip, Property<Double> property, SimpleFormData data,
             Composite parent, boolean editable, int fractionDigits ) {
         return newFormField( label )

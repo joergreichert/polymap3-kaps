@@ -24,6 +24,9 @@ import org.qi4j.api.property.Computed;
 import org.qi4j.api.property.ComputedPropertyInstance;
 import org.qi4j.api.property.GenericPropertyInfo;
 import org.qi4j.api.property.Property;
+import org.qi4j.api.query.Query;
+import org.qi4j.api.query.QueryExpressions;
+import org.qi4j.api.query.grammar.BooleanExpression;
 
 import org.polymap.core.qi4j.QiEntity;
 import org.polymap.core.qi4j.event.ModelChangeSupport;
@@ -31,6 +34,7 @@ import org.polymap.core.qi4j.event.PropertyChangeSupport;
 
 import org.polymap.kaps.importer.ImportColumn;
 import org.polymap.kaps.importer.ImportTable;
+import org.polymap.kaps.model.KapsRepository;
 
 /**
  * 
@@ -51,13 +55,13 @@ public interface FlurstueckWohneigentumComposite
     // OBJEKTNR - Long
     @Optional
     @ImportColumn("OBJEKTNR")
-    Property<Long> objektNummer();
+    Property<Integer> objektNummer();
 
 
     // FORTF - Long
     @Optional
     @ImportColumn("FORTF")
-    Property<Long> objektFortfuehrung();
+    Property<Integer> objektFortfuehrung();
 
 
     // GEM - String
@@ -73,7 +77,7 @@ public interface FlurstueckWohneigentumComposite
     // FLSTNR - Long
     @Optional
     @ImportColumn("FLSTNR")
-    Property<Long> nummer();
+    Property<Integer> nummer();
 
 
     // FLSTNRU - String
@@ -124,13 +128,13 @@ public interface FlurstueckWohneigentumComposite
     // GEBNR - Long
     @Optional
     @ImportColumn("GEBNR")
-    Property<Long> gebaeudeNummer();
+    Property<Integer> gebaeudeNummer();
 
 
     // GEBNRFORTF - Long
     @Optional
     @ImportColumn("GEBNRFORTF")
-    Property<Long> gebaeudeFortfuehrung();
+    Property<Integer> gebaeudeFortfuehrung();
 
 
     // HAUSNR - String
@@ -182,6 +186,18 @@ public interface FlurstueckWohneigentumComposite
                             + gebaeudeFortfuehrung().get() + "/" + nummer().get() + "/" + unterNummer().get();
                 }
             };
+        }
+
+
+        public static Iterable<FlurstueckWohneigentumComposite> forEntity( WohnungseigentumComposite eigentum ) {
+            FlurstueckWohneigentumComposite template = QueryExpressions
+                    .templateFor( FlurstueckWohneigentumComposite.class );
+            BooleanExpression expr = QueryExpressions.and(
+                    QueryExpressions.eq( template.objektNummer(), eigentum.objektNummer().get() ),
+                    QueryExpressions.eq( template.objektFortfuehrung(), eigentum.objektFortfuehrung().get() ) );
+            Query<FlurstueckWohneigentumComposite> matches = KapsRepository.instance().findEntities(
+                    FlurstueckWohneigentumComposite.class, expr, 0, -1 );
+            return matches;
         }
     }
 }

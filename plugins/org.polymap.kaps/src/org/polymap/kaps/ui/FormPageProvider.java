@@ -25,6 +25,8 @@ import org.polymap.kaps.model.data.FlurstuecksdatenAgrarComposite;
 import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
 import org.polymap.kaps.model.data.RichtwertzoneComposite;
 import org.polymap.kaps.model.data.VertragComposite;
+import org.polymap.kaps.model.data.WohnungComposite;
+import org.polymap.kaps.model.data.WohnungseigentumComposite;
 import org.polymap.kaps.ui.form.FlurstuecksdatenAgrarBodenwertFormEditorPage;
 import org.polymap.kaps.ui.form.FlurstuecksdatenAgrarGrunddatenFormEditorPage;
 import org.polymap.kaps.ui.form.FlurstuecksdatenBaulandBodenwertFormEditorPage;
@@ -37,6 +39,12 @@ import org.polymap.kaps.ui.form.KaufvertragErweitertFormEditorPage;
 import org.polymap.kaps.ui.form.KaufvertragFlurstueckeFormEditorPage;
 import org.polymap.kaps.ui.form.RichtwertzoneGrunddatenFormEditorPage;
 import org.polymap.kaps.ui.form.RichtwertzoneWeitereDatenFormEditorPage;
+import org.polymap.kaps.ui.form.WohnungGrunddatenFormEditorPage;
+import org.polymap.kaps.ui.form.WohnungLiegenschaftzinsFormEditorPage;
+import org.polymap.kaps.ui.form.WohnungVertragsdatenFormEditorPage;
+import org.polymap.kaps.ui.form.WohnungseigentumFlurstueckeFormEditorPage;
+import org.polymap.kaps.ui.form.WohnungseigentumGebaeudeFormEditorPage;
+import org.polymap.kaps.ui.form.WohnungseigentumObjektdatenFormEditorPage;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -68,6 +76,16 @@ public class FormPageProvider
         else if (name.equalsIgnoreCase( FlurstuecksdatenAgrarComposite.NAME )) {
             result.add( new FlurstuecksdatenAgrarGrunddatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
             result.add( new FlurstuecksdatenAgrarBodenwertFormEditorPage( feature, formEditor.getFeatureStore() ) );
+        }
+        else if (name.equalsIgnoreCase( WohnungseigentumComposite.NAME )) {
+            result.add( new WohnungseigentumObjektdatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
+            result.add( new WohnungseigentumGebaeudeFormEditorPage( feature, formEditor.getFeatureStore() ) );
+            result.add( new WohnungseigentumFlurstueckeFormEditorPage( feature, formEditor.getFeatureStore() ) );
+        }
+        else if (name.equalsIgnoreCase( WohnungComposite.NAME )) {
+            result.add( new WohnungGrunddatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
+            result.add( new WohnungVertragsdatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
+            result.add( new WohnungLiegenschaftzinsFormEditorPage( feature, formEditor.getFeatureStore() ) );
         }
         return result;
     }

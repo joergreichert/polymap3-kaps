@@ -121,10 +121,10 @@ public interface FlurstueckComposite
     // LAGE VARCHAR(35),
     // Enthält nochmal den Strassennamen, in UI nicht zu erkennen
 
-    // HAUSNR INTEGER DEFAULT 0,
+    // HAUSNR INTEGER
     @Optional
     @ImportColumn("HAUSNR")
-    Property<Integer> hausnummer();
+    Property<String> hausnummer();
 
 
     // STRNR VARCHAR(5),

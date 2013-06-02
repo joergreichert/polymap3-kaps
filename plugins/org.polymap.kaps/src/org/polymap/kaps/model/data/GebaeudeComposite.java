@@ -24,6 +24,9 @@ import org.qi4j.api.property.Computed;
 import org.qi4j.api.property.ComputedPropertyInstance;
 import org.qi4j.api.property.GenericPropertyInfo;
 import org.qi4j.api.property.Property;
+import org.qi4j.api.query.Query;
+import org.qi4j.api.query.QueryExpressions;
+import org.qi4j.api.query.grammar.BooleanExpression;
 
 import org.polymap.core.qi4j.QiEntity;
 import org.polymap.core.qi4j.event.ModelChangeSupport;
@@ -31,6 +34,7 @@ import org.polymap.core.qi4j.event.PropertyChangeSupport;
 
 import org.polymap.kaps.importer.ImportColumn;
 import org.polymap.kaps.importer.ImportTable;
+import org.polymap.kaps.model.KapsRepository;
 
 /**
  * 
@@ -46,90 +50,92 @@ public interface GebaeudeComposite
         extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite {
 
     String NAME = "Gebäude";
-    
+
+
     // OBJEKTNR - Long
     @Optional
     @ImportColumn("OBJEKTNR")
-    Property<Long> objektNummer();
-    
+    Property<Integer> objektNummer();
+
 
     // OBJEKTNRFORTF - Long
     @Optional
     @ImportColumn("OBJEKTNRFORTF")
-    Property<Long> objektFortfuehrung();
-    
+    Property<Integer> objektFortfuehrung();
+
 
     // GEBNR - Long
     @Optional
     @ImportColumn("GEBNR")
-    Property<Long> gebaeudeNummer();
-    
+    Property<Integer> gebaeudeNummer();
+
 
     // FORTF - Long
     @Optional
     @ImportColumn("FORTF")
-    Property<Long> gebaeudeFortfuehrung();
-    
+    Property<Integer> gebaeudeFortfuehrung();
+
 
     // GEBART - String
     @Optional
     Association<GebaeudeArtComposite> gebaeudeArt();
-    
+
 
     // AUFZUG - String JNNull
     @Optional
     @ImportColumn("AUFZUG")
     Property<String> aufzug();
-    
+
 
     // LAGEKLWE - Double
     @Optional
     @ImportColumn("LAGEKLWE")
     Property<Double> lageklasse();
-    
+
 
     // BEMERKUNG - String
     @Optional
     @ImportColumn("BEMERKUNG")
     Property<String> bemerkung();
-    
+
 
     // BAUJAHR - Long
     @Optional
     @ImportColumn("BAUJAHR")
-    Property<Long> baujahr();
-    
+    Property<Integer> baujahr();
+
 
     // BAUJAHRTATS - Long
     @Optional
     @ImportColumn("BAUJAHRTATS")
-    Property<Long> baujahrTatsaechlich();
-    
+    Property<Integer> baujahrTatsaechlich();
+
 
     // Sanierung - String JNNull
     @Optional
     @ImportColumn("Sanierung")
     Property<String> sanierung();
-    
+
 
     // Weinheit - Long
     @Optional
     @ImportColumn("Weinheit")
-    Property<Long> wohnEinheiten();
-    
+    Property<Integer> wohnEinheiten();
+
 
     // SANANFEND - String
     @Optional
     @ImportColumn("SANANFEND")
     // AENull
     Property<String> sanierungswert();
-    
+
 
     // DENKMALSCHUTZ - String
     @Optional
     @ImportColumn("DENKMALSCHUTZ")
     Property<String> denkmalschutz();
-    
+
+
     @Optional
     @Computed
     Property<String> schl();
@@ -143,17 +149,29 @@ public interface GebaeudeComposite
 
         private static Log log = LogFactory.getLog( Mixin.class );
 
+
         @Override
         public Property<String> schl() {
-            return new ComputedPropertyInstance<String>( new GenericPropertyInfo( WohnungseigentumComposite.class, "schl" ) ) {
+            return new ComputedPropertyInstance<String>( new GenericPropertyInfo( WohnungseigentumComposite.class,
+                    "schl" ) ) {
 
                 @Override
                 public String get() {
-                    return objektNummer().get() + "/" + objektFortfuehrung().get() + "/" + gebaeudeNummer().get() + "/" + gebaeudeFortfuehrung().get();
+                    return objektNummer().get() + "/" + objektFortfuehrung().get() + "/" + gebaeudeNummer().get() + "/"
+                            + gebaeudeFortfuehrung().get();
                 }
             };
         }
 
-    }
 
+        public static Iterable<GebaeudeComposite> forEntity( WohnungseigentumComposite eigentum ) {
+            GebaeudeComposite template = QueryExpressions.templateFor( GebaeudeComposite.class );
+            BooleanExpression expr = QueryExpressions.and(
+                    QueryExpressions.eq( template.objektNummer(), eigentum.objektNummer().get() ),
+                    QueryExpressions.eq( template.objektFortfuehrung(), eigentum.objektFortfuehrung().get() ) );
+            Query<GebaeudeComposite> matches = KapsRepository.instance().findEntities( GebaeudeComposite.class, expr,
+                    0, -1 );
+            return matches;
+        }
+    }
 }

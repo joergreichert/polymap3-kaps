@@ -65,6 +65,7 @@ import org.polymap.kaps.model.data.StalaComposite;
 import org.polymap.kaps.model.data.StrasseComposite;
 import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.VertragsArtComposite;
+import org.polymap.kaps.model.data.WohnungComposite;
 import org.polymap.kaps.model.data.WohnungseigentumComposite;
 
 /**
@@ -167,6 +168,8 @@ public class KapsRepository
 
                     new SimpleEntityProvider<WohnungseigentumComposite>( this, WohnungseigentumComposite.class,
                             new NameImpl( KapsRepository.NAMESPACE, WohnungseigentumComposite.NAME ) ),
+                            new SimpleEntityProvider<WohnungComposite>( this, WohnungComposite.class,
+                                    new NameImpl( KapsRepository.NAMESPACE, WohnungComposite.NAME ) ),
                     // nicht änderbare Wertelisten
                     // new SimpleEntityProvider<ErschliessungsBeitragComposite>(
                     // this,

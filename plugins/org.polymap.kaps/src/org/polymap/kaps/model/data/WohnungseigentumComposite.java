@@ -52,13 +52,13 @@ public interface WohnungseigentumComposite
     // OBJEKTNR - Long
     @Optional
     @ImportColumn("OBJEKTNR")
-    Property<Long> objektNummer();
+    Property<Integer> objektNummer();
 
 
     // FORTF - Long
     @Optional
     @ImportColumn("FORTF")
-    Property<Long> objektFortfuehrung();
+    Property<Integer> objektFortfuehrung();
 
 
     // FLURSTUECK - String
@@ -93,8 +93,8 @@ public interface WohnungseigentumComposite
 
     // GFLAECHE_AKT - Long
     @Optional
-    @ImportColumn("GFLAECHE_AKT")
-    Property<Long> gesamtFlaeche();
+//    @ImportColumn("GFLAECHE_AKT")
+    Property<Double> gesamtFlaeche();
 
 
     // TEURNR - String

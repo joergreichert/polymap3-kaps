@@ -51,37 +51,37 @@ public interface WohnungsTeileigentumComposite
     // OBJEKTNR - Long
     @Optional
     @ImportColumn("OBJEKTNR")
-    Property<Long> objektNummer();
+    Property<Integer> objektNummer();
 
 
     // OBJEKTNRFORTF - Long
     @Optional
     @ImportColumn("OBJEKTNRFORTF")
-    Property<Long> objektFortfuehrung();
+    Property<Integer> objektFortfuehrung();
 
 
     // GEBNR - Long
     @Optional
     @ImportColumn("GEBNR")
-    Property<Long> gebaeudeNummer();
+    Property<Integer> gebaeudeNummer();
 
 
     // GEBFORTF - Long
     @Optional
     @ImportColumn("GEBFORTF")
-    Property<Long> gebaeudeFortfuehrung();
+    Property<Integer> gebaeudeFortfuehrung();
 
 
     // WOHNUNGSNR - Long
     @Optional
     @ImportColumn("WOHNUNGSNR")
-    Property<Long> wohnungsNummer();
+    Property<Integer> wohnungsNummer();
 
 
     // FORTF - Long
     @Optional
     @ImportColumn("FORTF")
-    Property<Long> wohnungsFortfuehrung();
+    Property<Integer> wohnungsFortfuehrung();
 
 
     // TENR - String

@@ -202,7 +202,7 @@ public class KaufvertragFlurstueckeFormEditorPage
         // .setLayoutData( right().top( line0 ).create() ).create();
 
         // BUTTON zur Datenabfrage
-        sfAction = new FlurstueckSearcher( prefix, selectedComposite ) {
+        sfAction = new FlurstueckSearcher( prefix ) {
 
             protected void adopt( FlurstueckComposite toAdopt )
                     throws Exception {
@@ -273,7 +273,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                         new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix + "hausnummer",
                                 new PropertyCallback<FlurstueckComposite>() {
 
-                                    public Property<Integer> get( FlurstueckComposite entity ) {
+                                    public Property<String> get( FlurstueckComposite entity ) {
                                         return entity.hausnummer();
                                     }
                                 } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )

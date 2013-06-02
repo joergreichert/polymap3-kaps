@@ -26,6 +26,9 @@ import org.qi4j.api.property.Computed;
 import org.qi4j.api.property.ComputedPropertyInstance;
 import org.qi4j.api.property.GenericPropertyInfo;
 import org.qi4j.api.property.Property;
+import org.qi4j.api.query.Query;
+import org.qi4j.api.query.QueryExpressions;
+import org.qi4j.api.query.grammar.BooleanExpression;
 
 import org.polymap.core.qi4j.QiEntity;
 import org.polymap.core.qi4j.event.ModelChangeSupport;
@@ -33,6 +36,7 @@ import org.polymap.core.qi4j.event.PropertyChangeSupport;
 
 import org.polymap.kaps.importer.ImportColumn;
 import org.polymap.kaps.importer.ImportTable;
+import org.polymap.kaps.model.KapsRepository;
 
 /**
  * 
@@ -53,37 +57,37 @@ public interface WohnungComposite
     // OBJEKTNR - Long
     @Optional
     @ImportColumn("OBJEKTNR")
-    Property<Long> objektNummer();
+    Property<Integer> objektNummer();
 
 
     // OBJEKTNRFORTF - Long
     @Optional
     @ImportColumn("OBJEKTNRFORTF")
-    Property<Long> objektFortfuehrung();
+    Property<Integer> objektFortfuehrung();
 
 
     // GEBNR - Long
     @Optional
     @ImportColumn("GEBNR")
-    Property<Long> gebaeudeNummer();
+    Property<Integer> gebaeudeNummer();
 
 
     // GEBFORTF - Long
     @Optional
     @ImportColumn("GEBFORTF")
-    Property<Long> gebaeudeFortfuehrung();
+    Property<Integer> gebaeudeFortfuehrung();
 
 
     // WOHNUNGSNR - Long
     @Optional
     @ImportColumn("WOHNUNGSNR")
-    Property<Long> wohnungsNummer();
+    Property<Integer> wohnungsNummer();
 
 
     // FORTF - Long
     @Optional
     @ImportColumn("FORTF")
-    Property<Long> wohnungsFortfuehrung();
+    Property<Integer> wohnungsFortfuehrung();
 
 
     // WENR - String
@@ -158,13 +162,13 @@ public interface WohnungComposite
     // BAUJAHR - Long
     @Optional
     @ImportColumn("BAUJAHR")
-    Property<Long> baujahr();
+    Property<Integer> baujahr();
 
 
     // UMBAU - Long
     @Optional
     @ImportColumn("UMBAU")
-    Property<Long> umbau();
+    Property<Integer> umbau();
 
 
     // BERBAUJ - INT
@@ -245,8 +249,8 @@ public interface WohnungComposite
 
     // EINGANGSNR - Double
     @Optional
-    @ImportColumn("EINGANGSNR")
-    Property<Double> eingangsNummer();
+    // @ImportColumn("EINGANGSNR")
+    Property<Integer> eingangsNummer();
 
 
     //
@@ -281,10 +285,12 @@ public interface WohnungComposite
     // Property<String> KKREIS();
     //
     //
-    // // TODO KAUFPREIS - Double
-    // @Optional
-    // @ImportColumn("KAUFPREIS")
-    // Property<Double> KAUFPREIS();
+    // KAUFPREIS - Double
+    @Optional
+    @ImportColumn("KAUFPREIS")
+    Property<Double> kaufpreis();
+
+
     //
     //
     // ABGA - Double
@@ -304,7 +310,7 @@ public interface WohnungComposite
     // ABNEB - Double
     @Optional
     @ImportColumn("ABNEB")
-    Property<Double> abschlagAnders();
+    Property<Double> abschlagAnderes();
 
 
     //
@@ -356,6 +362,8 @@ public interface WohnungComposite
     @ImportColumn("MONROHERTR")
     Property<Double> monatlicherRohertrag();
 
+    @Optional
+    Property<Double> monatlicherRohertragJeQm();
 
     // MIETFESEIT - SHORT_DATE_TIME
     @Optional
@@ -382,8 +390,8 @@ public interface WohnungComposite
 
     // BEBABSCHL - Long
     @Optional
-    @ImportColumn("BEBABSCHL")
-    Property<Long> bebauungsabschlagInProzent();
+//    @ImportColumn("BEBABSCHL")
+    Property<Double> bebauungsabschlagInProzent();
 
 
     // TODO GEBBOD - Double
@@ -495,53 +503,54 @@ public interface WohnungComposite
     Association<FlurstueckWohneigentumComposite> flurstueck();
 
 
-    // TODO GEM - String
-    @Optional
-    @ImportColumn("GEM")
-    Property<String> GEM();
-
-
-    // TODO FLUR - String
-    @Optional
-    @ImportColumn("FLUR")
-    Property<String> FLUR();
-
-
-    // TODO GEMEINDE - Long
-    @Optional
-    @ImportColumn("GEMEINDE")
-    Property<Long> GEMEINDE();
-
-
-    // TODO STRNR - String
-    @Optional
-    @ImportColumn("STRNR")
-    Property<String> STRNR();
-
-
-    // TODO HAUSNR - String
-    @Optional
-    @ImportColumn("HAUSNR")
-    Property<String> HAUSNR();
-
-
-    // TODO HZUSNR - String
-    @Optional
-    @ImportColumn("HZUSNR")
-    Property<String> HZUSNR();
-
-
-    // TODO FLSTNR - Long
-    @Optional
-    @ImportColumn("FLSTNR")
-    Property<Long> FLSTNR();
-
-
-    // TODO FLSTNRU - String
-    @Optional
-    @ImportColumn("FLSTNRU")
-    Property<String> FLSTNRU();
-
+    //
+    // // TODO GEM - String
+    // @Optional
+    // @ImportColumn("GEM")
+    // Property<String> GEM();
+    //
+    //
+    // // TODO FLUR - String
+    // @Optional
+    // @ImportColumn("FLUR")
+    // Property<String> FLUR();
+    //
+    //
+    // // TODO GEMEINDE - Long
+    // @Optional
+    // @ImportColumn("GEMEINDE")
+    // Property<Integer> GEMEINDE();
+    //
+    //
+    // // TODO STRNR - String
+    // @Optional
+    // @ImportColumn("STRNR")
+    // Property<String> STRNR();
+    //
+    //
+    // // TODO HAUSNR - String
+    // @Optional
+    // @ImportColumn("HAUSNR")
+    // Property<String> HAUSNR();
+    //
+    //
+    // // TODO HZUSNR - String
+    // @Optional
+    // @ImportColumn("HZUSNR")
+    // Property<String> HZUSNR();
+    //
+    //
+    // // TODO FLSTNR - Long
+    // @Optional
+    // @ImportColumn("FLSTNR")
+    // Property<Integer> FLSTNR();
+    //
+    //
+    // // TODO FLSTNRU - String
+    // @Optional
+    // @ImportColumn("FLSTNRU")
+    // Property<String> FLSTNRU();
+    //
 
     // Zusatz - String
     @Optional
@@ -642,13 +651,13 @@ public interface WohnungComposite
     // TODO NHK - Long
     @Optional
     @ImportColumn("NHK")
-    Property<Long> NHK();
+    Property<Integer> NHK();
 
 
     // GEWICHT - Long
     @Optional
     @ImportColumn("GEWICHT")
-    Property<Long> gewichtungFehlabweichung();
+    Property<Integer> gewichtungFehlabweichung();
 
 
     // G1 - String
@@ -660,7 +669,7 @@ public interface WohnungComposite
     // FL1 - Long
     @Optional
     @ImportColumn("FL1")
-    Property<Long> flaeche1();
+    Property<Integer> flaeche1();
 
 
     // M1 - Double
@@ -678,7 +687,7 @@ public interface WohnungComposite
     // FL2 - Long
     @Optional
     @ImportColumn("FL2")
-    Property<Long> flaeche2();
+    Property<Integer> flaeche2();
 
 
     // M2 - Double
@@ -696,7 +705,7 @@ public interface WohnungComposite
     // FL3 - Long
     @Optional
     @ImportColumn("FL3")
-    Property<Long> flaeche3();
+    Property<Integer> flaeche3();
 
 
     // M3 - Double
@@ -714,7 +723,7 @@ public interface WohnungComposite
     // FL4 - Long
     @Optional
     @ImportColumn("FL4")
-    Property<Long> flaeche4();
+    Property<Integer> flaeche4();
 
 
     // M4 - Double
@@ -732,7 +741,7 @@ public interface WohnungComposite
     // FL5 - Long
     @Optional
     @ImportColumn("FL5")
-    Property<Long> flaeche5();
+    Property<Integer> flaeche5();
 
 
     // M5 - Double
@@ -750,7 +759,7 @@ public interface WohnungComposite
     // FL6 - Long
     @Optional
     @ImportColumn("FL6")
-    Property<Long> flaeche6();
+    Property<Integer> flaeche6();
 
 
     // M6 - Double
@@ -762,7 +771,7 @@ public interface WohnungComposite
     // BETRKOST - Long
     @Optional
     @ImportColumn("BETRKOST")
-    Property<Long> betriebskostenInProzent();
+    Property<Integer> betriebskostenInProzent();
 
 
     // LIZI_GARAGE - String
@@ -832,37 +841,37 @@ public interface WohnungComposite
     // ANZAHL1 - Long
     @Optional
     @ImportColumn("ANZAHL1")
-    Property<Long> anzahl1();
+    Property<Integer> anzahl1();
 
 
     // ANZAHL2 - Long
     @Optional
     @ImportColumn("ANZAHL2")
-    Property<Long> anzahl2();
+    Property<Integer> anzahl2();
 
 
     // ANZAHL3 - Long
     @Optional
     @ImportColumn("ANZAHL3")
-    Property<Long> anzahl3();
+    Property<Integer> anzahl3();
 
 
     // ANZAHL4 - Long
     @Optional
     @ImportColumn("ANZAHL4")
-    Property<Long> anzahl4();
+    Property<Integer> anzahl4();
 
 
     // ANZAHL5 - Long
     @Optional
     @ImportColumn("ANZAHL5")
-    Property<Long> anzahl5();
+    Property<Integer> anzahl5();
 
 
     // ANZAHL6 - Long
     @Optional
     @ImportColumn("ANZAHL6")
-    Property<Long> anzahl6();
+    Property<Integer> anzahl6();
 
 
     @Optional
@@ -890,6 +899,33 @@ public interface WohnungComposite
                             + wohnungsFortfuehrung().get();
                 }
             };
+        }
+
+
+        public static Iterable<FlurstueckWohneigentumComposite> findFlurstueckeFor( WohnungComposite wohnung ) {
+            FlurstueckWohneigentumComposite template = QueryExpressions
+                    .templateFor( FlurstueckWohneigentumComposite.class );
+            BooleanExpression expr = QueryExpressions.and(
+                    QueryExpressions.eq( template.objektNummer(), wohnung.objektNummer().get() ),
+                    QueryExpressions.eq( template.objektFortfuehrung(), wohnung.objektFortfuehrung().get() ),
+                    QueryExpressions.eq( template.gebaeudeNummer(), wohnung.gebaeudeNummer().get() ),
+                    QueryExpressions.eq( template.gebaeudeFortfuehrung(), wohnung.gebaeudeFortfuehrung().get() ) );
+            Query<FlurstueckWohneigentumComposite> matches = KapsRepository.instance().findEntities(
+                    FlurstueckWohneigentumComposite.class, expr, 0, -1 );
+            return matches;
+        }
+
+
+        public static VertragComposite vertragFor( WohnungComposite wohnung ) {
+            Integer number = wohnung.eingangsNummer().get().intValue();
+            if (number != null) {
+                VertragComposite template = QueryExpressions.templateFor( VertragComposite.class );
+                BooleanExpression expr = QueryExpressions.eq( template.eingangsNr(), number );
+                Query<VertragComposite> matches = KapsRepository.instance().findEntities( VertragComposite.class, expr,
+                        0, 1 );
+                return matches.find();
+            }
+            return null;
         }
     }
 

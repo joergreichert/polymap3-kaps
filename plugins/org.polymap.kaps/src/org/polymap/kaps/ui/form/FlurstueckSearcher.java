@@ -46,7 +46,6 @@ import org.polymap.core.model.EntityType;
 import org.polymap.core.workbench.PolymapWorkbench;
 
 import org.polymap.rhei.data.entityfeature.PropertyDescriptorAdapter;
-import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter.CompositeProvider;
 import org.polymap.rhei.field.FormFieldEvent;
 import org.polymap.rhei.field.IFormFieldListener;
 
@@ -69,8 +68,6 @@ public abstract class FlurstueckSearcher
 
     private List<FlurstueckComposite>                    content;
 
-    private final CompositeProvider<FlurstueckComposite> provider;
-
     private final String                                 prefix;
 
     private GemarkungComposite                           gemarkung;
@@ -82,10 +79,9 @@ public abstract class FlurstueckSearcher
     private String                                       unterNummer;
 
 
-    public FlurstueckSearcher( String prefix, CompositeProvider<FlurstueckComposite> provider ) {
+    public FlurstueckSearcher( String prefix) {
         super( "Flurstück suchen" );
         this.prefix = prefix;
-        this.provider = provider;
 
         setToolTipText( "Flurstück suchen" );
         // setImageDescriptor( BiotopPlugin.imageDescriptorFromPlugin(

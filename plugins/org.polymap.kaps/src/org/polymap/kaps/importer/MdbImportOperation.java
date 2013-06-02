@@ -706,6 +706,13 @@ public class MdbImportOperation
 
                 @Override
                 public void fillEntity( WohnungseigentumComposite entity, Map<String, Object> builderRow ) {
+
+                    // LONG to Double
+
+                    Integer flaeche = (Integer)builderRow.get( "GFLAECHE_AKT" );
+                    if (flaeche != null) {
+                        entity.gesamtFlaeche().set( Double.valueOf( flaeche.doubleValue() ) );
+                    }
                     String separator = System.getProperty( "line.separator" );
                     // BEM1 und BEM2 zusammenfassen
                     String bem1 = (String)builderRow.get( "BEMERKUNG" );
@@ -730,7 +737,7 @@ public class MdbImportOperation
 
                 @Override
                 public void fillEntity( GebaeudeComposite entity, Map<String, Object> builderRow ) {
-                    if (entity.sanierungswert() == null) {
+                    if (entity.sanierungswert().get() == null) {
                         entity.sanierungswert().set( "U" );
                     }
                     entity.gebaeudeArt().set( find( allGebaeudeArt, builderRow, "GEBART" ) );
@@ -759,12 +766,15 @@ public class MdbImportOperation
                             Date jahr = (Date)builderRow.get( "RIJAHR" );
                             //
                             try {
-                            RichtwertzoneZeitraumComposite found = MdbImportOperation.this.findRichtwertZone( w,
-                                    allRichtwertZoneGueltigkeit, zone, gemeinde, jahr,
-                                    FlurstueckWohneigentumComposite.class, entity.schl().get() + "_" + entity.gemarkung().get().name().get() );
-                            entity.richtwertZone().set( found.zone().get() );
-                            } catch (Exception e) {
-                                // weitermachen und importieren, die suche stimmt, aber die Daten sind Mist
+                                RichtwertzoneZeitraumComposite found = MdbImportOperation.this.findRichtwertZone( w,
+                                        allRichtwertZoneGueltigkeit, zone, gemeinde, jahr,
+                                        FlurstueckWohneigentumComposite.class, entity.schl().get() + "_"
+                                                + entity.gemarkung().get().name().get() );
+                                entity.richtwertZone().set( found.zone().get() );
+                            }
+                            catch (Exception e) {
+                                // weitermachen und importieren, die suche stimmt,
+                                // aber die Daten sind Mist
                             }
 
                             allFlurstueckWohneigentum.put( entity.schl().get(), entity );
@@ -774,7 +784,17 @@ public class MdbImportOperation
             importEntity( db, sub, WohnungComposite.class, new EntityCallback<WohnungComposite>() {
 
                 @Override
-                public void fillEntity( WohnungComposite entity, Map<String, Object> builderRow ) throws IOException {
+                public void fillEntity( WohnungComposite entity, Map<String, Object> builderRow )
+                        throws IOException {
+
+                    Double eingangsnummer = (Double)builderRow.get( "EINGANGSNR" );
+                    if (eingangsnummer != null) {
+                        entity.eingangsNummer().set( eingangsnummer.intValue() );
+                    }
+                    Integer abschl = (Integer)builderRow.get( "BEBABSCHL" );
+                    if (abschl != null) {
+                        entity.bebauungsabschlagInProzent().set( abschl.doubleValue() );
+                    }
 
                     entity.mitBebauungsabschlag().set( getBooleanValue( builderRow, "BEBAB" ) );
                     entity.geeignet().set( getBooleanValue( builderRow, "VERWERTEN" ) );
@@ -787,6 +807,7 @@ public class MdbImportOperation
                             getBooleanValue( builderRow, "LIZI_GARAGE" ) );
                     entity.zurAuswertungGeeignet().set( getBooleanValue( builderRow, "VERARBKZ" ) );
 
+                    entity.ausstattung().set( find( allAusstattung, builderRow, "BEWSCHL" ) );
                     entity.eigentumsArt().set( find( allEigentumsArt, builderRow, "EIGENTART" ) );
                     entity.etage().set( find( allEtageArt, builderRow, "GESCHOSS" ) );
                     entity.himmelsrichtung().set( find( allHimmelsrichtung, builderRow, "HIMMELSRI" ) );
@@ -817,9 +838,11 @@ public class MdbImportOperation
                             + builderRow.get( "FLSTNR" ) + "/" + builderRow.get( "FLSTNRU" );
                     FlurstueckWohneigentumComposite flurstueck = allFlurstueckWohneigentum.get( flurstueckNummer );
                     if (flurstueck == null) {
-                        w.write( String.format( "Kein Flurstück in Gebäude gefunden für %s in %s:%s\n", flurstueckNummer, WohnungComposite.class, entity.schl().get() ));
-                    } else {
-                    entity.flurstueck().set( flurstueck );
+                        w.write( String.format( "Kein Flurstück in Gebäude gefunden für %s in %s:%s\n",
+                                flurstueckNummer, WohnungComposite.class, entity.schl().get() ) );
+                    }
+                    else {
+                        entity.flurstueck().set( flurstueck );
                     }
                 }
             } );
