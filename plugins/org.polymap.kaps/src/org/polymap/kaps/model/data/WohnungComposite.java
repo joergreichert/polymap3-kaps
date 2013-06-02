@@ -1,0 +1,896 @@
+/*
+ * polymap.org Copyright 2013 Polymap GmbH. All rights reserved.
+ * 
+ * This is free software; you can redistribute it and/or modify it under the terms of
+ * the GNU Lesser General Public License as published by the Free Software
+ * Foundation; either version 2.1 of the License, or (at your option) any later
+ * version.
+ * 
+ * This software is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
+ */
+package org.polymap.kaps.model.data;
+
+import java.util.Date;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import org.qi4j.api.common.Optional;
+import org.qi4j.api.concern.Concerns;
+import org.qi4j.api.entity.EntityComposite;
+import org.qi4j.api.entity.association.Association;
+import org.qi4j.api.mixin.Mixins;
+import org.qi4j.api.property.Computed;
+import org.qi4j.api.property.ComputedPropertyInstance;
+import org.qi4j.api.property.GenericPropertyInfo;
+import org.qi4j.api.property.Property;
+
+import org.polymap.core.qi4j.QiEntity;
+import org.polymap.core.qi4j.event.ModelChangeSupport;
+import org.polymap.core.qi4j.event.PropertyChangeSupport;
+
+import org.polymap.kaps.importer.ImportColumn;
+import org.polymap.kaps.importer.ImportTable;
+
+/**
+ * 
+ * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
+ */
+@Concerns({ PropertyChangeSupport.Concern.class })
+@Mixins({ WohnungComposite.Mixin.class, PropertyChangeSupport.Mixin.class, ModelChangeSupport.Mixin.class,
+        QiEntity.Mixin.class
+// JsonState.Mixin.class
+})
+@ImportTable("K_EWOHN")
+public interface WohnungComposite
+        extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite {
+
+    String NAME = "Wohnung";
+
+
+    // OBJEKTNR - Long
+    @Optional
+    @ImportColumn("OBJEKTNR")
+    Property<Long> objektNummer();
+
+
+    // OBJEKTNRFORTF - Long
+    @Optional
+    @ImportColumn("OBJEKTNRFORTF")
+    Property<Long> objektFortfuehrung();
+
+
+    // GEBNR - Long
+    @Optional
+    @ImportColumn("GEBNR")
+    Property<Long> gebaeudeNummer();
+
+
+    // GEBFORTF - Long
+    @Optional
+    @ImportColumn("GEBFORTF")
+    Property<Long> gebaeudeFortfuehrung();
+
+
+    // WOHNUNGSNR - Long
+    @Optional
+    @ImportColumn("WOHNUNGSNR")
+    Property<Long> wohnungsNummer();
+
+
+    // FORTF - Long
+    @Optional
+    @ImportColumn("FORTF")
+    Property<Long> wohnungsFortfuehrung();
+
+
+    // WENR - String
+    @Optional
+    @ImportColumn("WENR")
+    Property<String> wohnungseigentumsNummer();
+
+
+    // EIGENTART - String
+    @Optional
+    Association<EigentumsartComposite> eigentumsArt();
+
+
+    // WOHNFL - Double
+    @Optional
+    @ImportColumn("WOHNFL")
+    Property<Double> wohnflaeche();
+
+
+    // ZAHLZI - Double
+    @Optional
+    @ImportColumn("ZAHLZI")
+    Property<Double> anzahlZimmer();
+
+
+    // BRZAEHLER - Double
+    @Optional
+    @ImportColumn("BRZAEHLER")
+    Property<Double> bruchteilZaehler();
+
+
+    // BRNENNER - Double
+    @Optional
+    @ImportColumn("BRNENNER")
+    Property<Double> bruchteilNenner();
+
+
+    // GESCHOSS - String
+    @Optional
+    Association<EtageComposite> etage();
+
+
+    // TODO GJAHR - INT
+    @Optional
+    @ImportColumn("GJAHR")
+    Property<Integer> GJAHR();
+
+
+    // GESCHBESCH - String
+    @Optional
+    @ImportColumn("GESCHBESCH")
+    Property<String> etageBeschreibung();
+
+
+    // AUFZUG - String
+    @Optional
+    @ImportColumn("AUFZUG")
+    Property<String> aufzug();
+
+
+    // HIMMELSRI - String
+    @Optional
+    Association<HimmelsrichtungComposite> himmelsrichtung();
+
+
+    // TODO HJAHR - INT
+    @Optional
+    @ImportColumn("HJAHR")
+    Property<Integer> HJAHR();
+
+
+    // BAUJAHR - Long
+    @Optional
+    @ImportColumn("BAUJAHR")
+    Property<Long> baujahr();
+
+
+    // UMBAU - Long
+    @Optional
+    @ImportColumn("UMBAU")
+    Property<Long> umbau();
+
+
+    // BERBAUJ - INT
+    @Optional
+    @ImportColumn("BERBAUJ")
+    Property<Integer> bereinigtesBaujahr();
+
+
+    // GLDAUER - Double
+    @Optional
+    @ImportColumn("GLDAUER")
+    Property<Double> gesamtNutzungsDauer();
+
+
+    // TODO GAANZAHL - Double
+    @Optional
+    @ImportColumn("GAANZAHL")
+    Property<Double> GAANZAHL();
+
+
+    // TODO GAART1 - String
+    @Optional
+    @ImportColumn("GAART1")
+    Property<String> GAART1();
+
+
+    // TODO GAART2 - String
+    @Optional
+    @ImportColumn("GAART2")
+    Property<String> GAART2();
+
+
+    // TODO STANZAHL - Double
+    @Optional
+    @ImportColumn("STANZAHL")
+    Property<Double> STANZAHL();
+
+
+    // TODO START1 - String
+    @Optional
+    @ImportColumn("START1")
+    Property<String> START1();
+
+
+    // TODO START2 - String
+    @Optional
+    @ImportColumn("START2")
+    Property<String> START2();
+
+
+    // GEBBRVERS - Double
+    @Optional
+    @ImportColumn("GEBBRVERS")
+    Property<Double> gebaeudebrandversicherungswert();
+
+
+    // TODO BEWSCHL - String
+    @Optional
+    Association<AusstattungComposite> ausstattung();
+
+
+    // BEWPUNKTE - Double
+    @Optional
+    @ImportColumn("BEWPUNKTE")
+    Property<Double> bewertungsPunkte();
+
+
+    // BALKON - String
+    @Optional
+    @ImportColumn("BALKON")
+    Property<String> balkon();
+
+
+    // BEMERKUNG - String
+    @Optional
+    Property<String> bemerkung();
+
+
+    // EINGANGSNR - Double
+    @Optional
+    @ImportColumn("EINGANGSNR")
+    Property<Double> eingangsNummer();
+
+
+    //
+    //
+    // // TODO VERTDATUM - SHORT_DATE_TIME
+    // @Optional
+    // @ImportColumn("VERTDATUM")
+    // Property<SHORT_DATE_TIME> VERTDATUM();
+    //
+    //
+    // // TODO VERKZEITP - String
+    // @Optional
+    // @ImportColumn("VERKZEITP")
+    // Property<String> VERKZEITP();
+    //
+    //
+    // // TODO VERTRAGART - String
+    // @Optional
+    // @ImportColumn("VERTRAGART")
+    // Property<String> VERTRAGART();
+    //
+    //
+    // // TODO VKREIS - String
+    // @Optional
+    // @ImportColumn("VKREIS")
+    // Property<String> VKREIS();
+    //
+    //
+    // // TODO KKREIS - String
+    // @Optional
+    // @ImportColumn("KKREIS")
+    // Property<String> KKREIS();
+    //
+    //
+    // // TODO KAUFPREIS - Double
+    // @Optional
+    // @ImportColumn("KAUFPREIS")
+    // Property<Double> KAUFPREIS();
+    //
+    //
+    // ABGA - Double
+    @Optional
+    @ImportColumn("ABGA")
+    Property<Double> abschlagGarage();
+
+
+    //
+    //
+    // // TODO ABBEM1 - String
+    // @Optional
+    // @ImportColumn("ABBEM1")
+    // Property<String> ABBEM1();
+    //
+    //
+    // ABNEB - Double
+    @Optional
+    @ImportColumn("ABNEB")
+    Property<Double> abschlagAnders();
+
+
+    //
+    //
+    // // TODO ABBEM2 - String
+    // @Optional
+    // @ImportColumn("ABBEM2")
+    // Property<String> ABBEM2();
+    //
+    //
+    // BERKPREIS - Double
+    @Optional
+    @ImportColumn("BERKPREIS")
+    Property<Double> bereinigterVollpreis();
+
+
+    // DMQM - Double
+    @Optional
+    @ImportColumn("DMQM")
+    Property<Double> vollpreisWohnflaeche();
+
+
+    // VERMIETET - String
+    @Optional
+    @ImportColumn("VERMIETET")
+    Property<String> vermietet();
+
+
+    // GEWICHTUNG - Double
+    @Optional
+    @ImportColumn("GEWICHTUNG")
+    Property<Double> gewichtung();
+
+
+    // Boolean VERARBKZ - String
+    @Optional
+    // @ImportColumn("VERARBKZ")
+    Property<Boolean> zurAuswertungGeeignet();
+
+
+    // BEMERKUNG2 - String
+    @Optional
+    @ImportColumn("BEMERKUNG2")
+    Property<String> bemerkungVertragsdaten();
+
+
+    // MONROHERTR - Double
+    @Optional
+    @ImportColumn("MONROHERTR")
+    Property<Double> monatlicherRohertrag();
+
+
+    // MIETFESEIT - SHORT_DATE_TIME
+    @Optional
+    @ImportColumn("MIETFESEIT")
+    Property<Date> mietfestsetzungSeit();
+
+
+    // BODENUNB - Double
+    @Optional
+    @ImportColumn("BODENUNB")
+    Property<Double> bodenpreis();
+
+
+    // BEBAB - String
+    @Optional
+    Property<Boolean> mitBebauungsabschlag();
+
+
+    // BODENBEB - Double
+    @Optional
+    @ImportColumn("BODENBEB")
+    Property<Double> bebauungsabschlag();
+
+
+    // BEBABSCHL - Long
+    @Optional
+    @ImportColumn("BEBABSCHL")
+    Property<Long> bebauungsabschlagInProzent();
+
+
+    // TODO GEBBOD - Double
+    @Optional
+    @ImportColumn("GEBBOD")
+    Property<Double> GEBBOD();
+
+
+    // TODO BODENWE - Double
+    @Optional
+    @ImportColumn("BODENWE")
+    Property<Double> BODENWE();
+
+
+    // SACHWERT - Double
+    @Optional
+    @ImportColumn("SACHWERT")
+    Property<Double> sachwertDerWohnung();
+
+
+    // TODO KAUFSACH - Double
+    @Optional
+    @ImportColumn("KAUFSACH")
+    Property<Double> KAUFSACH();
+
+
+    // LIEZINS - Double
+    @Optional
+    @ImportColumn("LIEZINS")
+    Property<Double> liegenschaftsZins();
+
+
+    // TODO FEUEBSCHR - Double
+    @Optional
+    @ImportColumn("FEUEBSCHR")
+    Property<Double> FEUEBSCHR();
+
+
+    // VERWERTEN - String
+    @Optional
+    @ImportColumn("VERWERTEN")
+    Property<Boolean> geeignet();
+
+
+    //
+    // // TODO HINWEIS - String
+    // @Optional
+    // @ImportColumn("HINWEIS")
+    // Property<String> HINWEIS();
+
+    //
+    // // TODO DMEURO - String
+    // @Optional
+    // @ImportColumn("DMEURO")
+    // Property<String> DMEURO();
+
+    // GEBARTG - String
+    @Optional
+    Association<GebaeudeArtComposite> gebaeudeArtGarage();
+
+
+    // GEBARTS - String
+    @Optional
+    Association<GebaeudeArtComposite> gebaeudeArtStellplatz();
+
+
+    // GEBARTN - String
+    @Optional
+    Association<GebaeudeArtComposite> gebaeudeArtAnderes();
+
+
+    // ABST - Double
+    @Optional
+    @ImportColumn("ABST")
+    Property<Double> abschlagStellplatz();
+
+
+    // TODO ABBEMST - String
+    @Optional
+    @ImportColumn("ABBEMST")
+    Property<String> ABBEMST();
+
+
+    // TERRASSE - String
+    @Optional
+    @ImportColumn("TERRASSE")
+    Property<String> terrasse();
+
+
+    // SCHAETZGA - String
+    @Optional
+    @ImportColumn("SCHAETZGA")
+    Property<Boolean> schaetzungGarage();
+
+
+    // SCHAETZST - String
+    @Optional
+    @ImportColumn("SCHAETZST")
+    Property<Boolean> schaetzungStellplatz();
+
+
+    // SCHAETZNE - String
+    @Optional
+    @ImportColumn("SCHAETZNE")
+    Property<Boolean> schaetzungAnderes();
+
+
+    @Optional
+    Association<FlurstueckWohneigentumComposite> flurstueck();
+
+
+    // TODO GEM - String
+    @Optional
+    @ImportColumn("GEM")
+    Property<String> GEM();
+
+
+    // TODO FLUR - String
+    @Optional
+    @ImportColumn("FLUR")
+    Property<String> FLUR();
+
+
+    // TODO GEMEINDE - Long
+    @Optional
+    @ImportColumn("GEMEINDE")
+    Property<Long> GEMEINDE();
+
+
+    // TODO STRNR - String
+    @Optional
+    @ImportColumn("STRNR")
+    Property<String> STRNR();
+
+
+    // TODO HAUSNR - String
+    @Optional
+    @ImportColumn("HAUSNR")
+    Property<String> HAUSNR();
+
+
+    // TODO HZUSNR - String
+    @Optional
+    @ImportColumn("HZUSNR")
+    Property<String> HZUSNR();
+
+
+    // TODO FLSTNR - Long
+    @Optional
+    @ImportColumn("FLSTNR")
+    Property<Long> FLSTNR();
+
+
+    // TODO FLSTNRU - String
+    @Optional
+    @ImportColumn("FLSTNRU")
+    Property<String> FLSTNRU();
+
+
+    // Zusatz - String
+    @Optional
+    @ImportColumn("Zusatz")
+    Property<String> abschlagBemerkung();
+
+
+    // ANzan - INT
+    @Optional
+    @ImportColumn("ANzan")
+    Property<Integer> anzahlAnderes();
+
+
+    // Anzga - INT
+    @Optional
+    @ImportColumn("Anzga")
+    Property<Integer> anzahlGaragen();
+
+
+    // anzst - INT
+    @Optional
+    @ImportColumn("anzst")
+    Property<Integer> anzahlStellplatz();
+
+
+    // BERBODPREIS - Double
+    @Optional
+    @ImportColumn("BERBODPREIS")
+    Property<Double> bereinigterBodenpreis();
+
+
+    // TODO BEBABBETR - Double
+    @Optional
+    @ImportColumn("BEBABBETR")
+    Property<Double> BEBABBETR();
+
+
+    // BEWIKODM - Double
+    @Optional
+    @ImportColumn("BEWIKODM")
+    Property<Double> bewirtschaftsungsKosten();
+
+
+    // BEWIKOPROZ - Double
+    @Optional
+    @ImportColumn("BEWIKOPROZ")
+    Property<Double> bewirtschaftsungsKostenInProzent();
+
+
+    // JREINERTR - Double
+    @Optional
+    @ImportColumn("JREINERTR")
+    Property<Double> jahresReinErtrag();
+
+
+    // BODWERTANT - Double
+    @Optional
+    @ImportColumn("BODWERTANT")
+    Property<Double> bodenwertAnteil();
+
+
+    // BODWERTANTW - Double
+    @Optional
+    @ImportColumn("BODWERTANTW")
+    Property<Double> bodenwertAnteilDerWohnung();
+
+
+    // GEBWERTANT - Double
+    @Optional
+    @ImportColumn("GEBWERTANT")
+    Property<Double> gebaeudewertAnteil();
+
+
+    // GEBWERTANTW - Double
+    @Optional
+    @ImportColumn("GEBWERTANTW")
+    Property<Double> gebaeudewertAnteilDerWohnung();
+
+
+    // JREINKP - Double
+    @Optional
+    @ImportColumn("JREINKP")
+    Property<Double> jahresReinErtragZuKaufpreis();
+
+
+    // GEBWERTKP - Double
+    @Optional
+    @ImportColumn("GEBWERTKP")
+    Property<Double> gebaeuderwertAnteilZuKaufpreis();
+
+
+    // KORRFAKTOR - Double
+    @Optional
+    @ImportColumn("KORRFAKTOR")
+    Property<Double> korrekturFaktor();
+
+
+    // TODO NHK - Long
+    @Optional
+    @ImportColumn("NHK")
+    Property<Long> NHK();
+
+
+    // GEWICHT - Long
+    @Optional
+    @ImportColumn("GEWICHT")
+    Property<Long> gewichtungFehlabweichung();
+
+
+    // G1 - String
+    @Optional
+    @ImportColumn("G1")
+    Property<String> etage1();
+
+
+    // FL1 - Long
+    @Optional
+    @ImportColumn("FL1")
+    Property<Long> flaeche1();
+
+
+    // M1 - Double
+    @Optional
+    @ImportColumn("M1")
+    Property<Double> miete1();
+
+
+    // G2 - String
+    @Optional
+    @ImportColumn("G2")
+    Property<String> etage2();
+
+
+    // FL2 - Long
+    @Optional
+    @ImportColumn("FL2")
+    Property<Long> flaeche2();
+
+
+    // M2 - Double
+    @Optional
+    @ImportColumn("M2")
+    Property<Double> miete2();
+
+
+    // G3 - String
+    @Optional
+    @ImportColumn("G3")
+    Property<String> etage3();
+
+
+    // FL3 - Long
+    @Optional
+    @ImportColumn("FL3")
+    Property<Long> flaeche3();
+
+
+    // M3 - Double
+    @Optional
+    @ImportColumn("M3")
+    Property<Double> miete3();
+
+
+    // G4 - String
+    @Optional
+    @ImportColumn("G4")
+    Property<String> etage4();
+
+
+    // FL4 - Long
+    @Optional
+    @ImportColumn("FL4")
+    Property<Long> flaeche4();
+
+
+    // M4 - Double
+    @Optional
+    @ImportColumn("M4")
+    Property<Double> miete4();
+
+
+    // G5 - String
+    @Optional
+    @ImportColumn("G5")
+    Property<String> etage5();
+
+
+    // FL5 - Long
+    @Optional
+    @ImportColumn("FL5")
+    Property<Long> flaeche5();
+
+
+    // M5 - Double
+    @Optional
+    @ImportColumn("M5")
+    Property<Double> miete5();
+
+
+    // G6 - String
+    @Optional
+    @ImportColumn("G6")
+    Property<String> etage6();
+
+
+    // FL6 - Long
+    @Optional
+    @ImportColumn("FL6")
+    Property<Long> flaeche6();
+
+
+    // M6 - Double
+    @Optional
+    @ImportColumn("M6")
+    Property<Double> miete6();
+
+
+    // BETRKOST - Long
+    @Optional
+    @ImportColumn("BETRKOST")
+    Property<Long> betriebskostenInProzent();
+
+
+    // LIZI_GARAGE - String
+    @Optional
+    @ImportColumn("LIZI_GARAGE")
+    Property<Boolean> garagenBeiLiegenschaftszinsBeruecksichtigen();
+
+
+    // GESMIETE_EING - String
+    @Optional
+    Property<Boolean> eingabeGesamtMiete();
+
+
+    // GM1 - Double
+    @Optional
+    @ImportColumn("GM1")
+    Property<Double> gesamtMiete1();
+
+
+    // GM2 - Double
+    @Optional
+    @ImportColumn("GM2")
+    Property<Double> gesamtMiete2();
+
+
+    // GM3 - Double
+    @Optional
+    @ImportColumn("GM3")
+    Property<Double> gesamtMiete3();
+
+
+    // GM4 - Double
+    @Optional
+    @ImportColumn("GM4")
+    Property<Double> gesamtMiete4();
+
+
+    // GM5 - Double
+    @Optional
+    @ImportColumn("GM5")
+    Property<Double> gesamtMiete5();
+
+
+    // GM6 - Double
+    @Optional
+    @ImportColumn("GM6")
+    Property<Double> gesamtMiete6();
+
+
+    // MIETE_TATS - String
+    @Optional
+    Property<Boolean> tatsaechlicheMieteVerwenden();
+
+
+    // TODO GUTACHTNR1 - String
+    @Optional
+    @ImportColumn("GUTACHTNR1")
+    Property<String> GUTACHTNR1();
+
+
+    // TODO WE_WOHNEINH_ZAEHLER - String
+    @Optional
+    @ImportColumn("WE_WOHNEINH_ZAEHLER")
+    Property<String> WE_WOHNEINH_ZAEHLER();
+
+
+    // ANZAHL1 - Long
+    @Optional
+    @ImportColumn("ANZAHL1")
+    Property<Long> anzahl1();
+
+
+    // ANZAHL2 - Long
+    @Optional
+    @ImportColumn("ANZAHL2")
+    Property<Long> anzahl2();
+
+
+    // ANZAHL3 - Long
+    @Optional
+    @ImportColumn("ANZAHL3")
+    Property<Long> anzahl3();
+
+
+    // ANZAHL4 - Long
+    @Optional
+    @ImportColumn("ANZAHL4")
+    Property<Long> anzahl4();
+
+
+    // ANZAHL5 - Long
+    @Optional
+    @ImportColumn("ANZAHL5")
+    Property<Long> anzahl5();
+
+
+    // ANZAHL6 - Long
+    @Optional
+    @ImportColumn("ANZAHL6")
+    Property<Long> anzahl6();
+
+
+    @Optional
+    @Computed
+    Property<String> schl();
+
+
+    /**
+     * Methods and transient fields.
+     */
+    public static abstract class Mixin
+            implements WohnungComposite {
+
+        private static Log log = LogFactory.getLog( Mixin.class );
+
+
+        @Override
+        public Property<String> schl() {
+            return new ComputedPropertyInstance<String>( new GenericPropertyInfo( WohnungComposite.class, "schl" ) ) {
+
+                @Override
+                public String get() {
+                    return objektNummer().get() + "/" + objektFortfuehrung().get() + "/" + gebaeudeNummer().get() + "/"
+                            + gebaeudeFortfuehrung().get() + "/" + wohnungsNummer().get() + "/"
+                            + wohnungsFortfuehrung().get();
+                }
+            };
+        }
+    }
+
+}

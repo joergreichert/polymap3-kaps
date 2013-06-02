@@ -85,18 +85,19 @@ public class KapsRepositoryAssembler
         // project layer / module
         LayerAssembly domainLayer = _app.layerAssembly( "application-layer" );
         ModuleAssembly domainModule = domainLayer.moduleAssembly( "kaps-module" );
-        domainModule.addEntities( VertragComposite.class, VertragsArtComposite.class,
-                KaeuferKreisComposite.class, StalaComposite.class, GemeindeComposite.class,
-                GebaeudeArtComposite.class, NutzungComposite.class, StrasseComposite.class,
-                BodennutzungComposite.class, FlurComposite.class, GemarkungComposite.class,
+        domainModule.addEntities( VertragComposite.class, VertragsArtComposite.class, KaeuferKreisComposite.class,
+                StalaComposite.class, GemeindeComposite.class, GebaeudeArtComposite.class, NutzungComposite.class,
+                StrasseComposite.class, BodennutzungComposite.class, FlurComposite.class, GemarkungComposite.class,
                 RichtwertzoneComposite.class, RichtwertzoneZeitraumComposite.class,
                 ErschliessungsBeitragComposite.class, BodenRichtwertKennungComposite.class,
                 EntwicklungsZustandComposite.class, RichtwertZoneLageComposite.class,
-                EntwicklungsZusatzComposite.class, BauweiseComposite.class,
-                ArtDesBaugebietsComposite.class, FlurstueckComposite.class,
-                GemeindeFaktorComposite.class, BodenwertAufteilungTextComposite.class,
-                FlurstuecksdatenBaulandComposite.class, VertragsdatenErweitertComposite.class,
-                KellerComposite.class, FlurstuecksdatenAgrarComposite.class );
+                EntwicklungsZusatzComposite.class, BauweiseComposite.class, ArtDesBaugebietsComposite.class,
+                FlurstueckComposite.class, GemeindeFaktorComposite.class, BodenwertAufteilungTextComposite.class,
+                FlurstuecksdatenBaulandComposite.class, VertragsdatenErweitertComposite.class, KellerComposite.class,
+                FlurstuecksdatenAgrarComposite.class, BelastungComposite.class, EtageComposite.class,
+                AusstattungComposite.class, EigentumsartComposite.class, HimmelsrichtungComposite.class,
+                WohnungseigentumComposite.class, GebaeudeComposite.class, FlurstueckWohneigentumComposite.class,
+                AusstattungBewertungComposite.class, WohnungComposite.class, WohnungsTeileigentumComposite.class );
 
         // persistence: workspace/Lucene
         File root = new File( Polymap.getWorkspacePath().toFile(), "data" );
@@ -109,8 +110,7 @@ public class KapsRepositoryAssembler
                 .identifiedBy( "lucene-repository" );
 
         // indexer
-        domainModule.addServices( LuceneEntityStoreQueryService.class )
-                .instantiateOnStartup();
+        domainModule.addServices( LuceneEntityStoreQueryService.class ).instantiateOnStartup();
 
         domainModule.addServices( HRIdentityGeneratorService.class );
 
@@ -149,10 +149,9 @@ public class KapsRepositoryAssembler
 
 
     private boolean isDBInitialized( UnitOfWork uow ) {
-        QueryBuilder<ErschliessungsBeitragComposite> builder = getModule().queryBuilderFactory()
-                .newQueryBuilder( ErschliessungsBeitragComposite.class );
-        Query<ErschliessungsBeitragComposite> query = builder.newQuery( uow ).maxResults( 1 )
-                .firstResult( 0 );
+        QueryBuilder<ErschliessungsBeitragComposite> builder = getModule().queryBuilderFactory().newQueryBuilder(
+                ErschliessungsBeitragComposite.class );
+        Query<ErschliessungsBeitragComposite> query = builder.newQuery( uow ).maxResults( 1 ).firstResult( 0 );
         return query.iterator().hasNext();
     }
 

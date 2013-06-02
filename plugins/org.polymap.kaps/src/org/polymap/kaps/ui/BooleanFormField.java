@@ -1,6 +1,5 @@
 /*
- * polymap.org Copyright 2010, Falko Br�utigam, and other contributors as indicated
- * by the @authors tag.
+ * polymap.org Copyright 2013 Polymap GmbH. All rights reserved.
  * 
  * This is free software; you can redistribute it and/or modify it under the terms of
  * the GNU Lesser General Public License as published by the Free Software
@@ -10,8 +9,6 @@
  * This software is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
  * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
- * 
- * $Id: $
  */
 package org.polymap.kaps.ui;
 
@@ -42,7 +39,7 @@ import org.polymap.rhei.internal.form.FormEditorToolkit;
 
 /**
  * 
- * 
+ * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 public class BooleanFormField
         implements IFormField {

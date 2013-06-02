@@ -65,6 +65,7 @@ import org.polymap.kaps.model.data.StalaComposite;
 import org.polymap.kaps.model.data.StrasseComposite;
 import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.VertragsArtComposite;
+import org.polymap.kaps.model.data.WohnungseigentumComposite;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -138,34 +139,34 @@ public class KapsRepository
                     // KapsRepository.NAMESPACE,
                     // "Richtwertzone - Gültigkeit" ) ),
                     new SimpleEntityProvider<VertragsArtComposite>( this, VertragsArtComposite.class, new NameImpl(
-                            KapsRepository.NAMESPACE, "Vertragsart" ) ), 
-                            
-                            new SimpleEntityProvider<StalaComposite>(
-                            this, StalaComposite.class, new NameImpl( KapsRepository.NAMESPACE, "Stala" ) ),
+                            KapsRepository.NAMESPACE, "Vertragsart" ) ),
+
+                    new SimpleEntityProvider<StalaComposite>( this, StalaComposite.class, new NameImpl(
+                            KapsRepository.NAMESPACE, "Stala" ) ),
                     new SimpleEntityProvider<KaeuferKreisComposite>( this, KaeuferKreisComposite.class, new NameImpl(
-                            KapsRepository.NAMESPACE, "Käuferkreis" ) ), 
-                            
-                            new SimpleEntityProvider<NutzungComposite>(
-                            this, NutzungComposite.class, new NameImpl( KapsRepository.NAMESPACE, "Nutzung" ) ),
-                    new SimpleEntityProvider<GebaeudeArtComposite>( this, GebaeudeArtComposite.class, new NameImpl(
-                            KapsRepository.NAMESPACE, "Gebäudeart" ) ), 
-                            
-                            new SimpleEntityProvider<GemeindeComposite>(
-                            this, GemeindeComposite.class, new NameImpl( KapsRepository.NAMESPACE, "Gemeinde" ) ),
-                    new SimpleEntityProvider<StrasseComposite>( this, StrasseComposite.class, new NameImpl(
-                            KapsRepository.NAMESPACE, "Strasse" ) ), 
-                            
-                            new SimpleEntityProvider<GemarkungComposite>(
-                            this, GemarkungComposite.class, new NameImpl( KapsRepository.NAMESPACE, "Gemarkung" ) ),
-                    new SimpleEntityProvider<FlurstuecksdatenBaulandComposite>( this, FlurstuecksdatenBaulandComposite.class,
-                            new NameImpl( KapsRepository.NAMESPACE, FlurstuecksdatenBaulandComposite.NAME ) ),
-                    
-                            
-                            new SimpleEntityProvider<FlurstuecksdatenAgrarComposite>( this,
+                            KapsRepository.NAMESPACE, "Käuferkreis" ) ),
+
+                    new SimpleEntityProvider<NutzungComposite>( this, NutzungComposite.class, new NameImpl(
+                            KapsRepository.NAMESPACE, "Nutzung" ) ), new SimpleEntityProvider<GebaeudeArtComposite>(
+                            this, GebaeudeArtComposite.class, new NameImpl( KapsRepository.NAMESPACE, "Gebäudeart" ) ),
+
+                    new SimpleEntityProvider<GemeindeComposite>( this, GemeindeComposite.class, new NameImpl(
+                            KapsRepository.NAMESPACE, "Gemeinde" ) ), new SimpleEntityProvider<StrasseComposite>( this,
+                            StrasseComposite.class, new NameImpl( KapsRepository.NAMESPACE, "Strasse" ) ),
+
+                    new SimpleEntityProvider<GemarkungComposite>( this, GemarkungComposite.class, new NameImpl(
+                            KapsRepository.NAMESPACE, "Gemarkung" ) ),
+                    new SimpleEntityProvider<FlurstuecksdatenBaulandComposite>( this,
+                            FlurstuecksdatenBaulandComposite.class, new NameImpl( KapsRepository.NAMESPACE,
+                                    FlurstuecksdatenBaulandComposite.NAME ) ),
+
+                    new SimpleEntityProvider<FlurstuecksdatenAgrarComposite>( this,
                             FlurstuecksdatenAgrarComposite.class, new NameImpl( KapsRepository.NAMESPACE,
                                     FlurstuecksdatenAgrarComposite.NAME ) ), new SimpleEntityProvider<FlurComposite>(
                             this, FlurComposite.class, new NameImpl( KapsRepository.NAMESPACE, "Flur" ) ),
 
+                    new SimpleEntityProvider<WohnungseigentumComposite>( this, WohnungseigentumComposite.class,
+                            new NameImpl( KapsRepository.NAMESPACE, WohnungseigentumComposite.NAME ) ),
                     // nicht änderbare Wertelisten
                     // new SimpleEntityProvider<ErschliessungsBeitragComposite>(
                     // this,
