@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.polymap.core.project.ui.util.SimpleFormData;
 import org.polymap.core.runtime.Polymap;
+import org.polymap.core.workbench.PolymapWorkbench;
 
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
 import org.polymap.rhei.field.IFormFieldLabel;
@@ -39,10 +40,11 @@ import org.polymap.rhei.field.PicklistFormField;
 import org.polymap.rhei.field.SelectlistFormField;
 import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.form.DefaultFormEditorPage;
-import org.polymap.rhei.form.IFormEditorPage3;
+import org.polymap.rhei.form.IFormEditorPage2;
 import org.polymap.rhei.form.IFormEditorPageSite;
 import org.polymap.rhei.form.IFormEditorToolkit;
 
+import org.polymap.kaps.KapsPlugin;
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.Named;
 
@@ -51,7 +53,7 @@ import org.polymap.kaps.model.Named;
  */
 public abstract class KapsDefaultFormEditorPage
         extends DefaultFormEditorPage
-        implements IFormEditorPage3 {
+        implements IFormEditorPage2 {
 
     protected static final int SPACING = 12;
 
@@ -144,11 +146,22 @@ public abstract class KapsDefaultFormEditorPage
 
 
     @Override
-    public void doLoad( IProgressMonitor monitor )
+    public void doLoad( final IProgressMonitor monitor )
             throws Exception {
+        // call afterDoLoad() after fields are loaded in order to prevent
+        // computed fields from re-set
+        Polymap.getSessionDisplay().asyncExec( new Runnable() {
+            public void run() {
+                try {
+                    afterDoLoad( monitor );
+                }
+                catch (Exception e) {
+                    PolymapWorkbench.handleError( KapsPlugin.PLUGIN_ID, this, "An error occured while creating the new page.", e );
+                }
+            }
+        });
     }
     
-    @Override
     public void afterDoLoad( IProgressMonitor monitor )
             throws Exception {
     }

@@ -119,6 +119,7 @@ public class FlurstuecksdatenAgrarGrunddatenFormEditorPage
     @Override
     public void doLoad( IProgressMonitor monitor )
             throws Exception {
+        super.doLoad( monitor );
         enableBauFields( vb.istBebaut().get() );
     }
 

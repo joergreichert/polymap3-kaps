@@ -35,8 +35,6 @@ import org.polymap.core.runtime.Polymap;
 import org.polymap.rhei.data.entitystore.lucene.LuceneEntityStoreInfo;
 import org.polymap.rhei.data.entitystore.lucene.LuceneEntityStoreQueryService;
 import org.polymap.rhei.data.entitystore.lucene.LuceneEntityStoreService;
-import org.polymap.rhei.filter.FilterFactory;
-
 import org.polymap.kaps.model.SchlNamedCreatorCallback.Impl;
 import org.polymap.kaps.model.data.*;
 
@@ -117,8 +115,6 @@ public class KapsRepositoryAssembler
         // additional services
         // domainModule.addServices( BiotopnummerGeneratorService.class )
         // .identifiedBy( "biotopnummer" );
-
-        FilterFactory.instance().disableStandardFilter();
     }
 
 
