@@ -24,6 +24,7 @@ import org.qi4j.api.property.Property;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 
 import org.eclipse.ui.forms.widgets.Section;
 
@@ -150,6 +151,7 @@ public abstract class KapsDefaultFormEditorPage
             throws Exception {
         // call afterDoLoad() after fields are loaded in order to prevent
         // computed fields from re-set
+        assert Display.getCurrent() != null;
         Polymap.getSessionDisplay().asyncExec( new Runnable() {
             public void run() {
                 try {
