@@ -30,6 +30,7 @@ import org.polymap.core.runtime.event.EventManager;
 
 import org.polymap.rhei.data.entityfeature.AssociationAdapter;
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
+import org.polymap.rhei.field.CheckboxFormField;
 import org.polymap.rhei.field.FormFieldEvent;
 import org.polymap.rhei.field.IFormFieldLabel;
 import org.polymap.rhei.field.IFormFieldListener;
@@ -52,15 +53,15 @@ import org.polymap.kaps.ui.FieldListener;
 public class WohnungVertragsdatenFormEditorPage
         extends WohnungFormEditorPage {
 
-    private static Log             log = LogFactory.getLog( WohnungVertragsdatenFormEditorPage.class );
+    private static Log       log = LogFactory.getLog( WohnungVertragsdatenFormEditorPage.class );
 
-    private FieldListener          fieldListener;
-
-    @SuppressWarnings("unused")
-    private FieldCalculation       vollpreis;
+    private FieldListener    fieldListener;
 
     @SuppressWarnings("unused")
-    private FieldCalculation       vollpreisWohnflaeche;
+    private FieldCalculation vollpreis;
+
+    @SuppressWarnings("unused")
+    private FieldCalculation vollpreisWohnflaeche;
 
 
     // private IFormFieldListener gemeindeListener;
@@ -104,7 +105,7 @@ public class WohnungVertragsdatenFormEditorPage
         createPreisField( wohnung.kaufpreis(), left().left( ONE ).right( TWO ).top( lastLine ), parent, false );
 
         lastLine = newLine;
-        newLine = createLabel( parent, "Abschlag/Zuschlag in €", left().right( TWO ).top( lastLine, 22 ), SWT.CENTER );
+        newLine = createLabel( parent, "Abschlag in €", left().right( TWO ).top( lastLine, 22 ), SWT.CENTER );
         createLabel( parent, "geschätzt", left().left( TWO ).right( THREE ).top( lastLine ), SWT.CENTER );
         createLabel( parent, "Beschreibung", left().left( THREE ).right( FOUR ).top( lastLine ), SWT.CENTER );
         createLabel( parent, "Anzahl", left().left( FOUR ).right( 100 ).top( lastLine ), SWT.CENTER );
@@ -113,6 +114,7 @@ public class WohnungVertragsdatenFormEditorPage
         newLine = createLabel( parent, "Garage", left().right( ONE ).top( lastLine ), SWT.RIGHT );
         createPreisField( wohnung.abschlagGarage(), left().left( ONE ).right( TWO ).top( lastLine ), parent, true );
         newFormField( IFormFieldLabel.NO_LABEL ).setProperty( new PropertyAdapter( wohnung.schaetzungGarage() ) )
+                .setField( new CheckboxFormField() )
                 .setLayoutData( left().left( TWO ).right( THREE ).top( lastLine ).create() ).create();
         newFormField( IFormFieldLabel.NO_LABEL )
                 .setProperty( new AssociationAdapter<GebaeudeArtComposite>( wohnung.gebaeudeArtGarage() ) )
@@ -120,13 +122,14 @@ public class WohnungVertragsdatenFormEditorPage
                 .setLayoutData( left().left( THREE ).right( FOUR ).top( lastLine ).create() ).create();
         newFormField( IFormFieldLabel.NO_LABEL ).setProperty( new PropertyAdapter( wohnung.anzahlGaragen() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Integer.class, Polymap.getSessionLocale() ) ).setEnabled( false )
+                .setValidator( new NumberValidator( Integer.class, Polymap.getSessionLocale() ) )
                 .setLayoutData( left().left( FOUR ).right( 100 ).top( lastLine ).create() ).create();
 
         lastLine = newLine;
         newLine = createLabel( parent, "Stellplatz", left().right( ONE ).top( lastLine ), SWT.RIGHT );
         createPreisField( wohnung.abschlagStellplatz(), left().left( ONE ).right( TWO ).top( lastLine ), parent, true );
         newFormField( IFormFieldLabel.NO_LABEL ).setProperty( new PropertyAdapter( wohnung.schaetzungStellplatz() ) )
+                .setField( new CheckboxFormField() )
                 .setLayoutData( left().left( TWO ).right( THREE ).top( lastLine ).create() ).create();
         newFormField( IFormFieldLabel.NO_LABEL )
                 .setProperty( new AssociationAdapter<GebaeudeArtComposite>( wohnung.gebaeudeArtStellplatz() ) )
@@ -134,13 +137,14 @@ public class WohnungVertragsdatenFormEditorPage
                 .setLayoutData( left().left( THREE ).right( FOUR ).top( lastLine ).create() ).create();
         newFormField( IFormFieldLabel.NO_LABEL ).setProperty( new PropertyAdapter( wohnung.anzahlStellplatz() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Integer.class, Polymap.getSessionLocale() ) ).setEnabled( false )
+                .setValidator( new NumberValidator( Integer.class, Polymap.getSessionLocale() ) )
                 .setLayoutData( left().left( FOUR ).right( 100 ).top( lastLine ).create() ).create();
 
         lastLine = newLine;
         newLine = createLabel( parent, "Anderes", left().right( ONE ).top( lastLine ), SWT.RIGHT );
         createPreisField( wohnung.abschlagAnderes(), left().left( ONE ).right( TWO ).top( lastLine ), parent, true );
         newFormField( IFormFieldLabel.NO_LABEL ).setProperty( new PropertyAdapter( wohnung.schaetzungAnderes() ) )
+                .setField( new CheckboxFormField() )
                 .setLayoutData( left().left( TWO ).right( THREE ).top( lastLine ).create() ).create();
         newFormField( IFormFieldLabel.NO_LABEL )
                 .setProperty( new AssociationAdapter<GebaeudeArtComposite>( wohnung.gebaeudeArtAnderes() ) )
@@ -148,7 +152,7 @@ public class WohnungVertragsdatenFormEditorPage
                 .setLayoutData( left().left( THREE ).right( FOUR ).top( lastLine ).create() ).create();
         newFormField( IFormFieldLabel.NO_LABEL ).setProperty( new PropertyAdapter( wohnung.anzahlAnderes() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Integer.class, Polymap.getSessionLocale() ) ).setEnabled( false )
+                .setValidator( new NumberValidator( Integer.class, Polymap.getSessionLocale() ) )
                 .setLayoutData( left().left( FOUR ).right( 100 ).top( lastLine ).create() ).create();
 
         lastLine = newLine;
@@ -209,6 +213,7 @@ public class WohnungVertragsdatenFormEditorPage
                 .setField( new BooleanFormField() ).setLayoutData( left().top( lastLine ).create() ).create();
         newLine = newFormField( "geeignet?" ).setToolTipText( "zur Auswertung geeignet?" )
                 .setProperty( new PropertyAdapter( wohnung.zurAuswertungGeeignet() ) )
+                .setField( new CheckboxFormField() )
                 .setLayoutData( right().top( lastLine ).create() ).create();
 
         lastLine = newLine;
@@ -241,7 +246,7 @@ public class WohnungVertragsdatenFormEditorPage
             }
         }
         if (kaufpreis != null && !kaufpreis.equals( wohnung.kaufpreis().get() )) {
-            pageSite.setFieldValue( wohnung.kaufpreis().qualifiedName().name(), getFormatter( 2 ).format( kaufpreis) );
+            pageSite.setFieldValue( wohnung.kaufpreis().qualifiedName().name(), getFormatter( 2 ).format( kaufpreis ) );
         }
 
         if (fieldListener.get( wohnung.wohnflaeche() ) != null) {

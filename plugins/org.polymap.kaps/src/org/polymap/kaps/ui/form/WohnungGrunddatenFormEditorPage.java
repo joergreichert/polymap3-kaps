@@ -193,12 +193,12 @@ public class WohnungGrunddatenFormEditorPage
         newLine = newFormField( "Baujahr tatsächlich" ).setToolTipText( "Baujahr tatsächlich" )
                 .setProperty( new PropertyAdapter( wohnung.baujahr() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Integer.class, Polymap.getSessionLocale(), 12, 0, 1, 0 ) )
+                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 0, 1, 0 ) )
                 .setLayoutData( left().top( lastLine ).create() ).setParent( parent ).create();
         newFormField( "Baujahr bereinigt" ).setToolTipText( "Baujahr bereinigt" )
                 .setProperty( new PropertyAdapter( wohnung.bereinigtesBaujahr() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Integer.class, Polymap.getSessionLocale(), 12, 0, 1, 0 ) )
+                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 0, 1, 0 ) )
                 .setLayoutData( right().top( lastLine ).create() ).setParent( parent ).create();
 
         lastLine = newLine;

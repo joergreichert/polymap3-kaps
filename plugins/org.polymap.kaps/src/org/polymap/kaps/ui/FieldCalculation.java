@@ -93,7 +93,7 @@ public abstract class FieldCalculation
     protected abstract Double calculate( ValueProvider values );
 
 
-    private void refreshResult() {
+    protected void refreshResult() {
         Double resultValue = calculate( values );
         if (resultValue != null) {
             site.setFieldValue( result.qualifiedName().name(), getFormatter().format( resultValue ) );

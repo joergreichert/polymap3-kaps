@@ -33,13 +33,10 @@ import org.qi4j.api.query.Query;
 import org.qi4j.api.query.QueryExpressions;
 import org.qi4j.api.query.grammar.BooleanExpression;
 import org.qi4j.api.query.grammar.OrderBy;
-import org.qi4j.api.unitofwork.ConcurrentEntityModificationException;
-import org.qi4j.api.unitofwork.UnitOfWorkCompletionException;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 
 import org.polymap.core.catalog.model.CatalogRepository;
-import org.polymap.core.model.CompletionException;
 import org.polymap.core.model.Entity;
 import org.polymap.core.model.EntityType.Property;
 import org.polymap.core.operation.IOperationSaveListener;
@@ -49,7 +46,6 @@ import org.polymap.core.qi4j.Qi4jPlugin.Session;
 import org.polymap.core.qi4j.QiModule;
 import org.polymap.core.qi4j.QiModuleAssembler;
 import org.polymap.core.runtime.Polymap;
-import org.polymap.core.runtime.entity.ConcurrentModificationException;
 
 import org.polymap.kaps.model.data.BodennutzungComposite;
 import org.polymap.kaps.model.data.FlurComposite;
@@ -222,22 +218,22 @@ public class KapsRepository
 
         return super.findEntities( compositeType, expression, firstResult, maxResults );
     }
-
-
-    public void applyChanges()
-            throws ConcurrentModificationException, CompletionException {
-        try {
-            // save changes
-            uow.apply();
-        }
-        catch (ConcurrentEntityModificationException e) {
-            throw new ConcurrentModificationException( e );
-        }
-        catch (UnitOfWorkCompletionException e) {
-            throw new CompletionException( e );
-        }
-    }
-
+//
+//    @Override
+//    public void commitChanges()
+//            throws ConcurrentModificationException, CompletionException {
+//                try {
+//                    // save changes
+//                    uow.complete();
+//                    uow = assembler.getModule().unitOfWorkFactory().newUnitOfWork();
+//                }
+//                catch (ConcurrentEntityModificationException e) {
+//                    throw new ConcurrentModificationException( e );
+//                }
+//                catch (UnitOfWorkCompletionException e) {
+//                    throw new CompletionException( e );
+//                }
+//            }
 
     public VertragComposite newKaufvertrag( final EntityCreator<VertragComposite> creator )
             throws Exception {

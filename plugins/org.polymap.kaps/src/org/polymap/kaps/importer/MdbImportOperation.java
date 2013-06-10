@@ -807,6 +807,9 @@ public class MdbImportOperation
                             getBooleanValue( builderRow, "LIZI_GARAGE" ) );
                     entity.zurAuswertungGeeignet().set( getBooleanValue( builderRow, "VERARBKZ" ) );
 
+                    Object schl = builderRow.get( "BEWSCHL" );
+                    System.out.println(schl);
+                    AusstattungComposite ausstattungComposite = find( allAusstattung, builderRow, "BEWSCHL" );
                     entity.ausstattung().set( find( allAusstattung, builderRow, "BEWSCHL" ) );
                     entity.eigentumsArt().set( find( allEigentumsArt, builderRow, "EIGENTART" ) );
                     entity.etage().set( find( allEtageArt, builderRow, "GESCHOSS" ) );

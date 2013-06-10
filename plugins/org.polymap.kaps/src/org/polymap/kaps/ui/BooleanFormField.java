@@ -161,7 +161,7 @@ public class BooleanFormField
 
         // find label for given value
         for (Map.Entry<String, String> entry : values.entrySet()) {
-            if (value == entry.getValue()) {
+            if ((value == null && entry.getValue() == null) || value.equals( entry.getValue() )) {
                 combo.setText( entry.getKey() );
                 break;
             }

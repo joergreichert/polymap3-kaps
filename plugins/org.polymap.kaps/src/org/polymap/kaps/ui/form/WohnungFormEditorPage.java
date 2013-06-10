@@ -43,7 +43,6 @@ public abstract class WohnungFormEditorPage
         super.createFormContent( site );
 
         String nummer = wohnung.objektNummer().get() != null ? wohnung.schl().get() : "neu";
-
         site.setEditorTitle( formattedTitle( "Wohnung", nummer, null ) );
         site.setFormTitle( formattedTitle( "Wohnung", nummer, getTitle() ) );
 

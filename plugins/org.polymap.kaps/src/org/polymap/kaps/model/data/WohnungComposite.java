@@ -161,8 +161,8 @@ public interface WohnungComposite
 
     // BAUJAHR - Long
     @Optional
-    @ImportColumn("BAUJAHR")
-    Property<Integer> baujahr();
+//    @ImportColumn("BAUJAHR")
+    Property<Double> baujahr();
 
 
     // UMBAU - Long
@@ -173,8 +173,8 @@ public interface WohnungComposite
 
     // BERBAUJ - INT
     @Optional
-    @ImportColumn("BERBAUJ")
-    Property<Integer> bereinigtesBaujahr();
+//    @ImportColumn("BERBAUJ")
+    Property<Double> bereinigtesBaujahr();
 
 
     // GLDAUER - Double
@@ -225,7 +225,7 @@ public interface WohnungComposite
     Property<Double> gebaeudebrandversicherungswert();
 
 
-    // TODO BEWSCHL - String
+    // BEWSCHL - String
     @Optional
     Association<AusstattungComposite> ausstattung();
 
@@ -362,6 +362,9 @@ public interface WohnungComposite
     @ImportColumn("MONROHERTR")
     Property<Double> monatlicherRohertrag();
 
+    @Optional
+    Property<Double> jahresRohertrag();
+    
     @Optional
     Property<Double> monatlicherRohertragJeQm();
 
@@ -591,19 +594,19 @@ public interface WohnungComposite
     // BEWIKODM - Double
     @Optional
     @ImportColumn("BEWIKODM")
-    Property<Double> bewirtschaftsungsKosten();
+    Property<Double> bewirtschaftungsKosten();
 
 
     // BEWIKOPROZ - Double
     @Optional
     @ImportColumn("BEWIKOPROZ")
-    Property<Double> bewirtschaftsungsKostenInProzent();
+    Property<Double> bewirtschaftungsKostenInProzent();
 
 
     // JREINERTR - Double
     @Optional
     @ImportColumn("JREINERTR")
-    Property<Double> jahresReinErtrag();
+    Property<Double> jahresReinertrag();
 
 
     // BODWERTANT - Double
@@ -639,7 +642,7 @@ public interface WohnungComposite
     // GEBWERTKP - Double
     @Optional
     @ImportColumn("GEBWERTKP")
-    Property<Double> gebaeuderwertAnteilZuKaufpreis();
+    Property<Double> gebaeudewertAnteilZuKaufpreis();
 
 
     // KORRFAKTOR - Double

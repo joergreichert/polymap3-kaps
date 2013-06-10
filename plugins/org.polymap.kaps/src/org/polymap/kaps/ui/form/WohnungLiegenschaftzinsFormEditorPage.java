@@ -12,6 +12,8 @@
  */
 package org.polymap.kaps.ui.form;
 
+import java.util.Date;
+
 import org.geotools.data.FeatureStore;
 import org.opengis.feature.Feature;
 
@@ -29,6 +31,7 @@ import org.polymap.core.runtime.event.EventFilter;
 import org.polymap.core.runtime.event.EventManager;
 
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
+import org.polymap.rhei.field.CheckboxFormField;
 import org.polymap.rhei.field.DateTimeFormField;
 import org.polymap.rhei.field.FormFieldEvent;
 import org.polymap.rhei.field.IFormFieldLabel;
@@ -36,7 +39,9 @@ import org.polymap.rhei.field.IFormFieldListener;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
 import org.polymap.kaps.ui.FieldCalculation;
+import org.polymap.kaps.ui.FieldCalculationWithTrigger;
 import org.polymap.kaps.ui.FieldListener;
+import org.polymap.kaps.ui.FieldSummation;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -44,33 +49,65 @@ import org.polymap.kaps.ui.FieldListener;
 public class WohnungLiegenschaftzinsFormEditorPage
         extends WohnungFormEditorPage {
 
-    private static Log       log   = LogFactory.getLog( WohnungLiegenschaftzinsFormEditorPage.class );
+    private static Log                  log   = LogFactory.getLog( WohnungLiegenschaftzinsFormEditorPage.class );
 
-    private static final int ONE   = 0;
+    private static final int            ONE   = 0;
 
-    private static final int TWO   = 23;
+    private static final int            TWO   = 23;
 
-    private static final int THREE = 43;
+    private static final int            THREE = 43;
 
-    private static final int FOUR  = 71;
+    private static final int            FOUR  = 71;
 
-    private static final int FIVE  = 80;
+    private static final int            FIVE  = 80;
 
-    private static final int SIX   = 100;
+    private static final int            SIX   = 100;
 
-    private FieldCalculation bebabschlag;
+    @SuppressWarnings("unused")
+    private FieldCalculation            bebabschlag;
 
-    private FieldCalculation berPreis;
+    @SuppressWarnings("unused")
+    private FieldCalculation            berPreis;
 
-    private FieldListener    fieldListener;
+    @SuppressWarnings("unused")
+    private FieldListener               fieldListener;
+
+    @SuppressWarnings("unused")
+    private FieldCalculation            jahresRohertrag;
+
+    @SuppressWarnings("unused")
+    private FieldCalculation            bewirtschaftungskosten;
+
+    @SuppressWarnings("unused")
+    private FieldCalculation            jahresReinertrag;
+
+    @SuppressWarnings("unused")
+    private FieldCalculation            bodenwertAnteilDerWohnung;
+
+    @SuppressWarnings("unused")
+    private FieldCalculation            gebaeudewertAnteilDerWohnung;
+
+    @SuppressWarnings("unused")
+    private FieldSummation              sachwertDerWohnung;
+
+    @SuppressWarnings("unused")
+    private FieldCalculationWithTrigger jahresReinErtragZuKaufpreis;
+
+    @SuppressWarnings("unused")
+    private FieldCalculationWithTrigger gebaeudewertAnteilZuKaufpreis;
+
+    @SuppressWarnings("unused")
+    private FieldCalculationWithTrigger liegenschaftsZins;
 
 
     // private IFormFieldListener gemeindeListener;
 
     public WohnungLiegenschaftzinsFormEditorPage( Feature feature, FeatureStore featureStore ) {
         super( WohnungLiegenschaftzinsFormEditorPage.class.getName(), "Liegenschaftszins", feature, featureStore );
-        EventManager.instance().subscribe( fieldListener = new FieldListener( wohnung.wohnflaeche() ),
-                new EventFilter<FormFieldEvent>() {
+        EventManager.instance().subscribe(
+                fieldListener = new FieldListener( wohnung.wohnflaeche(), wohnung.bruchteilNenner(),
+                        wohnung.bruchteilZaehler(), wohnung.bereinigterVollpreis(), wohnung.kaufpreis(),
+                        wohnung.baujahr(), wohnung.gesamtNutzungsDauer() ), new EventFilter<FormFieldEvent>() {
 
                     public boolean apply( FormFieldEvent ev ) {
                         return ev.getEventCode() == IFormFieldListener.VALUE_CHANGE;
@@ -149,10 +186,7 @@ public class WohnungLiegenschaftzinsFormEditorPage
         } );
 
         lastLine = newLine;
-        newLine = createLabel( parent, "monatlicher Rohertrag in €", one().top( lastLine ), SWT.RIGHT );
-        createPreisField( wohnung.monatlicherRohertrag(), two().top( lastLine ), parent, true );
-
-        createLabel( parent, "bereinigter Bodenpreis", three().top( lastLine ), SWT.RIGHT );
+        newLine = createLabel( parent, "bereinigter Bodenpreis", three().top( lastLine ), SWT.RIGHT );
         createPreisField( wohnung.bereinigterBodenpreis(), five().top( lastLine ), parent, true );
         site.addFieldListener( berPreis = new FieldCalculation( site, 2, wohnung.bereinigterBodenpreis(), wohnung
                 .bebauungsabschlag(), wohnung.bodenpreis() ) {
@@ -173,29 +207,211 @@ public class WohnungLiegenschaftzinsFormEditorPage
         } );
 
         lastLine = newLine;
+        newLine = createLabel( parent, "monatlicher Rohertrag in €", one().top( lastLine ), SWT.RIGHT );
+        createPreisField( wohnung.monatlicherRohertrag(), two().top( lastLine ), parent, true );
+        createLabel( parent, "Jahresrohertrag in €", three().top( lastLine ), SWT.RIGHT );
+        createPreisField( wohnung.jahresRohertrag(), five().top( lastLine ), parent, true );
+        site.addFieldListener( jahresRohertrag = new FieldCalculation( site, 2, wohnung.jahresRohertrag(), wohnung
+                .monatlicherRohertrag() ) {
+
+            @Override
+            protected Double calculate( ValueProvider values ) {
+                Double abschlag = values.get( wohnung.monatlicherRohertrag() );
+                if (abschlag != null) {
+                    return abschlag * 12;
+                }
+                return null;
+            }
+
+        } );
+
+        lastLine = newLine;
         newLine = createLabel( parent, "Rohertrag in €/m²", one().top( lastLine ), SWT.RIGHT );
         createPreisField( wohnung.monatlicherRohertragJeQm(), two().top( lastLine ), parent, true );
-//        createLabel( parent, "bereinigter Bodenpreis", three().top( lastLine ), SWT.RIGHT );
-//        // createFlaecheField( wohnung.bebauungsabschlagInProzent(), four().top(
-//        // lastLine ), parent, true );
-//        createPreisField( wohnung.bereinigterBodenpreis(), five().top( lastLine ), parent, true );
-//        site.addFieldListener( berPreis = new FieldCalculation( site, 2, wohnung.bereinigterBodenpreis(), wohnung
-//                .bebauungsabschlag(), wohnung.bodenpreis() ) {
-//
-//            @Override
-//            protected Double calculate( ValueProvider values ) {
-//                Double abschlag = values.get( wohnung.bebauungsabschlag() );
-//                Double preis = values.get( wohnung.bodenpreis() );
-//                if (preis == null) {
-//                    return null;
-//                }
-//                if (abschlag == null) {
-//                    return preis;
-//                }
-//                return preis - abschlag;
-//            }
-//
-//        } );
+        createLabel( parent, "Bewirtschaftungkosten in %", three().top( lastLine ), SWT.RIGHT );
+        createFlaecheField( wohnung.bewirtschaftungsKostenInProzent(), four().top( lastLine ), parent, true );
+        createPreisField( wohnung.bewirtschaftungsKosten(), five().top( lastLine ), parent, false );
+        site.addFieldListener( bewirtschaftungskosten = new FieldCalculation( site, 2,
+                wohnung.bewirtschaftungsKosten(), wohnung.bewirtschaftungsKostenInProzent(), wohnung.jahresRohertrag() ) {
+
+            @Override
+            protected Double calculate( ValueProvider values ) {
+                Double prozent = values.get( wohnung.bewirtschaftungsKostenInProzent() );
+                Double preis = values.get( wohnung.jahresRohertrag() );
+                if (preis == null) {
+                    return null;
+                }
+                if (prozent == null) {
+                    return preis;
+                }
+                return preis * prozent / 100;
+            }
+
+        } );
+
+        lastLine = newLine;
+        newLine = createLabel( parent, "Jahresreinertrag in €", three().top( lastLine ), SWT.RIGHT );
+        createPreisField( wohnung.jahresReinertrag(), five().top( lastLine ), parent, true );
+        site.addFieldListener( jahresReinertrag = new FieldCalculation( site, 2, wohnung.jahresReinertrag(), wohnung
+                .bewirtschaftungsKosten(), wohnung.jahresRohertrag() ) {
+
+            @Override
+            protected Double calculate( ValueProvider values ) {
+                Double ertrag = values.get( wohnung.jahresRohertrag() );
+                if (ertrag != null) {
+                    Double kosten = values.get( wohnung.bewirtschaftungsKosten() );
+                    if (kosten == null) {
+                        return ertrag;
+                    }
+                    else {
+                        return ertrag - kosten;
+                    }
+                }
+                return null;
+            }
+
+        } );
+
+        lastLine = newLine;
+        newLine = createLabel( parent, "Bodenwertanteil der Wohnung in €", three().top( lastLine ), SWT.RIGHT );
+        createPreisField( wohnung.bodenwertAnteilDerWohnung(), five().top( lastLine ), parent, true );
+        site.addFieldListener( bodenwertAnteilDerWohnung = new FieldCalculation( site, 2, wohnung
+                .bodenwertAnteilDerWohnung(), wohnung.wohnflaeche(), wohnung.bereinigterBodenpreis(), wohnung
+                .bruchteilNenner(), wohnung.bruchteilZaehler() ) {
+
+            @Override
+            protected Double calculate( ValueProvider values ) {
+                Double flaeche = values.get( wohnung.flurstueck().get().flaeche() );
+                if (flaeche != null) {
+                    Double zaehler = values.get( wohnung.bruchteilZaehler() );
+                    Double nenner = values.get( wohnung.bruchteilNenner() );
+                    Double preis = values.get( wohnung.bereinigterBodenpreis() );
+                    if (zaehler != null) {
+                        flaeche *= zaehler;
+                    }
+                    if (nenner != null && !nenner.equals( Double.valueOf( 0.0d ) )) {
+                        flaeche /= nenner;
+                    }
+                    if (preis != null) {
+                        flaeche *= preis;
+                    }
+                    else {
+                        flaeche = Double.valueOf( 0.0d );
+                    }
+                    return flaeche;
+                }
+                return null;
+            }
+
+        } );
+
+        lastLine = newLine;
+        newLine = createLabel( parent, "Abschläge berücksichtigen?",
+                "beim Kaufpreis die Zu/Abschläge bei\nGaragen/Stellplatz/Anderes berücksichtigen?", one()
+                        .top( lastLine ), SWT.RIGHT );
+        newFormField( IFormFieldLabel.NO_LABEL )
+                .setToolTipText( "beim Kaufpreis die Zu/Abschläge bei\nGaragen/Stellplatz/Anderes berücksichtigen?" )
+                .setProperty( new PropertyAdapter( wohnung.garagenBeiLiegenschaftszinsBeruecksichtigen() ) )
+                .setField( new CheckboxFormField() ).setLayoutData( two().top( lastLine ).create() ).create();
+        createLabel( parent, "Gebäudewertanteil der Wohnung in €", three().top( lastLine ), SWT.RIGHT );
+        createPreisField( wohnung.gebaeudewertAnteilDerWohnung(), five().top( lastLine ), parent, true );
+        site.addFieldListener( gebaeudewertAnteilDerWohnung = new FieldCalculationWithTrigger( site, 2, wohnung
+                .gebaeudewertAnteilDerWohnung(), wohnung.garagenBeiLiegenschaftszinsBeruecksichtigen(), wohnung
+                .bodenwertAnteilDerWohnung(), wohnung.bereinigterVollpreis(), wohnung.kaufpreis() ) {
+
+            @Override
+            protected Double calculate( ValueProvider values ) {
+                Double bodenwert = values.get( wohnung.bodenwertAnteilDerWohnung() );
+                if (bodenwert != null) {
+                    Double preis = this.triggerValue() != null && this.triggerValue().booleanValue() ? values
+                            .get( wohnung.bereinigterVollpreis() ) : values.get( wohnung.kaufpreis() );
+                    if (preis != null) {
+                        return preis - bodenwert;
+                    }
+                }
+                return null;
+            }
+        } );
+
+        lastLine = newLine;
+        newLine = createLabel( parent, "Sachwert der Wohnung in €", three().top( lastLine ), SWT.RIGHT );
+        createPreisField( wohnung.sachwertDerWohnung(), five().top( lastLine ), parent, false );
+        site.addFieldListener( sachwertDerWohnung = new FieldSummation( site, 2, wohnung.sachwertDerWohnung(), wohnung
+                .bodenwertAnteilDerWohnung(), wohnung.gebaeudewertAnteilDerWohnung() ) );
+
+        lastLine = newLine;
+        newLine = createLabel( parent, "Jahresreinertrag/Kaufpreis", three().top( lastLine ), SWT.RIGHT );
+        createFlaecheField( wohnung.jahresReinErtragZuKaufpreis(), five().top( lastLine ), parent, false );
+        site.addFieldListener( jahresReinErtragZuKaufpreis = new FieldCalculationWithTrigger( site, 2, wohnung
+                .jahresReinErtragZuKaufpreis(), wohnung.garagenBeiLiegenschaftszinsBeruecksichtigen(), wohnung
+                .jahresReinertrag(), wohnung.bereinigterVollpreis(), wohnung.kaufpreis() ) {
+
+            @Override
+            protected Double calculate( ValueProvider values ) {
+                Double reinertrag = values.get( wohnung.jahresReinertrag() );
+                if (reinertrag != null) {
+                    Double preis = this.triggerValue() != null && this.triggerValue().booleanValue() ? values
+                            .get( wohnung.bereinigterVollpreis() ) : values.get( wohnung.kaufpreis() );
+                    if (preis != null && !preis.equals( Double.valueOf( 0.0d ) )) {
+                        return reinertrag / preis;
+                    }
+                }
+                return null;
+            }
+        } );
+
+        lastLine = newLine;
+        newLine = createLabel( parent, "Gebäudewertanteil/Kaufpreis", three().top( lastLine ), SWT.RIGHT );
+        createFlaecheField( wohnung.gebaeudewertAnteilZuKaufpreis(), five().top( lastLine ), parent, false );
+        site.addFieldListener( gebaeudewertAnteilZuKaufpreis = new FieldCalculationWithTrigger( site, 2, wohnung
+                .gebaeudewertAnteilZuKaufpreis(), wohnung.garagenBeiLiegenschaftszinsBeruecksichtigen(), wohnung
+                .gebaeudewertAnteil(), wohnung.bereinigterVollpreis(), wohnung.kaufpreis() ) {
+
+            @Override
+            protected Double calculate( ValueProvider values ) {
+                Double gebaeudewertAnteil = values.get( wohnung.gebaeudewertAnteil() );
+                if (gebaeudewertAnteil != null) {
+                    Double preis = this.triggerValue() != null && this.triggerValue().booleanValue() ? values
+                            .get( wohnung.bereinigterVollpreis() ) : values.get( wohnung.kaufpreis() );
+                    if (preis != null && !preis.equals( Double.valueOf( 0.0d ) )) {
+                        return gebaeudewertAnteil / preis;
+                    }
+                }
+                return null;
+            }
+        } );
+
+        lastLine = newLine;
+        newLine = createLabel( parent, "Liegenschaftszins in %", three().top( lastLine ), SWT.RIGHT );
+        createFlaecheField( wohnung.liegenschaftsZins(), five().top( lastLine ), parent, false );
+        site.addFieldListener( liegenschaftsZins = new FieldCalculationWithTrigger( site, 2, wohnung
+                .liegenschaftsZins(), wohnung.garagenBeiLiegenschaftszinsBeruecksichtigen(), wohnung
+                .gebaeudewertAnteilZuKaufpreis(), wohnung.jahresReinErtragZuKaufpreis(), wohnung.gesamtNutzungsDauer(),
+                wohnung.baujahr() ) {
+
+            @Override
+            protected Double calculate( ValueProvider values ) {
+                Double faktor1 = values.get( wohnung.jahresReinErtragZuKaufpreis() );
+                Double faktor2 = values.get( wohnung.gebaeudewertAnteilZuKaufpreis() );
+                Double GND = values.get( wohnung.gesamtNutzungsDauer() );
+                Double baujahr = values.get( wohnung.baujahr() );
+                
+                int currentYear = new Date().getYear() + 1900;
+                Double RND = (GND != null && baujahr != null) ? baujahr + GND - currentYear : null;
+                if (RND != null && faktor1 != null && faktor2 != null) {
+                    Double lizi = faktor1 - ((1 + faktor1 -1)/(Math.pow(1+faktor1,RND) - 1) * faktor2);
+                    int iteration = 1;
+                    while (Math.abs(lizi - faktor1) > 0.5d) {
+                        faktor1 = lizi;
+                        lizi = faktor1 - ((1 + faktor1 -1)/(Math.pow(1+faktor1,RND) - 1) * faktor2);
+                        iteration++;
+                    }
+                    // in % umrechnen
+                    return lizi  * 100;
+                }
+                return null;
+            }
+        } );
     }
 
 
@@ -205,6 +421,30 @@ public class WohnungLiegenschaftzinsFormEditorPage
         if (fieldListener.get( wohnung.wohnflaeche() ) != null) {
             pageSite.fireEvent( this, wohnung.wohnflaeche().qualifiedName().name(), IFormFieldListener.VALUE_CHANGE,
                     fieldListener.get( wohnung.wohnflaeche() ) );
+        }
+        if (fieldListener.get( wohnung.bruchteilNenner() ) != null) {
+            pageSite.fireEvent( this, wohnung.bruchteilNenner().qualifiedName().name(),
+                    IFormFieldListener.VALUE_CHANGE, fieldListener.get( wohnung.bruchteilNenner() ) );
+        }
+        if (fieldListener.get( wohnung.bruchteilZaehler() ) != null) {
+            pageSite.fireEvent( this, wohnung.bruchteilZaehler().qualifiedName().name(),
+                    IFormFieldListener.VALUE_CHANGE, fieldListener.get( wohnung.bruchteilZaehler() ) );
+        }
+        if (fieldListener.get( wohnung.bereinigterVollpreis() ) != null) {
+            pageSite.fireEvent( this, wohnung.bereinigterVollpreis().qualifiedName().name(),
+                    IFormFieldListener.VALUE_CHANGE, fieldListener.get( wohnung.bereinigterVollpreis() ) );
+        }
+        if (fieldListener.get( wohnung.kaufpreis() ) != null) {
+            pageSite.fireEvent( this, wohnung.kaufpreis().qualifiedName().name(), IFormFieldListener.VALUE_CHANGE,
+                    fieldListener.get( wohnung.kaufpreis() ) );
+        }
+        if (fieldListener.get( wohnung.baujahr() ) != null) {
+            pageSite.fireEvent( this, wohnung.baujahr().qualifiedName().name(), IFormFieldListener.VALUE_CHANGE,
+                    fieldListener.get( wohnung.baujahr() ) );
+        }
+        if (fieldListener.get( wohnung.gesamtNutzungsDauer() ) != null) {
+            pageSite.fireEvent( this, wohnung.gesamtNutzungsDauer().qualifiedName().name(),
+                    IFormFieldListener.VALUE_CHANGE, fieldListener.get( wohnung.gesamtNutzungsDauer() ) );
         }
     }
 }
