@@ -152,7 +152,7 @@ public class KapsRepository
                             StrasseComposite.class, new NameImpl( KapsRepository.NAMESPACE, "Strasse" ) ),
 
                     new SimpleEntityProvider<GemarkungComposite>( this, GemarkungComposite.class, new NameImpl(
-                            KapsRepository.NAMESPACE, "Gemarkung" ) ),
+                            KapsRepository.NAMESPACE, GemarkungComposite.NAME ) ),
                     new SimpleEntityProvider<FlurstuecksdatenBaulandComposite>( this,
                             FlurstuecksdatenBaulandComposite.class, new NameImpl( KapsRepository.NAMESPACE,
                                     FlurstuecksdatenBaulandComposite.NAME ) ),

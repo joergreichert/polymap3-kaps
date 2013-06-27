@@ -43,6 +43,9 @@ import org.polymap.kaps.model.SchlNamed;
 public interface GemarkungComposite
         extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite, SchlNamed {
 
+    final static String NAME = "Gemarkung";
+
+
     @Optional
     @ImportColumn("SCHL")
     Property<String> schl();
