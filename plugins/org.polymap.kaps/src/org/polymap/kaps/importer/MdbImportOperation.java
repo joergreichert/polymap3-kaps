@@ -897,15 +897,6 @@ public class MdbImportOperation
                             entity.NEU().set( getBooleanValue( builderRow, "NEU" ) );
                         }
                     } );
-            sub = new SubMonitor( monitor, 10 );
-            importEntity( db, sub, WohnungsTeileigentumComposite.class,
-                    new EntityCallback<WohnungsTeileigentumComposite>() {
-
-                        @Override
-                        public void fillEntity( WohnungsTeileigentumComposite entity, Map<String, Object> builderRow ) {
-                            entity.gebaeudeArt().set( find( allGebaeudeArt, builderRow, "TEBEZ" ) );
-                        }
-                    } );
 
             w.flush();
             w.close();

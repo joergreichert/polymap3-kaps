@@ -35,6 +35,7 @@ import org.polymap.core.runtime.Polymap;
 import org.polymap.rhei.data.entitystore.lucene.LuceneEntityStoreInfo;
 import org.polymap.rhei.data.entitystore.lucene.LuceneEntityStoreQueryService;
 import org.polymap.rhei.data.entitystore.lucene.LuceneEntityStoreService;
+
 import org.polymap.kaps.model.SchlNamedCreatorCallback.Impl;
 import org.polymap.kaps.model.data.*;
 
@@ -95,7 +96,7 @@ public class KapsRepositoryAssembler
                 FlurstuecksdatenAgrarComposite.class, BelastungComposite.class, EtageComposite.class,
                 AusstattungComposite.class, EigentumsartComposite.class, HimmelsrichtungComposite.class,
                 WohnungseigentumComposite.class, GebaeudeComposite.class, FlurstueckWohneigentumComposite.class,
-                AusstattungBewertungComposite.class, WohnungComposite.class, WohnungsTeileigentumComposite.class );
+                AusstattungBewertungComposite.class, WohnungComposite.class );
 
         // persistence: workspace/Lucene
         File root = new File( Polymap.getWorkspacePath().toFile(), "data" );
