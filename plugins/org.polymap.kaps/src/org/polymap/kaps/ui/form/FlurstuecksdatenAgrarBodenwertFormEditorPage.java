@@ -36,6 +36,7 @@ import org.polymap.core.runtime.event.EventManager;
 
 import org.polymap.rhei.data.entityfeature.AssociationAdapter;
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
+import org.polymap.rhei.field.CheckboxFormField;
 import org.polymap.rhei.field.FormFieldEvent;
 import org.polymap.rhei.field.IFormFieldLabel;
 import org.polymap.rhei.field.IFormFieldListener;
@@ -520,19 +521,20 @@ public class FlurstuecksdatenAgrarBodenwertFormEditorPage
 
         lastLine = newLine;
         newLine = createLabel( client, "Kaufpreisanteil Boden", four().right( SIX ).top( lastLine, 12 ), SWT.RIGHT );
-        createPreisField( IFormFieldLabel.NO_LABEL, "Kaufpreisanteil Bodenwert = Bodenwert * Faktor", vb.kaufpreisAnteilBodenwert(), six()
-                .top( lastLine ), client, false );
+        createPreisField( IFormFieldLabel.NO_LABEL, "Kaufpreisanteil Bodenwert = Bodenwert * Faktor",
+                vb.kaufpreisAnteilBodenwert(), six().top( lastLine ), client, false );
         site.addFieldListener( anteilBoden = new FieldMultiplication( site, 2, vb.faktorKaufpreisZuSachwert(), vb
                 .bodenwertGesamt(), vb.kaufpreisAnteilBodenwert() ) );
 
         lastLine = newLine;
         newLine = createLabel( client, "für Statistiken geeignet?", one().right( THREE ).top( lastLine, 12 ), SWT.RIGHT );
         newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Für Statisiken geeignet?" )
-                .setProperty( new PropertyAdapter( vb.fuerStatistikGeeignet() ) )
+                .setProperty( new PropertyAdapter( vb.fuerStatistikGeeignet() ) ).setField( new CheckboxFormField() )
                 .setLayoutData( three().top( lastLine ).bottom( 100 ).create() ).setParent( client ).create();
 
         createLabel( client, "für Richtwertermittlung geeignet?", four().right( SIX ).top( lastLine, 12 ), SWT.RIGHT );
         newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Für Richtwertermittlung geeignet?" )
+                .setField( new CheckboxFormField() )
                 .setProperty( new PropertyAdapter( vb.zurRichtwertermittlungGeeignet() ) )
                 .setLayoutData( six().top( lastLine ).bottom( 100 ).create() ).setParent( client ).create();
     }
@@ -569,7 +571,7 @@ public class FlurstuecksdatenAgrarBodenwertFormEditorPage
             // set the default zone from flurstueck
             RichtwertzoneZeitraumComposite zone = RichtwertzoneZeitraumComposite.Mixin.findZeitraumFor( vb.flurstueck()
                     .get().richtwertZone().get(), vb.vertrag().get().vertragsDatum().get() );
-            //vb.richtwertZone1().set( zone );
+            // vb.richtwertZone1().set( zone );
             pageSite.setFieldValue( vb.richtwertZone1().qualifiedName().name(), zone );
         }
         // daten vom 1. tab könnte sich geändert haben, also neu berechnen

@@ -70,7 +70,7 @@ public class MdbImportOperation
 
             sub = new SubMonitor( monitor, 10 );
 
-            final Map<String, StalaComposite> allStalas = new HashMap<String, StalaComposite>();
+            final List<StalaComposite> allStalas = new ArrayList<StalaComposite>();
             final Map<String, KaeuferKreisComposite> allKKreise = new HashMap<String, KaeuferKreisComposite>();
             final Map<String, VertragsArtComposite> allVertragsarten = new HashMap<String, VertragsArtComposite>();
             final Map<String, NutzungComposite> allNutzung = new HashMap<String, NutzungComposite>();
@@ -83,7 +83,7 @@ public class MdbImportOperation
                 @Override
                 public void fillEntity( StalaComposite entity, Map<String, Object> builderRow ) {
                     // collecting
-                    allStalas.put( entity.schl().get(), entity );
+                    allStalas.add( entity );
                 }
             } );
 
@@ -93,9 +93,7 @@ public class MdbImportOperation
                 @Override
                 public void fillEntity( VertragsArtComposite entity, Map<String, Object> builderRow ) {
                     // associate stala
-                    // Rückfrage welche STALAS verknüpft werden sollen
-                    // SCHL aus STALA ist nicht eindeutig
-                    // TODO [KAPS] #15
+                    entity.stala().set( findStala( allStalas, "STALA", builderRow, StalaComposite.VERWANDSCHAFTSVERHAELTNIS ));
                     // collecting
                     allVertragsarten.put( entity.schl().get(), entity );
                 }
@@ -107,15 +105,8 @@ public class MdbImportOperation
                 @Override
                 public void fillEntity( KaeuferKreisComposite entity, Map<String, Object> builderRow ) {
                     // associate stala erstellen
-                    Object stalaSchl = builderRow.get( "STALA" );
-                    if (stalaSchl != null) {
-                        StalaComposite stala = allStalas.get( stalaSchl.toString() );
-                        if (stala == null) {
-                            throw new IllegalStateException( "no stala found for schl '" + stalaSchl
-                                    + "' in K_KREIS_1 '" + entity.schl() + "'!" );
-                        }
-                        entity.stala().set( stala );
-                    }
+                    entity.stala().set( findStala( allStalas, "STALA", builderRow, StalaComposite.VERAEUSSERER_BAULAND ) );
+                    entity.stalaAgrar().set( findStala( allStalas, "STALA_AGRAR", builderRow, StalaComposite.VERAEUSSERER_AGRARLAND ) );
                     // collecting
                     allKKreise.put( entity.schl().get(), entity );
                 }
@@ -206,7 +197,7 @@ public class MdbImportOperation
 
                 @Override
                 public void fillEntity( NutzungComposite entity, Map<String, Object> builderRow ) {
-                    entity.stala().set( find( allStalas, builderRow, "STALA" ) );
+                    entity.stala().set( findStala( allStalas, "STALA", builderRow, StalaComposite.GRUNDSTUECKSART  ) );
                     entity.isAgrar().set( getBooleanValue( builderRow, "AGRAR" ) );
                     allNutzung.put( entity.schl().get(), entity );
                 }
@@ -246,7 +237,7 @@ public class MdbImportOperation
                 @Override
                 public void fillEntity( BodennutzungComposite entity, Map<String, Object> builderRow ) {
                     // associate stala erstellen
-                    entity.stala().set( find( allStalas, builderRow, "STALA" ) );
+                    entity.stala().set( findStala( allStalas, "STALA", builderRow, StalaComposite.ARTDESBAUGEBIETES  ) );
                     allBodennutzung.put( entity.schl().get(), entity );
                 }
             } );
@@ -929,6 +920,27 @@ public class MdbImportOperation
         }
 
         return Status.OK_STATUS;
+    }
+
+
+    protected final StalaComposite findStala( List<StalaComposite> allStalas, String columnName, Map<String, Object> builderRow,
+            String neededArt ) {
+        String stalaSchl = (String)builderRow.get( columnName );
+        StalaComposite foundStala = null;
+        if (stalaSchl != null && !stalaSchl.isEmpty()) {
+            for (StalaComposite stala : allStalas) {
+                String schl = stala.schl().get();
+                String art = stala.art().get();
+                if (schl != null && schl.equals( stalaSchl ) && art != null && art.equals( neededArt )) {
+                    foundStala = stala;
+                    break;
+                } 
+            }
+            if (foundStala == null) {
+                throw new IllegalStateException( "no stala found for schl '" + stalaSchl + "'!" );                           
+            }
+        }
+        return foundStala;
     }
 
 

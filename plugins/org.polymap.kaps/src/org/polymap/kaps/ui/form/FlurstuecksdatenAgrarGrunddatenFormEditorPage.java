@@ -26,6 +26,7 @@ import org.polymap.core.runtime.Polymap;
 
 import org.polymap.rhei.data.entityfeature.AssociationAdapter;
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
+import org.polymap.rhei.field.CheckboxFormField;
 import org.polymap.rhei.field.FormFieldEvent;
 import org.polymap.rhei.field.IFormFieldListener;
 import org.polymap.rhei.field.NumberValidator;
@@ -70,6 +71,7 @@ public class FlurstuecksdatenAgrarGrunddatenFormEditorPage
 
         lastLine = newLine;
         newLine = newFormField( "ist bebaut" ).setToolTipText( "Agrarland ist bebaut" )
+                .setField( new CheckboxFormField() )
                 .setProperty( new PropertyAdapter( vb.istBebaut() ) ).setLayoutData( left().top( lastLine ).create() )
                 .setParent( client ).create();
         pageSite.addFieldListener( listener = new IFormFieldListener() {

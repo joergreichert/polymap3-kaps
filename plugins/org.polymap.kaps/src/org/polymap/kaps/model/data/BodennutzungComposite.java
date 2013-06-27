@@ -43,6 +43,9 @@ import org.polymap.kaps.model.SchlNamed;
 public interface BodennutzungComposite
         extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite, SchlNamed {
 
+    final static String NAME = "Bodennutzung";
+
+
     @Optional
     @ImportColumn("SCHL")
     Property<String> schl();

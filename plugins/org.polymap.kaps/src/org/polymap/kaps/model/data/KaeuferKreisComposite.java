@@ -58,8 +58,9 @@ public interface KaeuferKreisComposite
     Association<StalaComposite> stala();
 
 
-    @ImportColumn("STALA_AGRAR")
-    Property<String> stalaAgrar();
+    @Optional
+    //@ImportColumn("STALA_AGRAR")
+    Association<StalaComposite> stalaAgrar();
 
 
     /**

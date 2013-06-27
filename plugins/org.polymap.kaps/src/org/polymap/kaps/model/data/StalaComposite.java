@@ -50,12 +50,24 @@ public interface StalaComposite
     // );
 
     // Arten: Handbuch Seite 40
+    // Bauland
     // 1 = Grundstücksart
     // 2 = Art des Baugebietes
     // 3 = Veräußerer/Erwerber
     // 4 = Verwandschaftsverhältnis
-    // 5 = 7 = ?
-    // 6 = unbekannt
+    // Agrarland
+    // 5 = Veräußerer 
+    // 6 = Art des Grundstücks
+    // 7 = Erwerber
+
+    static String GRUNDSTUECKSART = "1";
+    static String ARTDESBAUGEBIETES = "2";
+    static String VERAEUSSERER_BAULAND = "3";
+    static String VERWANDSCHAFTSVERHAELTNIS = "4";
+    static String VERAEUSSERER_AGRARLAND = "5";
+    static String ARTDESGRUNDSTUECKES = "6";
+    static String ERWERBER = "7";
+
 
     @Optional
     @ImportColumn("ART")

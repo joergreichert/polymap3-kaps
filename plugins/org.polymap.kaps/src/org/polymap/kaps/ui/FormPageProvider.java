@@ -21,12 +21,14 @@ import org.polymap.rhei.form.FormEditor;
 import org.polymap.rhei.form.IFormEditorPage;
 import org.polymap.rhei.form.IFormPageProvider;
 
+import org.polymap.kaps.model.data.BodennutzungComposite;
 import org.polymap.kaps.model.data.FlurstuecksdatenAgrarComposite;
 import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
 import org.polymap.kaps.model.data.RichtwertzoneComposite;
 import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.WohnungComposite;
 import org.polymap.kaps.model.data.WohnungseigentumComposite;
+import org.polymap.kaps.ui.form.BodennutzungFormEditorPage;
 import org.polymap.kaps.ui.form.FlurstuecksdatenAgrarBodenwertFormEditorPage;
 import org.polymap.kaps.ui.form.FlurstuecksdatenAgrarGrunddatenFormEditorPage;
 import org.polymap.kaps.ui.form.FlurstuecksdatenBaulandBodenwertFormEditorPage;
@@ -86,6 +88,9 @@ public class FormPageProvider
             result.add( new WohnungGrunddatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
             result.add( new WohnungVertragsdatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
             result.add( new WohnungLiegenschaftzinsFormEditorPage( feature, formEditor.getFeatureStore() ) );
+        }
+        else if (name.equalsIgnoreCase( BodennutzungComposite.NAME )) {
+            result.add( new BodennutzungFormEditorPage( feature, formEditor.getFeatureStore() ) );
         }
         return result;
     }

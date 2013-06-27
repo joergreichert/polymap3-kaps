@@ -346,7 +346,7 @@ public interface VertragComposite
         public void beforeCompletion()
                 throws UnitOfWorkCompletionException {
             if (eingangsNr().get() == null) {
-                eingangsNr().set( KapsRepository.instance().highestEingangsNummer() );
+                eingangsNr().set( KapsRepository.instance().highestEingangsNummer(vertragsDatum().get()) );
             }
         }
 

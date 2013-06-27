@@ -180,7 +180,7 @@ public class KapsRepository
                     // KapsRepository.NAMESPACE, "Entwicklungszustand" ) ) )
 
                     new SimpleEntityProvider<BodennutzungComposite>( this, BodennutzungComposite.class, new NameImpl(
-                            KapsRepository.NAMESPACE, "Bodennutzung" ) ) );
+                            KapsRepository.NAMESPACE, BodennutzungComposite.NAME ) ) );
         }
         catch (Exception e) {
             throw new RuntimeException( e );
@@ -242,6 +242,7 @@ public class KapsRepository
             public void create( VertragComposite prototype )
                     throws Exception {
                 prototype.eingangsDatum().set( new Date() );
+                prototype.kaufpreis().set( 0.0d );
                 prototype.kaufpreisAnteilZaehler().set( 1.0 );
                 prototype.kaufpreisAnteilNenner().set( 1.0 );
                 prototype.fuerGewosGeeignet().set( Boolean.TRUE );
@@ -257,7 +258,7 @@ public class KapsRepository
     }
 
 
-    public int highestEingangsNummer() {
+    public int highestEingangsNummer(Date vertragsdatum) {
         // TODO umstellen auf sequenzgenerator
 
         // nur zum Test noch die Suche über Verkäuferkreis mit rein
