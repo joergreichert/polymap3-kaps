@@ -202,12 +202,19 @@ public class MdbImportOperation
                     allNutzung.put( entity.schl().get(), entity );
                 }
             } );
+            
+            // erschließungsbeitrag laden
+            final Map<String, GebaeudeArtStaBuComposite> allGebaeudeArtStaBu = repo
+                    .entitiesWithSchl( GebaeudeArtStaBuComposite.class );
+
             sub = new SubMonitor( monitor, 10 );
             final Map<String, GebaeudeArtComposite> allGebaeudeArt = new HashMap<String, GebaeudeArtComposite>();
             importEntity( db, sub, GebaeudeArtComposite.class, new EntityCallback<GebaeudeArtComposite>() {
 
                 @Override
                 public void fillEntity( GebaeudeArtComposite entity, Map<String, Object> builderRow ) {
+                    
+                    entity.gebaeudeArtStabu().set( find(allGebaeudeArtStaBu, builderRow, "STAT_BUND_ART" ) );
                     allGebaeudeArt.put( entity.schl().get(), entity );
                 }
             } );

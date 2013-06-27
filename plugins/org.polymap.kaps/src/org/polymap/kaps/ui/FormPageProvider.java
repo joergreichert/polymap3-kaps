@@ -24,6 +24,7 @@ import org.polymap.rhei.form.IFormPageProvider;
 import org.polymap.kaps.model.data.BodennutzungComposite;
 import org.polymap.kaps.model.data.FlurstuecksdatenAgrarComposite;
 import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
+import org.polymap.kaps.model.data.GebaeudeArtComposite;
 import org.polymap.kaps.model.data.RichtwertzoneComposite;
 import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.WohnungComposite;
@@ -35,6 +36,7 @@ import org.polymap.kaps.ui.form.FlurstuecksdatenBaulandBodenwertFormEditorPage;
 import org.polymap.kaps.ui.form.FlurstuecksdatenBaulandGrunddatenFormEditorPage;
 import org.polymap.kaps.ui.form.FlurstuecksdatenBaulandRichtwertFormEditorPage;
 import org.polymap.kaps.ui.form.FlurstuecksdatenBaulandSonstigesFormEditorPage;
+import org.polymap.kaps.ui.form.GebaeudeArtFormEditorPage;
 import org.polymap.kaps.ui.form.Kaufvertrag1FormEditorPage;
 import org.polymap.kaps.ui.form.Kaufvertrag2FormEditorPage;
 import org.polymap.kaps.ui.form.KaufvertragErweitertFormEditorPage;
@@ -88,6 +90,9 @@ public class FormPageProvider
             result.add( new WohnungGrunddatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
             result.add( new WohnungVertragsdatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
             result.add( new WohnungLiegenschaftzinsFormEditorPage( feature, formEditor.getFeatureStore() ) );
+        }
+        else if (name.equalsIgnoreCase( GebaeudeArtComposite.NAME )) {
+            result.add( new GebaeudeArtFormEditorPage( feature, formEditor.getFeatureStore() ) );
         }
         else if (name.equalsIgnoreCase( BodennutzungComposite.NAME )) {
             result.add( new BodennutzungFormEditorPage( feature, formEditor.getFeatureStore() ) );

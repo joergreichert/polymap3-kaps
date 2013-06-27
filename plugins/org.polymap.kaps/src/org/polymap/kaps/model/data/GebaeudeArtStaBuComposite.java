@@ -18,7 +18,6 @@ import org.apache.commons.logging.LogFactory;
 import org.qi4j.api.common.Optional;
 import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.entity.EntityComposite;
-import org.qi4j.api.entity.association.Association;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.property.Property;
 
@@ -26,46 +25,39 @@ import org.polymap.core.qi4j.QiEntity;
 import org.polymap.core.qi4j.event.ModelChangeSupport;
 import org.polymap.core.qi4j.event.PropertyChangeSupport;
 
-import org.polymap.kaps.importer.ImportColumn;
-import org.polymap.kaps.importer.ImportTable;
 import org.polymap.kaps.model.SchlNamed;
+import org.polymap.kaps.model.SchlNamedCreatorCallback.Impl;
 
 /**
  * 
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 @Concerns({ PropertyChangeSupport.Concern.class })
-@Mixins({ GebaeudeArtComposite.Mixin.class, PropertyChangeSupport.Mixin.class,
+@Mixins({ GebaeudeArtStaBuComposite.Mixin.class, PropertyChangeSupport.Mixin.class,
         ModelChangeSupport.Mixin.class, QiEntity.Mixin.class
 // JsonState.Mixin.class
 })
-@ImportTable("K_GEBART")
-public interface GebaeudeArtComposite
+public interface GebaeudeArtStaBuComposite
         extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite, SchlNamed {
 
-    final static String NAME = "Gebäudeart";
-
-
     @Optional
-    @ImportColumn("SCHL")
     Property<String> schl();
 
 
     @Optional
-    @ImportColumn("TEXT1")
     Property<String> name();
 
-    @Optional
-    Association<GebaeudeArtStaBuComposite> gebaeudeArtStabu();
 
-    /**
-     * Methods and transient fields.
-     */
     public static abstract class Mixin
-            implements GebaeudeArtComposite {
+            implements GebaeudeArtStaBuComposite {
 
         private static Log log = LogFactory.getLog( Mixin.class );
 
-    }
 
+        public static void createInitData( Impl cb ) {
+            cb.create(GebaeudeArtStaBuComposite.class, "1", "Freistehendes Haus" );
+            cb.create(GebaeudeArtStaBuComposite.class, "2", "Reihen(end)haus" );
+            cb.create(GebaeudeArtStaBuComposite.class, "3", "Doppelhaushälfte" );
+        }
+    }
 }
