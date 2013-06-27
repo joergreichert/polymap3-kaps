@@ -66,15 +66,6 @@ public class WohnungseigentumObjektdatenFormEditorPage
                 .setLayoutData( right().top( lastLine ).create() ).create();
 
         lastLine = newLine;
-        newLine = createPreisField( "Gebäudebrandwert", "Gebäudebrandwert des Objektes in Mark",
-                eigentum.gebaeudebrandwert(), left().top( lastLine ), parent, true );
-        
-        newFormField( "Jahr" ).setToolTipText( "Jahr der Erhebung des Gebäudebrandwertes" ).setProperty( new PropertyAdapter( eigentum.brandwertErhebung() ) )
-                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 4, 0, 0, 0 ) )
-                .setLayoutData( right().top( lastLine ).create() ).create();
-
-        lastLine = newLine;
         // Bemerkungen
         newLine = newFormField( "Bemerkungen" ).setProperty( new PropertyAdapter( eigentum.bemerkungen() ) )
                 .setField( new TextFormField() )

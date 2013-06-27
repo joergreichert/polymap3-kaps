@@ -73,18 +73,6 @@ public interface WohnungseigentumComposite
     Property<Date> datumTeilungserklerung();
 
 
-    // GEBBRAND - Double
-    @Optional
-    @ImportColumn("GEBBRAND")
-    Property<Double> gebaeudebrandwert();
-
-
-    // GEBJAHR - Double
-    @Optional
-    @ImportColumn("GEBJAHR")
-    Property<Double> brandwertErhebung();
-
-
     // BEMERKUNG - String
     @Optional
     // @ImportColumn("BEMERKUNG")
