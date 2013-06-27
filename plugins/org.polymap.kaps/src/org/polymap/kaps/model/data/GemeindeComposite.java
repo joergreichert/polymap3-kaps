@@ -43,6 +43,8 @@ import org.polymap.kaps.model.SchlNamed;
 public interface GemeindeComposite
         extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite, SchlNamed {
 
+    final static String NAME = "Gemeinde";
+
     @Optional
     @ImportColumn("SCHL")
     Property<String> schl();
@@ -52,15 +54,20 @@ public interface GemeindeComposite
     @ImportColumn("BEZ")
     Property<String> name();
 
-    //@Optional
+    @Optional
     @UseDefaults
     @ImportColumn("EINWOHN")
     Property<Integer> einwohner();
-
-    // @Optional
+    
+    @Optional
+    @UseDefaults
+    @ImportColumn("EINWOHNT")
+    Property<Integer> einwohnerTatsaechlich();
+    
+    @Optional
     @UseDefaults
     @ImportColumn("FAKTOR")
-    Property<Float> faktor();
+    Property<Double> faktor();
 
     /**
      * Methods and transient fields.

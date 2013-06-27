@@ -148,7 +148,7 @@ public class KapsRepository
                             this, GebaeudeArtComposite.class, new NameImpl( KapsRepository.NAMESPACE, GebaeudeArtComposite.NAME ) ),
 
                     new SimpleEntityProvider<GemeindeComposite>( this, GemeindeComposite.class, new NameImpl(
-                            KapsRepository.NAMESPACE, "Gemeinde" ) ), new SimpleEntityProvider<StrasseComposite>( this,
+                            KapsRepository.NAMESPACE, GemeindeComposite.NAME ) ), new SimpleEntityProvider<StrasseComposite>( this,
                             StrasseComposite.class, new NameImpl( KapsRepository.NAMESPACE, "Strasse" ) ),
 
                     new SimpleEntityProvider<GemarkungComposite>( this, GemarkungComposite.class, new NameImpl(

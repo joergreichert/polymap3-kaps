@@ -26,31 +26,12 @@ import org.polymap.kaps.model.data.FlurstuecksdatenAgrarComposite;
 import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
 import org.polymap.kaps.model.data.GebaeudeArtComposite;
 import org.polymap.kaps.model.data.GemarkungComposite;
+import org.polymap.kaps.model.data.GemeindeComposite;
 import org.polymap.kaps.model.data.RichtwertzoneComposite;
 import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.WohnungComposite;
 import org.polymap.kaps.model.data.WohnungseigentumComposite;
-import org.polymap.kaps.ui.form.BodennutzungFormEditorPage;
-import org.polymap.kaps.ui.form.FlurstuecksdatenAgrarBodenwertFormEditorPage;
-import org.polymap.kaps.ui.form.FlurstuecksdatenAgrarGrunddatenFormEditorPage;
-import org.polymap.kaps.ui.form.FlurstuecksdatenBaulandBodenwertFormEditorPage;
-import org.polymap.kaps.ui.form.FlurstuecksdatenBaulandGrunddatenFormEditorPage;
-import org.polymap.kaps.ui.form.FlurstuecksdatenBaulandRichtwertFormEditorPage;
-import org.polymap.kaps.ui.form.FlurstuecksdatenBaulandSonstigesFormEditorPage;
-import org.polymap.kaps.ui.form.GebaeudeArtFormEditorPage;
-import org.polymap.kaps.ui.form.GemarkungFormEditorPage;
-import org.polymap.kaps.ui.form.Kaufvertrag1FormEditorPage;
-import org.polymap.kaps.ui.form.Kaufvertrag2FormEditorPage;
-import org.polymap.kaps.ui.form.KaufvertragErweitertFormEditorPage;
-import org.polymap.kaps.ui.form.KaufvertragFlurstueckeFormEditorPage;
-import org.polymap.kaps.ui.form.RichtwertzoneGrunddatenFormEditorPage;
-import org.polymap.kaps.ui.form.RichtwertzoneWeitereDatenFormEditorPage;
-import org.polymap.kaps.ui.form.WohnungGrunddatenFormEditorPage;
-import org.polymap.kaps.ui.form.WohnungLiegenschaftzinsFormEditorPage;
-import org.polymap.kaps.ui.form.WohnungVertragsdatenFormEditorPage;
-import org.polymap.kaps.ui.form.WohnungseigentumFlurstueckeFormEditorPage;
-import org.polymap.kaps.ui.form.WohnungseigentumGebaeudeFormEditorPage;
-import org.polymap.kaps.ui.form.WohnungseigentumObjektdatenFormEditorPage;
+import org.polymap.kaps.ui.form.*;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -98,6 +79,9 @@ public class FormPageProvider
         }
         else if (name.equalsIgnoreCase( GemarkungComposite.NAME )) {
             result.add( new GemarkungFormEditorPage( feature, formEditor.getFeatureStore() ) );
+        }
+        else if (name.equalsIgnoreCase( GemeindeComposite.NAME )) {
+            result.add( new GemeindeFormEditorPage( feature, formEditor.getFeatureStore() ) );
         }
         else if (name.equalsIgnoreCase( BodennutzungComposite.NAME )) {
             result.add( new BodennutzungFormEditorPage( feature, formEditor.getFeatureStore() ) );
