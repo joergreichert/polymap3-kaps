@@ -87,7 +87,7 @@ public class VerkaufteFlaecheRefresher
             Double kp = flaeche == null ? flurstueck.flaeche().get() : flaeche;
             Double n = flaechenAnteilNenner == null ? flurstueck.flaechenAnteilNenner().get()
                     : flaechenAnteilNenner;
-            Double z = flaecheAnteilZaehler == null ? flurstueck.flaecheAnteilZaehler().get()
+            Double z = flaecheAnteilZaehler == null ? flurstueck.flaechenAnteilZaehler().get()
                     : flaecheAnteilZaehler;
 
             if (kp != null && n != null && z != null && z != 0) {

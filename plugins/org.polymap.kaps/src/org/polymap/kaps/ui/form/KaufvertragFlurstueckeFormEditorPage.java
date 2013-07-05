@@ -222,7 +222,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                 current.gebaeudeArt().set( toAdopt.gebaeudeArt().get() );
                 current.artDesBaugebiets().set( toAdopt.artDesBaugebiets().get() );
                 current.flaeche().set( toAdopt.flaeche().get() );
-                current.flaecheAnteilZaehler().set( toAdopt.flaecheAnteilZaehler().get() );
+                current.flaechenAnteilZaehler().set( toAdopt.flaechenAnteilZaehler().get() );
                 current.flaechenAnteilNenner().set( toAdopt.flaechenAnteilNenner().get() );
                 current.verkaufteFlaeche().set( toAdopt.verkaufteFlaeche().get() );
 
@@ -455,7 +455,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                                 + "flaecheAnteilZaehler", new PropertyCallback<FlurstueckComposite>() {
 
                             public Property get( FlurstueckComposite entity ) {
-                                return entity.flaecheAnteilZaehler();
+                                return entity.flaechenAnteilZaehler();
                             }
                         } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
                 .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
@@ -568,7 +568,7 @@ public class KaufvertragFlurstueckeFormEditorPage
             public void create( FlurstueckComposite prototype )
                     throws Exception {
                 prototype.vertrag().set( kaufvertrag );
-                prototype.flaecheAnteilZaehler().set( 1.0d );
+                prototype.flaechenAnteilZaehler().set( 1.0d );
                 prototype.flaechenAnteilNenner().set( 1.0d );
             }
         } );
