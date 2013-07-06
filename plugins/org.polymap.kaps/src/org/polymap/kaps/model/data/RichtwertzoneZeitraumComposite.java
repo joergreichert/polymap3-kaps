@@ -53,6 +53,9 @@ import org.polymap.kaps.model.SchlNamed;
 public interface RichtwertzoneZeitraumComposite
         extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite, SchlNamed {
 
+    final String NAME = "Richtwertzone Gültigkeit";
+
+
     // CREATE TABLE K_RIWE (
     //
     // DMQM DOUBLE, Richtwert

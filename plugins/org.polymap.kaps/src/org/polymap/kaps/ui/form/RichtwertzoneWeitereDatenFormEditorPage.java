@@ -48,10 +48,13 @@ public class RichtwertzoneWeitereDatenFormEditorPage
 
     public RichtwertzoneWeitereDatenFormEditorPage( Feature feature, FeatureStore featureStore ) {
         super( RichtwertzoneWeitereDatenFormEditorPage.class.getName(), "weitere Daten", feature, featureStore );
-        richtwertzone = repository.findEntity( RichtwertzoneComposite.class, feature.getIdentifier().getID() );
+        richtwertzone = lookupRichtwertzoneComposite();
     }
 
-
+    protected RichtwertzoneComposite lookupRichtwertzoneComposite() {
+        return repository.findEntity( RichtwertzoneComposite.class, feature.getIdentifier().getID() );
+    }
+    
     @Override
     public void createFormContent( final IFormEditorPageSite site ) {
         super.createFormContent( site );

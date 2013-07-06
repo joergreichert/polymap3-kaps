@@ -57,6 +57,7 @@ import org.polymap.kaps.model.data.GemarkungComposite;
 import org.polymap.kaps.model.data.GemeindeComposite;
 import org.polymap.kaps.model.data.KaeuferKreisComposite;
 import org.polymap.kaps.model.data.NutzungComposite;
+import org.polymap.kaps.model.data.RichtwertzoneZeitraumComposite;
 import org.polymap.kaps.model.data.StalaComposite;
 import org.polymap.kaps.model.data.StrasseComposite;
 import org.polymap.kaps.model.data.VertragComposite;
@@ -136,7 +137,9 @@ public class KapsRepository
                     // KapsRepository.NAMESPACE,
                     // "Richtwertzone - Gültigkeit" ) ),
                     new SimpleEntityProvider<VertragsArtComposite>( this, VertragsArtComposite.class, new NameImpl(
-                            KapsRepository.NAMESPACE, "Vertragsart" ) ),
+                            KapsRepository.NAMESPACE, "Vertragsart" ) ), 
+                            new SimpleEntityProvider<RichtwertzoneZeitraumComposite>( this, RichtwertzoneZeitraumComposite.class, new NameImpl(
+                                    KapsRepository.NAMESPACE, RichtwertzoneZeitraumComposite.NAME ) ),
 
                     new SimpleEntityProvider<StalaComposite>( this, StalaComposite.class, new NameImpl(
                             KapsRepository.NAMESPACE, "Stala" ) ),

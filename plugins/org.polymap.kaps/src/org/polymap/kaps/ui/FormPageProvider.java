@@ -28,6 +28,7 @@ import org.polymap.kaps.model.data.GebaeudeArtComposite;
 import org.polymap.kaps.model.data.GemarkungComposite;
 import org.polymap.kaps.model.data.GemeindeComposite;
 import org.polymap.kaps.model.data.RichtwertzoneComposite;
+import org.polymap.kaps.model.data.RichtwertzoneZeitraumComposite;
 import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.WohnungComposite;
 import org.polymap.kaps.model.data.WohnungseigentumComposite;
@@ -53,6 +54,10 @@ public class FormPageProvider
         else if (name.equalsIgnoreCase( RichtwertzoneComposite.NAME )) {
             result.add( new RichtwertzoneGrunddatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
             result.add( new RichtwertzoneWeitereDatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
+        }
+        else if (name.equalsIgnoreCase( RichtwertzoneZeitraumComposite.NAME )) {
+            result.add( new RichtwertzoneZeitraumGrunddatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
+            result.add( new RichtwertzoneZeitraumWeitereDatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
         }
         else if (name.equalsIgnoreCase( FlurstuecksdatenBaulandComposite.NAME )) {
             result.add( new FlurstuecksdatenBaulandGrunddatenFormEditorPage( feature, formEditor.getFeatureStore() ) );

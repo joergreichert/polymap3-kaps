@@ -938,7 +938,7 @@ public class MdbImportOperation
             for (StalaComposite stala : allStalas) {
                 String schl = stala.schl().get();
                 String art = stala.art().get();
-                if (schl != null && schl.equals( stalaSchl ) && art != null && art.equals( neededArt )) {
+                if (schl != null && schl.trim().equals( stalaSchl.trim() ) && art != null && art.trim().equals( neededArt.trim() )) {
                     foundStala = stala;
                     break;
                 } 

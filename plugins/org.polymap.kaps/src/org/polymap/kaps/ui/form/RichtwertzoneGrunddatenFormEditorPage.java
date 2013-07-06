@@ -68,7 +68,11 @@ public class RichtwertzoneGrunddatenFormEditorPage
     public RichtwertzoneGrunddatenFormEditorPage( Feature feature, FeatureStore featureStore ) {
         super( RichtwertzoneGrunddatenFormEditorPage.class.getName(), "Grunddaten", feature, featureStore );
 
-        richtwertzone = repository.findEntity( RichtwertzoneComposite.class, feature.getIdentifier().getID() );
+        richtwertzone = lookupRichtwertzoneComposite();
+    }
+
+    protected RichtwertzoneComposite lookupRichtwertzoneComposite() {
+        return repository.findEntity( RichtwertzoneComposite.class, feature.getIdentifier().getID() );
     }
 
 
