@@ -276,14 +276,13 @@ public class WohnungLiegenschaftzinsFormEditorPage
         newLine = createLabel( parent, "Bodenwertanteil der Wohnung in €", three().top( lastLine ), SWT.RIGHT );
         createPreisField( wohnung.bodenwertAnteilDerWohnung(), five().top( lastLine ), parent, true );
         site.addFieldListener( bodenwertAnteilDerWohnung = new FieldCalculation( site, 2, wohnung
-                .bodenwertAnteilDerWohnung(), wohnung.wohnflaeche(), wohnung.bereinigterBodenpreis(), wohnung
-                .bruchteilNenner(), wohnung.bruchteilZaehler() ) {
+                .bodenwertAnteilDerWohnung(), wohnung.wohnflaeche(), wohnung.bereinigterBodenpreis() ) {
 
             @Override
             protected Double calculate( ValueProvider values ) {
                 Double flaeche = values.get( wohnung.flurstueck().get().flaeche() );
                 if (flaeche != null) {
-                    Double zaehler = values.get( wohnung.bruchteilZaehler() );
+                    Double zaehler = values.get( wohnung.flurstueck().get().flaechebruchteilZaehler() );
                     Double nenner = values.get( wohnung.bruchteilNenner() );
                     Double preis = values.get( wohnung.bereinigterBodenpreis() );
                     if (zaehler != null) {

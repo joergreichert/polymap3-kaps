@@ -96,7 +96,7 @@ public interface FlurstueckComposite
     @Optional
     @UseDefaults
     @ImportColumn("FANTZ1")
-    Property<Double> flaecheAnteilZaehler();
+    Property<Double> flaechenAnteilZaehler();
 
 
     // FANTN1 DOUBLE,

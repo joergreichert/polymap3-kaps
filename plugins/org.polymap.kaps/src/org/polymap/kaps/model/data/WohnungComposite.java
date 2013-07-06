@@ -113,18 +113,6 @@ public interface WohnungComposite
     Property<Double> anzahlZimmer();
 
 
-    // BRZAEHLER - Double
-    @Optional
-    @ImportColumn("BRZAEHLER")
-    Property<Double> bruchteilZaehler();
-
-
-    // BRNENNER - Double
-    @Optional
-    @ImportColumn("BRNENNER")
-    Property<Double> bruchteilNenner();
-
-
     // GESCHOSS - String
     @Optional
     Association<EtageComposite> etage();
@@ -897,6 +885,7 @@ public interface WohnungComposite
 
                 @Override
                 public String get() {
+                    vertragFor( WohnungComposite.Mixin.this ).bruchteilANteil;
                     return objektNummer().get() + "/" + objektFortfuehrung().get() + "/" + gebaeudeNummer().get() + "/"
                             + gebaeudeFortfuehrung().get() + "/" + wohnungsNummer().get() + "/"
                             + wohnungsFortfuehrung().get();
@@ -930,6 +919,8 @@ public interface WohnungComposite
             }
             return null;
         }
+        
+        
     }
 
 }

@@ -155,17 +155,6 @@ public class WohnungGrunddatenFormEditorPage
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setLayoutData( left().top( lastLine ).create() ).setParent( parent ).create();
 
-        newFormField( "Bruchteile" ).setToolTipText( "Bruchteil Zähler" )
-                .setProperty( new PropertyAdapter( wohnung.bruchteilZaehler() ) )
-                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 4, 1, 1 ) )
-                .setLayoutData( right().right( 75 ).top( lastLine ).create() ).setParent( parent ).create();
-        newFormField( "/" ).setToolTipText( "Bruchteil Nenner" )
-                .setProperty( new PropertyAdapter( wohnung.bruchteilNenner() ) )
-                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 4, 1, 1 ) )
-                .setLayoutData( right().left( 75 ).top( lastLine ).create() ).setParent( parent ).create();
-
         lastLine = newLine;
         newLine = newFormField( "Eigentum" ).setToolTipText( "Eigentum am Grundstück" )
                 .setProperty( new AssociationAdapter<EigentumsartComposite>( wohnung.eigentumsArt() ) )
