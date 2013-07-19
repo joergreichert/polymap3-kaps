@@ -137,6 +137,7 @@ public class DefaultEntityFilter
                             label );
                     site.addStandardLayout( formField );
                     ((FormData)formField.getLayoutData()).height = 100;
+                    ((FormData)formField.getLayoutData()).width = 100;
                 }
 //            }
         }
