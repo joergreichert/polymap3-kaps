@@ -95,8 +95,8 @@ public class KapsRepositoryAssembler
                 FlurstuecksdatenBaulandComposite.class, VertragsdatenErweitertComposite.class, KellerComposite.class,
                 FlurstuecksdatenAgrarComposite.class, BelastungComposite.class, EtageComposite.class,
                 AusstattungComposite.class, EigentumsartComposite.class, HimmelsrichtungComposite.class,
-                WohnungseigentumComposite.class, GebaeudeComposite.class, FlurstueckWohneigentumComposite.class,
-                AusstattungBewertungComposite.class, WohnungComposite.class, GebaeudeArtStaBuComposite.class );
+                WohnungseigentumComposite.class, GebaeudeComposite.class, AusstattungBewertungComposite.class,
+                WohnungComposite.class, GebaeudeArtStaBuComposite.class );
 
         // persistence: workspace/Lucene
         File root = new File( Polymap.getWorkspacePath().toFile(), "data" );
@@ -144,7 +144,7 @@ public class KapsRepositoryAssembler
             log.info( "Create StaBu Data" );
 
             final Impl schlCreator = new SchlNamedCreatorCallback.Impl( uow );
-            GebaeudeArtStaBuComposite.Mixin.createInitData(schlCreator);
+            GebaeudeArtStaBuComposite.Mixin.createInitData( schlCreator );
         }
         uow.complete();
         log.info( "Create Init Data Completed" );
@@ -157,7 +157,8 @@ public class KapsRepositoryAssembler
         Query<ErschliessungsBeitragComposite> query = builder.newQuery( uow ).maxResults( 1 ).firstResult( 0 );
         return query.iterator().hasNext();
     }
-    
+
+
     private boolean isDBStaBuInitialized( UnitOfWork uow ) {
         QueryBuilder<GebaeudeArtStaBuComposite> builder = getModule().queryBuilderFactory().newQueryBuilder(
                 GebaeudeArtStaBuComposite.class );

@@ -53,6 +53,7 @@ import org.polymap.kaps.KapsPlugin;
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.FlurComposite;
 import org.polymap.kaps.model.data.FlurstueckComposite;
+import org.polymap.kaps.model.data.FlurstueckVerkaufComposite;
 import org.polymap.kaps.model.data.GemarkungComposite;
 import org.polymap.kaps.ui.NamedCompositesFeatureContentProvider;
 
@@ -66,7 +67,7 @@ public abstract class FlurstueckSearcher
 
     private static Log                                   log = LogFactory.getLog( FlurstueckSearcher.class );
 
-    private List<FlurstueckComposite>                    content;
+    private List<FlurstueckVerkaufComposite>                    content;
 
     private final String                                 prefix;
 
@@ -90,7 +91,7 @@ public abstract class FlurstueckSearcher
     }
 
 
-    protected abstract void adopt( FlurstueckComposite element )
+    protected abstract void adopt( FlurstueckVerkaufComposite element )
             throws Exception;
 
 
@@ -115,7 +116,7 @@ public abstract class FlurstueckSearcher
             // }
             // }
             content = new ArrayList();
-            for (FlurstueckComposite fc : KapsRepository.instance().findFlurstuecke( gemarkung, flur, nummer,
+            for (FlurstueckVerkaufComposite fc : KapsRepository.instance().findFlurstuecke( gemarkung, flur, nummer,
                     unterNummer )) {
                 content.add( fc );
             }
@@ -126,9 +127,9 @@ public abstract class FlurstueckSearcher
             if (dialog.open() == Window.OK) {
                 assert dialog.sel.length == 1 : "Selected: " + dialog.sel.length;
                 final IFeatureTableElement sel = dialog.sel[0];
-                adopt( Iterables.find( content, new Predicate<FlurstueckComposite>() {
+                adopt( Iterables.find( content, new Predicate<FlurstueckVerkaufComposite>() {
 
-                    public boolean apply( FlurstueckComposite input ) {
+                    public boolean apply( FlurstueckVerkaufComposite input ) {
                         return input.id().equals( sel.fid() );
                     }
                 } ) );

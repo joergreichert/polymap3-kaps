@@ -12,6 +12,7 @@
  */
 package org.polymap.kaps.model.data;
 
+import java.util.Collections;
 import java.util.Date;
 
 import org.apache.commons.logging.Log;
@@ -238,8 +239,8 @@ public interface WohnungComposite
     // EINGANGSNR - Double
     @Optional
     // @ImportColumn("EINGANGSNR")
-    Property<Integer> eingangsNummer();
-
+//    Association<VertragComposite> vertrag();
+    Association<FlurstueckVerkaufComposite> flurstueckVerkauf();
 
     //
     //
@@ -491,7 +492,7 @@ public interface WohnungComposite
 
 
     @Optional
-    Association<FlurstueckWohneigentumComposite> flurstueck();
+    Association<FlurstueckComposite> flurstueck();
 
 
     //
@@ -868,6 +869,10 @@ public interface WohnungComposite
     @Optional
     @Computed
     Property<String> schl();
+    
+    @Optional
+    TODO auch beim Create einer Wohnung beachten
+    Association<GebaeudeComposite> gebaeude();
 
 
     /**
@@ -885,7 +890,6 @@ public interface WohnungComposite
 
                 @Override
                 public String get() {
-                    vertragFor( WohnungComposite.Mixin.this ).bruchteilANteil;
                     return objektNummer().get() + "/" + objektFortfuehrung().get() + "/" + gebaeudeNummer().get() + "/"
                             + gebaeudeFortfuehrung().get() + "/" + wohnungsNummer().get() + "/"
                             + wohnungsFortfuehrung().get();
@@ -894,17 +898,12 @@ public interface WohnungComposite
         }
 
 
-        public static Iterable<FlurstueckWohneigentumComposite> findFlurstueckeFor( WohnungComposite wohnung ) {
-            FlurstueckWohneigentumComposite template = QueryExpressions
-                    .templateFor( FlurstueckWohneigentumComposite.class );
-            BooleanExpression expr = QueryExpressions.and(
-                    QueryExpressions.eq( template.objektNummer(), wohnung.objektNummer().get() ),
-                    QueryExpressions.eq( template.objektFortfuehrung(), wohnung.objektFortfuehrung().get() ),
-                    QueryExpressions.eq( template.gebaeudeNummer(), wohnung.gebaeudeNummer().get() ),
-                    QueryExpressions.eq( template.gebaeudeFortfuehrung(), wohnung.gebaeudeFortfuehrung().get() ) );
-            Query<FlurstueckWohneigentumComposite> matches = KapsRepository.instance().findEntities(
-                    FlurstueckWohneigentumComposite.class, expr, 0, -1 );
-            return matches;
+        public static Iterable<FlurstueckComposite> findFlurstueckeFor( WohnungComposite wohnung ) {
+            GebaeudeComposite gebaeude = wohnung.gebaeude().get();
+            if (gebaeude != null) {
+                return gebaeude.flurstuecke().toSet();
+            }
+            return Collections.EMPTY_SET;
         }
 
 

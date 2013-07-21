@@ -322,6 +322,7 @@ public class WohnungseigentumGebaeudeFormEditorPage
                     throws Exception {
                 prototype.objektNummer().set( eigentum.objektNummer().get() );
                 prototype.objektFortfuehrung().set( eigentum.objektFortfuehrung().get() );
+                gebaeude als association setzen
             }
         } );
     }

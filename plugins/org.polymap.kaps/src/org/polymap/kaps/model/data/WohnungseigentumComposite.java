@@ -60,13 +60,6 @@ public interface WohnungseigentumComposite
     @ImportColumn("FORTF")
     Property<Integer> objektFortfuehrung();
 
-
-    // FLURSTUECK - String
-    @Optional
-    @ImportColumn("FLURSTUECK")
-    Property<String> flurstueck();
-
-
     // TEDATUM - SHORT_DATE_TIME
     @Optional
     @ImportColumn("TEDATUM")

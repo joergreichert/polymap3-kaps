@@ -50,6 +50,7 @@ import org.polymap.core.runtime.Polymap;
 import org.polymap.kaps.model.data.BodennutzungComposite;
 import org.polymap.kaps.model.data.FlurComposite;
 import org.polymap.kaps.model.data.FlurstueckComposite;
+import org.polymap.kaps.model.data.FlurstueckVerkaufComposite;
 import org.polymap.kaps.model.data.FlurstuecksdatenAgrarComposite;
 import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
 import org.polymap.kaps.model.data.GebaeudeArtComposite;
@@ -360,7 +361,7 @@ public class KapsRepository
     }
 
 
-    public Iterable<FlurstueckComposite> findFlurstuecke( GemarkungComposite gemarkung, FlurComposite flur,
+    public Iterable<FlurstueckVerkaufComposite> findFlurstuecke( GemarkungComposite gemarkung, FlurComposite flur,
             Integer flurstuecksNummer, String unternummer ) {
         FlurstueckComposite template = templateFor( FlurstueckComposite.class );
         BooleanExpression expr = null;
@@ -381,6 +382,22 @@ public class KapsRepository
         }
         Query<FlurstueckComposite> matches = KapsRepository.instance().findEntities( FlurstueckComposite.class, expr,
                 0, 100 );
-        return matches;
+        
+//        alle FlurstueckVerkaufComposite finden für die Flurstücke
+        
+        FlurstueckVerkaufComposite verkaufTemplate = QueryExpressions.templateFor( FlurstueckVerkaufComposite.class );
+        BooleanExpression dExpr = null;
+        for (FlurstueckComposite flurstueck : matches) {
+            BooleanExpression newExpr = QueryExpressions.eq( verkaufTemplate.flurstueck(), flurstueck );
+            if (dExpr == null) {
+                dExpr = newExpr;
+            }
+            else {
+                dExpr = QueryExpressions.or( dExpr, newExpr );
+            }
+        }
+        Query<FlurstueckVerkaufComposite> matches2 = KapsRepository.instance().findEntities( FlurstueckVerkaufComposite.class, dExpr,
+                0, 100 );
+        return matches2;
     }
 }

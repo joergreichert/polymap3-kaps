@@ -525,10 +525,10 @@ public interface FlurstuecksdatenBaulandComposite
     Property<String> gewart();
 
 
-    // ERBBAU VARCHAR(1),
-    @Optional
-    @ImportColumn("ERBBAU")
-    Property<String> erbbaurecht();
+//    // ERBBAU VARCHAR(1),
+//    @Optional
+//    @ImportColumn("ERBBAU")
+//    Property<String> erbbaurecht();
 
 
     // TODO WERT1 DOUBLE,
@@ -1002,7 +1002,7 @@ public interface FlurstuecksdatenBaulandComposite
 
     @Optional
     // @Computed
-    Association<FlurstueckComposite> flurstueck();
+    Association<FlurstueckVerkaufComposite> flurstueck();
 
 
     @Optional
@@ -1034,7 +1034,7 @@ public interface FlurstuecksdatenBaulandComposite
         private static Log log = LogFactory.getLog( Mixin.class );
 
 
-        public static FlurstuecksdatenBaulandComposite forFlurstueck( FlurstueckComposite flurstueck ) {
+        public static FlurstuecksdatenBaulandComposite forFlurstueck( FlurstueckVerkaufComposite flurstueck ) {
             FlurstuecksdatenBaulandComposite template = QueryExpressions
                     .templateFor( FlurstuecksdatenBaulandComposite.class );
             BooleanExpression expr = QueryExpressions.eq( template.flurstueck(), flurstueck );
@@ -1079,7 +1079,7 @@ public interface FlurstuecksdatenBaulandComposite
                     FlurstuecksdatenBaulandComposite.class, "nutzung" ) ) {
 
                 public NutzungComposite get() {
-                    FlurstueckComposite flurstueck = flurstueck().get();
+                    FlurstueckVerkaufComposite flurstueck = flurstueck().get();
                     return flurstueck != null ? flurstueck.nutzung().get() : null;
                 }
 
@@ -1120,7 +1120,7 @@ public interface FlurstuecksdatenBaulandComposite
                     FlurstuecksdatenBaulandComposite.class, "richtwertZone" ) ) {
 
                 public RichtwertzoneComposite get() {
-                    FlurstueckComposite flurstueck = flurstueck().get();
+                    FlurstueckVerkaufComposite flurstueck = flurstueck().get();
                     return flurstueck != null ? flurstueck.richtwertZone().get() : null;
                 }
 
@@ -1140,7 +1140,7 @@ public interface FlurstuecksdatenBaulandComposite
                     FlurstuecksdatenBaulandComposite.class, "gebaeudeArt" ) ) {
 
                 public GebaeudeArtComposite get() {
-                    FlurstueckComposite flurstueck = flurstueck().get();
+                    FlurstueckVerkaufComposite flurstueck = flurstueck().get();
                     return flurstueck != null ? flurstueck.gebaeudeArt().get() : null;
                 }
 

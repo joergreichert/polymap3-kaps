@@ -36,7 +36,7 @@ import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.filter.IFilterEditorSite;
 
 import org.polymap.kaps.model.KapsRepository;
-import org.polymap.kaps.model.data.FlurstueckComposite;
+import org.polymap.kaps.model.data.FlurstueckVerkaufComposite;
 import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
 import org.polymap.kaps.model.data.GebaeudeArtComposite;
 import org.polymap.kaps.model.data.VertragComposite;
@@ -85,12 +85,12 @@ public class VertraegeFuerBaujahrUndGebaeudeartFilter
         VertragComposite template = QueryExpressions.templateFor( VertragComposite.class );
 
         if (gebaeude != null) {
-            FlurstueckComposite flurTemplate = QueryExpressions.templateFor( FlurstueckComposite.class );
+            FlurstueckVerkaufComposite flurTemplate = QueryExpressions.templateFor( FlurstueckVerkaufComposite.class );
             BooleanExpression expr = QueryExpressions.eq( flurTemplate.gebaeudeArt(), gebaeude );
 
-            Query<FlurstueckComposite> flurstuecke = KapsRepository.instance().findEntities( FlurstueckComposite.class,
-                    expr, 0, -1 );
-            for (FlurstueckComposite fc : flurstuecke) {
+            Query<FlurstueckVerkaufComposite> flurstuecke = KapsRepository.instance().findEntities(
+                    FlurstueckVerkaufComposite.class, expr, 0, -1 );
+            for (FlurstueckVerkaufComposite fc : flurstuecke) {
                 BooleanExpression newExpr = QueryExpressions.eq( template.eingangsNr(), fc.vertrag().get().eingangsNr()
                         .get() );
                 if (fExpr == null) {
@@ -137,7 +137,7 @@ public class VertraegeFuerBaujahrUndGebaeudeartFilter
                 }
             }
         }
-        
+
         BooleanExpression allExpr = dExpr;
         if (allExpr != null) {
             if (fExpr != null) {

@@ -58,11 +58,11 @@ public class FlurstuecksdatenBaulandSonstigesFormEditorPage
 
         Composite client = parent;
 
-        newLine = newFormField( "Erbbaurecht" ).setEnabled( true )
-                .setProperty( new PropertyAdapter( vb.erbbaurecht() ) ).setField( new BooleanFormField() )
-                .setLayoutData( left().top( lastLine ).create() ).setParent( client ).create();
-
-        lastLine = newLine;
+//        newLine = newFormField( "Erbbaurecht" ).setEnabled( true )
+//                .setProperty( new PropertyAdapter( vb.erbbaurecht() ) ).setField( new BooleanFormField() )
+//                .setLayoutData( left().top( lastLine ).create() ).setParent( client ).create();
+//
+//        lastLine = newLine;
         newLine = newFormField( "Denkmalschutz" ).setEnabled( true )
                 .setProperty( new PropertyAdapter( vb.denkmalschutz() ) ).setField( new BooleanFormField() )
                 .setLayoutData( left().top( lastLine ).create() ).setParent( client ).create();

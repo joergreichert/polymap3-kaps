@@ -19,6 +19,7 @@ import org.qi4j.api.common.Optional;
 import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.entity.association.Association;
+import org.qi4j.api.entity.association.ManyAssociation;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.property.Computed;
 import org.qi4j.api.property.ComputedPropertyInstance;
@@ -139,7 +140,11 @@ public interface GebaeudeComposite
     @Optional
     @Computed
     Property<String> schl();
+    
+    @Optional
+    ManyAssociation<FlurstueckComposite> flurstuecke();
 
+    Wohnungseigentum als Association, auch beim Import beachten
 
     /**
      * Methods and transient fields.
