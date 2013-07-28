@@ -157,6 +157,15 @@ public interface GebaeudeComposite
         private static Log log = LogFactory.getLog( Mixin.class );
 
 
+//        @Override
+//        public void beforeCompletion()
+//                throws UnitOfWorkCompletionException {
+//            if (objektNummer().get() == null || objektFortfuehrung().get() == null || gebaeudeNummer().get() == null
+//                    || gebaeudeFortfuehrung().get() == null ) {
+//                throw new UnitOfWorkCompletionException( "Alle Nummern und Fortführungen müssen ausgefüllt sein!" );
+//            }
+//        }
+
         @Override
         public Property<String> schl() {
             return new ComputedPropertyInstance<String>( new GenericPropertyInfo( WohnungseigentumComposite.class,

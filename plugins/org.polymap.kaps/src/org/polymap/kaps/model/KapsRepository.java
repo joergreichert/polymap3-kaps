@@ -372,7 +372,7 @@ public class KapsRepository
     public Iterable<FlurstueckComposite> findFlurstuecke( GemarkungComposite gemarkung, FlurComposite flur,
             Integer flurstuecksNummer, String unternummer ) {
         FlurstueckComposite template = templateFor( FlurstueckComposite.class );
-        BooleanExpression expr = QueryExpressions.isNotNull( template.vertrag() );
+        BooleanExpression expr = null;//QueryExpressions.not( QueryExpressions.eq( template.vertrag(), null ));
         if (gemarkung != null) {
             expr = QueryExpressions.eq( template.gemarkung(), gemarkung );
         }

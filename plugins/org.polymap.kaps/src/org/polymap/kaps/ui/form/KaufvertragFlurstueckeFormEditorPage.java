@@ -52,11 +52,13 @@ import org.polymap.rhei.form.IFormEditorPageSite;
 import org.polymap.kaps.KapsPlugin;
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.ArtDesBaugebietsComposite;
+import org.polymap.kaps.model.data.BelastungComposite;
 import org.polymap.kaps.model.data.FlurComposite;
 import org.polymap.kaps.model.data.FlurstueckComposite;
 import org.polymap.kaps.model.data.FlurstuecksdatenAgrarComposite;
 import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
 import org.polymap.kaps.model.data.GebaeudeArtComposite;
+import org.polymap.kaps.model.data.GebaeudeComposite;
 import org.polymap.kaps.model.data.GemarkungComposite;
 import org.polymap.kaps.model.data.GemeindeComposite;
 import org.polymap.kaps.model.data.NutzungComposite;
@@ -95,6 +97,12 @@ public class KaufvertragFlurstueckeFormEditorPage
 
     private ActionButton              searchFlurstueckeButton;
 
+    private StrasseComposite          selectedStrasse;
+
+    private RichtwertzoneComposite    selectedRichtwertzone;
+
+    private ArtDesBaugebietsComposite selectedArtDesBaugebietes;
+
 
     public KaufvertragFlurstueckeFormEditorPage( Feature feature, FeatureStore featureStore ) {
         super( KaufvertragFlurstueckeFormEditorPage.class.getName(), "Flurstücke", feature, featureStore );
@@ -124,8 +132,10 @@ public class KaufvertragFlurstueckeFormEditorPage
             throws Exception {
         FlurstueckComposite composite = selectedComposite.get();
         selectedGemarkung = composite != null ? composite.gemarkung().get() : null;
-
+        selectedStrasse = composite != null ? composite.strasse().get() : null;
+        selectedRichtwertzone = composite != null ? composite.richtwertZone().get() : null;
         selectedNutzung = composite != null ? composite.nutzung().get() : null;
+        selectedArtDesBaugebietes = composite != null ? composite.artDesBaugebiets().get() : null;
 
         super.refreshReloadables();
         if (sfAction != null) {
@@ -134,6 +144,8 @@ public class KaufvertragFlurstueckeFormEditorPage
             openErweiterteDatenAgrar.setEnabled( composite != null );
             openErweiterteDatenBauland.setEnabled( composite != null );
             wohnungPicklist.setEnabled( composite != null );
+            createWohnung.setEnabled( composite != null );
+            searchWohnung.setEnabled( composite != null );
         }
         // das muss disabled bleiben
         pageSite.setFieldEnabled( prefix + "verkaufteFlaeche", false );
@@ -220,27 +232,39 @@ public class KaufvertragFlurstueckeFormEditorPage
                     throws Exception {
                 assert toAdopt != null;
                 FlurstueckComposite current = selectedComposite.get();
-                current.gemarkung().set( toAdopt.gemarkung().get() );
-                current.flur().set( toAdopt.flur().get() );
-                current.nummer().set( toAdopt.nummer().get() );
-                current.unterNummer().set( toAdopt.unterNummer().get() );
-                current.strasse().set( toAdopt.strasse().get() );
-                current.hausnummer().set( toAdopt.hausnummer().get() );
-                current.hausnummerZusatz().set( toAdopt.hausnummerZusatz().get() );
-                current.richtwertZone().set( toAdopt.richtwertZone().get() );
-                current.kartenBlatt().set( toAdopt.kartenBlatt().get() );
-                current.baublock().set( toAdopt.baublock().get() );
-                current.nutzung().set( toAdopt.nutzung().get() );
-                current.gebaeudeArt().set( toAdopt.gebaeudeArt().get() );
-                current.artDesBaugebiets().set( toAdopt.artDesBaugebiets().get() );
-                current.flaeche().set( toAdopt.flaeche().get() );
-                current.flaechenAnteilZaehler().set( toAdopt.flaechenAnteilZaehler().get() );
-                current.flaechenAnteilNenner().set( toAdopt.flaechenAnteilNenner().get() );
-                current.verkaufteFlaeche().set( toAdopt.verkaufteFlaeche().get() );
-                current.erbbaurecht().set( toAdopt.erbbaurecht().get() );
-                current.belastung().set( toAdopt.belastung().get() );
+                // separate behandeln, da die 3 felder von zusätzlichen reloads von
+                // gemakrung und nutzung
+                // wieder zurückgesetzt werden
+                selectedStrasse = toAdopt.strasse().get();
+                selectedRichtwertzone = toAdopt.richtwertZone().get();
+                selectedArtDesBaugebietes = toAdopt.artDesBaugebiets().get();
 
-                refreshReloadables();
+                pageSite.setFieldValue( prefix + "gemarkung", toAdopt.gemarkung().get() );
+                // current.gemarkung().set( toAdopt.gemarkung().get() );
+                pageSite.setFieldValue( prefix + "flur", toAdopt.flur().get() );
+                pageSite.setFieldValue( prefix + "nummer", String.valueOf( toAdopt.nummer().get() ) );
+                pageSite.setFieldValue( prefix + "unterNummer", toAdopt.unterNummer().get() );
+                pageSite.setFieldValue( prefix + "strasse", toAdopt.strasse().get() );
+                pageSite.setFieldValue( prefix + "hausnummer", toAdopt.hausnummer().get() );
+                pageSite.setFieldValue( prefix + "hausnummerZusatz", toAdopt.hausnummerZusatz().get() );
+                pageSite.setFieldValue( prefix + "richtwertZone", toAdopt.richtwertZone().get() );
+                // pageSite.setFieldValue( prefix + "kartenBlatt",
+                // toAdopt.kartenBlatt().get() );
+                // pageSite.setFieldValue( prefix + "baublock",
+                // toAdopt.baublock().get() );
+                pageSite.setFieldValue( prefix + "nutzung", toAdopt.nutzung().get() );
+                pageSite.setFieldValue( prefix + "gebaeudeArt", toAdopt.gebaeudeArt().get() );
+                pageSite.setFieldValue( prefix + "artDesBaugebiets", toAdopt.artDesBaugebiets().get() );
+                pageSite.setFieldValue( prefix + "flaeche", String.valueOf( toAdopt.flaeche().get() ) );
+                pageSite.setFieldValue( prefix + "flaechenAnteilZaehler",
+                        String.valueOf( toAdopt.flaechenAnteilZaehler().get() ) );
+                pageSite.setFieldValue( prefix + "flaechenAnteilNenner",
+                        String.valueOf( toAdopt.flaechenAnteilNenner().get() ) );
+                pageSite.setFieldValue( prefix + "verkaufteFlaeche", String.valueOf( toAdopt.verkaufteFlaeche().get() ) );
+                pageSite.setFieldValue( prefix + "erbbaurecht", toAdopt.erbbaurecht().get() );
+                pageSite.setFieldValue( prefix + "belastung", toAdopt.belastung().get() );
+
+                // refreshReloadables();
             }
         };
         sfAction.setEnabled( false );
@@ -344,12 +368,13 @@ public class KaufvertragFlurstueckeFormEditorPage
                     if ((ev.getNewValue() == null && selectedGemarkung != null)
                             || (ev.getNewValue() != null && !ev.getNewValue().equals( selectedGemarkung ))) {
                         selectedGemarkung = ev.getNewValue();
+                        // strassePickList.
                         strassePickList.reloadValues();
-                        strassePickList.setValue( selectedComposite.get() != null ? selectedComposite.get().strasse()
-                                .get() : null );
+                        pageSite.setFieldValue( prefix + "strasse", selectedStrasse );
                         richtwertZonePickList.reloadValues();
-                        richtwertZonePickList.setValue( selectedComposite.get() != null ? selectedComposite.get()
-                                .richtwertZone().get() : null );
+                        pageSite.setFieldValue( prefix + "richtwertZone", selectedRichtwertzone );
+                        // selectedComposite.get() != null ?
+                        // selectedComposite.get().richtwertZone().get() : null );
                     }
                 }
             }
@@ -428,8 +453,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                             || (ev.getNewValue() != null && !ev.getNewValue().equals( selectedNutzung ))) {
                         selectedNutzung = ev.getNewValue();
                         artPicklist.reloadValues();
-                        artPicklist.setValue( selectedComposite.get() != null ? selectedComposite.get()
-                                .artDesBaugebiets().get() : null );
+                        pageSite.setFieldValue( prefix + "artDesBaugebiets", selectedArtDesBaugebietes );
                     }
                 }
             }
@@ -465,7 +489,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                 .setParent( parent )
                 .setProperty(
                         new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix
-                                + "flaecheAnteilZaehler", new PropertyCallback<FlurstueckComposite>() {
+                                + "flaechenAnteilZaehler", new PropertyCallback<FlurstueckComposite>() {
 
                             public Property get( FlurstueckComposite entity ) {
                                 return entity.flaechenAnteilZaehler();
@@ -516,6 +540,21 @@ public class KaufvertragFlurstueckeFormEditorPage
                                     }
                                 } ) ).setField( reloadable( new BooleanFormField() ) )
                 .setLayoutData( left().top( line6 ).bottom( 100 ).create() ).create();
+
+        newFormField( "Belastung" )
+                // .setToolTipText(
+                // "Art des Grundstücks bei Agrarland, Art des Baugebietes sonst" )
+                .setParent( parent )
+                .setProperty(
+                        new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix + "belastung",
+                                new AssociationCallback<FlurstueckComposite>() {
+
+                                    public Association get( FlurstueckComposite entity ) {
+                                        return entity.belastung();
+                                    }
+                                } ) ).setField( namedAssocationsPicklist( BelastungComposite.class ) )
+                .setLayoutData( right().top( line6 ).create() ).create();
+
         // return the last line
         return formSection;
     }
@@ -523,6 +562,10 @@ public class KaufvertragFlurstueckeFormEditorPage
     private ActionButton                     openErweiterteDatenAgrar;
 
     private ActionButton                     openErweiterteDatenBauland;
+
+    private ActionButton                     createWohnung;
+
+    private ActionButton                     searchWohnung;
 
     private SimplePickList<WohnungComposite> wohnungPicklist;
 
@@ -606,7 +649,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                 super.setEnabled( enabled );
             };
         };
-        openErweiterteDatenBauland.setLayoutData( left().left( 20 ).right( 35 ).height( 25 ).top( null ).create() );
+        openErweiterteDatenBauland.setLayoutData( left().left( 17 ).right( 32 ).height( 25 ).top( null ).create() );
         openErweiterteDatenBauland.setEnabled( false );
 
         final ActionButton openWohnung = new ActionButton( parent, new Action( "Wohnung bearbeiten" ) {
@@ -620,7 +663,7 @@ public class KaufvertragFlurstueckeFormEditorPage
             }
 
         } );
-        openWohnung.setLayoutData( left().left( 62 ).right( 77 ).height( 25 ).top( null ).create() );
+        openWohnung.setLayoutData( left().left( 55 ).right( 68 ).height( 25 ).top( null ).create() );
         openWohnung.setEnabled( false );
 
         // Liste mit Wohnung + Auswählen daneben
@@ -647,8 +690,47 @@ public class KaufvertragFlurstueckeFormEditorPage
                 }
             }
         };
-        wohnungPicklist.setLayoutData( right().left( 45 ).right( 60 ).height( 25 ).top( null ).create() );
+        wohnungPicklist.setLayoutData( right().left( 40 ).right( 55 ).height( 25 ).top( null ).create() );
 
+        createWohnung = new ActionButton( parent, new Action( "Wohnung anlegen" ) {
+
+            @Override
+            public void run() {
+                FlurstueckComposite flurstueck = selectedComposite.get();
+                if (flurstueck != null) {
+                    WohnungComposite wohnung = repository.newEntity( WohnungComposite.class, null );
+                    wohnung.flurstueck().set( flurstueck );
+                    // wohnung.vertrag().set( flurstueck.vertrag().get() );
+                    KapsPlugin.openEditor( fs, WohnungComposite.NAME, wohnung );
+                }
+            }
+
+        } );
+        createWohnung.setLayoutData( left().left( 71 ).right( 85 ).height( 25 ).top( null ).create() );
+        createWohnung.setEnabled( false );
+
+        searchWohnung = new ActionButton( parent, new WohnungSearcher() {
+
+            @Override
+            protected void adopt( WohnungComposite wohnung )
+                    throws Exception {
+                if (wohnung != null) {
+                    // TODO hier einen Adapter einbauen, der erst beim speichern der
+                    // Seite ausgeführt wird
+                    wohnung.flurstueck().set( selectedComposite.get() );
+                    if (wohnung.gebaeudeNummer().get() != null) {
+                        GebaeudeComposite gebaeude = GebaeudeComposite.Mixin.forKeys( wohnung.objektNummer().get(),
+                                wohnung.objektFortfuehrung().get(), wohnung.gebaeudeNummer().get(), wohnung
+                                        .gebaeudeFortfuehrung().get() );
+                        if (gebaeude != null && !gebaeude.flurstuecke().contains( selectedComposite.get() )) {
+                            gebaeude.flurstuecke().add( selectedComposite.get() );
+                        }
+                    }
+                }
+            }
+        } );
+        searchWohnung.setLayoutData( left().left( 87 ).right( 100 ).height( 25 ).top( null ).create() );
+        searchWohnung.setEnabled( false );
         //
         // wohnungPicklist.addSelectionListener( new Selectio )
         // wohnungPicklist.setLayoutData( right().right( 70 ).height( 25 ).top( null

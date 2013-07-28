@@ -30,6 +30,7 @@ import org.polymap.core.runtime.Polymap;
 
 import org.polymap.rhei.data.entityfeature.AssociationAdapter;
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
+import org.polymap.rhei.field.IFormFieldLabel;
 import org.polymap.rhei.field.IFormFieldListener;
 import org.polymap.rhei.field.NumberValidator;
 import org.polymap.rhei.field.PicklistFormField;
@@ -86,63 +87,61 @@ public class WohnungGrunddatenFormEditorPage
         Composite newLine, lastLine = null;
         Composite parent = pageSite.getPageBody();
 
-        newLine = newFormField( "Objektnummer" ).setProperty( new PropertyAdapter( wohnung.objektNummer() ) )
+        newLine = newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Objektnummer" )
+                .setProperty( new PropertyAdapter( wohnung.objektNummer() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Integer.class, Polymap.getSessionLocale() ) ).setEnabled( false )
-                .setLayoutData( left().create() ).create();
+                .setValidator( new NotNullNumberValidator( Integer.class, Polymap.getSessionLocale() ) )
+                .setEnabled( wohnung.objektNummer().get() == null ).setLayoutData( left().left( 0 ).right( 15 ).create() ).create();
 
-        newFormField( "Fortführung" ).setProperty( new PropertyAdapter( wohnung.objektFortfuehrung() ) )
+        newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Fortführung" )
+                .setProperty( new PropertyAdapter( wohnung.objektFortfuehrung() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Integer.class, Polymap.getSessionLocale() ) ).setEnabled( false )
-                .setLayoutData( right().create() ).create();
-
-        lastLine = newLine;
-        newLine = newFormField( "Gebäudenummer" ).setProperty( new PropertyAdapter( wohnung.gebaeudeNummer() ) )
-                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Integer.class, Polymap.getSessionLocale() ) ).setEnabled( false )
-                .setLayoutData( left().top( lastLine ).create() ).create();
-
-        newFormField( "Fortführung" ).setProperty( new PropertyAdapter( wohnung.gebaeudeFortfuehrung() ) )
-                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Integer.class, Polymap.getSessionLocale() ) ).setEnabled( false )
-                .setLayoutData( right().top( lastLine ).create() ).create();
+                .setValidator( new NotNullNumberValidator( Integer.class, Polymap.getSessionLocale() ) )
+                .setEnabled( wohnung.objektNummer().get() == null ).setLayoutData( left().left( 16 ).right( 31 ).create() ).create();
 
         lastLine = newLine;
-        newLine = newFormField( "Wohnungsnummer" ).setProperty( new PropertyAdapter( wohnung.wohnungsNummer() ) )
+        newLine = newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Gebäudenummer" )
+                .setProperty( new PropertyAdapter( wohnung.gebaeudeNummer() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Integer.class, Polymap.getSessionLocale() ) )
-                .setEnabled( wohnung.wohnungsNummer().get() == null ).setLayoutData( left().top( lastLine ).create() )
+                .setValidator( new NotNullNumberValidator( Integer.class, Polymap.getSessionLocale() ) )
+                .setEnabled( wohnung.objektNummer().get() == null ).setLayoutData( left().left( 34 ).right( 49 ).create() )
                 .create();
 
-        newFormField( "Fortführung" ).setProperty( new PropertyAdapter( wohnung.wohnungsFortfuehrung() ) )
+        newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Fortführung" )
+                .setProperty( new PropertyAdapter( wohnung.gebaeudeFortfuehrung() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Integer.class, Polymap.getSessionLocale() ) )
-                .setEnabled( wohnung.wohnungsNummer().get() == null ).setLayoutData( right().top( lastLine ).create() )
+                .setValidator( new NotNullNumberValidator( Integer.class, Polymap.getSessionLocale() ) )
+                .setEnabled( wohnung.objektNummer().get() == null ).setLayoutData( left().left( 50 ).right( 65 ).create() )
+                .create();
+
+        lastLine = newLine;
+        newLine = newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Wohnungsnummer" )
+                .setProperty( new PropertyAdapter( wohnung.wohnungsNummer() ) )
+                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
+                .setValidator( new NotNullNumberValidator( Integer.class, Polymap.getSessionLocale() ) )
+                .setEnabled( wohnung.wohnungsNummer().get() == null ).setLayoutData( left().left( 69 ).right( 83 ).create() )
+                .create();
+
+        newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Fortführung" )
+                .setProperty( new PropertyAdapter( wohnung.wohnungsFortfuehrung() ) )
+                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
+                .setValidator( new NotNullNumberValidator( Integer.class, Polymap.getSessionLocale() ) )
+                .setEnabled( wohnung.wohnungsNummer().get() == null ).setLayoutData( left().left( 84 ).right( 100 ).create() )
                 .create();
 
         // flurstücke
         lastLine = newLine;
         TreeMap<String, FlurstueckComposite> flurstuecke = new TreeMap<String, FlurstueckComposite>();
 
-        Iterable<FlurstueckComposite> iterable = WohnungComposite.Mixin.findFlurstueckeFor( wohnung );
-        for (FlurstueckComposite flurstueck : iterable) {
-//            StringBuffer label = new StringBuffer();
-//            if (flurstueck.strasse().get() != null) {
-//                label.append( flurstueck.strasse().get().name().get() ).append( " - " );
-//            }
-//            if (flurstueck.hausnummer().get() != null) {
-//                label.append( flurstueck.hausnummer().get() );
-//
-//                if (flurstueck.hausnummerZusatz().get() != null) {
-//                    label.append( flurstueck.hausnummerZusatz().get() );
-//                }
-//                label.append( " - " );
-//            }
-//            if (flurstueck.gemarkung().get() != null) {
-//                label.append( flurstueck.gemarkung().get().name().get() ).append( " - " );
-//            }
-//            label.append( flurstueck.nummer().get() ).append( "/" ).append( flurstueck.unterNummer().get() );
-            flurstuecke.put( flurstueck.name().get(), flurstueck );
+        if (wohnung.gebaeudeNummer().get() != null) {
+            // its not a new wohnung without a gebaeude
+            Iterable<FlurstueckComposite> iterable = WohnungComposite.Mixin.findFlurstueckeFor( wohnung );
+            for (FlurstueckComposite flurstueck : iterable) {
+                flurstuecke.put( flurstueck.name().get(), flurstueck );
+            }
+        }
+        if (wohnung.flurstueck().get() != null) {
+            flurstuecke.put( wohnung.flurstueck().get().name().get(), wohnung.flurstueck().get() );
         }
         newLine = newFormField( "Lage" )
                 .setProperty( new AssociationAdapter<FlurstueckComposite>( wohnung.flurstueck() ) )

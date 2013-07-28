@@ -106,7 +106,7 @@ public class WohnungVertragsdatenFormEditorPage
                 KapsPlugin.openEditor( fs, VertragComposite.NAME, vertrag );
             }
         } );
-        openErweiterteDaten.setLayoutData( left().right( 20 ).height( 25 ).create() );
+        openErweiterteDaten.setLayoutData( left().left( ONE ).right( TWO ).height( 25 ).create() );
         openErweiterteDaten.setEnabled( vertrag != null );
         newLine = openErweiterteDaten;
 

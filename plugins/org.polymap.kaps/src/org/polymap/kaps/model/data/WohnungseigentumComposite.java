@@ -60,6 +60,7 @@ public interface WohnungseigentumComposite
     @ImportColumn("FORTF")
     Property<Integer> objektFortfuehrung();
 
+
     // TEDATUM - SHORT_DATE_TIME
     @Optional
     @ImportColumn("TEDATUM")
@@ -74,7 +75,7 @@ public interface WohnungseigentumComposite
 
     // GFLAECHE_AKT - Long
     @Optional
-//    @ImportColumn("GFLAECHE_AKT")
+    // @ImportColumn("GFLAECHE_AKT")
     Property<Double> gesamtFlaeche();
 
 
@@ -83,9 +84,11 @@ public interface WohnungseigentumComposite
     @ImportColumn("TEURNR")
     Property<String> urkundenNummerDerTeilungserklaerung();
 
+
     @Optional
     @Computed
     Property<String> schl();
+
 
     /**
      * Methods and transient fields.
@@ -95,10 +98,20 @@ public interface WohnungseigentumComposite
 
         private static Log log = LogFactory.getLog( Mixin.class );
 
+//
+//        @Override
+//        public void beforeCompletion()
+//                throws UnitOfWorkCompletionException {
+//            if (objektNummer().get() == null || objektFortfuehrung().get() == null) {
+//                throw new UnitOfWorkCompletionException( "Nummer und Fortführung muß ausgefüllt sein!" );
+//            }
+//        }
+
 
         @Override
         public Property<String> schl() {
-            return new ComputedPropertyInstance<String>( new GenericPropertyInfo( WohnungseigentumComposite.class, "schl" ) ) {
+            return new ComputedPropertyInstance<String>( new GenericPropertyInfo( WohnungseigentumComposite.class,
+                    "schl" ) ) {
 
                 @Override
                 public String get() {

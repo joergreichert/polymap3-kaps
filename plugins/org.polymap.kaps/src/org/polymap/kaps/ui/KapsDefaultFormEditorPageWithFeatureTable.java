@@ -89,6 +89,7 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
             field.setEnabled( enabled );
             field.load();
         }
+        dirty = false;
     }
 
 

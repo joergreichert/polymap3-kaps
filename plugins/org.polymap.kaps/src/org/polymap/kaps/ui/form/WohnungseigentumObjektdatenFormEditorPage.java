@@ -44,7 +44,7 @@ public class WohnungseigentumObjektdatenFormEditorPage
         Composite lastLine, newLine = null;
         // readonly
 
-        newLine = newFormField( "Objekt-Nr." ).setProperty( new PropertyAdapter( eigentum.objektNummer() ) )
+        newLine = newFormField( "Objektnummer" ).setProperty( new PropertyAdapter( eigentum.objektNummer() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setValidator( new NumberValidator( Integer.class, Polymap.getSessionLocale() ) )
                 .setLayoutData( left().create() ).setEnabled( eigentum.objektNummer().get() == null ).create();
