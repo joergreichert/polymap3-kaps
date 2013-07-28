@@ -47,6 +47,8 @@ import org.polymap.kaps.model.SchlNamed;
 public interface StrasseComposite
         extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite, SchlNamed {
 
+    static final String NAME = "Straße";
+
     @Optional
     @ImportColumn("NUMMER")
     Property<String> schl();

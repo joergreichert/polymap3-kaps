@@ -58,4 +58,6 @@ public interface FlurComposite
 
     }
 
+    static final String NAME = "Flur";
+
 }

@@ -43,6 +43,9 @@ import org.polymap.kaps.model.SchlNamed;
 public interface VertragsArtComposite
         extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite, SchlNamed {
 
+    String NAME = "Vertragsart";
+
+
     @Optional
     @ImportColumn("SCHL")
     Property<String> schl();

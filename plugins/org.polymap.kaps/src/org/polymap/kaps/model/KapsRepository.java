@@ -136,14 +136,14 @@ public class KapsRepository
                     // KapsRepository.NAMESPACE,
                     // "Richtwertzone - Gültigkeit" ) ),
                     new SimpleEntityProvider<VertragsArtComposite>( this, VertragsArtComposite.class, new NameImpl(
-                            KapsRepository.NAMESPACE, "Vertragsart" ) ), 
+                            KapsRepository.NAMESPACE, VertragsArtComposite.NAME ) ), 
                             new SimpleEntityProvider<RichtwertzoneZeitraumComposite>( this, RichtwertzoneZeitraumComposite.class, new NameImpl(
                                     KapsRepository.NAMESPACE, RichtwertzoneZeitraumComposite.NAME ) ),
 
 //                    new SimpleEntityProvider<StalaComposite>( this, StalaComposite.class, new NameImpl(
 //                            KapsRepository.NAMESPACE, "Stala" ) ),
                     new SimpleEntityProvider<KaeuferKreisComposite>( this, KaeuferKreisComposite.class, new NameImpl(
-                            KapsRepository.NAMESPACE, "Käuferkreis" ) ),
+                            KapsRepository.NAMESPACE, KaeuferKreisComposite.NAME ) ),
 
                     new SimpleEntityProvider<NutzungComposite>( this, NutzungComposite.class, new NameImpl(
                             KapsRepository.NAMESPACE, NutzungComposite.NAME ) ), new SimpleEntityProvider<GebaeudeArtComposite>(
@@ -151,7 +151,7 @@ public class KapsRepository
 
                     new SimpleEntityProvider<GemeindeComposite>( this, GemeindeComposite.class, new NameImpl(
                             KapsRepository.NAMESPACE, GemeindeComposite.NAME ) ), new SimpleEntityProvider<StrasseComposite>( this,
-                            StrasseComposite.class, new NameImpl( KapsRepository.NAMESPACE, "Strasse" ) ),
+                            StrasseComposite.class, new NameImpl( KapsRepository.NAMESPACE, StrasseComposite.NAME ) ),
 
                     new SimpleEntityProvider<GemarkungComposite>( this, GemarkungComposite.class, new NameImpl(
                             KapsRepository.NAMESPACE, GemarkungComposite.NAME ) ),
@@ -162,7 +162,7 @@ public class KapsRepository
                     new SimpleEntityProvider<FlurstuecksdatenAgrarComposite>( this,
                             FlurstuecksdatenAgrarComposite.class, new NameImpl( KapsRepository.NAMESPACE,
                                     FlurstuecksdatenAgrarComposite.NAME ) ), new SimpleEntityProvider<FlurComposite>(
-                            this, FlurComposite.class, new NameImpl( KapsRepository.NAMESPACE, "Flur" ) ),
+                            this, FlurComposite.class, new NameImpl( KapsRepository.NAMESPACE, FlurComposite.NAME ) ),
 
                     new SimpleEntityProvider<WohnungseigentumComposite>( this, WohnungseigentumComposite.class,
                             new NameImpl( KapsRepository.NAMESPACE, WohnungseigentumComposite.NAME ) ),

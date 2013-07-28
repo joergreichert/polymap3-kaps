@@ -43,6 +43,8 @@ import org.polymap.kaps.model.SchlNamed;
 public interface KaeuferKreisComposite
         extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite, SchlNamed {
 
+    static final String NAME = "Käuferkreis";
+
     @Optional
     @ImportColumn("SCHL")
     Property<String> schl();

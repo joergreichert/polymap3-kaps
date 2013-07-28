@@ -23,15 +23,19 @@ import org.polymap.rhei.form.IFormPageProvider;
 
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.BodennutzungComposite;
+import org.polymap.kaps.model.data.FlurComposite;
 import org.polymap.kaps.model.data.FlurstuecksdatenAgrarComposite;
 import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
 import org.polymap.kaps.model.data.GebaeudeArtComposite;
 import org.polymap.kaps.model.data.GemarkungComposite;
 import org.polymap.kaps.model.data.GemeindeComposite;
+import org.polymap.kaps.model.data.KaeuferKreisComposite;
 import org.polymap.kaps.model.data.NutzungComposite;
 import org.polymap.kaps.model.data.RichtwertzoneComposite;
 import org.polymap.kaps.model.data.RichtwertzoneZeitraumComposite;
+import org.polymap.kaps.model.data.StrasseComposite;
 import org.polymap.kaps.model.data.VertragComposite;
+import org.polymap.kaps.model.data.VertragsArtComposite;
 import org.polymap.kaps.model.data.WohnungComposite;
 import org.polymap.kaps.model.data.WohnungseigentumComposite;
 import org.polymap.kaps.ui.form.*;
@@ -82,20 +86,141 @@ public class FormPageProvider
             result.add( new WohnungLiegenschaftzinsFormEditorPage( feature, formEditor.getFeatureStore() ) );
         }
         else if (name.equalsIgnoreCase( GebaeudeArtComposite.NAME )) {
-            result.add( new GebaeudeArtFormEditorPage( feature, formEditor.getFeatureStore() ) );
+            result.add( new DefaultEntityFormEditorPage( feature, formEditor.getFeatureStore(),
+                    GebaeudeArtComposite.class, KapsRepository.instance(), GebaeudeArtComposite.NAME ) {
+
+                @Override
+                protected String labelFor( String name ) {
+                    if ("gebaeudeArtStabu".equals( name )) {
+                        return "Gebäudeart";
+                    }
+                    return super.labelFor( name );
+                }
+
+
+                @Override
+                protected String tooltipFor( String name ) {
+                    if ("gebaeudeArtStabu".equals( name )) {
+                        return "Gebäudeart entsprechend Statistischem Bundesamt";
+                    }
+                    return super.tooltipFor( name );
+                }
+            } );
         }
         else if (name.equalsIgnoreCase( GemarkungComposite.NAME )) {
-            result.add( new GemarkungFormEditorPage( feature, formEditor.getFeatureStore() ) );
+            result.add( new DefaultEntityFormEditorPage( feature, formEditor.getFeatureStore(),
+                    GemarkungComposite.class, KapsRepository.instance(), GemarkungComposite.NAME ) );
         }
         else if (name.equalsIgnoreCase( GemeindeComposite.NAME )) {
             result.add( new GemeindeFormEditorPage( feature, formEditor.getFeatureStore() ) );
         }
         else if (name.equalsIgnoreCase( BodennutzungComposite.NAME )) {
-            result.add( new BodennutzungFormEditorPage( feature, formEditor.getFeatureStore() ) );
+            result.add( new DefaultEntityFormEditorPage( feature, formEditor.getFeatureStore(),
+                    BodennutzungComposite.class, KapsRepository.instance(), BodennutzungComposite.NAME ) );
         }
         else if (name.equalsIgnoreCase( NutzungComposite.NAME )) {
             result.add( new DefaultEntityFormEditorPage( feature, formEditor.getFeatureStore(), NutzungComposite.class,
-                    KapsRepository.instance(), NutzungComposite.NAME ) );
+                    KapsRepository.instance(), NutzungComposite.NAME )  {
+
+                @Override
+                protected String labelFor( String name ) {
+                    if ("name".equals( name )) {
+                        return "Bezeichnung";
+                    }
+                    if ("isAgrar".equals( name )) {
+                        return "Ist Agrarland?";
+                    }
+                    if ("isWohneigentum".equals( name )) {
+                        return "Ist Wohneigentum?";
+                    }
+                    if ("stala".equals( name )) {
+                        return "STALA";
+                    }
+                    if ("artDerBauflaeche".equals( name )) {
+                        return "STABU";
+                    }
+                    return super.labelFor( name );
+                }
+                
+                @Override
+                protected String tooltipFor( String name ) {
+                    if ("artDerBauflaeche".equals( name )) {
+                        return "Schlüssel Statistisches Bundesamt - Art der Baufläche";
+                    }
+                    if ("stala".equals( name )) {
+                        return "Schlüssel Statistisches Landesamt - Art des Grundstücks";
+                    }
+                    return super.labelFor( name );
+                }
+            } );
+        }
+        else if (name.equalsIgnoreCase( VertragsArtComposite.NAME )) {
+            result.add( new DefaultEntityFormEditorPage( feature, formEditor.getFeatureStore(),
+                    VertragsArtComposite.class, KapsRepository.instance(), VertragsArtComposite.NAME ){
+
+                @Override
+                protected String labelFor( String name ) {
+                    if ("name".equals( name )) {
+                        return "Bezeichnung";
+                    }
+                    if ("stala".equals( name )) {
+                        return "STALA";
+                    }
+                    return super.labelFor( name );
+                }
+                
+                @Override
+                protected String tooltipFor( String name ) {
+                    if ("stala".equals( name )) {
+                        return "Schlüssel Statistisches Landesamt - Verwandschaftsverhältnis";
+                    }
+                    return super.labelFor( name );
+                }
+            }  );
+        }
+        else if (name.equalsIgnoreCase( KaeuferKreisComposite.NAME )) {
+            result.add( new DefaultEntityFormEditorPage( feature, formEditor.getFeatureStore(),
+                    KaeuferKreisComposite.class, KapsRepository.instance(), KaeuferKreisComposite.NAME ) {
+
+                @Override
+                protected String labelFor( String name ) {
+                    if ("name".equals( name )) {
+                        return "Bezeichnung";
+                    }
+                    if ("stala".equals( name )) {
+                        return "STALA Bauland";
+                    }
+                    if ("stalaAgrar".equals( name )) {
+                        return "STALA Agrar";
+                    }
+                    if ("kaeuferKreisStabu".equals( name )) {
+                        return "STABU";
+                    }
+                    return super.labelFor( name );
+                }
+                
+                @Override
+                protected String tooltipFor( String name ) {
+                    if ("stala".equals( name )) {
+                        return "Schlüssel Statistisches Landesamt - Veräußerer Bauland";
+                    }
+                    if ("stalaAgrar".equals( name )) {
+                        return "Schlüssel Statistisches Landesamt - Veräußerer Agrarland";
+                    }
+                    if ("kaeuferKreisStabu".equals( name )) {
+                        return "Schlüssel Statistisches Bundesamt";
+                    }
+                    return super.labelFor( name );
+                }
+            } );
+        }
+        else if (name.equalsIgnoreCase( StrasseComposite.NAME )) {
+            result.add( new DefaultEntityFormEditorPage( feature, formEditor.getFeatureStore(), StrasseComposite.class,
+                    KapsRepository.instance(), StrasseComposite.NAME ) );
+        }
+        else if (name.equalsIgnoreCase( FlurComposite.NAME )) {
+            result.add( new DefaultEntityFormEditorPage( feature, formEditor.getFeatureStore(), FlurComposite.class,
+                    KapsRepository.instance(), FlurComposite.NAME ) );
         }
         return result;
     }

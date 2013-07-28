@@ -156,50 +156,34 @@ public class DefaultEntityFormEditorPage
             // .setField( namedAssocationsPicklist( GebaeudeArtStaBuComposite.class )
             // )
             // .setLayoutData( left().top( lastLine ).create() ).create();
-
+            FormFieldBuilder fieldBuilder = newFormField( label ).setToolTipText( tooltipFor( propertyName ) ).setLayoutData( left().top( lastLine ).create() );
             if (String.class.isAssignableFrom( propertyType )) {
-                lastLine = newFormField( label ).setToolTipText( tooltipFor( propertyName ) )
-                        .setProperty( new PropertyAdapter( (org.qi4j.api.property.Property)delegate ) )
-                        .setField( new StringFormField() )
-                        // .setValidator( new NotNullValidator() )
-                        .setLayoutData( left().top( lastLine ).create() ).create();
+                fieldBuilder.setProperty( new PropertyAdapter( (org.qi4j.api.property.Property)delegate ) )
+                        .setField( new StringFormField() );
             }
             else if (Integer.class.isAssignableFrom( propertyType )) {
-                lastLine = newFormField( label )
-                        .setProperty( new PropertyAdapter( (org.qi4j.api.property.Property)delegate ) )
+                fieldBuilder.setProperty( new PropertyAdapter( (org.qi4j.api.property.Property)delegate ) )
                         .setField( new StringFormField() )
-                        .setValidator( new NumberValidator( Integer.class, Polymap.getSessionLocale() ) )
-                        .setLayoutData( left().top( lastLine ).create() ).create();
+                        .setValidator( new NumberValidator( Integer.class, Polymap.getSessionLocale() ) );
             }
             else if (Double.class.isAssignableFrom( propertyType )) {
-                lastLine = newFormField( label )
-                        .setProperty( new PropertyAdapter( (org.qi4j.api.property.Property)delegate ) )
+                fieldBuilder.setProperty( new PropertyAdapter( (org.qi4j.api.property.Property)delegate ) )
                         .setField( new StringFormField() )
-                        .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
-                        .setLayoutData( left().top( lastLine ).create() ).create();
+                        .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) );
             }
             else if (Date.class.isAssignableFrom( propertyType )) {
-                lastLine = newFormField( label )
-                        .setProperty( new PropertyAdapter( (org.qi4j.api.property.Property)delegate ) )
-                        .setField( new DateTimeFormField() ).setLayoutData( left().top( lastLine ).create() ).create();
+                fieldBuilder.setProperty( new PropertyAdapter( (org.qi4j.api.property.Property)delegate ) )
+                        .setField( new DateTimeFormField() );
             }
             else if (Boolean.class.isAssignableFrom( propertyType )) {
-                lastLine = newFormField( label )
-                        .setProperty( new PropertyAdapter( (org.qi4j.api.property.Property)delegate ) )
-                        .setField( new CheckboxFormField() ).setLayoutData( left().top( lastLine ).create() ).create();
+                fieldBuilder.setProperty( new PropertyAdapter( (org.qi4j.api.property.Property)delegate ) )
+                        .setField( new CheckboxFormField() );
             }
             else if (Named.class.isAssignableFrom( propertyType )) {
-                lastLine = newFormField( label )
-                        .setProperty( new AssociationAdapter( (org.qi4j.api.entity.association.Association)delegate ) )
-                        .setField( namedAssocationsPicklist( propertyType ) )
-                        .setLayoutData( left().top( lastLine ).create() ).create();
-
-                // Composite formField = site.newFormField( result,
-                // property.getName(), propertyType, field, null, label );
-                // site.addStandardLayout( formField );
-                // ((FormData)formField.getLayoutData()).height = 100;
-                // ((FormData)formField.getLayoutData()).width = 100;
+                fieldBuilder.setProperty( new AssociationAdapter( (org.qi4j.api.entity.association.Association)delegate ) )
+                        .setField( namedAssocationsPicklist( propertyType ) );
             }
+            lastLine = fieldBuilder.create();
         }
     }
 
@@ -218,6 +202,9 @@ public class DefaultEntityFormEditorPage
 
 
     protected String labelFor( String name ) {
+        if ("schl".equals( name )) {
+            return "Schlüssel";
+        }
         return name.substring( 0, 1 ).toUpperCase() + name.substring( 1 );
     }
 
