@@ -47,6 +47,7 @@ import org.polymap.core.qi4j.QiModule;
 import org.polymap.core.qi4j.QiModuleAssembler;
 import org.polymap.core.runtime.Polymap;
 
+import org.polymap.kaps.model.data.BodenRichtwertRichtlinieComposite;
 import org.polymap.kaps.model.data.BodennutzungComposite;
 import org.polymap.kaps.model.data.FlurComposite;
 import org.polymap.kaps.model.data.FlurstueckComposite;
@@ -136,22 +137,29 @@ public class KapsRepository
                     // KapsRepository.NAMESPACE,
                     // "Richtwertzone - Gültigkeit" ) ),
                     new SimpleEntityProvider<VertragsArtComposite>( this, VertragsArtComposite.class, new NameImpl(
-                            KapsRepository.NAMESPACE, VertragsArtComposite.NAME ) ), 
-                            new SimpleEntityProvider<RichtwertzoneZeitraumComposite>( this, RichtwertzoneZeitraumComposite.class, new NameImpl(
-                                    KapsRepository.NAMESPACE, RichtwertzoneZeitraumComposite.NAME ) ),
+                            KapsRepository.NAMESPACE, VertragsArtComposite.NAME ) ),
+                    new SimpleEntityProvider<RichtwertzoneZeitraumComposite>( this,
+                            RichtwertzoneZeitraumComposite.class, new NameImpl( KapsRepository.NAMESPACE,
+                                    RichtwertzoneZeitraumComposite.NAME ) ),
 
-//                    new SimpleEntityProvider<StalaComposite>( this, StalaComposite.class, new NameImpl(
-//                            KapsRepository.NAMESPACE, "Stala" ) ),
+                    // new SimpleEntityProvider<StalaComposite>( this,
+                    // StalaComposite.class, new NameImpl(
+                    // KapsRepository.NAMESPACE, "Stala" ) ),
                     new SimpleEntityProvider<KaeuferKreisComposite>( this, KaeuferKreisComposite.class, new NameImpl(
                             KapsRepository.NAMESPACE, KaeuferKreisComposite.NAME ) ),
+                    new SimpleEntityProvider<BodenRichtwertRichtlinieComposite>( this,
+                            BodenRichtwertRichtlinieComposite.class, new NameImpl( KapsRepository.NAMESPACE,
+                                    BodenRichtwertRichtlinieComposite.NAME ) ),
 
                     new SimpleEntityProvider<NutzungComposite>( this, NutzungComposite.class, new NameImpl(
-                            KapsRepository.NAMESPACE, NutzungComposite.NAME ) ), new SimpleEntityProvider<GebaeudeArtComposite>(
-                            this, GebaeudeArtComposite.class, new NameImpl( KapsRepository.NAMESPACE, GebaeudeArtComposite.NAME ) ),
+                            KapsRepository.NAMESPACE, NutzungComposite.NAME ) ),
+                    new SimpleEntityProvider<GebaeudeArtComposite>( this, GebaeudeArtComposite.class, new NameImpl(
+                            KapsRepository.NAMESPACE, GebaeudeArtComposite.NAME ) ),
 
                     new SimpleEntityProvider<GemeindeComposite>( this, GemeindeComposite.class, new NameImpl(
-                            KapsRepository.NAMESPACE, GemeindeComposite.NAME ) ), new SimpleEntityProvider<StrasseComposite>( this,
-                            StrasseComposite.class, new NameImpl( KapsRepository.NAMESPACE, StrasseComposite.NAME ) ),
+                            KapsRepository.NAMESPACE, GemeindeComposite.NAME ) ),
+                    new SimpleEntityProvider<StrasseComposite>( this, StrasseComposite.class, new NameImpl(
+                            KapsRepository.NAMESPACE, StrasseComposite.NAME ) ),
 
                     new SimpleEntityProvider<GemarkungComposite>( this, GemarkungComposite.class, new NameImpl(
                             KapsRepository.NAMESPACE, GemarkungComposite.NAME ) ),
@@ -166,8 +174,8 @@ public class KapsRepository
 
                     new SimpleEntityProvider<WohnungseigentumComposite>( this, WohnungseigentumComposite.class,
                             new NameImpl( KapsRepository.NAMESPACE, WohnungseigentumComposite.NAME ) ),
-                            new SimpleEntityProvider<WohnungComposite>( this, WohnungComposite.class,
-                                    new NameImpl( KapsRepository.NAMESPACE, WohnungComposite.NAME ) ),
+                    new SimpleEntityProvider<WohnungComposite>( this, WohnungComposite.class, new NameImpl(
+                            KapsRepository.NAMESPACE, WohnungComposite.NAME ) ),
                     // nicht änderbare Wertelisten
                     // new SimpleEntityProvider<ErschliessungsBeitragComposite>(
                     // this,
@@ -220,22 +228,24 @@ public class KapsRepository
 
         return super.findEntities( compositeType, expression, firstResult, maxResults );
     }
-//
-//    @Override
-//    public void commitChanges()
-//            throws ConcurrentModificationException, CompletionException {
-//                try {
-//                    // save changes
-//                    uow.complete();
-//                    uow = assembler.getModule().unitOfWorkFactory().newUnitOfWork();
-//                }
-//                catch (ConcurrentEntityModificationException e) {
-//                    throw new ConcurrentModificationException( e );
-//                }
-//                catch (UnitOfWorkCompletionException e) {
-//                    throw new CompletionException( e );
-//                }
-//            }
+
+
+    //
+    // @Override
+    // public void commitChanges()
+    // throws ConcurrentModificationException, CompletionException {
+    // try {
+    // // save changes
+    // uow.complete();
+    // uow = assembler.getModule().unitOfWorkFactory().newUnitOfWork();
+    // }
+    // catch (ConcurrentEntityModificationException e) {
+    // throw new ConcurrentModificationException( e );
+    // }
+    // catch (UnitOfWorkCompletionException e) {
+    // throw new CompletionException( e );
+    // }
+    // }
 
     public VertragComposite newKaufvertrag( final EntityCreator<VertragComposite> creator )
             throws Exception {
@@ -260,7 +270,7 @@ public class KapsRepository
     }
 
 
-    public int highestEingangsNummer(Date vertragsdatum) {
+    public int highestEingangsNummer( Date vertragsdatum ) {
         // TODO umstellen auf sequenzgenerator
 
         // nur zum Test noch die Suche über Verkäuferkreis mit rein
@@ -380,22 +390,25 @@ public class KapsRepository
         }
         Query<FlurstueckComposite> matches = KapsRepository.instance().findEntities( FlurstueckComposite.class, expr,
                 0, 100 );
-        
-//        alle FlurstueckComposite finden für die Flurstücke
-//        
-//        FlurstueckComposite verkaufTemplate = QueryExpressions.templateFor( FlurstueckComposite.class );
-//        BooleanExpression dExpr = null;
-//        for (FlurstueckComposite flurstueck : matches) {
-//            BooleanExpression newExpr = QueryExpressions.eq( verkaufTemplate.flurstueck(), flurstueck );
-//            if (dExpr == null) {
-//                dExpr = newExpr;
-//            }
-//            else {
-//                dExpr = QueryExpressions.or( dExpr, newExpr );
-//            }
-//        }
-//        Query<FlurstueckComposite> matches2 = KapsRepository.instance().findEntities( FlurstueckComposite.class, dExpr,
-//                0, 100 );
+
+        // alle FlurstueckComposite finden für die Flurstücke
+        //
+        // FlurstueckComposite verkaufTemplate = QueryExpressions.templateFor(
+        // FlurstueckComposite.class );
+        // BooleanExpression dExpr = null;
+        // for (FlurstueckComposite flurstueck : matches) {
+        // BooleanExpression newExpr = QueryExpressions.eq(
+        // verkaufTemplate.flurstueck(), flurstueck );
+        // if (dExpr == null) {
+        // dExpr = newExpr;
+        // }
+        // else {
+        // dExpr = QueryExpressions.or( dExpr, newExpr );
+        // }
+        // }
+        // Query<FlurstueckComposite> matches2 =
+        // KapsRepository.instance().findEntities( FlurstueckComposite.class, dExpr,
+        // 0, 100 );
         return matches;
     }
 }

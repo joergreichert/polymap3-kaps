@@ -100,7 +100,7 @@ public class KapsRepositoryAssembler
                 ArtDesBaugebietesStalaComposite.class, GrundstuecksArtAgrarLandStalaComposite.class,
                 ErwerberStalaComposite.class, GrundstuecksArtBaulandStalaComposite.class, KaeuferKreisStaBuComposite.class,
                 VeraeussererAgrarLandStalaComposite.class, VeraeussererBaulandStalaComposite.class,
-                VerwandschaftsVerhaeltnisStalaComposite.class );
+                VerwandschaftsVerhaeltnisStalaComposite.class, BodenRichtwertRichtlinieComposite.class );
 
         // persistence: workspace/Lucene
         File root = new File( Polymap.getWorkspacePath().toFile(), "data" );

@@ -29,7 +29,6 @@ import org.polymap.core.runtime.SubMonitor;
 import org.polymap.core.runtime.entity.ConcurrentModificationException;
 
 import org.polymap.kaps.model.KapsRepository;
-import org.polymap.kaps.model.SchlNamed;
 import org.polymap.kaps.model.data.AusstattungBewertungComposite;
 import org.polymap.kaps.model.data.AusstattungComposite;
 import org.polymap.kaps.model.data.BelastungComposite;
@@ -294,14 +293,17 @@ public class MdbImportWohneigentumOperation
                                             .equals( found.gemarkung().get().schl().get() )
                                     && gebaeudeFlurstueck.nummer().get().equals( found.nummer().get() )
                                     && gebaeudeFlurstueck.unterNummer().get().equals( found.unterNummer().get() )) {
-                                // belastung und erbbau vom Gebäudegrundstück übernehmen
+                                // belastung und erbbau vom Gebäudegrundstück
+                                // übernehmen
                                 found.belastung().set( gebaeudeFlurstueck.belastung().get() );
                                 found.erbbaurecht().set( gebaeudeFlurstueck.erbbaurecht().get() );
-                                
-                                // pseudoflurstück an gebäude löschen und durch neues ersetzen
+
+                                // pseudoflurstück an gebäude löschen und durch neues
+                                // ersetzen
                                 if (gebaeudeFlurstueck.vertrag().get() == null && found != gebaeudeFlurstueck) {
                                     // Flurstück aus wohnung ersetzen
-                                    for( WohnungComposite wohnung : WohnungComposite.Mixin.findWohnungenFor( gebaeudeFlurstueck )) {
+                                    for (WohnungComposite wohnung : WohnungComposite.Mixin
+                                            .findWohnungenFor( gebaeudeFlurstueck )) {
                                         wohnung.flurstueck().set( found );
                                     }
                                     // und an Gebäude entfernen
@@ -404,7 +406,7 @@ public class MdbImportWohneigentumOperation
 
             FlurstueckComposite flurstueck = repo.newEntity( FlurstueckComposite.class, null );
 
-            flurstueck.gemarkung().set( findBySchl( GemarkungComposite.class, builderRow, "GEM" ) );
+            flurstueck.gemarkung().set( findBySchl( GemarkungComposite.class, builderRow, "GEM", false ) );
             // Integer
             flurstueck.nummer().set( (Integer)builderRow.get( "FLSTNR" ) );
             flurstueck.unterNummer().set( (String)builderRow.get( "FLSTNRU" ) );
@@ -420,10 +422,11 @@ public class MdbImportWohneigentumOperation
             flurstueck.kartenBlattNummer().set( (String)builderRow.get( "KARTBLATTN" ) );
 
             flurstueck.flur().set( repo.findSchlNamed( FlurComposite.class, "000" ) );
-            flurstueck.nutzung().set( findBySchl( NutzungComposite.class, builderRow, "NUTZUNG" ) );
-            flurstueck.strasse().set( findBySchl( StrasseComposite.class, builderRow, "STRNR" ) );
+            flurstueck.nutzung().set( findBySchl( NutzungComposite.class, builderRow, "NUTZUNG", false ) );
+            flurstueck.strasse().set( findBySchl( StrasseComposite.class, builderRow, "STRNR", false ) );
             try {
-                flurstueck.richtwertZone().set( findBySchl( RichtwertzoneComposite.class, builderRow, "RIZONE" ) );
+                flurstueck.richtwertZone()
+                        .set( findBySchl( RichtwertzoneComposite.class, builderRow, "RIZONE", false ) );
             }
             catch (IllegalStateException ise) {
                 wmvaopfW.write( "Keine Richtwertzone  gefunden für " + builderRow.get( "RIZONE" ) + "\n" );
@@ -451,47 +454,4 @@ public class MdbImportWohneigentumOperation
         log.info( "Imported and committed: K_EOBJF -> " + count );
         monitor.done();
     }
-
-
-    private <T extends SchlNamed> T findBySchl( Class<T> type, Map<String, Object> builderRow, String string ) {
-        String schl = (String)builderRow.get( string );
-        if (schl != null && !schl.isEmpty()) {
-            T findSchlNamed = repo.findSchlNamed( type, schl );
-            if (findSchlNamed == null) {
-                throw new IllegalStateException( "no " + type + " found for schl() " + schl );
-            }
-            return findSchlNamed;
-        }
-        return null;
-    }
-
-    //
-    // private Query<FlurstueckComposite> findFlurstuecke( String gemarkungSchl,
-    // Integer flurstueckNummer,
-    // String flurstueckUnternummer ) {
-    // KapsRepository.instance().f
-    // GemarkungComposite gemarkung = repo.findSchlNamed( GemarkungComposite.class,
-    // gemarkungSchl);
-    //
-    // FlurstueckComposite flurstueckTemplate = QueryExpressions.templateFor(
-    // FlurstueckComposite.class );
-    // BooleanExpression expr2 = QueryExpressions.and(
-    // QueryExpressions.eq( flurstueckTemplate.gemarkung(), gemarkung ),
-    // QueryExpressions.eq( flurstueckTemplate.nummer(), flurstueckNummer ),
-    // QueryExpressions.eq( flurstueckTemplate.unterNummer(), flurstueckUnternummer )
-    // );
-    // Query<FlurstueckComposite> flurstuecke = repo.findEntities(
-    // FlurstueckComposite.class, expr2, 0, 1 );
-    // // if (flurstueck == null) {
-    // // throw new IllegalStateException( String.format(
-    // "flurstueck could not be found for %s, %d, %s",
-    // // gemarkungSchl, flurstueckNummer, flurstueckUnternummer ) );
-    // // }
-    // return flurstuecke;
-    // }
-
-    // public static void main(String[] args) {
-    // double d = 123456789.0;
-    // System.out.println(String.format( "blah %f0", d ));
-    // }
 }

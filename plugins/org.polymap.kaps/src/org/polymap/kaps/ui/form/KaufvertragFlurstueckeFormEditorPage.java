@@ -606,7 +606,7 @@ public class KaufvertragFlurstueckeFormEditorPage
         openErweiterteDatenBauland.setEnabled( false );
 
         // Liste mit Wohnung + Auswählen daneben
-        //reloadable( namedAssocationsPicklist( WohnungComposite.Mixin.findWohnungenFor( flurstueck ) ) ) );
+//        reloadable( namedAssocationsPicklist( WohnungComposite.Mixin.findWohnungenFor( flurstueck ) ) ) );
         // und daneben Knopf zum Wohnung anlegen
         
         return formSection;
