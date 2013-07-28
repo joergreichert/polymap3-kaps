@@ -17,18 +17,22 @@ import java.util.List;
 
 import org.opengis.feature.Feature;
 
+import org.polymap.rhei.field.PicklistFormField;
 import org.polymap.rhei.form.FormEditor;
 import org.polymap.rhei.form.IFormEditorPage;
 import org.polymap.rhei.form.IFormPageProvider;
 
+import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.BodennutzungComposite;
 import org.polymap.kaps.model.data.FlurstuecksdatenAgrarComposite;
 import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
 import org.polymap.kaps.model.data.GebaeudeArtComposite;
 import org.polymap.kaps.model.data.GemarkungComposite;
 import org.polymap.kaps.model.data.GemeindeComposite;
+import org.polymap.kaps.model.data.NutzungComposite;
 import org.polymap.kaps.model.data.RichtwertzoneComposite;
 import org.polymap.kaps.model.data.RichtwertzoneZeitraumComposite;
+import org.polymap.kaps.model.data.StalaComposite;
 import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.WohnungComposite;
 import org.polymap.kaps.model.data.WohnungseigentumComposite;
@@ -90,6 +94,23 @@ public class FormPageProvider
         }
         else if (name.equalsIgnoreCase( BodennutzungComposite.NAME )) {
             result.add( new BodennutzungFormEditorPage( feature, formEditor.getFeatureStore() ) );
+        }
+        else if (name.equalsIgnoreCase( NutzungComposite.NAME )) {
+            result.add( new DefaultEntityFormEditorPage( feature, formEditor.getFeatureStore(), NutzungComposite.class,
+                    KapsRepository.instance(), NutzungComposite.NAME ) {
+
+                @Override
+                protected <T extends org.polymap.kaps.model.Named> PicklistFormField namedAssocationsPicklist(
+                        java.lang.Class<T> type ) {
+                    if (type.isAssignableFrom( StalaComposite.class )) {
+                        return new PicklistFormField( StalaComposite.Mixin
+                                .stalasWithNames( StalaComposite.GRUNDSTUECKSART ) );
+                    }
+                    else {
+                        return super.namedAssocationsPicklist( type );
+                    }
+                };
+            } );
         }
         return result;
     }

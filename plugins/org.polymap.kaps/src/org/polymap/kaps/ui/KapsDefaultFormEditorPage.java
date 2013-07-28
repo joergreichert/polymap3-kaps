@@ -94,7 +94,7 @@ public abstract class KapsDefaultFormEditorPage
 
 
     protected String formattedTitle( String type, Object name, String pageTitle ) {
-        return type + ": " + (name != null ? name.toString() : "-") + (pageTitle != null ? " - " + pageTitle + "" : "");
+        return type + ": " + (name != null ? name.toString() : "-") + (pageTitle != null ? " - " + pageTitle : "");
     }
 
 

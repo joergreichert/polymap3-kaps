@@ -14,6 +14,7 @@ package org.polymap.kaps.ui;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import net.refractions.udig.catalog.IGeoResource;
 
@@ -31,8 +32,10 @@ import org.polymap.kaps.model.KapsEntityProvider;
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.FlurstuecksdatenAgrarComposite;
 import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
+import org.polymap.kaps.model.data.NutzungComposite;
 import org.polymap.kaps.model.data.RichtwertzoneComposite;
 import org.polymap.kaps.model.data.RichtwertzoneZeitraumComposite;
+import org.polymap.kaps.model.data.StalaComposite;
 import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.WohnungComposite;
 import org.polymap.kaps.ui.filter.DefaultEntityFilter;
@@ -93,6 +96,21 @@ public class FilterProvider
                     result.add( new DefaultEntityFilter( layer, type, repo, "objektNummer", "objektFortfuehrung",
                             "gebaeudeNummer", "gebaeudeFortfuehrung", "wohnungsNummer", "wohnungsFortfuehrung" ) );
                 }
+                else if (type.isAssignableFrom( NutzungComposite.class )) {
+                    result.add( new DefaultEntityFilter( layer, type, repo ) {
+
+                        @Override
+                        protected Map<String, ? extends Object> valuesFor( Class propertyType ) {
+                            // stala
+                            if (propertyType.isAssignableFrom( StalaComposite.class )) {
+                                return StalaComposite.Mixin.stalasWithNames( StalaComposite.GRUNDSTUECKSART );
+                            } else {
+                                return super.valuesFor( propertyType );
+                            }
+                        }
+                    } );
+                }
+
                 else {
                     // standard to all other entitytypes
                     result.add( new DefaultEntityFilter( layer, type, repo ) );

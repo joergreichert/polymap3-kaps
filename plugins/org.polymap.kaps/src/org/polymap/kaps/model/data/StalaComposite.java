@@ -12,6 +12,11 @@
  */
 package org.polymap.kaps.model.data;
 
+import static org.qi4j.api.query.QueryExpressions.templateFor;
+
+import java.util.SortedMap;
+import java.util.TreeMap;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -20,6 +25,7 @@ import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.property.Property;
+import org.qi4j.api.query.QueryExpressions;
 
 import org.polymap.core.qi4j.QiEntity;
 import org.polymap.core.qi4j.event.ModelChangeSupport;
@@ -27,6 +33,7 @@ import org.polymap.core.qi4j.event.PropertyChangeSupport;
 
 import org.polymap.kaps.importer.ImportColumn;
 import org.polymap.kaps.importer.ImportTable;
+import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.SchlNamed;
 
 /**
@@ -35,8 +42,8 @@ import org.polymap.kaps.model.SchlNamed;
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 @Concerns({ PropertyChangeSupport.Concern.class })
-@Mixins({ StalaComposite.Mixin.class, PropertyChangeSupport.Mixin.class,
-        ModelChangeSupport.Mixin.class, QiEntity.Mixin.class
+@Mixins({ StalaComposite.Mixin.class, PropertyChangeSupport.Mixin.class, ModelChangeSupport.Mixin.class,
+        QiEntity.Mixin.class
 // JsonState.Mixin.class
 })
 @ImportTable("K_STALA")
@@ -56,26 +63,34 @@ public interface StalaComposite
     // 3 = Veräußerer/Erwerber
     // 4 = Verwandschaftsverhältnis
     // Agrarland
-    // 5 = Veräußerer 
+    // 5 = Veräußerer
     // 6 = Art des Grundstücks
     // 7 = Erwerber
 
-    static String GRUNDSTUECKSART = "1";
-    static String ARTDESBAUGEBIETES = "2";
-    static String VERAEUSSERER_BAULAND = "3";
+    static String GRUNDSTUECKSART           = "1";
+
+    static String ARTDESBAUGEBIETES         = "2";
+
+    static String VERAEUSSERER_BAULAND      = "3";
+
     static String VERWANDSCHAFTSVERHAELTNIS = "4";
-    static String VERAEUSSERER_AGRARLAND = "5";
-    static String ARTDESGRUNDSTUECKES = "6";
-    static String ERWERBER = "7";
+
+    static String VERAEUSSERER_AGRARLAND    = "5";
+
+    static String ARTDESGRUNDSTUECKES       = "6";
+
+    static String ERWERBER                  = "7";
 
 
     @Optional
     @ImportColumn("ART")
     Property<String> art();
 
+
     @Optional
     @ImportColumn("SCHL")
     Property<String> schl();
+
 
     @Optional
     @ImportColumn("BEZ")
@@ -90,5 +105,19 @@ public interface StalaComposite
 
         private static Log log = LogFactory.getLog( Mixin.class );
 
+
+        public static Iterable<StalaComposite> stalasFor( String art ) {
+            return KapsRepository.instance().findEntities( StalaComposite.class,
+                    QueryExpressions.eq( templateFor( StalaComposite.class ).art(), art ), 0, -1 );
+        }
+
+
+        public static SortedMap<String, StalaComposite> stalasWithNames( String art ) {
+            SortedMap<String, StalaComposite> namen = new TreeMap<String, StalaComposite>();
+            for (StalaComposite stala : stalasFor( art )) {
+                namen.put( stala.schl().get() + " - " + stala.name().get(), stala );
+            }
+            return namen;
+        }
     }
 }

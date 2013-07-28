@@ -34,7 +34,7 @@ import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.SchlNamed;
 
 /**
- * 
+ *  
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 @Concerns({ PropertyChangeSupport.Concern.class })

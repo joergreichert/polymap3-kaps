@@ -13,7 +13,6 @@
 package org.polymap.kaps.ui.filter;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -66,25 +65,35 @@ public class DefaultEntityFilter
     private final List<String> propertyNames;
 
 
-    public <T extends Entity> DefaultEntityFilter( ILayer layer, Class<T> type, QiModule module ) {
-        super( "__kaps--", layer, "Standard...", null, 10000, type );
-        this.module = module;
-        this.propertyNames = new ArrayList();
-        EntityType<?> entityType = module.entityType( entityClass );
-        for (Property property : entityType.getProperties()) {
-            propertyNames.add( property.getName() );
-        }
-        Collections.sort( this.propertyNames );
-    }
+//    public <T extends Entity> DefaultEntityFilter( ILayer layer, Class<T> type, QiModule module ) {
+//        super( "__kaps--", layer, "Standard...", null, 10000, type );
+//        this.module = module;
+//        this.propertyNames = new ArrayList();
+//        EntityType<?> entityType = module.entityType( entityClass );
+//        for (Property property : entityType.getProperties()) {
+//            propertyNames.add( property.getName() );
+//        }
+//        // Collections.sort( this.propertyNames );
+//    }
 
 
     public <T extends Entity> DefaultEntityFilter( ILayer layer, Class<T> type, QiModule module,
-            String... propertyNames ) {
+            String... properties ) {
         super( "__kaps--", layer, "Standard...", null, 10000, type );
         this.module = module;
-        this.propertyNames = new ArrayList();
-        for (String name : propertyNames) {
-            this.propertyNames.add( name );
+
+        this.propertyNames = new ArrayList<String>();
+
+        if (properties.length == 0) {
+            EntityType<?> entityType = module.entityType( entityClass );
+            for (Property property : entityType.getProperties()) {
+                propertyNames.add( property.getName() );
+            }
+        }
+        else {
+            for (String name : properties) {
+                this.propertyNames.add( name );
+            }
         }
     }
 
@@ -103,50 +112,46 @@ public class DefaultEntityFilter
         for (String propertyName : propertyNames) {
             labels.put( labelFor( propertyName ), propertyName );
         }
-        
-        for (String label: labels.keySet()) {
+
+        for (String label : labels.keySet()) {
             String propertyName = labels.get( label );
             Property property = entityType.getProperty( propertyName );
-//            if (!(property instanceof EntityType.ManyAssociation)) {
-                Class propertyType = property.getType();
-                if (String.class.isAssignableFrom( propertyType )) {
-                    site.addStandardLayout( site.newFormField( result, property.getName(), String.class,
-                            new StringFormField(), null, label ) );
-                }
-                else if (Integer.class.isAssignableFrom( propertyType )) {
-                    site.addStandardLayout( site.newFormField( result, property.getName(), Integer.class,
-                            new BetweenFormField( new StringFormField(), new StringFormField() ), new BetweenValidator(
-                                    new NumberValidator( Integer.class, Polymap.getSessionLocale() ) ),
-                            label ) );
-                }
-                else if (Double.class.isAssignableFrom( propertyType )) {
-                    site.addStandardLayout( site.newFormField( result, property.getName(), Double.class,
-                            new BetweenFormField( new StringFormField(), new StringFormField() ), new BetweenValidator(
-                                    new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) ),
-                            label ) );
-                }
-                else if (Date.class.isAssignableFrom( propertyType )) {
-                    site.addStandardLayout( site.newFormField( result, property.getName(), Date.class,
-                            new BetweenFormField( new DateTimeFormField(), new DateTimeFormField() ), null,
-                            label ) );
-                }
-                else if (Named.class.isAssignableFrom( propertyType )) {
-                    SelectlistFormField field = new SelectlistFormField( valuesFor( propertyType ) );
-                    field.setIsMultiple( true );
-                    Composite formField = site.newFormField( result, property.getName(), propertyType, field, null,
-                            label );
-                    site.addStandardLayout( formField );
-                    ((FormData)formField.getLayoutData()).height = 100;
-                    ((FormData)formField.getLayoutData()).width = 100;
-                }
-//            }
+            // if (!(property instanceof EntityType.ManyAssociation)) {
+            Class propertyType = property.getType();
+            if (String.class.isAssignableFrom( propertyType )) {
+                site.addStandardLayout( site.newFormField( result, property.getName(), String.class,
+                        new StringFormField(), null, label ) );
+            }
+            else if (Integer.class.isAssignableFrom( propertyType )) {
+                site.addStandardLayout( site.newFormField( result, property.getName(), Integer.class,
+                        new BetweenFormField( new StringFormField(), new StringFormField() ), new BetweenValidator(
+                                new NumberValidator( Integer.class, Polymap.getSessionLocale() ) ), label ) );
+            }
+            else if (Double.class.isAssignableFrom( propertyType )) {
+                site.addStandardLayout( site.newFormField( result, property.getName(), Double.class,
+                        new BetweenFormField( new StringFormField(), new StringFormField() ), new BetweenValidator(
+                                new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) ), label ) );
+            }
+            else if (Date.class.isAssignableFrom( propertyType )) {
+                site.addStandardLayout( site.newFormField( result, property.getName(), Date.class,
+                        new BetweenFormField( new DateTimeFormField(), new DateTimeFormField() ), null, label ) );
+            }
+            else if (Named.class.isAssignableFrom( propertyType )) {
+                SelectlistFormField field = new SelectlistFormField( valuesFor( propertyType ) );
+                field.setIsMultiple( true );
+                Composite formField = site.newFormField( result, property.getName(), propertyType, field, null, label );
+                site.addStandardLayout( formField );
+                ((FormData)formField.getLayoutData()).height = 100;
+                ((FormData)formField.getLayoutData()).width = 100;
+            }
+            // }
         }
 
         return result;
     }
 
 
-    private Map<String, ? extends Object> valuesFor( Class propertyType ) {
+    protected Map<String, ? extends Object> valuesFor( Class propertyType ) {
         return ((KapsRepository)module).entitiesWithNames( propertyType );
     }
 
@@ -233,7 +238,8 @@ public class DefaultEntityFilter
 
 
     private BooleanExpression createNamedExpression( Entity template, Object value, Method propertyMethod )
-            throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException {
+            throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException,
+            NoSuchMethodException {
         List<Named> values = (List<Named>)value;
         BooleanExpression expr = null;
         for (Named named : values) {

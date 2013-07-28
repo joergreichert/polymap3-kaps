@@ -147,7 +147,7 @@ public class KapsRepository
                             KapsRepository.NAMESPACE, "Käuferkreis" ) ),
 
                     new SimpleEntityProvider<NutzungComposite>( this, NutzungComposite.class, new NameImpl(
-                            KapsRepository.NAMESPACE, "Nutzung" ) ), new SimpleEntityProvider<GebaeudeArtComposite>(
+                            KapsRepository.NAMESPACE, NutzungComposite.NAME ) ), new SimpleEntityProvider<GebaeudeArtComposite>(
                             this, GebaeudeArtComposite.class, new NameImpl( KapsRepository.NAMESPACE, GebaeudeArtComposite.NAME ) ),
 
                     new SimpleEntityProvider<GemeindeComposite>( this, GemeindeComposite.class, new NameImpl(

@@ -25,6 +25,7 @@ import org.polymap.core.qi4j.QiModule.EntityCreator;
 import org.polymap.core.qi4j.event.AbstractModelChangeOperation;
 
 import org.polymap.kaps.model.KapsRepository;
+import org.polymap.kaps.model.SchlNamed;
 import org.polymap.kaps.model.data.RichtwertzoneZeitraumComposite;
 
 /**
@@ -36,7 +37,7 @@ public abstract class AbstractMdbImportOperation
         extends AbstractModelChangeOperation
         implements IUndoableOperation {
 
-    private static Log     log = LogFactory.getLog( AbstractMdbImportOperation.class );
+    private static Log       log = LogFactory.getLog( AbstractMdbImportOperation.class );
 
     protected File           dbFile;
 
@@ -51,6 +52,7 @@ public abstract class AbstractMdbImportOperation
         this.tableNames = tableNames;
         this.repo = KapsRepository.instance();
     }
+
 
     protected final RichtwertzoneZeitraumComposite findRichtwertZone( BufferedWriter w,
             Map<String, List<RichtwertzoneZeitraumComposite>> allRichtwertZoneGueltigkeit, String zone,
@@ -165,6 +167,21 @@ public abstract class AbstractMdbImportOperation
             }
         }
         return null;
+    }
+
+
+    protected final <T extends SchlNamed> T findBySchl( Class<T> type, Map<String, Object> row, String columnName,
+            boolean nullAllowed ) {
+        String schl = (String)row.get( columnName );
+        if (schl != null && !schl.isEmpty()) {
+            return repo.findSchlNamed( type, schl );
+        }
+        else {
+            if (!nullAllowed) {
+                throw new IllegalStateException( "no " + type + " found for schl '" + schl + "'!" );
+            }
+            return null;
+        }
     }
 
 

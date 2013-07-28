@@ -198,7 +198,10 @@ public class MdbImportOperation
                 @Override
                 public void fillEntity( NutzungComposite entity, Map<String, Object> builderRow ) {
                     entity.stala().set( findStala( allStalas, "STALA", builderRow, StalaComposite.GRUNDSTUECKSART ) );
+                    entity.artDerBauflaeche().set(
+                            findBySchl( ArtDerBauflaecheComposite.class, builderRow, "STAT_BUND_ART", false ));
                     entity.isAgrar().set( getBooleanValue( builderRow, "AGRAR" ) );
+                    entity.isWohneigentum().set( getBooleanValue( builderRow, "STAT_BUND_WE" ) );
                     allNutzung.put( entity.schl().get(), entity );
                 }
             } );

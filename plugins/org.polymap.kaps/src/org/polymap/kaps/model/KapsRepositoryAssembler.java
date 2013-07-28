@@ -96,7 +96,7 @@ public class KapsRepositoryAssembler
                 FlurstuecksdatenAgrarComposite.class, BelastungComposite.class, EtageComposite.class,
                 AusstattungComposite.class, EigentumsartComposite.class, HimmelsrichtungComposite.class,
                 WohnungseigentumComposite.class, GebaeudeComposite.class, AusstattungBewertungComposite.class,
-                WohnungComposite.class, GebaeudeArtStaBuComposite.class );
+                WohnungComposite.class, GebaeudeArtStaBuComposite.class, ArtDerBauflaecheComposite.class );
 
         // persistence: workspace/Lucene
         File root = new File( Polymap.getWorkspacePath().toFile(), "data" );
@@ -145,6 +145,7 @@ public class KapsRepositoryAssembler
 
             final Impl schlCreator = new SchlNamedCreatorCallback.Impl( uow );
             GebaeudeArtStaBuComposite.Mixin.createInitData( schlCreator );
+            ArtDerBauflaecheComposite.Mixin.createInitData( schlCreator );
         }
         uow.complete();
         log.info( "Create Init Data Completed" );
