@@ -63,9 +63,11 @@ import org.polymap.kaps.model.data.NutzungComposite;
 import org.polymap.kaps.model.data.RichtwertzoneComposite;
 import org.polymap.kaps.model.data.StrasseComposite;
 import org.polymap.kaps.model.data.VertragComposite;
+import org.polymap.kaps.model.data.WohnungComposite;
 import org.polymap.kaps.ui.ActionButton;
 import org.polymap.kaps.ui.BooleanFormField;
 import org.polymap.kaps.ui.KapsDefaultFormEditorPageWithFeatureTable;
+import org.polymap.kaps.ui.SimplePickList;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -131,6 +133,7 @@ public class KaufvertragFlurstueckeFormEditorPage
             searchFlurstueckeButton.setEnabled( composite != null );
             openErweiterteDatenAgrar.setEnabled( composite != null );
             openErweiterteDatenBauland.setEnabled( composite != null );
+            wohnungPicklist.setEnabled( composite != null );
         }
         // das muss disabled bleiben
         pageSite.setFieldEnabled( prefix + "verkaufteFlaeche", false );
@@ -517,9 +520,11 @@ public class KaufvertragFlurstueckeFormEditorPage
         return formSection;
     }
 
-    private ActionButton openErweiterteDatenAgrar;
+    private ActionButton                     openErweiterteDatenAgrar;
 
-    private ActionButton openErweiterteDatenBauland;
+    private ActionButton                     openErweiterteDatenBauland;
+
+    private SimplePickList<WohnungComposite> wohnungPicklist;
 
 
     public Section createErweiterteDatenForm( Composite top ) {
@@ -563,7 +568,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                 super.setEnabled( enabled );
             };
         };
-        openErweiterteDatenAgrar.setLayoutData( left().right( 20 ).height( 25 ).top( null ).bottom( 100 ).create() );
+        openErweiterteDatenAgrar.setLayoutData( left().right( 15 ).height( 25 ).top( null ).bottom( 100 ).create() );
         openErweiterteDatenAgrar.setEnabled( false );
 
         openErweiterteDatenBauland = new ActionButton( parent, new Action( "Daten Bauland anlegen" ) {
@@ -578,8 +583,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                         bauland = repository.newEntity( FlurstuecksdatenBaulandComposite.class, null );
                         bauland.flurstueck().set( flurstueck );
                         bauland.vertrag().set( flurstueck.vertrag().get() );
-                        // bauland.richtwertZone().set(
-                        // flurstueck.richtwertZone().get() );
+                        bauland.richtwertZone().set( flurstueck.richtwertZone().get() );
                     }
                     KapsPlugin.openEditor( fs, FlurstuecksdatenBaulandComposite.NAME, bauland );
                 }
@@ -602,13 +606,56 @@ public class KaufvertragFlurstueckeFormEditorPage
                 super.setEnabled( enabled );
             };
         };
-        openErweiterteDatenBauland.setLayoutData( left().left( 30 ).height( 25 ).top( null ).create() );
+        openErweiterteDatenBauland.setLayoutData( left().left( 20 ).right( 35 ).height( 25 ).top( null ).create() );
         openErweiterteDatenBauland.setEnabled( false );
 
+        final ActionButton openWohnung = new ActionButton( parent, new Action( "Wohnung bearbeiten" ) {
+
+            @Override
+            public void run() {
+                WohnungComposite wohnung = wohnungPicklist.getSelection();
+                if (wohnung != null) {
+                    KapsPlugin.openEditor( fs, WohnungComposite.NAME, wohnung );
+                }
+            }
+
+        } );
+        openWohnung.setLayoutData( left().left( 62 ).right( 77 ).height( 25 ).top( null ).create() );
+        openWohnung.setEnabled( false );
+
         // Liste mit Wohnung + Auswählen daneben
-//        reloadable( namedAssocationsPicklist( WohnungComposite.Mixin.findWohnungenFor( flurstueck ) ) ) );
+        wohnungPicklist = new SimplePickList<WohnungComposite>( parent, pageSite ) {
+
+            @Override
+            public SortedMap<String, WohnungComposite> getValues() {
+                SortedMap<String, WohnungComposite> values = new TreeMap<String, WohnungComposite>();
+                if (selectedComposite != null) {
+                    Iterable<WohnungComposite> iterable = WohnungComposite.Mixin.findWohnungenFor( selectedComposite
+                            .get() );
+                    for (WohnungComposite zone : iterable) {
+                        values.put( zone.schl().get(), zone );
+                    }
+                }
+                return values;
+            }
+
+
+            @Override
+            public void onSelection( WohnungComposite selectedObject ) {
+                if (openWohnung != null) {
+                    openWohnung.setEnabled( selectedObject != null );
+                }
+            }
+        };
+        wohnungPicklist.setLayoutData( right().left( 45 ).right( 60 ).height( 25 ).top( null ).create() );
+
+        //
+        // wohnungPicklist.addSelectionListener( new Selectio )
+        // wohnungPicklist.setLayoutData( right().right( 70 ).height( 25 ).top( null
+        // ).create() );
+
         // und daneben Knopf zum Wohnung anlegen
-        
+
         return formSection;
     }
 
