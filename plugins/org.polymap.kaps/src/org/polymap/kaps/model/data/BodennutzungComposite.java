@@ -58,7 +58,7 @@ public interface BodennutzungComposite
 
     @Optional
     // STALA
-    Association<StalaComposite> stala();
+    Association<ArtDesBaugebietesStalaComposite> stala();
 
 
     /**

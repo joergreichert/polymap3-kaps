@@ -15,6 +15,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.healthmarketscience.jackcess.Database;
+import com.healthmarketscience.jackcess.Table;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -24,6 +25,7 @@ import org.eclipse.core.runtime.Status;
 import org.polymap.core.qi4j.QiModule.EntityCreator;
 import org.polymap.core.runtime.SubMonitor;
 
+import org.polymap.kaps.model.SchlNamed;
 import org.polymap.kaps.model.data.*;
 import org.polymap.kaps.ui.form.EingangsNummerFormatter;
 
@@ -55,7 +57,8 @@ public class MdbImportOperation
 
             sub = new SubMonitor( monitor, 10 );
 
-            final List<StalaComposite> allStalas = new ArrayList<StalaComposite>();
+            // final List<StalaComposite> allStalas = new
+            // ArrayList<StalaComposite>();
             final Map<String, KaeuferKreisComposite> allKKreise = new HashMap<String, KaeuferKreisComposite>();
             final Map<String, VertragsArtComposite> allVertragsarten = new HashMap<String, VertragsArtComposite>();
             final Map<String, NutzungComposite> allNutzung = new HashMap<String, NutzungComposite>();
@@ -63,14 +66,18 @@ public class MdbImportOperation
             final Map<String, VertragComposite> allKaufvertrag = new HashMap<String, VertragComposite>();
 
             sub = new SubMonitor( monitor, 10 );
-            importEntity( db, sub, StalaComposite.class, new EntityCallback<StalaComposite>() {
-
-                @Override
-                public void fillEntity( StalaComposite entity, Map<String, Object> builderRow ) {
-                    // collecting
-                    allStalas.add( entity );
-                }
-            } );
+            importStalas( db, sub );
+            // sub = new SubMonitor( monitor, 10 );
+            // importEntity( db, sub, StalaComposite.class, new
+            // EntityCallback<StalaComposite>() {
+            //
+            // @Override
+            // public void fillEntity( StalaComposite entity, Map<String, Object>
+            // builderRow ) {
+            // // collecting
+            // allStalas.add( entity );
+            // }
+            // } );
 
             sub = new SubMonitor( monitor, 10 );
             importEntity( db, sub, VertragsArtComposite.class, new EntityCallback<VertragsArtComposite>() {
@@ -79,7 +86,7 @@ public class MdbImportOperation
                 public void fillEntity( VertragsArtComposite entity, Map<String, Object> builderRow ) {
                     // associate stala
                     entity.stala().set(
-                            findStala( allStalas, "STALA", builderRow, StalaComposite.VERWANDSCHAFTSVERHAELTNIS ) );
+                            findBySchl( VerwandschaftsVerhaeltnisStalaComposite.class, builderRow, "STALA", false ) );
                     // collecting
                     allVertragsarten.put( entity.schl().get(), entity );
                 }
@@ -91,10 +98,13 @@ public class MdbImportOperation
                 @Override
                 public void fillEntity( KaeuferKreisComposite entity, Map<String, Object> builderRow ) {
                     // associate stala erstellen
-                    entity.stala()
-                            .set( findStala( allStalas, "STALA", builderRow, StalaComposite.VERAEUSSERER_BAULAND ) );
+                    entity.stala().set(
+                            findBySchl( VeraeussererBaulandStalaComposite.class, builderRow, "STALA", false ) );
                     entity.stalaAgrar().set(
-                            findStala( allStalas, "STALA_AGRAR", builderRow, StalaComposite.VERAEUSSERER_AGRARLAND ) );
+                            findBySchl( VeraeussererAgrarLandStalaComposite.class, builderRow, "STALA", false ) );
+                    entity.kaeuferKreisStabu().set(
+                            findBySchl( KaeuferKreisStaBuComposite.class, builderRow, "STAT_BUND", false ) );
+
                     // collecting
                     allKKreise.put( entity.schl().get(), entity );
                 }
@@ -197,9 +207,10 @@ public class MdbImportOperation
 
                 @Override
                 public void fillEntity( NutzungComposite entity, Map<String, Object> builderRow ) {
-                    entity.stala().set( findStala( allStalas, "STALA", builderRow, StalaComposite.GRUNDSTUECKSART ) );
+                    entity.stala().set(
+                            findBySchl( GrundstuecksArtBaulandStalaComposite.class, builderRow, "STALA", false ) );
                     entity.artDerBauflaeche().set(
-                            findBySchl( ArtDerBauflaecheComposite.class, builderRow, "STAT_BUND_ART", false ));
+                            findBySchl( ArtDerBauflaecheStaBuComposite.class, builderRow, "STAT_BUND_ART", false ) );
                     entity.isAgrar().set( getBooleanValue( builderRow, "AGRAR" ) );
                     entity.isWohneigentum().set( getBooleanValue( builderRow, "STAT_BUND_WE" ) );
                     allNutzung.put( entity.schl().get(), entity );
@@ -247,7 +258,8 @@ public class MdbImportOperation
                 @Override
                 public void fillEntity( BodennutzungComposite entity, Map<String, Object> builderRow ) {
                     // associate stala erstellen
-                    entity.stala().set( findStala( allStalas, "STALA", builderRow, StalaComposite.ARTDESBAUGEBIETES ) );
+                    entity.stala()
+                            .set( findBySchl( ArtDesBaugebietesStalaComposite.class, builderRow, "STALA", false ) );
                     allBodennutzung.put( entity.schl().get(), entity );
                 }
             } );
@@ -707,7 +719,7 @@ public class MdbImportOperation
             allKKreise.clear();
             allNutzung.clear();
             allRichtwertZoneGueltigkeit.clear();
-            allStalas.clear();
+            // allStalas.clear();
             allStrasse.clear();
             allVertragsarten.clear();
         }
@@ -719,24 +731,76 @@ public class MdbImportOperation
     }
 
 
-    protected final StalaComposite findStala( List<StalaComposite> allStalas, String columnName,
-            Map<String, Object> builderRow, String neededArt ) {
-        String stalaSchl = (String)builderRow.get( columnName );
-        StalaComposite foundStala = null;
-        if (stalaSchl != null && !stalaSchl.isEmpty()) {
-            for (StalaComposite stala : allStalas) {
-                String schl = stala.schl().get();
-                String art = stala.art().get();
-                if (schl != null && schl.trim().equals( stalaSchl.trim() ) && art != null
-                        && art.trim().equals( neededArt.trim() )) {
-                    foundStala = stala;
-                    break;
-                }
+    //
+    //
+    // protected final StalaComposite findStala( List<StalaComposite> allStalas,
+    // String columnName,
+    // Map<String, Object> builderRow, String neededArt ) {
+    // String stalaSchl = (String)builderRow.get( columnName );
+    // StalaComposite foundStala = null;
+    // if (stalaSchl != null && !stalaSchl.isEmpty()) {
+    // for (StalaComposite stala : allStalas) {
+    // String schl = stala.schl().get();
+    // String art = stala.art().get();
+    // if (schl != null && schl.trim().equals( stalaSchl.trim() ) && art != null
+    // && art.trim().equals( neededArt.trim() )) {
+    // foundStala = stala;
+    // break;
+    // }
+    // }
+    // if (foundStala == null) {
+    // throw new IllegalStateException( "no stala found for schl '" + stalaSchl +
+    // "'!" );
+    // }
+    // }
+    // return foundStala;
+    // }
+    //
+
+    protected void importStalas( Database db, IProgressMonitor monitor )
+            throws Exception {
+        Table table = db.getTable( "K_STALA" );
+        monitor.beginTask( "Tabelle: " + table.getName(), table.getRowCount() );
+
+        // data rows
+        Map<String, Object> builderRow = null;
+        int count = 0;
+        while ((builderRow = table.getNextRow()) != null) {
+
+            String art = (String)builderRow.get( "ART" );
+            SchlNamed stala = null;
+            if ("1".equals( art )) {
+                stala = repo.newEntity( GrundstuecksArtBaulandStalaComposite.class, null );
             }
-            if (foundStala == null) {
-                throw new IllegalStateException( "no stala found for schl '" + stalaSchl + "'!" );
+            else if ("2".equals( art )) {
+                stala = repo.newEntity( ArtDesBaugebietesStalaComposite.class, null );
             }
+            else if ("3".equals( art )) {
+                stala = repo.newEntity( VeraeussererBaulandStalaComposite.class, null );
+            }
+            else if ("4".equals( art )) {
+                stala = repo.newEntity( VerwandschaftsVerhaeltnisStalaComposite.class, null );
+            }
+            else if ("5".equals( art )) {
+                stala = repo.newEntity( VeraeussererAgrarLandStalaComposite.class, null );
+            }
+            else if ("6".equals( art )) {
+                stala = repo.newEntity( GrundstuecksArtAgrarLandStalaComposite.class, null );
+            }
+            else if ("7".equals( art )) {
+                stala = repo.newEntity( ErwerberStalaComposite.class, null );
+            }
+            else {
+                throw new IllegalStateException( "unknown Stala Art " + art );
+            }
+            String value = (String)builderRow.get( "SCHL" );
+            stala.schl().set( value != null ? value.trim() : null );
+            value = (String)builderRow.get( "BEZ" );
+            stala.name().set( value != null ? value.trim() : null );
+            count++;
         }
-        return foundStala;
+        repo.commitChanges();
+        log.info( "Imported and committed: K_Stala -> " + count );
+        monitor.done();
     }
 }

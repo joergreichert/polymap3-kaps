@@ -174,14 +174,13 @@ public abstract class AbstractMdbImportOperation
             boolean nullAllowed ) {
         String schl = (String)row.get( columnName );
         if (schl != null && !schl.isEmpty()) {
-            return repo.findSchlNamed( type, schl );
-        }
-        else {
-            if (!nullAllowed) {
+            T named = repo.findSchlNamed( type, schl );
+            if (named == null && !nullAllowed) {
                 throw new IllegalStateException( "no " + type + " found for schl '" + schl + "'!" );
             }
-            return null;
+            return named;
         }
+        return null;
     }
 
 

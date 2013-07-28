@@ -58,7 +58,6 @@ import org.polymap.kaps.model.data.GemeindeComposite;
 import org.polymap.kaps.model.data.KaeuferKreisComposite;
 import org.polymap.kaps.model.data.NutzungComposite;
 import org.polymap.kaps.model.data.RichtwertzoneZeitraumComposite;
-import org.polymap.kaps.model.data.StalaComposite;
 import org.polymap.kaps.model.data.StrasseComposite;
 import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.VertragsArtComposite;
@@ -141,8 +140,8 @@ public class KapsRepository
                             new SimpleEntityProvider<RichtwertzoneZeitraumComposite>( this, RichtwertzoneZeitraumComposite.class, new NameImpl(
                                     KapsRepository.NAMESPACE, RichtwertzoneZeitraumComposite.NAME ) ),
 
-                    new SimpleEntityProvider<StalaComposite>( this, StalaComposite.class, new NameImpl(
-                            KapsRepository.NAMESPACE, "Stala" ) ),
+//                    new SimpleEntityProvider<StalaComposite>( this, StalaComposite.class, new NameImpl(
+//                            KapsRepository.NAMESPACE, "Stala" ) ),
                     new SimpleEntityProvider<KaeuferKreisComposite>( this, KaeuferKreisComposite.class, new NameImpl(
                             KapsRepository.NAMESPACE, "Käuferkreis" ) ),
 

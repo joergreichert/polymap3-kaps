@@ -18,7 +18,6 @@ import org.apache.commons.logging.LogFactory;
 import org.qi4j.api.common.Optional;
 import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.entity.EntityComposite;
-import org.qi4j.api.entity.association.Association;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.property.Property;
 
@@ -32,19 +31,17 @@ import org.polymap.kaps.model.SchlNamed;
 
 /**
  * 
+ * 
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 @Concerns({ PropertyChangeSupport.Concern.class })
-@Mixins({ NutzungComposite.Mixin.class, PropertyChangeSupport.Mixin.class,
-        ModelChangeSupport.Mixin.class, QiEntity.Mixin.class
+@Mixins({ GrundstuecksArtBaulandStalaComposite.Mixin.class, PropertyChangeSupport.Mixin.class, ModelChangeSupport.Mixin.class,
+        QiEntity.Mixin.class
 // JsonState.Mixin.class
 })
-@ImportTable("K_NUTZ")
-public interface NutzungComposite
+@ImportTable("K_STALA")
+public interface GrundstuecksArtBaulandStalaComposite
         extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite, SchlNamed {
-
-
-    String NAME = "Nutzung";
 
     @Optional
     @ImportColumn("SCHL")
@@ -52,35 +49,17 @@ public interface NutzungComposite
 
 
     @Optional
-    @ImportColumn("TEXT1")
+    @ImportColumn("BEZ")
     Property<String> name();
 
 
-    @Optional
-    // STALA
-    Association<GrundstuecksArtBaulandStalaComposite> stala();
-
-    @Optional
-    //@ImportColumn("AGRAR")
-    Property<Boolean> isAgrar();
-
-    @Optional
-    // STABU  - Art der Baufläche
-    //@ImportColumn("STAT_BUND_ART")
-    Association<ArtDerBauflaecheStaBuComposite> artDerBauflaeche();
-
-    @Optional
-    //@ImportColumn("STAT_BUND_WE")
-    Property<Boolean> isWohneigentum();
-    
     /**
      * Methods and transient fields.
      */
     public static abstract class Mixin
-            implements NutzungComposite {
+            implements GrundstuecksArtBaulandStalaComposite {
 
         private static Log log = LogFactory.getLog( Mixin.class );
 
     }
-
 }

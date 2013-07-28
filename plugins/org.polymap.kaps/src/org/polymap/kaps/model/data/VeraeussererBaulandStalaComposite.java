@@ -15,46 +15,51 @@ package org.polymap.kaps.model.data;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.qi4j.api.common.Optional;
 import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.mixin.Mixins;
+import org.qi4j.api.property.Property;
 
 import org.polymap.core.qi4j.QiEntity;
 import org.polymap.core.qi4j.event.ModelChangeSupport;
 import org.polymap.core.qi4j.event.PropertyChangeSupport;
 
+import org.polymap.kaps.importer.ImportColumn;
+import org.polymap.kaps.importer.ImportTable;
 import org.polymap.kaps.model.SchlNamed;
-import org.polymap.kaps.model.SchlNamedCreatorCallback;
 
 /**
- * siehe NutzungComposite
+ * 
  * 
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 @Concerns({ PropertyChangeSupport.Concern.class })
-@Mixins({ ArtDerBauflaecheComposite.Mixin.class, PropertyChangeSupport.Mixin.class, ModelChangeSupport.Mixin.class,
-        QiEntity.Mixin.class
+@Mixins({ VeraeussererBaulandStalaComposite.Mixin.class, PropertyChangeSupport.Mixin.class,
+        ModelChangeSupport.Mixin.class, QiEntity.Mixin.class
 // JsonState.Mixin.class
 })
-public interface ArtDerBauflaecheComposite
+@ImportTable("K_STALA")
+public interface VeraeussererBaulandStalaComposite
         extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite, SchlNamed {
 
-    // Property<String> schl();
+    @Optional
+    @ImportColumn("SCHL")
+    Property<String> schl();
 
-    // Property<String> name();
+
+    @Optional
+    @ImportColumn("BEZ")
+    Property<String> name();
+
 
     /**
      * Methods and transient fields.
      */
     public static abstract class Mixin
-            implements ArtDerBauflaecheComposite {
+            implements VeraeussererBaulandStalaComposite {
 
         private static Log log = LogFactory.getLog( Mixin.class );
 
-
-        public static void createInitData( SchlNamedCreatorCallback.Impl cb ) {
-            cb.create( ArtDerBauflaecheComposite.class, "1", "Wohnbaufläche" );
-            cb.create( ArtDerBauflaecheComposite.class, "2", "Gemischte Baufläche" );
-        }
     }
 }

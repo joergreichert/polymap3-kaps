@@ -55,7 +55,7 @@ public interface VertragsArtComposite
 
     @Optional
     // STALA
-    Association<StalaComposite> stala();
+    Association<VerwandschaftsVerhaeltnisStalaComposite> stala();
 
 
     /**

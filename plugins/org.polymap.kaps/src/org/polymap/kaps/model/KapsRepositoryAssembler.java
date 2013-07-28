@@ -85,8 +85,8 @@ public class KapsRepositoryAssembler
         LayerAssembly domainLayer = _app.layerAssembly( "application-layer" );
         ModuleAssembly domainModule = domainLayer.moduleAssembly( "kaps-module" );
         domainModule.addEntities( VertragComposite.class, VertragsArtComposite.class, KaeuferKreisComposite.class,
-                StalaComposite.class, GemeindeComposite.class, GebaeudeArtComposite.class, NutzungComposite.class,
-                StrasseComposite.class, BodennutzungComposite.class, FlurComposite.class, GemarkungComposite.class,
+                GemeindeComposite.class, GebaeudeArtComposite.class, NutzungComposite.class, StrasseComposite.class,
+                BodennutzungComposite.class, FlurComposite.class, GemarkungComposite.class,
                 RichtwertzoneComposite.class, RichtwertzoneZeitraumComposite.class,
                 ErschliessungsBeitragComposite.class, BodenRichtwertKennungComposite.class,
                 EntwicklungsZustandComposite.class, RichtwertZoneLageComposite.class,
@@ -96,7 +96,11 @@ public class KapsRepositoryAssembler
                 FlurstuecksdatenAgrarComposite.class, BelastungComposite.class, EtageComposite.class,
                 AusstattungComposite.class, EigentumsartComposite.class, HimmelsrichtungComposite.class,
                 WohnungseigentumComposite.class, GebaeudeComposite.class, AusstattungBewertungComposite.class,
-                WohnungComposite.class, GebaeudeArtStaBuComposite.class, ArtDerBauflaecheComposite.class );
+                WohnungComposite.class, GebaeudeArtStaBuComposite.class, ArtDerBauflaecheStaBuComposite.class,
+                ArtDesBaugebietesStalaComposite.class, GrundstuecksArtAgrarLandStalaComposite.class,
+                ErwerberStalaComposite.class, GrundstuecksArtBaulandStalaComposite.class, KaeuferKreisStaBuComposite.class,
+                VeraeussererAgrarLandStalaComposite.class, VeraeussererBaulandStalaComposite.class,
+                VerwandschaftsVerhaeltnisStalaComposite.class );
 
         // persistence: workspace/Lucene
         File root = new File( Polymap.getWorkspacePath().toFile(), "data" );
@@ -145,7 +149,8 @@ public class KapsRepositoryAssembler
 
             final Impl schlCreator = new SchlNamedCreatorCallback.Impl( uow );
             GebaeudeArtStaBuComposite.Mixin.createInitData( schlCreator );
-            ArtDerBauflaecheComposite.Mixin.createInitData( schlCreator );
+            ArtDerBauflaecheStaBuComposite.Mixin.createInitData( schlCreator );
+            KaeuferKreisStaBuComposite.Mixin.createInitData( schlCreator );
         }
         uow.complete();
         log.info( "Create Init Data Completed" );

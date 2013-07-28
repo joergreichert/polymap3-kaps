@@ -55,13 +55,16 @@ public interface KaeuferKreisComposite
 
     @Optional
     // STALA
-    Association<StalaComposite> stala();
+    Association<VeraeussererBaulandStalaComposite> stala();
 
 
     @Optional
     //@ImportColumn("STALA_AGRAR")
-    Association<StalaComposite> stalaAgrar();
+    Association<VeraeussererAgrarLandStalaComposite> stalaAgrar();
 
+    @Optional
+    //@ImportColumn("STAT_BUND")
+    Association<KaeuferKreisStaBuComposite> kaeuferKreisStabu();
 
     /**
      * Methods and transient fields.
