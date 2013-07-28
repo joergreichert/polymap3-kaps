@@ -140,11 +140,13 @@ public interface GebaeudeComposite
     @Optional
     @Computed
     Property<String> schl();
-    
+
+
     @Optional
     ManyAssociation<FlurstueckComposite> flurstuecke();
 
-    Wohnungseigentum als Association, auch beim Import beachten
+
+    // TODO Wohnungseigentum als Association, auch beim Import beachten
 
     /**
      * Methods and transient fields.
@@ -177,6 +179,20 @@ public interface GebaeudeComposite
             Query<GebaeudeComposite> matches = KapsRepository.instance().findEntities( GebaeudeComposite.class, expr,
                     0, -1 );
             return matches;
+        }
+
+
+        public static GebaeudeComposite forKeys( final Integer objektNummer,
+                final Integer objektFortfuehrung, final Integer gebaeudeNummer, final Integer gebaeudeFortfuehrung ) {
+            GebaeudeComposite template = QueryExpressions.templateFor( GebaeudeComposite.class );
+            BooleanExpression expr = QueryExpressions.and(
+                    QueryExpressions.eq( template.objektNummer(), objektNummer ),
+                    QueryExpressions.eq( template.objektFortfuehrung(), objektFortfuehrung ),
+                    QueryExpressions.eq( template.gebaeudeNummer(), gebaeudeNummer ),
+                    QueryExpressions.eq( template.gebaeudeFortfuehrung(), gebaeudeFortfuehrung ) );
+            Query<GebaeudeComposite> matches = KapsRepository.instance().findEntities( GebaeudeComposite.class, expr,
+                    0, 1 );
+            return matches.find();
         }
     }
 }

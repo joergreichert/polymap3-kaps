@@ -40,7 +40,7 @@ import org.polymap.rhei.form.IFormEditorPageSite;
 import org.polymap.kaps.model.data.AusstattungComposite;
 import org.polymap.kaps.model.data.EigentumsartComposite;
 import org.polymap.kaps.model.data.EtageComposite;
-import org.polymap.kaps.model.data.FlurstueckWohneigentumComposite;
+import org.polymap.kaps.model.data.FlurstueckComposite;
 import org.polymap.kaps.model.data.HimmelsrichtungComposite;
 import org.polymap.kaps.model.data.WohnungComposite;
 import org.polymap.kaps.ui.BooleanFormField;
@@ -122,30 +122,30 @@ public class WohnungGrunddatenFormEditorPage
 
         // flurstücke
         lastLine = newLine;
-        TreeMap<String, FlurstueckWohneigentumComposite> flurstuecke = new TreeMap<String, FlurstueckWohneigentumComposite>();
+        TreeMap<String, FlurstueckComposite> flurstuecke = new TreeMap<String, FlurstueckComposite>();
 
-        Iterable<FlurstueckWohneigentumComposite> iterable = WohnungComposite.Mixin.findFlurstueckeFor( wohnung );
-        for (FlurstueckWohneigentumComposite flurstueck : iterable) {
-            StringBuffer label = new StringBuffer();
-            if (flurstueck.strasse().get() != null) {
-                label.append( flurstueck.strasse().get().name().get() ).append( " - " );
-            }
-            if (flurstueck.hausnummer().get() != null) {
-                label.append( flurstueck.hausnummer().get() );
-
-                if (flurstueck.hausnummerZusatz().get() != null) {
-                    label.append( flurstueck.hausnummerZusatz().get() );
-                }
-                label.append( " - " );
-            }
-            if (flurstueck.gemarkung().get() != null) {
-                label.append( flurstueck.gemarkung().get().name().get() ).append( " - " );
-            }
-            label.append( flurstueck.nummer().get() ).append( "/" ).append( flurstueck.unterNummer().get() );
-            flurstuecke.put( label.toString(), flurstueck );
+        Iterable<FlurstueckComposite> iterable = WohnungComposite.Mixin.findFlurstueckeFor( wohnung );
+        for (FlurstueckComposite flurstueck : iterable) {
+//            StringBuffer label = new StringBuffer();
+//            if (flurstueck.strasse().get() != null) {
+//                label.append( flurstueck.strasse().get().name().get() ).append( " - " );
+//            }
+//            if (flurstueck.hausnummer().get() != null) {
+//                label.append( flurstueck.hausnummer().get() );
+//
+//                if (flurstueck.hausnummerZusatz().get() != null) {
+//                    label.append( flurstueck.hausnummerZusatz().get() );
+//                }
+//                label.append( " - " );
+//            }
+//            if (flurstueck.gemarkung().get() != null) {
+//                label.append( flurstueck.gemarkung().get().name().get() ).append( " - " );
+//            }
+//            label.append( flurstueck.nummer().get() ).append( "/" ).append( flurstueck.unterNummer().get() );
+            flurstuecke.put( flurstueck.name().get(), flurstueck );
         }
         newLine = newFormField( "Lage" )
-                .setProperty( new AssociationAdapter<FlurstueckWohneigentumComposite>( wohnung.flurstueck() ) )
+                .setProperty( new AssociationAdapter<FlurstueckComposite>( wohnung.flurstueck() ) )
                 .setField( new PicklistFormField( flurstuecke.descendingMap() ) )
                 .setLayoutData( left().top( lastLine ).right( RIGHT ).create() ).setParent( parent ).create();
 

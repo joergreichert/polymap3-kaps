@@ -43,7 +43,7 @@ import org.polymap.rhei.form.IFormEditorPageSite;
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.BodennutzungComposite;
 import org.polymap.kaps.model.data.ErschliessungsBeitragComposite;
-import org.polymap.kaps.model.data.FlurstueckVerkaufComposite;
+import org.polymap.kaps.model.data.FlurstueckComposite;
 import org.polymap.kaps.model.data.GebaeudeArtComposite;
 import org.polymap.kaps.model.data.GemeindeComposite;
 import org.polymap.kaps.model.data.RichtwertzoneComposite;
@@ -135,7 +135,7 @@ public class FlurstuecksdatenBaulandGrunddatenFormEditorPage
         lastLine = newLine;
         TreeMap<String, Object> zonen = new TreeMap<String, Object>();
         TreeMap<String, Object> zeitraeume = new TreeMap<String, Object>();
-        FlurstueckVerkaufComposite flurstueck = vb.flurstueck().get();
+        FlurstueckComposite flurstueck = vb.flurstueck().get();
         RichtwertzoneComposite richtwertZone;
         if (flurstueck != null) {
             GemeindeComposite gemeinde = flurstueck.richtwertZone().get().gemeinde().get();

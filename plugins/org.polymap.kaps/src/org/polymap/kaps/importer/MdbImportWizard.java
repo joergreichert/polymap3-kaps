@@ -60,14 +60,16 @@ public class MdbImportWizard
 
     public boolean performFinish() {
         try {
-            MdbImportOperation op = new MdbImportOperation( importPage.dbFile,
+//            MdbImportOperation op = new MdbImportOperation( importPage.dbFile, importPage.tableNames );
+//            OperationSupport.instance().execute( op, true, true );
+            MdbImportWohneigentumOperation op2 = new MdbImportWohneigentumOperation( importPage.dbFile,
                     importPage.tableNames );
-            OperationSupport.instance().execute( op, true, true );
+            OperationSupport.instance().execute( op2, true, true );
+
             return true;
         }
         catch (Exception e) {
-            PolymapWorkbench
-                    .handleError( KapsPlugin.PLUGIN_ID, this, "Fehler beim importieren.", e );
+            PolymapWorkbench.handleError( KapsPlugin.PLUGIN_ID, this, "Fehler beim importieren.", e );
             return false;
         }
     }

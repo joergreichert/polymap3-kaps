@@ -34,6 +34,7 @@ import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
 import org.polymap.kaps.model.data.RichtwertzoneComposite;
 import org.polymap.kaps.model.data.RichtwertzoneZeitraumComposite;
 import org.polymap.kaps.model.data.VertragComposite;
+import org.polymap.kaps.model.data.WohnungComposite;
 import org.polymap.kaps.ui.filter.DefaultEntityFilter;
 import org.polymap.kaps.ui.filter.EinzelneVertragsdatenAgrarFilter;
 import org.polymap.kaps.ui.filter.EinzelneVertragsdatenBaulandFilter;
@@ -87,6 +88,10 @@ public class FilterProvider
                 }
                 else if (type.isAssignableFrom( FlurstuecksdatenAgrarComposite.class )) {
                     result.add( new EinzelneVertragsdatenAgrarFilter( layer ) );
+                }
+                else if (type.isAssignableFrom( WohnungComposite.class )) {
+                    result.add( new DefaultEntityFilter( layer, type, repo, "objektNummer", "objektFortfuehrung",
+                            "gebaeudeNummer", "gebaeudeFortfuehrung", "wohnungsNummer", "wohnungsFortfuehrung" ) );
                 }
                 else {
                     // standard to all other entitytypes

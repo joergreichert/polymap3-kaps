@@ -112,7 +112,7 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
         int TOPSPACING = 20;
         viewer = new FeatureTableViewer( parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL );
         viewer.getTable().setLayoutData(
-                new SimpleFormData().fill().left( 2 ).height( 100 ).right( 90 ).top( top, TOPSPACING ).create() );
+                new SimpleFormData().fill().left( 2 ).height( 100 ).right( 90 ).top( top, TOPSPACING ).bottom( 100 ).create() );
 
         // columns
         EntityType<T> type = addViewerColumns( viewer );

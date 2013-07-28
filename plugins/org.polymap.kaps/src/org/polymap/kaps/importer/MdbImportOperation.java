@@ -45,6 +45,9 @@ public class MdbImportOperation
 
     protected IStatus doExecute( IProgressMonitor monitor, IAdaptable info )
             throws Exception {
+        File parentFolder = new File( "kaps" );
+        parentFolder.mkdirs();
+
         monitor.beginTask( getLabel(), 12000 );
         final Database db = Database.open( dbFile );
         try {
@@ -100,7 +103,8 @@ public class MdbImportOperation
             importEntity( db, sub, VertragComposite.class, new EntityCallback<VertragComposite>() {
 
                 @Override
-                public void fillEntity( VertragComposite entity, Map<String, Object> builderRow ) {
+                public void fillEntity( VertragComposite entity, Map<String, Object> builderRow )
+                        throws Exception {
                     // VERARBKZ
                     entity.fuerAuswertungGeeignet().set( getBooleanValue( builderRow, "VERARBKZ" ) );
                     // GESPLITTET
@@ -168,6 +172,17 @@ public class MdbImportOperation
                         anfr.append( anfr2 );
                     }
                     entity.anfragen().set( anfr.toString() );
+
+                    VertragsdatenErweitertComposite vdec = repo.newEntity( VertragsdatenErweitertComposite.class, null,
+                            new EntityCreator<VertragsdatenErweitertComposite>() {
+
+                                public void create( VertragsdatenErweitertComposite prototype )
+                                        throws Exception {
+                                    // vertragsdatenErweitertCompositeImporter.fillEntity(
+                                    // prototype, builderRow );
+                                }
+                            } );
+                    entity.erweiterteVertragsdaten().set( vdec );
 
                     // find also Verkaufsverträge alt und geplittete
                     // Verträge
@@ -327,17 +342,19 @@ public class MdbImportOperation
 
             final Map<String, ArtDesBaugebietsComposite> allArtDesBaugebietes = repo
                     .entitiesWithSchl( ArtDesBaugebietsComposite.class );
-            final Map<String, FlurstueckComposite> allFlurstuecke = new HashMap<String, FlurstueckComposite>();
+            // final Map<String, FlurstueckComposite> allFlurstuecke = new
+            // HashMap<String, FlurstueckComposite>();
 
-            final Map<VertragComposite, FlurstueckVerkaufComposite> allHauptflurstuecke = new HashMap<VertragComposite, FlurstueckVerkaufComposite>();
-            final AnnotatedCompositeImporter flurstueckImporter = new AnnotatedCompositeImporter(
-                    FlurstueckComposite.class, table( db, FlurstueckComposite.class ) );
+            final Map<VertragComposite, FlurstueckComposite> allHauptflurstuecke = new HashMap<VertragComposite, FlurstueckComposite>();
+            // final AnnotatedCompositeImporter flurstueckImporter = new
+            // AnnotatedCompositeImporter(
+            // FlurstueckComposite.class, table( db, FlurstueckComposite.class ) );
 
             sub = new SubMonitor( monitor, 10 );
-            importEntity( db, sub, FlurstueckVerkaufComposite.class, new EntityCallback<FlurstueckVerkaufComposite>() {
+            importEntity( db, sub, FlurstueckComposite.class, new EntityCallback<FlurstueckComposite>() {
 
                 @Override
-                public void fillEntity( final FlurstueckVerkaufComposite entity, final Map<String, Object> builderRow )
+                public void fillEntity( final FlurstueckComposite entity, final Map<String, Object> builderRow )
                         throws Exception {
                     entity.vertrag().set( find( allKaufvertrag, builderRow, "EINGANGSNR" ) );
 
@@ -367,33 +384,37 @@ public class MdbImportOperation
                     entity.nutzung().set( find( allNutzung, builderRow, "NUTZUNG" ) );
                     entity.strasse().set( find( allStrasse, builderRow, "STRNR" ) );
                     entity.gebaeudeArt().set( find( allGebaeudeArt, builderRow, "GEBART" ) );
-                    entity.artDesBaugebiets().set(
-                            find( allArtDesBaugebietes, builderRow, "BAUGEBART" ) );
+                    entity.artDesBaugebiets().set( find( allArtDesBaugebietes, builderRow, "BAUGEBART" ) );
                     // entity.richtwertZoneG().set( found );
+                    entity.gemarkung().set( find( allGemarkung, builderRow, "GEMARKUNG" ) );
+                    entity.flur().set( flur );
 
-                    String gemarkung = (String)builderRow.get( "GEMARKUNG" );
-                    Integer flurstueckNummer = (Integer)builderRow.get( "FLSTNR1" );
-                    String unterNummer = (String)builderRow.get( "FLSTNR1U" );
-                    // check if always loaded
-                    String key = gemarkung + "-" + flurstueckNummer + "-" + unterNummer;
-                    FlurstueckComposite flurstueck = allFlurstuecke.get( key );
-                    if (flurstueck == null) {
-                        flurstueck = repo.newEntity( FlurstueckComposite.class, null,
-                                new EntityCreator<FlurstueckComposite>() {
-
-                                    public void create( FlurstueckComposite prototype )
-                                            throws Exception {
-                                        flurstueckImporter.fillEntity( prototype, builderRow );
-                                        prototype.gemarkung().set( find( allGemarkung, builderRow, "GEMARKUNG" ) );                                      
-                                        prototype.flur().set( flur );
-                                    }
-                                } );
-                        allFlurstuecke.put( key, flurstueck );
-                    }
-                    entity.flurstueck().set( flurstueck );
+                    // String gemarkung = (String)builderRow.get( "GEMARKUNG" );
+                    // Integer flurstueckNummer = (Integer)builderRow.get( "FLSTNR1"
+                    // );
+                    // String unterNummer = (String)builderRow.get( "FLSTNR1U" );
+                    // // check if always loaded
+                    // String key = gemarkung + "-" + flurstueckNummer + "-" +
+                    // unterNummer;
+                    // FlurstueckComposite flurstueck = allFlurstuecke.get( key );
+                    // if (flurstueck == null) {
+                    // flurstueck = repo.newEntity( FlurstueckComposite.class, null,
+                    // new EntityCreator<FlurstueckComposite>() {
+                    //
+                    // public void create( FlurstueckComposite prototype )
+                    // throws Exception {
+                    // flurstueckImporter.fillEntity( prototype, builderRow );
+                    // prototype.gemarkung().set( find( allGemarkung, builderRow,
+                    // "GEMARKUNG" ) );
+                    // prototype.flur().set( flur );
+                    // }
+                    // } );
+                    // allFlurstuecke.put( key, flurstueck );
+                    // }
+                    // entity.flurstueck().set( flurstueck );
                 }
             } );
-            allFlurstuecke.clear();
+            // allFlurstuecke.clear();
 
             final Map<String, BodenwertAufteilungTextComposite> allBodenwertText = new HashMap<String, BodenwertAufteilungTextComposite>();
 
@@ -410,7 +431,7 @@ public class MdbImportOperation
 
             final Map<String, KellerComposite> allKeller = repo.entitiesWithSchl( KellerComposite.class );
 
-            File importfehler = new File( "importfehler.txt" );
+            File importfehler = new File( parentFolder, "importfehler.txt" );
             final BufferedWriter w = new BufferedWriter( new FileWriter( importfehler ) );
             sub = new SubMonitor( monitor, 10 );
             final AnnotatedCompositeImporter vertragsdatenErweitertCompositeImporter = new AnnotatedCompositeImporter(
@@ -488,7 +509,7 @@ public class MdbImportOperation
                             // Flurstück setzen, bisher Hauptflurstück, ab jetzt je
                             // Flurstück einmal
                             // erweiterte Daten
-                            FlurstueckVerkaufComposite flurstueck = repo.findEntity( FlurstueckVerkaufComposite.class,
+                            FlurstueckComposite flurstueck = repo.findEntity( FlurstueckComposite.class,
                                     allHauptflurstuecke.get( entity.vertrag().get() ).id() );
                             if (flurstueck == null) {
                                 throw new IllegalStateException( String.format(
@@ -501,28 +522,26 @@ public class MdbImportOperation
                             String erbbau = (String)builderRow.get( "ERBBAU" );
                             flurstueck.erbbaurecht().set( erbbau );
 
+                            // subcreate VertragsdatenErweitert
+                            // in der Tabelle K_BEVERW sind Vertrags- und
+                            // Flurstücksdaten, letztere werden hier separat
+                            // erzeugt
+                            // VertragsdatenErweitertComposite vdec = repo.newEntity(
+                            // VertragsdatenErweitertComposite.class, null,
+                            // new EntityCreator<VertragsdatenErweitertComposite>() {
+                            //
+                            // public void create( VertragsdatenErweitertComposite
+                            // prototype )
+                            // throws Exception {
+                            vertragsdatenErweitertCompositeImporter.fillEntity(
+                                    vertrag.erweiterteVertragsdaten().get(), builderRow );
+                            // }
+                            // } );
+                            // vertrag.erweiterteVertragsdaten().set( vdec );
+
                             // checken ob Flurstück tatsächlich agrar ist, in der DB
                             // ist ganz schöner Mist drin
-                            //
-                            if (!flurstueck.nutzung().get().isAgrar().get()) {
-                                // subcreate VertragsdatenErweitert
-                                // in der Tabelle K_BEVERW sind Vertrags- und
-                                // Flurstücksdaten, letztere werden hier separat
-                                // erzeugt
-                                VertragsdatenErweitertComposite vdec = repo.newEntity(
-                                        VertragsdatenErweitertComposite.class, null,
-                                        new EntityCreator<VertragsdatenErweitertComposite>() {
-
-                                            public void create( VertragsdatenErweitertComposite prototype )
-                                                    throws Exception {
-                                                vertragsdatenErweitertCompositeImporter.fillEntity( prototype,
-                                                        builderRow );
-                                            }
-                                        } );
-                                vertrag.eingangsNr().get();
-                                vertrag.erweiterteVertragsdaten().set( vdec );
-                            }
-                            else {
+                            if (flurstueck.nutzung().get().isAgrar().get()) {
                                 log.error( String.format(
                                         "Flurstück ist AGRAR müsste aber Bauland sein für Vertrag %s mit Nutzung %s",
                                         entity.vertrag().get().eingangsNr().get(), flurstueck.nutzung().get().schl()
@@ -606,7 +625,7 @@ public class MdbImportOperation
                             // Flurstück setzen, bisher Hauptflurstück, ab jetzt je
                             // Flurstück einmal
                             // erweiterte Daten
-                            FlurstueckVerkaufComposite flurstueck = allHauptflurstuecke.get( entity.vertrag().get() );
+                            FlurstueckComposite flurstueck = allHauptflurstuecke.get( entity.vertrag().get() );
                             if (flurstueck == null) {
                                 throw new IllegalStateException( String.format(
                                         "no flurstueck found for FlurstuecksdatenAgrar for vertrag %s", entity
@@ -617,25 +636,29 @@ public class MdbImportOperation
                             // checken ob Flurstück tatsächlich agrar ist, in der DB
                             // ist ganz schöner Mist drin
                             //
-                            if (flurstueck.nutzung().get().isAgrar().get()) {
+                            if (flurstueck.nutzung().get().isAgrar().get()
+                                    || vertrag.erweiterteVertragsdaten().get().bereinigterVollpreis().get() == null) {
                                 // subcreate VertragsdatenErweitert
                                 // in der Tabelle K_BEVERW sind Vertrags- und
                                 // Flurstücksdaten, letztere werden hier separate
                                 // erzeugt
-                                VertragsdatenErweitertComposite vdec = repo.newEntity(
-                                        VertragsdatenErweitertComposite.class, null,
-                                        new EntityCreator<VertragsdatenErweitertComposite>() {
-
-                                            public void create( VertragsdatenErweitertComposite prototype )
-                                                    throws Exception {
-                                                vertragsdatenErweitertAgrarCompositeImporter.fillEntity( prototype,
-                                                        builderRow );
-                                            }
-                                        } );
-                                vertrag.eingangsNr().get();
-                                vertrag.erweiterteVertragsdaten().set( vdec );
+                                // VertragsdatenErweitertComposite vdec =
+                                // repo.newEntity(
+                                // VertragsdatenErweitertComposite.class, null,
+                                // new
+                                // EntityCreator<VertragsdatenErweitertComposite>() {
+                                //
+                                // public void create(
+                                // VertragsdatenErweitertComposite prototype )
+                                // throws Exception {
+                                vertragsdatenErweitertAgrarCompositeImporter.fillEntity( vertrag
+                                        .erweiterteVertragsdaten().get(), builderRow );
+                                // }
+                                // } );
+                                // vertrag.eingangsNr().get();
+                                // vertrag.erweiterteVertragsdaten().set( vdec );
                             }
-                            else {
+                            if (flurstueck.nutzung().get().isAgrar().get()) {
                                 log.error( String.format(
                                         "Flurstück ist Bauland müsste aber AGRAR sein für Vertrag %s", entity.vertrag()
                                                 .get().eingangsNr().get() ) );

@@ -12,7 +12,6 @@
  */
 package org.polymap.kaps.model.data;
 
-import java.util.Collections;
 import java.util.Date;
 
 import org.apache.commons.logging.Log;
@@ -27,7 +26,6 @@ import org.qi4j.api.property.Computed;
 import org.qi4j.api.property.ComputedPropertyInstance;
 import org.qi4j.api.property.GenericPropertyInfo;
 import org.qi4j.api.property.Property;
-import org.qi4j.api.query.Query;
 import org.qi4j.api.query.QueryExpressions;
 import org.qi4j.api.query.grammar.BooleanExpression;
 
@@ -150,7 +148,7 @@ public interface WohnungComposite
 
     // BAUJAHR - Long
     @Optional
-//    @ImportColumn("BAUJAHR")
+    // @ImportColumn("BAUJAHR")
     Property<Double> baujahr();
 
 
@@ -162,7 +160,7 @@ public interface WohnungComposite
 
     // BERBAUJ - INT
     @Optional
-//    @ImportColumn("BERBAUJ")
+    // @ImportColumn("BERBAUJ")
     Property<Double> bereinigtesBaujahr();
 
 
@@ -239,8 +237,9 @@ public interface WohnungComposite
     // EINGANGSNR - Double
     @Optional
     // @ImportColumn("EINGANGSNR")
-//    Association<VertragComposite> vertrag();
-    Association<FlurstueckVerkaufComposite> flurstueckVerkauf();
+    // Association<VertragComposite> vertrag();
+    Association<FlurstueckComposite> flurstueck();
+
 
     //
     //
@@ -351,11 +350,14 @@ public interface WohnungComposite
     @ImportColumn("MONROHERTR")
     Property<Double> monatlicherRohertrag();
 
+
     @Optional
     Property<Double> jahresRohertrag();
-    
+
+
     @Optional
     Property<Double> monatlicherRohertragJeQm();
+
 
     // MIETFESEIT - SHORT_DATE_TIME
     @Optional
@@ -382,7 +384,7 @@ public interface WohnungComposite
 
     // BEBABSCHL - Long
     @Optional
-//    @ImportColumn("BEBABSCHL")
+    // @ImportColumn("BEBABSCHL")
     Property<Double> bebauungsabschlagInProzent();
 
 
@@ -489,10 +491,6 @@ public interface WohnungComposite
     @Optional
     @ImportColumn("SCHAETZNE")
     Property<Boolean> schaetzungAnderes();
-
-
-    @Optional
-    Association<FlurstueckComposite> flurstueck();
 
 
     //
@@ -869,11 +867,11 @@ public interface WohnungComposite
     @Optional
     @Computed
     Property<String> schl();
-    
-    @Optional
-    TODO auch beim Create einer Wohnung beachten
-    Association<GebaeudeComposite> gebaeude();
 
+
+    // @Optional
+    // TODO auch beim Create einer Wohnung beachten
+    // Association<GebaeudeComposite> gebaeude();
 
     /**
      * Methods and transient fields.
@@ -899,27 +897,28 @@ public interface WohnungComposite
 
 
         public static Iterable<FlurstueckComposite> findFlurstueckeFor( WohnungComposite wohnung ) {
-            GebaeudeComposite gebaeude = wohnung.gebaeude().get();
-            if (gebaeude != null) {
-                return gebaeude.flurstuecke().toSet();
-            }
-            return Collections.EMPTY_SET;
+            GebaeudeComposite gebaeudeTemplate = QueryExpressions.templateFor( GebaeudeComposite.class );
+            BooleanExpression expr3 = QueryExpressions
+                    .and( QueryExpressions.eq( gebaeudeTemplate.objektNummer(), wohnung.objektNummer().get() ),
+                            QueryExpressions.eq( gebaeudeTemplate.objektFortfuehrung(), wohnung.objektFortfuehrung()
+                                    .get() ), QueryExpressions.eq( gebaeudeTemplate.gebaeudeNummer(), wohnung
+                                    .gebaeudeNummer().get() ), QueryExpressions.eq(
+                                    gebaeudeTemplate.gebaeudeFortfuehrung(), wohnung.gebaeudeFortfuehrung().get() ) );
+            GebaeudeComposite gebaeude = KapsRepository.instance().findEntities( GebaeudeComposite.class, expr3, 0, 1 )
+                    .find();
+            return gebaeude.flurstuecke().toList();
         }
 
 
         public static VertragComposite vertragFor( WohnungComposite wohnung ) {
-            Integer number = wohnung.eingangsNummer().get().intValue();
-            if (number != null) {
-                VertragComposite template = QueryExpressions.templateFor( VertragComposite.class );
-                BooleanExpression expr = QueryExpressions.eq( template.eingangsNr(), number );
-                Query<VertragComposite> matches = KapsRepository.instance().findEntities( VertragComposite.class, expr,
-                        0, 1 );
-                return matches.find();
-            }
-            return null;
+            return wohnung.flurstueck().get().vertrag().get();
         }
-        
-        
-    }
 
+
+        public static Iterable<WohnungComposite> findWohnungenFor( FlurstueckComposite flurstueck ) {
+            WohnungComposite template = QueryExpressions.templateFor( WohnungComposite.class );
+            BooleanExpression expr = QueryExpressions.eq( template.flurstueck(), flurstueck );
+            return KapsRepository.instance().findEntities( WohnungComposite.class, expr, 0, -1 );
+        }
+    }
 }

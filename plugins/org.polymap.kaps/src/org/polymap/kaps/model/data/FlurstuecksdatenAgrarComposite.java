@@ -435,7 +435,7 @@ public interface FlurstuecksdatenAgrarComposite
 
 
     @Optional
-    Association<FlurstueckVerkaufComposite> flurstueck();
+    Association<FlurstueckComposite> flurstueck();
 
 
     // TODO KEYGES - String
@@ -483,7 +483,7 @@ public interface FlurstuecksdatenAgrarComposite
         private static Log log = LogFactory.getLog( Mixin.class );
 
 
-        public static FlurstuecksdatenAgrarComposite forFlurstueck( FlurstueckVerkaufComposite flurstueck ) {
+        public static FlurstuecksdatenAgrarComposite forFlurstueck( FlurstueckComposite flurstueck ) {
             FlurstuecksdatenAgrarComposite template = QueryExpressions
                     .templateFor( FlurstuecksdatenAgrarComposite.class );
             BooleanExpression expr = QueryExpressions.eq( template.flurstueck(), flurstueck );

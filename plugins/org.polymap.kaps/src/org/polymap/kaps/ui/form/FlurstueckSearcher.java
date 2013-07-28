@@ -53,7 +53,6 @@ import org.polymap.kaps.KapsPlugin;
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.FlurComposite;
 import org.polymap.kaps.model.data.FlurstueckComposite;
-import org.polymap.kaps.model.data.FlurstueckVerkaufComposite;
 import org.polymap.kaps.model.data.GemarkungComposite;
 import org.polymap.kaps.ui.NamedCompositesFeatureContentProvider;
 
@@ -67,7 +66,7 @@ public abstract class FlurstueckSearcher
 
     private static Log                                   log = LogFactory.getLog( FlurstueckSearcher.class );
 
-    private List<FlurstueckVerkaufComposite>                    content;
+    private List<FlurstueckComposite>                    content;
 
     private final String                                 prefix;
 
@@ -91,7 +90,7 @@ public abstract class FlurstueckSearcher
     }
 
 
-    protected abstract void adopt( FlurstueckVerkaufComposite element )
+    protected abstract void adopt( FlurstueckComposite element )
             throws Exception;
 
 
@@ -116,7 +115,7 @@ public abstract class FlurstueckSearcher
             // }
             // }
             content = new ArrayList();
-            for (FlurstueckVerkaufComposite fc : KapsRepository.instance().findFlurstuecke( gemarkung, flur, nummer,
+            for (FlurstueckComposite fc : KapsRepository.instance().findFlurstuecke( gemarkung, flur, nummer,
                     unterNummer )) {
                 content.add( fc );
             }
@@ -127,9 +126,9 @@ public abstract class FlurstueckSearcher
             if (dialog.open() == Window.OK) {
                 assert dialog.sel.length == 1 : "Selected: " + dialog.sel.length;
                 final IFeatureTableElement sel = dialog.sel[0];
-                adopt( Iterables.find( content, new Predicate<FlurstueckVerkaufComposite>() {
+                adopt( Iterables.find( content, new Predicate<FlurstueckComposite>() {
 
-                    public boolean apply( FlurstueckVerkaufComposite input ) {
+                    public boolean apply( FlurstueckComposite input ) {
                         return input.id().equals( sel.fid() );
                     }
                 } ) );
@@ -184,7 +183,7 @@ public abstract class FlurstueckSearcher
 
             // columns
             PropertyDescriptor prop = null;
-            prop = new PropertyDescriptorAdapter( type.getProperty( "name" ) );
+            prop = new PropertyDescriptorAdapter( type.getProperty( "vertragsNummer" ) );
             viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader( "Vertragsnummer" ) );
             prop = new PropertyDescriptorAdapter( type.getProperty( "gemarkung" ) );
             viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader( "Gemarkung" ) );

@@ -22,6 +22,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
+import org.eclipse.jface.action.Action;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.polymap.core.runtime.Polymap;
@@ -39,10 +41,12 @@ import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.field.TextFormField;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
+import org.polymap.kaps.KapsPlugin;
 import org.polymap.kaps.model.data.GebaeudeArtComposite;
 import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.VertragsdatenErweitertComposite;
 import org.polymap.kaps.model.data.WohnungComposite;
+import org.polymap.kaps.ui.ActionButton;
 import org.polymap.kaps.ui.BooleanFormField;
 import org.polymap.kaps.ui.FieldCalculation;
 import org.polymap.kaps.ui.FieldListener;
@@ -86,19 +90,25 @@ public class WohnungVertragsdatenFormEditorPage
         Control newLine, lastLine = null;
         Composite parent = pageSite.getPageBody();
 
-        newLine = newFormField( "Eingangsnummer" ).setProperty( new PropertyAdapter( wohnung.eingangsNummer() ) {
-
-            public Object getValue() {
-                return EingangsNummerFormatter.format( wohnung.eingangsNummer().get() );
-            };
-        } ).setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ).setLayoutData( left().create() )
-                .create();
-        // TODO Button zum Vertrag
-
         int ONE = 15;
         int TWO = 40;
         int THREE = 50;
         int FOUR = 80;
+
+        final VertragComposite vertrag = wohnung.flurstueck().get() != null ? wohnung.flurstueck().get().vertrag()
+                .get() : null;
+        String label = vertrag == null ? "Kein Vertrag zugewiesen" : "Vertrag "
+                + EingangsNummerFormatter.format( vertrag.eingangsNr().get() ) + " öffnen";
+        ActionButton openErweiterteDaten = new ActionButton( parent, new Action( label ) {
+
+            @Override
+            public void run() {
+                KapsPlugin.openEditor( fs, VertragComposite.NAME, vertrag );
+            }
+        } );
+        openErweiterteDaten.setLayoutData( left().right( 20 ).height( 25 ).create() );
+        openErweiterteDaten.setEnabled( vertrag != null );
+        newLine = openErweiterteDaten;
 
         lastLine = newLine;
         newLine = createLabel( parent, "Vollpreis", left().right( ONE ).top( lastLine ), SWT.RIGHT );
@@ -213,8 +223,7 @@ public class WohnungVertragsdatenFormEditorPage
                 .setField( new BooleanFormField() ).setLayoutData( left().top( lastLine ).create() ).create();
         newLine = newFormField( "geeignet?" ).setToolTipText( "zur Auswertung geeignet?" )
                 .setProperty( new PropertyAdapter( wohnung.zurAuswertungGeeignet() ) )
-                .setField( new CheckboxFormField() )
-                .setLayoutData( right().top( lastLine ).create() ).create();
+                .setField( new CheckboxFormField() ).setLayoutData( right().top( lastLine ).create() ).create();
 
         lastLine = newLine;
         newLine = createFlaecheField( "Gewichtung", "Gewichtung (Norm = 1,0)", wohnung.gewichtung(),
@@ -236,7 +245,6 @@ public class WohnungVertragsdatenFormEditorPage
         Double kaufpreis = null;
         if (vertrag != null) {
             if (vertrag.erweiterteVertragsdaten().get() != null) {
-
                 VertragsdatenErweitertComposite vertragsdatenErweitertComposite = vertrag.erweiterteVertragsdaten()
                         .get();
                 kaufpreis = vertragsdatenErweitertComposite.bereinigterVollpreis().get();

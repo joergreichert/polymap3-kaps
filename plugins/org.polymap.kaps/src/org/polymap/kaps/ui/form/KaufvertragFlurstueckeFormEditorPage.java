@@ -30,6 +30,8 @@ import org.eclipse.swt.widgets.Control;
 
 import org.eclipse.jface.action.Action;
 
+import org.eclipse.ui.forms.widgets.Section;
+
 import org.polymap.core.data.ui.featuretable.DefaultFeatureTableColumn;
 import org.polymap.core.data.ui.featuretable.FeatureTableViewer;
 import org.polymap.core.model.EntityType;
@@ -52,7 +54,6 @@ import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.ArtDesBaugebietsComposite;
 import org.polymap.kaps.model.data.FlurComposite;
 import org.polymap.kaps.model.data.FlurstueckComposite;
-import org.polymap.kaps.model.data.FlurstueckVerkaufComposite;
 import org.polymap.kaps.model.data.FlurstuecksdatenAgrarComposite;
 import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
 import org.polymap.kaps.model.data.GebaeudeArtComposite;
@@ -70,7 +71,7 @@ import org.polymap.kaps.ui.KapsDefaultFormEditorPageWithFeatureTable;
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 public class KaufvertragFlurstueckeFormEditorPage
-        extends KapsDefaultFormEditorPageWithFeatureTable<FlurstueckVerkaufComposite> {
+        extends KapsDefaultFormEditorPageWithFeatureTable<FlurstueckComposite> {
 
     private static Log                log    = LogFactory.getLog( KaufvertragFlurstueckeFormEditorPage.class );
 
@@ -92,11 +93,9 @@ public class KaufvertragFlurstueckeFormEditorPage
 
     private ActionButton              searchFlurstueckeButton;
 
-    private ActionButton              openErweiterteDaten;
-
 
     public KaufvertragFlurstueckeFormEditorPage( Feature feature, FeatureStore featureStore ) {
-        super( KaufvertragFlurstueckeFormEditorPage.class.getName(), "Flurstücksdaten", feature, featureStore );
+        super( KaufvertragFlurstueckeFormEditorPage.class.getName(), "Flurstücke", feature, featureStore );
 
         kaufvertrag = repository.findEntity( VertragComposite.class, feature.getIdentifier().getID() );
     }
@@ -110,15 +109,19 @@ public class KaufvertragFlurstueckeFormEditorPage
         site.setFormTitle( formattedTitle( "Kaufvertrag", kaufvertrag.eingangsNr().get(), getTitle() ) );
 
         Composite parent = site.getPageBody();
-        Control schildForm = createFlurstueckForm( parent );
-        createTableForm( parent, schildForm, true );
+        Composite schildForm = createFlurstueckForm( parent );
+
+        Composite extendedForm = createErweiterteDatenForm( schildForm );
+
+        Section tableSection = newSection( extendedForm, "Auswahl" );
+        createTableForm( (Composite)tableSection.getClient(), extendedForm, true );
     }
 
 
     protected void refreshReloadables()
             throws Exception {
-        FlurstueckVerkaufComposite composite = selectedComposite.get();
-        selectedGemarkung = composite != null ? composite.flurstueck().get().gemarkung().get() : null;
+        FlurstueckComposite composite = selectedComposite.get();
+        selectedGemarkung = composite != null ? composite.gemarkung().get() : null;
 
         selectedNutzung = composite != null ? composite.nutzung().get() : null;
 
@@ -126,7 +129,8 @@ public class KaufvertragFlurstueckeFormEditorPage
         if (sfAction != null) {
             sfAction.refresh();
             searchFlurstueckeButton.setEnabled( composite != null );
-            openErweiterteDaten.setEnabled( composite != null );
+            openErweiterteDatenAgrar.setEnabled( composite != null );
+            openErweiterteDatenBauland.setEnabled( composite != null );
         }
         // das muss disabled bleiben
         pageSite.setFieldEnabled( prefix + "verkaufteFlaeche", false );
@@ -138,28 +142,32 @@ public class KaufvertragFlurstueckeFormEditorPage
     }
 
 
-    public Control createFlurstueckForm( Composite parent ) {
+    public Composite createFlurstueckForm( Composite parent ) {
+
+        Section formSection = newSection( parent, "Flurstücksdaten" );
+        parent = (Composite)formSection.getClient();
 
         Composite line0 = newFormField( "Gemarkung" )
                 .setParent( parent )
                 .setProperty(
-                        new ReloadablePropertyAdapter<FlurstueckVerkaufComposite>( selectedComposite, prefix
-                                + "gemarkung", new AssociationCallback<FlurstueckVerkaufComposite>() {
+                        new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix + "gemarkung",
+                                new AssociationCallback<FlurstueckComposite>() {
 
-                            public Association get( FlurstueckVerkaufComposite entity ) {
-                                return entity.flurstueck().get().gemarkung();
-                            }
-                        } ) ).setField( reloadable( namedAssocationsPicklist( GemarkungComposite.class, true ) ) )
+                                    public Association get( FlurstueckComposite entity ) {
+                                        return entity.gemarkung();
+                                    }
+                                } ) )
+                .setField( reloadable( namedAssocationsPicklist( GemarkungComposite.class, true ) ) )
                 .setLayoutData( left().create() ).create();
 
         newFormField( "Flur" )
                 .setParent( parent )
                 .setProperty(
-                        new ReloadablePropertyAdapter<FlurstueckVerkaufComposite>( selectedComposite, prefix + "flur",
-                                new AssociationCallback<FlurstueckVerkaufComposite>() {
+                        new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix + "flur",
+                                new AssociationCallback<FlurstueckComposite>() {
 
-                                    public Association get( FlurstueckVerkaufComposite entity ) {
-                                        return entity.flurstueck().get().flur();
+                                    public Association get( FlurstueckComposite entity ) {
+                                        return entity.flur();
                                     }
                                 } ) ).setField( reloadable( namedAssocationsPicklist( FlurComposite.class, false ) ) )
                 .setLayoutData( right().create() ).create();
@@ -167,11 +175,11 @@ public class KaufvertragFlurstueckeFormEditorPage
         Control line1 = newFormField( "Flurstücksnummer" )
                 .setParent( parent )
                 .setProperty(
-                        new ReloadablePropertyAdapter<FlurstueckVerkaufComposite>( selectedComposite,
-                                prefix + "nummer", new PropertyCallback<FlurstueckVerkaufComposite>() {
+                        new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix + "nummer",
+                                new PropertyCallback<FlurstueckComposite>() {
 
-                                    public Property get( FlurstueckVerkaufComposite entity ) {
-                                        return entity.flurstueck().get().nummer();
+                                    public Property get( FlurstueckComposite entity ) {
+                                        return entity.nummer();
                                     }
                                 } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
                 .setLayoutData( left().right( 30 ).top( line0 ).create() )
@@ -180,13 +188,13 @@ public class KaufvertragFlurstueckeFormEditorPage
         newFormField( "/" )
                 .setParent( parent )
                 .setProperty(
-                        new ReloadablePropertyAdapter<FlurstueckVerkaufComposite>( selectedComposite, prefix
-                                + "unterNummer", new PropertyCallback<FlurstueckVerkaufComposite>() {
+                        new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix + "unterNummer",
+                                new PropertyCallback<FlurstueckComposite>() {
 
-                            public Property get( FlurstueckVerkaufComposite entity ) {
-                                return entity.flurstueck().get().unterNummer();
-                            }
-                        } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
+                                    public Property get( FlurstueckComposite entity ) {
+                                        return entity.unterNummer();
+                                    }
+                                } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
                 .setLayoutData( left().left( 30 ).right( 50 ).top( line0 ).create() ).create();
 
         // newFormField( "Hauptflurstück" )
@@ -205,42 +213,38 @@ public class KaufvertragFlurstueckeFormEditorPage
         // BUTTON zur Datenabfrage
         sfAction = new FlurstueckSearcher( prefix ) {
 
-            protected void adopt( FlurstueckVerkaufComposite toAdopt )
+            protected void adopt( FlurstueckComposite toAdopt )
                     throws Exception {
                 assert toAdopt != null;
-                FlurstueckVerkaufComposite current = selectedComposite.get();
-//                current.gemarkung().set( toAdopt.gemarkung().get() );
-//                current.flur().set( toAdopt.flur().get() );
-//                current.nummer().set( toAdopt.nummer().get() );
-//                current.unterNummer().set( toAdopt.unterNummer().get() );
+                FlurstueckComposite current = selectedComposite.get();
+                current.gemarkung().set( toAdopt.gemarkung().get() );
+                current.flur().set( toAdopt.flur().get() );
+                current.nummer().set( toAdopt.nummer().get() );
+                current.unterNummer().set( toAdopt.unterNummer().get() );
                 current.strasse().set( toAdopt.strasse().get() );
                 current.hausnummer().set( toAdopt.hausnummer().get() );
                 current.hausnummerZusatz().set( toAdopt.hausnummerZusatz().get() );
                 current.richtwertZone().set( toAdopt.richtwertZone().get() );
-//                current.kartenBlatt().set( toAdopt.kartenBlatt().get() );
+                current.kartenBlatt().set( toAdopt.kartenBlatt().get() );
                 current.baublock().set( toAdopt.baublock().get() );
                 current.nutzung().set( toAdopt.nutzung().get() );
                 current.gebaeudeArt().set( toAdopt.gebaeudeArt().get() );
                 current.artDesBaugebiets().set( toAdopt.artDesBaugebiets().get() );
-//                current.flaeche().set( toAdopt.flaeche().get() );
+                current.flaeche().set( toAdopt.flaeche().get() );
                 current.flaechenAnteilZaehler().set( toAdopt.flaechenAnteilZaehler().get() );
                 current.flaechenAnteilNenner().set( toAdopt.flaechenAnteilNenner().get() );
                 current.verkaufteFlaeche().set( toAdopt.verkaufteFlaeche().get() );
                 current.erbbaurecht().set( toAdopt.erbbaurecht().get() );
                 current.belastung().set( toAdopt.belastung().get() );
-                current.flurstueck().set( toAdopt.flurstueck().get() );
-                delete old flurstück wenn noch nicht persistent 
 
-                
                 refreshReloadables();
             }
         };
         sfAction.setEnabled( false );
         searchFlurstueckeButton = new ActionButton( parent, sfAction );
-        searchFlurstueckeButton.setLayoutData( left().right( 20 ).height( 25 ).top( line1 ).create() );
+        searchFlurstueckeButton.setLayoutData( right().right( 70 ).height( 25 ).top( line0 ).create() );
         searchFlurstueckeButton.setEnabled( false );
         line1 = searchFlurstueckeButton;
-
         pageSite.addFieldListener( sfAction );
 
         final PicklistFormField strassePickList = new PicklistFormField( new PicklistFormField.ValueProvider() {
@@ -264,35 +268,35 @@ public class KaufvertragFlurstueckeFormEditorPage
         Composite line2 = newFormField( "Straße/Gewann" )
                 .setParent( parent )
                 .setProperty(
-                        new ReloadablePropertyAdapter<FlurstueckVerkaufComposite>( selectedComposite, prefix
-                                + "strasse", new AssociationCallback<FlurstueckVerkaufComposite>() {
+                        new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix + "strasse",
+                                new AssociationCallback<FlurstueckComposite>() {
 
-                            public Association get( FlurstueckVerkaufComposite entity ) {
-                                return entity.strasse();
-                            }
-                        } ) ).setField( reloadable( strassePickList ) ).setLayoutData( left().top( line1 ).create() )
-                .create();
+                                    public Association get( FlurstueckComposite entity ) {
+                                        return entity.strasse();
+                                    }
+                                } ) ).setField( reloadable( strassePickList ) )
+                .setLayoutData( left().top( line1 ).create() ).create();
 
         newFormField( "Hausnummer" )
                 .setParent( parent )
                 .setProperty(
-                        new ReloadablePropertyAdapter<FlurstueckVerkaufComposite>( selectedComposite, prefix
-                                + "hausnummer", new PropertyCallback<FlurstueckVerkaufComposite>() {
+                        new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix + "hausnummer",
+                                new PropertyCallback<FlurstueckComposite>() {
 
-                            public Property<String> get( FlurstueckVerkaufComposite entity ) {
-                                return entity.hausnummer();
-                            }
-                        } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
+                                    public Property<String> get( FlurstueckComposite entity ) {
+                                        return entity.hausnummer();
+                                    }
+                                } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
                 .setLayoutData( right().right( 75 ).top( line1 ).create() ).create();
 
         newFormField( "Zusatz" )
                 .setToolTipText( "Hausnummernzusatz" )
                 .setParent( parent )
                 .setProperty(
-                        new ReloadablePropertyAdapter<FlurstueckVerkaufComposite>( selectedComposite, prefix
-                                + "hausnummerZusatz", new PropertyCallback<FlurstueckVerkaufComposite>() {
+                        new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix
+                                + "hausnummerZusatz", new PropertyCallback<FlurstueckComposite>() {
 
-                            public Property<String> get( FlurstueckVerkaufComposite entity ) {
+                            public Property<String> get( FlurstueckComposite entity ) {
                                 return entity.hausnummerZusatz();
                             }
                         } ) ).setField( reloadable( new StringFormField() ) )
@@ -320,13 +324,13 @@ public class KaufvertragFlurstueckeFormEditorPage
         Composite line3 = newFormField( "Richtwertzone" )
                 .setParent( parent )
                 .setProperty(
-                        new ReloadablePropertyAdapter<FlurstueckVerkaufComposite>( selectedComposite, prefix
-                                + "richtwertZone", new AssociationCallback<FlurstueckVerkaufComposite>() {
+                        new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite,
+                                prefix + "richtwertZone", new AssociationCallback<FlurstueckComposite>() {
 
-                            public Association<RichtwertzoneComposite> get( FlurstueckVerkaufComposite entity ) {
-                                return entity.richtwertZone();
-                            }
-                        } ) ).setField( reloadable( richtwertZonePickList ) )
+                                    public Association<RichtwertzoneComposite> get( FlurstueckComposite entity ) {
+                                        return entity.richtwertZone();
+                                    }
+                                } ) ).setField( reloadable( richtwertZonePickList ) )
                 .setLayoutData( left().top( line2 ).create() ).create();
 
         pageSite.addFieldListener( gemarkungListener = new IFormFieldListener() {
@@ -376,25 +380,25 @@ public class KaufvertragFlurstueckeFormEditorPage
         Composite line4 = newFormField( "Nutzung" )
                 .setParent( parent )
                 .setProperty(
-                        new ReloadablePropertyAdapter<FlurstueckVerkaufComposite>( selectedComposite, prefix
-                                + "nutzung", new AssociationCallback<FlurstueckVerkaufComposite>() {
+                        new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix + "nutzung",
+                                new AssociationCallback<FlurstueckComposite>() {
 
-                            public Association get( FlurstueckVerkaufComposite entity ) {
-                                return entity.nutzung();
-                            }
-                        } ) ).setField( reloadable( namedAssocationsPicklist( NutzungComposite.class ) ) )
+                                    public Association get( FlurstueckComposite entity ) {
+                                        return entity.nutzung();
+                                    }
+                                } ) ).setField( reloadable( namedAssocationsPicklist( NutzungComposite.class ) ) )
                 .setLayoutData( left().top( line3 ).create() ).create();
 
         newFormField( "Gebäudeart" )
                 .setParent( parent )
                 .setProperty(
-                        new ReloadablePropertyAdapter<FlurstueckVerkaufComposite>( selectedComposite, prefix
-                                + "gebaeudeArt", new AssociationCallback<FlurstueckVerkaufComposite>() {
+                        new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix + "gebaeudeArt",
+                                new AssociationCallback<FlurstueckComposite>() {
 
-                            public Association get( FlurstueckVerkaufComposite entity ) {
-                                return entity.gebaeudeArt();
-                            }
-                        } ) ).setField( reloadable( namedAssocationsPicklist( GebaeudeArtComposite.class ) ) )
+                                    public Association get( FlurstueckComposite entity ) {
+                                        return entity.gebaeudeArt();
+                                    }
+                                } ) ).setField( reloadable( namedAssocationsPicklist( GebaeudeArtComposite.class ) ) )
                 .setLayoutData( right().top( line3 ).create() ).create();
 
         final PicklistFormField artPicklist = new PicklistFormField( new PicklistFormField.ValueProvider() {
@@ -432,10 +436,10 @@ public class KaufvertragFlurstueckeFormEditorPage
                 .setToolTipText( "Art des Grundstücks bei Agrarland, Art des Baugebietes sonst" )
                 .setParent( parent )
                 .setProperty(
-                        new ReloadablePropertyAdapter<FlurstueckVerkaufComposite>( selectedComposite, prefix
-                                + "artDesBaugebiets", new AssociationCallback<FlurstueckVerkaufComposite>() {
+                        new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix
+                                + "artDesBaugebiets", new AssociationCallback<FlurstueckComposite>() {
 
-                            public Association get( FlurstueckVerkaufComposite entity ) {
+                            public Association get( FlurstueckComposite entity ) {
                                 return entity.artDesBaugebiets();
                             }
                         } ) ).setField( reloadable( artPicklist ) ).setLayoutData( left().top( line4 ).create() )
@@ -444,23 +448,23 @@ public class KaufvertragFlurstueckeFormEditorPage
         Composite line6 = newFormField( "Fläche in m²" )
                 .setParent( parent )
                 .setProperty(
-                        new ReloadablePropertyAdapter<FlurstueckVerkaufComposite>( selectedComposite, prefix
-                                + "flaeche", new PropertyCallback<FlurstueckVerkaufComposite>() {
+                        new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix + "flaeche",
+                                new PropertyCallback<FlurstueckComposite>() {
 
-                            public Property get( FlurstueckVerkaufComposite entity ) {
-                                return entity.flurstueck().get().flaeche();
-                            }
-                        } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
+                                    public Property get( FlurstueckComposite entity ) {
+                                        return entity.flaeche();
+                                    }
+                                } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
                 .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
                 .setLayoutData( left().right( 25 ).top( line5 ).create() ).create();
 
         newFormField( "Anteil" )
                 .setParent( parent )
                 .setProperty(
-                        new ReloadablePropertyAdapter<FlurstueckVerkaufComposite>( selectedComposite, prefix
-                                + "flaecheAnteilZaehler", new PropertyCallback<FlurstueckVerkaufComposite>() {
+                        new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix
+                                + "flaecheAnteilZaehler", new PropertyCallback<FlurstueckComposite>() {
 
-                            public Property get( FlurstueckVerkaufComposite entity ) {
+                            public Property get( FlurstueckComposite entity ) {
                                 return entity.flaechenAnteilZaehler();
                             }
                         } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
@@ -470,10 +474,10 @@ public class KaufvertragFlurstueckeFormEditorPage
         newFormField( "/" )
                 .setParent( parent )
                 .setProperty(
-                        new ReloadablePropertyAdapter<FlurstueckVerkaufComposite>( selectedComposite, prefix
-                                + "flaechenAnteilNenner", new PropertyCallback<FlurstueckVerkaufComposite>() {
+                        new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix
+                                + "flaechenAnteilNenner", new PropertyCallback<FlurstueckComposite>() {
 
-                            public Property get( FlurstueckVerkaufComposite entity ) {
+                            public Property get( FlurstueckComposite entity ) {
                                 return entity.flaechenAnteilNenner();
                             }
                         } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
@@ -484,10 +488,10 @@ public class KaufvertragFlurstueckeFormEditorPage
                 .setParent( parent )
                 .setEnabled( false )
                 .setProperty(
-                        new ReloadablePropertyAdapter<FlurstueckVerkaufComposite>( selectedComposite, prefix
-                                + "verkaufteFlaeche", new PropertyCallback<FlurstueckVerkaufComposite>() {
+                        new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix
+                                + "verkaufteFlaeche", new PropertyCallback<FlurstueckComposite>() {
 
-                            public Property get( FlurstueckVerkaufComposite entity ) {
+                            public Property get( FlurstueckComposite entity ) {
                                 return entity.verkaufteFlaeche();
                             }
                         } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
@@ -501,65 +505,121 @@ public class KaufvertragFlurstueckeFormEditorPage
                 .setEnabled( true )
                 .setParent( parent )
                 .setProperty(
-                        new ReloadablePropertyAdapter<FlurstueckVerkaufComposite>( selectedComposite, prefix
-                                + "erbbaurecht", new PropertyCallback<FlurstueckVerkaufComposite>() {
+                        new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix + "erbbaurecht",
+                                new PropertyCallback<FlurstueckComposite>() {
 
-                            public Property get( FlurstueckVerkaufComposite entity ) {
-                                return entity.erbbaurecht();
-                            }
-                        } ) ).setField( reloadable( new BooleanFormField() ) )
-                .setLayoutData( left().top( line6 ).create() ).create();
+                                    public Property get( FlurstueckComposite entity ) {
+                                        return entity.erbbaurecht();
+                                    }
+                                } ) ).setField( reloadable( new BooleanFormField() ) )
+                .setLayoutData( left().top( line6 ).bottom( 100 ).create() ).create();
+        // return the last line
+        return formSection;
+    }
 
-        openErweiterteDaten = new ActionButton( parent, new Action( "Flurstück bewerten" ) {
+    private ActionButton openErweiterteDatenAgrar;
+
+    private ActionButton openErweiterteDatenBauland;
+
+
+    public Section createErweiterteDatenForm( Composite top ) {
+
+        Section formSection = newSection( top, "Erweiterte Daten" );
+        formSection.setExpanded( false );
+        Composite parent = (Composite)formSection.getClient();
+
+        openErweiterteDatenAgrar = new ActionButton( parent, new Action( "Daten Agrarland anlegen" ) {
 
             @Override
             public void run() {
-                FlurstueckVerkaufComposite flurstueck = selectedComposite.get();
+                FlurstueckComposite flurstueck = selectedComposite.get();
                 if (flurstueck != null) {
-                    NutzungComposite nutzung = flurstueck.nutzung().get();
-                    if (nutzung.isAgrar().get()) {
-                        FlurstuecksdatenAgrarComposite agrar = FlurstuecksdatenAgrarComposite.Mixin
-                                .forFlurstueck( flurstueck );
-                        if (agrar == null) {
-                            agrar = repository.newEntity( FlurstuecksdatenAgrarComposite.class, null );
-                            agrar.flurstueck().set( flurstueck );
-                            agrar.vertrag().set( flurstueck.vertrag().get() );
-                            // agrar.richtwertZone1().set(
-                            // flurstueck.richtwertZone().get() );
-                        }
-                        KapsPlugin.openEditor( fs, FlurstuecksdatenAgrarComposite.NAME, agrar );
+                    FlurstuecksdatenAgrarComposite agrar = FlurstuecksdatenAgrarComposite.Mixin
+                            .forFlurstueck( flurstueck );
+                    if (agrar == null) {
+                        agrar = repository.newEntity( FlurstuecksdatenAgrarComposite.class, null );
+                        agrar.flurstueck().set( flurstueck );
+                        agrar.vertrag().set( flurstueck.vertrag().get() );
+                        // agrar.richtwertZone1().set(
+                        // flurstueck.richtwertZone().get() );
                     }
-                    else {
-                        FlurstuecksdatenBaulandComposite bauland = FlurstuecksdatenBaulandComposite.Mixin
-                                .forFlurstueck( flurstueck );
-                        if (bauland == null) {
-                            bauland = repository.newEntity( FlurstuecksdatenBaulandComposite.class, null );
-                            bauland.flurstueck().set( flurstueck );
-                            bauland.vertrag().set( flurstueck.vertrag().get() );
-                            // bauland.richtwertZone().set(
-                            // flurstueck.richtwertZone().get() );
-                        }
-                        KapsPlugin.openEditor( fs, FlurstuecksdatenBaulandComposite.NAME, bauland );
-                    }
+                    KapsPlugin.openEditor( fs, FlurstuecksdatenAgrarComposite.NAME, agrar );
                 }
             }
-        } );
-        openErweiterteDaten.setLayoutData( left().right( 20 ).height( 25 ).top( line6 ).create() );
-        openErweiterteDaten.setEnabled( false );
 
-        Control line8 = openErweiterteDaten;
-        // return the last line
-        return line8;
+        } ) {
+
+            @Override
+            public void setEnabled( boolean enabled ) {
+                if (enabled) {
+                    FlurstueckComposite flurstueck = selectedComposite.get();
+                    if (flurstueck != null && FlurstuecksdatenAgrarComposite.Mixin.forFlurstueck( flurstueck ) != null) {
+                        setText( "Daten Agrarland bearbeiten" );
+                    }
+                    else {
+                        setText( "Daten Agrarland anlegen" );
+                    }
+                }
+                super.setEnabled( enabled );
+            };
+        };
+        openErweiterteDatenAgrar.setLayoutData( left().right( 20 ).height( 25 ).top( null ).bottom( 100 ).create() );
+        openErweiterteDatenAgrar.setEnabled( false );
+
+        openErweiterteDatenBauland = new ActionButton( parent, new Action( "Daten Bauland anlegen" ) {
+
+            @Override
+            public void run() {
+                FlurstueckComposite flurstueck = selectedComposite.get();
+                if (flurstueck != null) {
+                    FlurstuecksdatenBaulandComposite bauland = FlurstuecksdatenBaulandComposite.Mixin
+                            .forFlurstueck( flurstueck );
+                    if (bauland == null) {
+                        bauland = repository.newEntity( FlurstuecksdatenBaulandComposite.class, null );
+                        bauland.flurstueck().set( flurstueck );
+                        bauland.vertrag().set( flurstueck.vertrag().get() );
+                        // bauland.richtwertZone().set(
+                        // flurstueck.richtwertZone().get() );
+                    }
+                    KapsPlugin.openEditor( fs, FlurstuecksdatenBaulandComposite.NAME, bauland );
+                }
+            }
+
+        } ) {
+
+            @Override
+            public void setEnabled( boolean enabled ) {
+                if (enabled) {
+                    FlurstueckComposite flurstueck = selectedComposite.get();
+                    if (flurstueck != null
+                            && FlurstuecksdatenBaulandComposite.Mixin.forFlurstueck( flurstueck ) != null) {
+                        setText( "Daten Bauland bearbeiten" );
+                    }
+                    else {
+                        setText( "Daten Bauland anlegen" );
+                    }
+                }
+                super.setEnabled( enabled );
+            };
+        };
+        openErweiterteDatenBauland.setLayoutData( left().left( 30 ).height( 25 ).top( null ).create() );
+        openErweiterteDatenBauland.setEnabled( false );
+
+        // Liste mit Wohnung + Auswählen daneben
+        //reloadable( namedAssocationsPicklist( WohnungComposite.Mixin.findWohnungenFor( flurstueck ) ) ) );
+        // und daneben Knopf zum Wohnung anlegen
+        
+        return formSection;
     }
 
 
-    protected EntityType<FlurstueckVerkaufComposite> addViewerColumns( FeatureTableViewer viewer ) {
+    protected EntityType<FlurstueckComposite> addViewerColumns( FeatureTableViewer viewer ) {
         // entity types
         final KapsRepository repo = KapsRepository.instance();
-        final EntityType<FlurstueckVerkaufComposite> type = repo.entityType( FlurstueckVerkaufComposite.class );
+        final EntityType<FlurstueckComposite> type = repo.entityType( FlurstueckComposite.class );
 
         PropertyDescriptor prop = null;
-        prop = new PropertyDescriptorAdapter( type.getProperty( "flurstueck.gemarkung" ) );
+        prop = new PropertyDescriptorAdapter( type.getProperty( "gemarkung" ) );
         viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader( "Gemarkung" ) );
         prop = new PropertyDescriptorAdapter( type.getProperty( "flur" ) );
         viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader( "Flur" ) );
@@ -580,26 +640,22 @@ public class KaufvertragFlurstueckeFormEditorPage
     }
 
 
-    public Iterable<FlurstueckVerkaufComposite> getElements() {
-        return FlurstueckVerkaufComposite.Mixin.forEntity( kaufvertrag );
+    public Iterable<FlurstueckComposite> getElements() {
+        return FlurstueckComposite.Mixin.forEntity( kaufvertrag );
     }
 
 
     @Override
-    protected FlurstueckVerkaufComposite createNewComposite()
+    protected FlurstueckComposite createNewComposite()
             throws Exception {
-        final FlurstueckComposite flurstueckComposite = repository.newEntity( FlurstueckComposite.class, null);
-        
-        return repository.newEntity( FlurstueckVerkaufComposite.class, null,
-                new EntityCreator<FlurstueckVerkaufComposite>() {
+        return repository.newEntity( FlurstueckComposite.class, null, new EntityCreator<FlurstueckComposite>() {
 
-                    public void create( FlurstueckVerkaufComposite prototype )
-                            throws Exception {
-                        prototype.vertrag().set( kaufvertrag );
-                        prototype.flaechenAnteilZaehler().set( 1.0d );
-                        prototype.flaechenAnteilNenner().set( 1.0d );
-                        prototype.flurstueck().set( flurstueckComposite );
-                    }
-                } );
+            public void create( FlurstueckComposite prototype )
+                    throws Exception {
+                prototype.vertrag().set( kaufvertrag );
+                prototype.flaechenAnteilZaehler().set( 1.0d );
+                prototype.flaechenAnteilNenner().set( 1.0d );
+            }
+        } );
     }
 }

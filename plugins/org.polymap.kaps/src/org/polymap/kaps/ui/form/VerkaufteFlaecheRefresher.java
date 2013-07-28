@@ -22,7 +22,7 @@ import org.polymap.rhei.field.FormFieldEvent;
 import org.polymap.rhei.field.IFormFieldListener;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
-import org.polymap.kaps.model.data.FlurstueckVerkaufComposite;
+import org.polymap.kaps.model.data.FlurstueckComposite;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -38,7 +38,7 @@ public class VerkaufteFlaecheRefresher
 
     private final IFormEditorPageSite                    site;
 
-    private final CompositeProvider<FlurstueckVerkaufComposite> flurstueckProvider;
+    private final CompositeProvider<FlurstueckComposite> flurstueckProvider;
 
     private boolean                                      triggeredKaufpreis   = false;
 
@@ -46,7 +46,7 @@ public class VerkaufteFlaecheRefresher
 
 
     public VerkaufteFlaecheRefresher( IFormEditorPageSite site,
-            CompositeProvider<FlurstueckVerkaufComposite> flurstueck, String prefix ) {
+            CompositeProvider<FlurstueckComposite> flurstueck, String prefix ) {
         this.site = site;
         this.flurstueckProvider = flurstueck;
         this.prefix = prefix;
@@ -82,9 +82,9 @@ public class VerkaufteFlaecheRefresher
 
 
     private void refreshVerkaufteFlaeche() {
-        FlurstueckVerkaufComposite flurstueck = flurstueckProvider.get();
+        FlurstueckComposite flurstueck = flurstueckProvider.get();
         if (flurstueck != null) {
-            Double kp = flaeche == null ? flurstueck.flurstueck().get().flaeche().get() : flaeche;
+            Double kp = flaeche == null ? flurstueck.flaeche().get() : flaeche;
             Double n = flaechenAnteilNenner == null ? flurstueck.flaechenAnteilNenner().get()
                     : flaechenAnteilNenner;
             Double z = flaecheAnteilZaehler == null ? flurstueck.flaechenAnteilZaehler().get()

@@ -105,9 +105,16 @@ public class WohnungLiegenschaftzinsFormEditorPage
     public WohnungLiegenschaftzinsFormEditorPage( Feature feature, FeatureStore featureStore ) {
         super( WohnungLiegenschaftzinsFormEditorPage.class.getName(), "Liegenschaftszins", feature, featureStore );
         EventManager.instance().subscribe(
-                fieldListener = new FieldListener( wohnung.wohnflaeche(), wohnung.bruchteilNenner(),
-                        wohnung.bruchteilZaehler(), wohnung.bereinigterVollpreis(), wohnung.kaufpreis(),
-                        wohnung.baujahr(), wohnung.gesamtNutzungsDauer() ), new EventFilter<FormFieldEvent>() {
+                fieldListener = new FieldListener( wohnung.wohnflaeche(), /*
+                                                                           * wohnung.
+                                                                           * bruchteilNenner
+                                                                           * (),
+                                                                           * wohnung.
+                                                                           * bruchteilZaehler
+                                                                           * (),
+                                                                           */wohnung.bereinigterVollpreis(),
+                        wohnung.kaufpreis(), wohnung.baujahr(), wohnung.gesamtNutzungsDauer() ),
+                new EventFilter<FormFieldEvent>() {
 
                     public boolean apply( FormFieldEvent ev ) {
                         return ev.getEventCode() == IFormFieldListener.VALUE_CHANGE;
@@ -282,8 +289,8 @@ public class WohnungLiegenschaftzinsFormEditorPage
             protected Double calculate( ValueProvider values ) {
                 Double flaeche = values.get( wohnung.flurstueck().get().flaeche() );
                 if (flaeche != null) {
-                    Double zaehler = values.get( wohnung.flurstueck().get().flaechebruchteilZaehler() );
-                    Double nenner = values.get( wohnung.bruchteilNenner() );
+                    Double zaehler = values.get( wohnung.flurstueck().get().flaechenAnteilZaehler() );
+                    Double nenner = values.get( wohnung.flurstueck().get().flaechenAnteilNenner() );
                     Double preis = values.get( wohnung.bereinigterBodenpreis() );
                     if (zaehler != null) {
                         flaeche *= zaehler;
@@ -394,19 +401,19 @@ public class WohnungLiegenschaftzinsFormEditorPage
                 Double faktor2 = values.get( wohnung.gebaeudewertAnteilZuKaufpreis() );
                 Double GND = values.get( wohnung.gesamtNutzungsDauer() );
                 Double baujahr = values.get( wohnung.baujahr() );
-                
+
                 int currentYear = new Date().getYear() + 1900;
                 Double RND = (GND != null && baujahr != null) ? baujahr + GND - currentYear : null;
                 if (RND != null && faktor1 != null && faktor2 != null) {
-                    Double lizi = faktor1 - ((1 + faktor1 -1)/(Math.pow(1+faktor1,RND) - 1) * faktor2);
+                    Double lizi = faktor1 - ((1 + faktor1 - 1) / (Math.pow( 1 + faktor1, RND ) - 1) * faktor2);
                     int iteration = 1;
-                    while (Math.abs(lizi - faktor1) > 0.5d) {
+                    while (Math.abs( lizi - faktor1 ) > 0.5d) {
                         faktor1 = lizi;
-                        lizi = faktor1 - ((1 + faktor1 -1)/(Math.pow(1+faktor1,RND) - 1) * faktor2);
+                        lizi = faktor1 - ((1 + faktor1 - 1) / (Math.pow( 1 + faktor1, RND ) - 1) * faktor2);
                         iteration++;
                     }
                     // in % umrechnen
-                    return lizi  * 100;
+                    return lizi * 100;
                 }
                 return null;
             }
@@ -421,14 +428,18 @@ public class WohnungLiegenschaftzinsFormEditorPage
             pageSite.fireEvent( this, wohnung.wohnflaeche().qualifiedName().name(), IFormFieldListener.VALUE_CHANGE,
                     fieldListener.get( wohnung.wohnflaeche() ) );
         }
-        if (fieldListener.get( wohnung.bruchteilNenner() ) != null) {
-            pageSite.fireEvent( this, wohnung.bruchteilNenner().qualifiedName().name(),
-                    IFormFieldListener.VALUE_CHANGE, fieldListener.get( wohnung.bruchteilNenner() ) );
-        }
-        if (fieldListener.get( wohnung.bruchteilZaehler() ) != null) {
-            pageSite.fireEvent( this, wohnung.bruchteilZaehler().qualifiedName().name(),
-                    IFormFieldListener.VALUE_CHANGE, fieldListener.get( wohnung.bruchteilZaehler() ) );
-        }
+        // if (fieldListener.get( wohnung.bruchteilNenner() ) != null) {
+        // pageSite.fireEvent( this,
+        // wohnung.bruchteilNenner().qualifiedName().name(),
+        // IFormFieldListener.VALUE_CHANGE, fieldListener.get(
+        // wohnung.bruchteilNenner() ) );
+        // }
+        // if (fieldListener.get( wohnung.bruchteilZaehler() ) != null) {
+        // pageSite.fireEvent( this,
+        // wohnung.bruchteilZaehler().qualifiedName().name(),
+        // IFormFieldListener.VALUE_CHANGE, fieldListener.get(
+        // wohnung.bruchteilZaehler() ) );
+        // }
         if (fieldListener.get( wohnung.bereinigterVollpreis() ) != null) {
             pageSite.fireEvent( this, wohnung.bereinigterVollpreis().qualifiedName().name(),
                     IFormFieldListener.VALUE_CHANGE, fieldListener.get( wohnung.bereinigterVollpreis() ) );

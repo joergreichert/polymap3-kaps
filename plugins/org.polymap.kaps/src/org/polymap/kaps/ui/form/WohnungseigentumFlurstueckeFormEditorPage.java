@@ -12,6 +12,8 @@
  */
 package org.polymap.kaps.ui.form;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -31,7 +33,6 @@ import org.eclipse.swt.widgets.Control;
 import org.polymap.core.data.ui.featuretable.DefaultFeatureTableColumn;
 import org.polymap.core.data.ui.featuretable.FeatureTableViewer;
 import org.polymap.core.model.EntityType;
-import org.polymap.core.qi4j.QiModule.EntityCreator;
 import org.polymap.core.runtime.Polymap;
 
 import org.polymap.rhei.data.entityfeature.PropertyDescriptorAdapter;
@@ -49,7 +50,7 @@ import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.BelastungComposite;
 import org.polymap.kaps.model.data.FlurComposite;
 import org.polymap.kaps.model.data.FlurstueckComposite;
-import org.polymap.kaps.model.data.FlurstueckWohneigentumComposite;
+import org.polymap.kaps.model.data.GebaeudeComposite;
 import org.polymap.kaps.model.data.GemarkungComposite;
 import org.polymap.kaps.model.data.GemeindeComposite;
 import org.polymap.kaps.model.data.NutzungComposite;
@@ -64,7 +65,7 @@ import org.polymap.kaps.ui.KapsDefaultFormEditorPageWithFeatureTable;
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 public class WohnungseigentumFlurstueckeFormEditorPage
-        extends KapsDefaultFormEditorPageWithFeatureTable<FlurstueckWohneigentumComposite> {
+        extends KapsDefaultFormEditorPageWithFeatureTable<FlurstueckComposite> {
 
     private static Log                log    = LogFactory.getLog( WohnungseigentumFlurstueckeFormEditorPage.class );
 
@@ -117,11 +118,11 @@ public class WohnungseigentumFlurstueckeFormEditorPage
         // openErweiterteDaten.setEnabled( compositeSelected );
         // }
         // das muss disabled bleiben
-        // pageSite.setFieldEnabled( prefix + "verkaufteFlaeche", false );
-        if (selectedComposite.get() != null && selectedComposite.get().gebaeudeNummer().get() != null) {
-            pageSite.setFieldEnabled( prefix + "gebaeudeNummer", false );
-            pageSite.setFieldEnabled( prefix + "gebaeudeFortfuehrung", false );
-        }
+//        // pageSite.setFieldEnabled( prefix + "verkaufteFlaeche", false );
+//        if (selectedComposite.get() != null && selectedComposite.get().gebaeudeNummer().get() != null) {
+//            pageSite.setFieldEnabled( prefix + "gebaeudeNummer", false );
+//            pageSite.setFieldEnabled( prefix + "gebaeudeFortfuehrung", false );
+//        }
     }
 
 
@@ -133,40 +134,40 @@ public class WohnungseigentumFlurstueckeFormEditorPage
     public Control createFlurstueckForm( Composite parent ) {
 
         Control lastLine, newLine = null;
-        
-        lastLine = newLine;
-        newLine = newFormField( "Gebäudenummer" )
-                .setProperty(
-                        new ReloadablePropertyAdapter<FlurstueckWohneigentumComposite>( selectedComposite, prefix
-                                + "gebaeudeNummer", new PropertyCallback<FlurstueckWohneigentumComposite>() {
-
-                            public Property<Integer> get( FlurstueckWohneigentumComposite entity ) {
-                                return entity.gebaeudeNummer();
-                            }
-                        } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setValidator( new NumberValidator( Integer.class, Polymap.getSessionLocale() ) )
-                .setLayoutData( left().top( lastLine ).create() ).create();
-
-        newFormField( "Fortführung" )
-                .setProperty(
-                        new ReloadablePropertyAdapter<FlurstueckWohneigentumComposite>( selectedComposite, prefix
-                                + "gebaeudeFortfuehrung", new PropertyCallback<FlurstueckWohneigentumComposite>() {
-
-                            public Property<Integer> get( FlurstueckWohneigentumComposite entity ) {
-                                return entity.gebaeudeFortfuehrung();
-                            }
-                        } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setValidator( new NumberValidator( Integer.class, Polymap.getSessionLocale() ) )
-                .setLayoutData( right().top( lastLine ).create() ).create();
+//        
+//        lastLine = newLine;
+//        newLine = newFormField( "Gebäudenummer" )
+//                .setProperty(
+//                        new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix
+//                                + "gebaeudeNummer", new PropertyCallback<FlurstueckComposite>() {
+//
+//                            public Property<Integer> get( FlurstueckComposite entity ) {
+//                                return entity.gebaeudeNummer();
+//                            }
+//                        } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
+//                .setValidator( new NumberValidator( Integer.class, Polymap.getSessionLocale() ) )
+//                .setLayoutData( left().top( lastLine ).create() ).create();
+//
+//        newFormField( "Fortführung" )
+//                .setProperty(
+//                        new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix
+//                                + "gebaeudeFortfuehrung", new PropertyCallback<FlurstueckComposite>() {
+//
+//                            public Property<Integer> get( FlurstueckComposite entity ) {
+//                                return entity.gebaeudeFortfuehrung();
+//                            }
+//                        } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
+//                .setValidator( new NumberValidator( Integer.class, Polymap.getSessionLocale() ) )
+//                .setLayoutData( right().top( lastLine ).create() ).create();
 
         lastLine = newLine;
         newLine = newFormField( "Gemarkung" )
                 .setParent( parent )
                 .setProperty(
-                        new ReloadablePropertyAdapter<FlurstueckWohneigentumComposite>( selectedComposite, prefix
-                                + "gemarkung", new AssociationCallback<FlurstueckWohneigentumComposite>() {
+                        new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix
+                                + "gemarkung", new AssociationCallback<FlurstueckComposite>() {
 
-                            public Association<GemarkungComposite> get( FlurstueckWohneigentumComposite entity ) {
+                            public Association<GemarkungComposite> get( FlurstueckComposite entity ) {
                                 return entity.gemarkung();
                             }
                         } ) ).setField( reloadable( namedAssocationsPicklist( GemarkungComposite.class, true ) ) )
@@ -175,10 +176,10 @@ public class WohnungseigentumFlurstueckeFormEditorPage
         newFormField( "Flur" )
                 .setParent( parent )
                 .setProperty(
-                        new ReloadablePropertyAdapter<FlurstueckWohneigentumComposite>( selectedComposite, prefix
-                                + "flur", new AssociationCallback<FlurstueckWohneigentumComposite>() {
+                        new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix
+                                + "flur", new AssociationCallback<FlurstueckComposite>() {
 
-                            public Association<FlurComposite> get( FlurstueckWohneigentumComposite entity ) {
+                            public Association<FlurComposite> get( FlurstueckComposite entity ) {
                                 return entity.flur();
                             }
                         } ) ).setField( reloadable( namedAssocationsPicklist( FlurComposite.class, false ) ) )
@@ -188,10 +189,10 @@ public class WohnungseigentumFlurstueckeFormEditorPage
         newLine = newFormField( "Flurstücksnummer" )
                 .setParent( parent )
                 .setProperty(
-                        new ReloadablePropertyAdapter<FlurstueckWohneigentumComposite>( selectedComposite, prefix
-                                + "nummer", new PropertyCallback<FlurstueckWohneigentumComposite>() {
+                        new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix
+                                + "nummer", new PropertyCallback<FlurstueckComposite>() {
 
-                            public Property<Integer> get( FlurstueckWohneigentumComposite entity ) {
+                            public Property<Integer> get( FlurstueckComposite entity ) {
                                 return entity.nummer();
                             }
                         } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
@@ -201,10 +202,10 @@ public class WohnungseigentumFlurstueckeFormEditorPage
         newFormField( "/" )
                 .setParent( parent )
                 .setProperty(
-                        new ReloadablePropertyAdapter<FlurstueckWohneigentumComposite>( selectedComposite, prefix
-                                + "unterNummer", new PropertyCallback<FlurstueckWohneigentumComposite>() {
+                        new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix
+                                + "unterNummer", new PropertyCallback<FlurstueckComposite>() {
 
-                            public Property<String> get( FlurstueckWohneigentumComposite entity ) {
+                            public Property<String> get( FlurstueckComposite entity ) {
                                 return entity.unterNummer();
                             }
                         } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
@@ -217,7 +218,7 @@ public class WohnungseigentumFlurstueckeFormEditorPage
             protected void adopt( FlurstueckComposite toAdopt )
                     throws Exception {
                 assert toAdopt != null;
-                FlurstueckWohneigentumComposite current = selectedComposite.get();
+                FlurstueckComposite current = selectedComposite.get();
                 current.gemarkung().set( toAdopt.gemarkung().get() );
                 current.flur().set( toAdopt.flur().get() );
                 current.nummer().set( toAdopt.nummer().get() );
@@ -229,8 +230,16 @@ public class WohnungseigentumFlurstueckeFormEditorPage
                 current.kartenBlatt().set( toAdopt.kartenBlatt().get() );
                 current.baublock().set( toAdopt.baublock().get() );
                 current.nutzung().set( toAdopt.nutzung().get() );
+                current.gebaeudeArt().set( toAdopt.gebaeudeArt().get() );
+                current.artDesBaugebiets().set( toAdopt.artDesBaugebiets().get() );
                 current.flaeche().set( toAdopt.flaeche().get() );
-
+                current.flaechenAnteilZaehler().set( toAdopt.flaechenAnteilZaehler().get() );
+                current.flaechenAnteilNenner().set( toAdopt.flaechenAnteilNenner().get() );
+                current.verkaufteFlaeche().set( toAdopt.verkaufteFlaeche().get() );
+                current.erbbaurecht().set( toAdopt.erbbaurecht().get() );
+                current.belastung().set( toAdopt.belastung().get() );
+                current.vertrag().set( toAdopt.vertrag().get() );
+                
                 refreshReloadables();
             }
         };
@@ -262,10 +271,10 @@ public class WohnungseigentumFlurstueckeFormEditorPage
         newLine = newFormField( "Straße/Gewann" )
                 .setParent( parent )
                 .setProperty(
-                        new ReloadablePropertyAdapter<FlurstueckWohneigentumComposite>( selectedComposite, prefix
-                                + "strasse", new AssociationCallback<FlurstueckWohneigentumComposite>() {
+                        new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix
+                                + "strasse", new AssociationCallback<FlurstueckComposite>() {
 
-                            public Association<StrasseComposite> get( FlurstueckWohneigentumComposite entity ) {
+                            public Association<StrasseComposite> get( FlurstueckComposite entity ) {
                                 return entity.strasse();
                             }
                         } ) ).setField( reloadable( strassePickList ) ).setLayoutData( left().top( lastLine ).create() )
@@ -274,10 +283,10 @@ public class WohnungseigentumFlurstueckeFormEditorPage
         newFormField( "Hausnummer" )
                 .setParent( parent )
                 .setProperty(
-                        new ReloadablePropertyAdapter<FlurstueckWohneigentumComposite>( selectedComposite, prefix
-                                + "hausnummer", new PropertyCallback<FlurstueckWohneigentumComposite>() {
+                        new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix
+                                + "hausnummer", new PropertyCallback<FlurstueckComposite>() {
 
-                            public Property<String> get( FlurstueckWohneigentumComposite entity ) {
+                            public Property<String> get( FlurstueckComposite entity ) {
                                 return entity.hausnummer();
                             }
                         } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
@@ -287,10 +296,10 @@ public class WohnungseigentumFlurstueckeFormEditorPage
                 .setToolTipText( "Hausnummernzusatz" )
                 .setParent( parent )
                 .setProperty(
-                        new ReloadablePropertyAdapter<FlurstueckWohneigentumComposite>( selectedComposite, prefix
-                                + "hausnummerZusatz", new PropertyCallback<FlurstueckWohneigentumComposite>() {
+                        new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix
+                                + "hausnummerZusatz", new PropertyCallback<FlurstueckComposite>() {
 
-                            public Property<String> get( FlurstueckWohneigentumComposite entity ) {
+                            public Property<String> get( FlurstueckComposite entity ) {
                                 return entity.hausnummerZusatz();
                             }
                         } ) ).setField( reloadable( new StringFormField() ) )
@@ -320,10 +329,10 @@ public class WohnungseigentumFlurstueckeFormEditorPage
         newLine = newFormField( "Richtwertzone" )
                 .setParent( parent )
                 .setProperty(
-                        new ReloadablePropertyAdapter<FlurstueckWohneigentumComposite>( selectedComposite, prefix
-                                + "richtwertZone", new AssociationCallback<FlurstueckWohneigentumComposite>() {
+                        new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix
+                                + "richtwertZone", new AssociationCallback<FlurstueckComposite>() {
 
-                            public Association<RichtwertzoneComposite> get( FlurstueckWohneigentumComposite entity ) {
+                            public Association<RichtwertzoneComposite> get( FlurstueckComposite entity ) {
                                 return entity.richtwertZone();
                             }
                         } ) ).setField( reloadable( richtwertZonePickList ) )
@@ -352,10 +361,10 @@ public class WohnungseigentumFlurstueckeFormEditorPage
         newLine = newFormField( "Nutzung" )
                 .setParent( parent )
                 .setProperty(
-                        new ReloadablePropertyAdapter<FlurstueckWohneigentumComposite>( selectedComposite, prefix
-                                + "nutzung", new AssociationCallback<FlurstueckWohneigentumComposite>() {
+                        new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix
+                                + "nutzung", new AssociationCallback<FlurstueckComposite>() {
 
-                            public Association<NutzungComposite> get( FlurstueckWohneigentumComposite entity ) {
+                            public Association<NutzungComposite> get( FlurstueckComposite entity ) {
                                 return entity.nutzung();
                             }
                         } ) ).setField( reloadable( namedAssocationsPicklist( NutzungComposite.class ) ) )
@@ -364,10 +373,10 @@ public class WohnungseigentumFlurstueckeFormEditorPage
         newFormField( "Belastung" )
                 .setParent( parent )
                 .setProperty(
-                        new ReloadablePropertyAdapter<FlurstueckWohneigentumComposite>( selectedComposite, prefix
-                                + "belastung", new AssociationCallback<FlurstueckWohneigentumComposite>() {
+                        new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix
+                                + "belastung", new AssociationCallback<FlurstueckComposite>() {
 
-                            public Association<BelastungComposite> get( FlurstueckWohneigentumComposite entity ) {
+                            public Association<BelastungComposite> get( FlurstueckComposite entity ) {
                                 return entity.belastung();
                             }
                         } ) ).setField( reloadable( namedAssocationsPicklist( BelastungComposite.class ) ) )
@@ -377,10 +386,10 @@ public class WohnungseigentumFlurstueckeFormEditorPage
         newLine = newFormField( "Fläche in m²" )
                 .setParent( parent )
                 .setProperty(
-                        new ReloadablePropertyAdapter<FlurstueckWohneigentumComposite>( selectedComposite, prefix
-                                + "flaeche", new PropertyCallback<FlurstueckWohneigentumComposite>() {
+                        new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix
+                                + "flaeche", new PropertyCallback<FlurstueckComposite>() {
 
-                            public Property<Double> get( FlurstueckWohneigentumComposite entity ) {
+                            public Property<Double> get( FlurstueckComposite entity ) {
                                 return entity.flaeche();
                             }
                         } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
@@ -389,10 +398,10 @@ public class WohnungseigentumFlurstueckeFormEditorPage
 
         newFormField( "Erbbaurecht" )
                 .setProperty(
-                        new ReloadablePropertyAdapter<FlurstueckWohneigentumComposite>( selectedComposite, prefix
-                                + "erbbaurecht", new PropertyCallback<FlurstueckWohneigentumComposite>() {
+                        new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix
+                                + "erbbaurecht", new PropertyCallback<FlurstueckComposite>() {
 
-                            public Property<String> get( FlurstueckWohneigentumComposite entity ) {
+                            public Property<String> get( FlurstueckComposite entity ) {
                                 return entity.erbbaurecht();
                             }
                         } ) ).setField( reloadable( new BooleanFormField() ) )
@@ -447,17 +456,15 @@ public class WohnungseigentumFlurstueckeFormEditorPage
     }
 
 
-    protected EntityType<FlurstueckWohneigentumComposite> addViewerColumns( FeatureTableViewer viewer ) {
+    protected EntityType<FlurstueckComposite> addViewerColumns( FeatureTableViewer viewer ) {
         // entity types
         final KapsRepository repo = KapsRepository.instance();
-        final EntityType<FlurstueckWohneigentumComposite> type = repo
-                .entityType( FlurstueckWohneigentumComposite.class );
+        final EntityType<FlurstueckComposite> type = repo
+                .entityType( FlurstueckComposite.class );
 
         PropertyDescriptor prop = null;
-        prop = new PropertyDescriptorAdapter( type.getProperty( "gebaeudeNummer" ) );
-        viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader( "Gebaeudenummer" ) );
-        prop = new PropertyDescriptorAdapter( type.getProperty( "gebaeudeFortfuehrung" ) );
-        viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader( "Gebaeudefortfuehrung" ) );
+        prop = new PropertyDescriptorAdapter( type.getProperty( "vertragsNummer" ) );
+        viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader( "Vertragsnummer" ) );
         prop = new PropertyDescriptorAdapter( type.getProperty( "gemarkung" ) );
         viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader( "Gemarkung" ) );
         prop = new PropertyDescriptorAdapter( type.getProperty( "nummer" ) );
@@ -469,22 +476,30 @@ public class WohnungseigentumFlurstueckeFormEditorPage
     }
 
 
-    public Iterable<FlurstueckWohneigentumComposite> getElements() {
-        return FlurstueckWohneigentumComposite.Mixin.forEntity( eigentum );
+    public Iterable<FlurstueckComposite> getElements() {
+         Iterable<GebaeudeComposite> allGebaeude = GebaeudeComposite.Mixin.forEntity( eigentum );
+         List<FlurstueckComposite> flurstuecke = new ArrayList<FlurstueckComposite>();
+         for (GebaeudeComposite gebaeude : allGebaeude) {
+            flurstuecke.addAll( gebaeude.flurstuecke().toList() );
+        }
+        return flurstuecke;
     }
 
 
     @Override
-    protected FlurstueckWohneigentumComposite createNewComposite()
+    protected FlurstueckComposite createNewComposite()
             throws Exception {
-        return repository.newEntity( FlurstueckWohneigentumComposite.class, null,
-                new EntityCreator<FlurstueckWohneigentumComposite>() {
-
-                    public void create( FlurstueckWohneigentumComposite prototype )
-                            throws Exception {
-                        prototype.objektNummer().set( eigentum.objektNummer().get() );
-                        prototype.objektFortfuehrung().set( eigentum.objektFortfuehrung().get() );
-                    }
-                } );
+        throw new IllegalStateException("not implemented yet");
+        // TODO die Flurstücke müssen einem Gebäude zugeordnet werden, hier haben wir aber nur das übergeordnete
+        // Wohneigentum
+//        return repository.newEntity( FlurstueckComposite.class, null,
+//                new EntityCreator<FlurstueckComposite>() {
+//
+//                    public void create( FlurstueckComposite prototype )
+//                            throws Exception {
+////                        prototype.objektNummer().set( eigentum.objektNummer().get() );
+////                        prototype.objektFortfuehrung().set( eigentum.objektFortfuehrung().get() );
+//                    }
+//                } );
     }
 }

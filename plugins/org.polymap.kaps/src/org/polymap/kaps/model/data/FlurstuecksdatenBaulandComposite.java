@@ -1002,7 +1002,7 @@ public interface FlurstuecksdatenBaulandComposite
 
     @Optional
     // @Computed
-    Association<FlurstueckVerkaufComposite> flurstueck();
+    Association<FlurstueckComposite> flurstueck();
 
 
     @Optional
@@ -1034,7 +1034,7 @@ public interface FlurstuecksdatenBaulandComposite
         private static Log log = LogFactory.getLog( Mixin.class );
 
 
-        public static FlurstuecksdatenBaulandComposite forFlurstueck( FlurstueckVerkaufComposite flurstueck ) {
+        public static FlurstuecksdatenBaulandComposite forFlurstueck( FlurstueckComposite flurstueck ) {
             FlurstuecksdatenBaulandComposite template = QueryExpressions
                     .templateFor( FlurstuecksdatenBaulandComposite.class );
             BooleanExpression expr = QueryExpressions.eq( template.flurstueck(), flurstueck );
@@ -1079,7 +1079,7 @@ public interface FlurstuecksdatenBaulandComposite
                     FlurstuecksdatenBaulandComposite.class, "nutzung" ) ) {
 
                 public NutzungComposite get() {
-                    FlurstueckVerkaufComposite flurstueck = flurstueck().get();
+                    FlurstueckComposite flurstueck = flurstueck().get();
                     return flurstueck != null ? flurstueck.nutzung().get() : null;
                 }
 
@@ -1120,7 +1120,7 @@ public interface FlurstuecksdatenBaulandComposite
                     FlurstuecksdatenBaulandComposite.class, "richtwertZone" ) ) {
 
                 public RichtwertzoneComposite get() {
-                    FlurstueckVerkaufComposite flurstueck = flurstueck().get();
+                    FlurstueckComposite flurstueck = flurstueck().get();
                     return flurstueck != null ? flurstueck.richtwertZone().get() : null;
                 }
 
@@ -1140,7 +1140,7 @@ public interface FlurstuecksdatenBaulandComposite
                     FlurstuecksdatenBaulandComposite.class, "gebaeudeArt" ) ) {
 
                 public GebaeudeArtComposite get() {
-                    FlurstueckVerkaufComposite flurstueck = flurstueck().get();
+                    FlurstueckComposite flurstueck = flurstueck().get();
                     return flurstueck != null ? flurstueck.gebaeudeArt().get() : null;
                 }
 
