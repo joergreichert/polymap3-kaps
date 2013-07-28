@@ -206,12 +206,6 @@ public interface WohnungComposite
     Property<String> START2();
 
 
-    // GEBBRVERS - Double
-    @Optional
-    @ImportColumn("GEBBRVERS")
-    Property<Double> gebaeudebrandversicherungswert();
-
-
     // BEWSCHL - String
     @Optional
     Association<AusstattungComposite> ausstattung();

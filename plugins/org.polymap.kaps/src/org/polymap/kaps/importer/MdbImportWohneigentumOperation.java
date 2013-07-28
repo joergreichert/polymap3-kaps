@@ -299,8 +299,12 @@ public class MdbImportWohneigentumOperation
                                 found.erbbaurecht().set( gebaeudeFlurstueck.erbbaurecht().get() );
                                 
                                 // pseudoflurstück an gebäude löschen und durch neues ersetzen
-                                if (gebaeudeFlurstueck.vertrag().get() == null) {
+                                if (gebaeudeFlurstueck.vertrag().get() == null && found != gebaeudeFlurstueck) {
                                     // Flurstück aus wohnung ersetzen
+                                    for( WohnungComposite wohnung : WohnungComposite.Mixin.findWohnungenFor( gebaeudeFlurstueck )) {
+                                        wohnung.flurstueck().set( found );
+                                    }
+                                    // und an Gebäude entfernen
                                     gebaeude.flurstuecke().remove( gebaeudeFlurstueck );
                                     repo.removeEntity( gebaeudeFlurstueck );
                                     // repo.commitChanges();
@@ -315,6 +319,7 @@ public class MdbImportWohneigentumOperation
                         entity.flurstueck().set( gebaeudeFlurstueck );
                     }
                     // TODO gebaeude an wohnung setzen
+                    repo.commitChanges();
                 }
             } );
             wmvaopfW.flush();

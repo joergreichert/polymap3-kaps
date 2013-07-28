@@ -168,8 +168,6 @@ public class WohnungGrunddatenFormEditorPage
         lastLine = newLine;
         newLine = createFlaecheField( "Wohn-/Nutzfläche", "Woh-/Nutzfläche in m²", wohnung.wohnflaeche(),
                 left().top( lastLine ), parent, true );
-        createPreisField( "Gebäudebrandwert", "Gebäudebrandversicherungswert in Mark",
-                wohnung.gebaeudebrandversicherungswert(), right().right( 75 ).top( lastLine ), parent, true );
 
         lastLine = newLine;
         newLine = newFormField( "Gesamtnutzungsdauer" ).setToolTipText( "Gesamtnutzungsdauer in Jahren" )
