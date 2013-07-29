@@ -60,11 +60,12 @@ public class MdbImportWizard
 
     public boolean performFinish() {
         try {
-            MdbImportOperation op = new MdbImportOperation( importPage.dbFile, importPage.tableNames );
-            OperationSupport.instance().execute( op, true, true );
-//            MdbImportWohneigentumOperation op2 = new MdbImportWohneigentumOperation( importPage.dbFile,
+//            MdbImportOperation op = new MdbImportOperation( importPage.dbFile, importPage.tableNames );
+//            MdbImportWohneigentumOperation op = new MdbImportWohneigentumOperation( importPage.dbFile,
 //                    importPage.tableNames );
-//            OperationSupport.instance().execute( op2, true, true );
+            MdbImportBewertungenOperation op = new MdbImportBewertungenOperation( importPage.dbFile,
+                    importPage.tableNames );
+            OperationSupport.instance().execute( op, true, true );
 
             return true;
         }

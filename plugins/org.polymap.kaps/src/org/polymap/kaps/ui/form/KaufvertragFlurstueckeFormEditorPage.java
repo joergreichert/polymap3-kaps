@@ -152,11 +152,6 @@ public class KaufvertragFlurstueckeFormEditorPage
     }
 
 
-    public boolean isValid() {
-        return true;
-    }
-
-
     public Composite createFlurstueckForm( Composite parent ) {
 
         Section formSection = newSection( parent, "Flurstücksdaten" );
@@ -696,7 +691,7 @@ public class KaufvertragFlurstueckeFormEditorPage
 
             @Override
             public void run() {
-                FlurstueckComposite flurstueck = selectedComposite.get();
+                final FlurstueckComposite flurstueck = selectedComposite.get();
                 if (flurstueck != null) {
                     WohnungComposite wohnung = repository.newEntity( WohnungComposite.class, null );
                     wohnung.flurstueck().set( flurstueck );
@@ -712,20 +707,26 @@ public class KaufvertragFlurstueckeFormEditorPage
         searchWohnung = new ActionButton( parent, new WohnungSearcher() {
 
             @Override
-            protected void adopt( WohnungComposite wohnung )
+            protected void adopt( final WohnungComposite wohnung )
                     throws Exception {
                 if (wohnung != null) {
-                    // TODO hier einen Adapter einbauen, der erst beim speichern der
-                    // Seite ausgeführt wird
-                    wohnung.flurstueck().set( selectedComposite.get() );
-                    if (wohnung.gebaeudeNummer().get() != null) {
-                        GebaeudeComposite gebaeude = GebaeudeComposite.Mixin.forKeys( wohnung.objektNummer().get(),
-                                wohnung.objektFortfuehrung().get(), wohnung.gebaeudeNummer().get(), wohnung
-                                        .gebaeudeFortfuehrung().get() );
-                        if (gebaeude != null && !gebaeude.flurstuecke().contains( selectedComposite.get() )) {
-                            gebaeude.flurstuecke().add( selectedComposite.get() );
+                    final FlurstueckComposite flurstueckComposite = selectedComposite.get();
+                    queue( new UpdateCommand() {
+                        @Override
+                        public void execute() {
+                            // Adapter der erst beim speichern der
+                            // Seite ausgeführt wird
+                            wohnung.flurstueck().set( flurstueckComposite );
+                            if (wohnung.gebaeudeNummer().get() != null) {
+                                GebaeudeComposite gebaeude = GebaeudeComposite.Mixin.forKeys( wohnung.objektNummer()
+                                        .get(), wohnung.objektFortfuehrung().get(), wohnung.gebaeudeNummer().get(),
+                                        wohnung.gebaeudeFortfuehrung().get() );
+                                if (gebaeude != null && !gebaeude.flurstuecke().contains( flurstueckComposite )) {
+                                    gebaeude.flurstuecke().add( flurstueckComposite );
+                                }
+                            }
                         }
-                    }
+                    } );
                 }
             }
         } );

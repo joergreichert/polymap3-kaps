@@ -12,6 +12,8 @@
  */
 package org.polymap.kaps.ui;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import java.text.NumberFormat;
@@ -26,6 +28,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 
+import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.Section;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -36,6 +39,7 @@ import org.polymap.core.workbench.PolymapWorkbench;
 
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
 import org.polymap.rhei.field.IFormFieldLabel;
+import org.polymap.rhei.field.IFormFieldListener;
 import org.polymap.rhei.field.NumberValidator;
 import org.polymap.rhei.field.PicklistFormField;
 import org.polymap.rhei.field.SelectlistFormField;
@@ -56,6 +60,7 @@ public abstract class KapsDefaultFormEditorPage
         extends DefaultFormEditorPage
         implements IFormEditorPage2 {
 
+
     protected static final int SPACING = 12;
 
     protected static final int LEFT    = 0;
@@ -68,6 +73,11 @@ public abstract class KapsDefaultFormEditorPage
 
     protected Locale           locale  = Locale.GERMAN;
 
+    protected interface UpdateCommand {
+        void execute();
+    }
+    
+    private List<UpdateCommand> updates = new ArrayList<UpdateCommand>(); 
 
     public KapsDefaultFormEditorPage( String id, String title, Feature feature, FeatureStore featureStore ) {
         super( id, title, feature, featureStore );
@@ -146,6 +156,13 @@ public abstract class KapsDefaultFormEditorPage
     }
 
 
+    protected final void queue(UpdateCommand command) {
+        updates.add( command );
+        
+        pageSite.fireEvent( ((FormPage)pageSite).getEditor(), id, IFormFieldListener.VALUE_CHANGE, null );
+//        and fire  pageSite.fireEvent( command, "queueUpdateCommand", IFormFieldListener.VALUE_CHANGE, command );
+    }
+    
     @Override
     public void doLoad( final IProgressMonitor monitor )
             throws Exception {
@@ -162,6 +179,7 @@ public abstract class KapsDefaultFormEditorPage
                 }
             }
         });
+        updates.clear();
     }
     
     public void afterDoLoad( IProgressMonitor monitor )
@@ -170,18 +188,24 @@ public abstract class KapsDefaultFormEditorPage
 
     @Override
     public void dispose() {
+        updates.clear();
     }
 
 
     @Override
     public void doSubmit( IProgressMonitor monitor )
             throws Exception {
+        for (UpdateCommand command : updates) {
+            command.execute();
+        }
+        updates.clear();
     }
 
 
     @Override
     public boolean isDirty() {
-        return false;
+        
+        return !updates.isEmpty();
     }
 
 

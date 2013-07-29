@@ -40,7 +40,6 @@ import org.polymap.core.project.ui.util.SimpleFormData;
 import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter.CompositeProvider;
 import org.polymap.rhei.field.IFormField;
 import org.polymap.rhei.field.IFormFieldListener;
-import org.polymap.rhei.form.IFormEditorPage2;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
 import org.polymap.kaps.ui.NamedCompositesFeatureContentProvider.FeatureTableElement;
@@ -49,8 +48,7 @@ import org.polymap.kaps.ui.NamedCompositesFeatureContentProvider.FeatureTableEle
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity>
-        extends KapsDefaultFormEditorPage
-        implements IFormEditorPage2 {
+        extends KapsDefaultFormEditorPage {
 
     protected FeatureStore         featureStore;
 
@@ -65,6 +63,7 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
     private List<IFormField>       reloadables       = new ArrayList<IFormField>();
 
     private boolean                updatingElements;
+
 
 
     public KapsDefaultFormEditorPageWithFeatureTable( String id, String title, Feature feature,
@@ -255,6 +254,7 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
         if (pageSite != null) {
             refreshReloadables();
         }
+        super.doLoad( monitor );
         dirty = false;
     }
 
@@ -264,22 +264,10 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
         if (model != null) {
             updateElements( model );
         }
+        super.doSubmit( monitor );
         dirty = false;
     }
 
-
-    public boolean isDirty() {
-        return dirty;
-    }
-
-
-    public boolean isValid() {
-        return true;
-    }
-
-
-    public void dispose() {
-    }
 
 
     /**
