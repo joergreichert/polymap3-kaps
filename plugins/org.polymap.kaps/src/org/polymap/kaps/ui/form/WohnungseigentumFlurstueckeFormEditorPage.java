@@ -79,6 +79,14 @@ public class WohnungseigentumFlurstueckeFormEditorPage
 
     private IFormFieldListener        gemarkungListener;
 
+    private Object selectedStrasse;
+
+    private Object selectedRichtwertzone;
+
+    private Object selectedNutzung;
+
+    private Object selectedArtDesBaugebietes;
+
     private final static String       prefix = WohnungseigentumFlurstueckeFormEditorPage.class.getSimpleName();
 
     public WohnungseigentumFlurstueckeFormEditorPage( Feature feature, FeatureStore featureStore ) {
@@ -105,11 +113,13 @@ public class WohnungseigentumFlurstueckeFormEditorPage
 
     protected void refreshReloadables()
             throws Exception {
-        boolean compositeSelected = selectedComposite.get() != null;
-        selectedGemarkung = compositeSelected ? selectedComposite.get().gemarkung().get() : null;
-        //
-        // selectedNutzung = compositeSelected ?
-        // selectedComposite.get().nutzung().get() : null;
+        FlurstueckComposite composite = selectedComposite.get();
+        boolean compositeSelected = composite != null;
+        selectedGemarkung = compositeSelected ? composite.gemarkung().get() : null;
+        selectedStrasse = composite != null ? composite.strasse().get() : null;
+        selectedRichtwertzone = composite != null ? composite.richtwertZone().get() : null;
+        selectedNutzung = composite != null ? composite.nutzung().get() : null;
+        selectedArtDesBaugebietes = composite != null ? composite.artDesBaugebiets().get() : null;
 
         super.refreshReloadables();
         // if (openErweiterteDaten != null) {
@@ -219,28 +229,39 @@ public class WohnungseigentumFlurstueckeFormEditorPage
                     throws Exception {
                 assert toAdopt != null;
                 FlurstueckComposite current = selectedComposite.get();
-                current.gemarkung().set( toAdopt.gemarkung().get() );
-                current.flur().set( toAdopt.flur().get() );
-                current.nummer().set( toAdopt.nummer().get() );
-                current.unterNummer().set( toAdopt.unterNummer().get() );
-                current.strasse().set( toAdopt.strasse().get() );
-                current.hausnummer().set( toAdopt.hausnummer().get() );
-                current.hausnummerZusatz().set( toAdopt.hausnummerZusatz().get() );
-                current.richtwertZone().set( toAdopt.richtwertZone().get() );
-                current.kartenBlatt().set( toAdopt.kartenBlatt().get() );
-                current.baublock().set( toAdopt.baublock().get() );
-                current.nutzung().set( toAdopt.nutzung().get() );
-                current.gebaeudeArt().set( toAdopt.gebaeudeArt().get() );
-                current.artDesBaugebiets().set( toAdopt.artDesBaugebiets().get() );
-                current.flaeche().set( toAdopt.flaeche().get() );
-                current.flaechenAnteilZaehler().set( toAdopt.flaechenAnteilZaehler().get() );
-                current.flaechenAnteilNenner().set( toAdopt.flaechenAnteilNenner().get() );
-                current.verkaufteFlaeche().set( toAdopt.verkaufteFlaeche().get() );
-                current.erbbaurecht().set( toAdopt.erbbaurecht().get() );
-                current.belastung().set( toAdopt.belastung().get() );
-                current.vertrag().set( toAdopt.vertrag().get() );
-                
-                refreshReloadables();
+                // separate behandeln, da die 3 felder von zusätzlichen reloads von
+                // gemarkung und nutzung
+                // wieder zurückgesetzt werden
+                selectedStrasse = toAdopt.strasse().get();
+                selectedRichtwertzone = toAdopt.richtwertZone().get();
+//                selectedArtDesBaugebietes = toAdopt.artDesBaugebiets().get();
+
+                pageSite.setFieldValue( prefix + "gemarkung", toAdopt.gemarkung().get() );
+                // current.gemarkung().set( toAdopt.gemarkung().get() );
+                pageSite.setFieldValue( prefix + "flur", toAdopt.flur().get() );
+                pageSite.setFieldValue( prefix + "nummer", String.valueOf( toAdopt.nummer().get() ) );
+                pageSite.setFieldValue( prefix + "unterNummer", toAdopt.unterNummer().get() );
+                pageSite.setFieldValue( prefix + "strasse", toAdopt.strasse().get() );
+                pageSite.setFieldValue( prefix + "hausnummer", toAdopt.hausnummer().get() );
+                pageSite.setFieldValue( prefix + "hausnummerZusatz", toAdopt.hausnummerZusatz().get() );
+                pageSite.setFieldValue( prefix + "richtwertZone", toAdopt.richtwertZone().get() );
+                // pageSite.setFieldValue( prefix + "kartenBlatt",
+                // toAdopt.kartenBlatt().get() );
+                // pageSite.setFieldValue( prefix + "baublock",
+                // toAdopt.baublock().get() );
+                pageSite.setFieldValue( prefix + "nutzung", toAdopt.nutzung().get() );
+//                pageSite.setFieldValue( prefix + "gebaeudeArt", toAdopt.gebaeudeArt().get() );
+//                pageSite.setFieldValue( prefix + "artDesBaugebiets", toAdopt.artDesBaugebiets().get() );
+                pageSite.setFieldValue( prefix + "flaeche", String.valueOf( toAdopt.flaeche().get() ) );
+//                pageSite.setFieldValue( prefix + "flaechenAnteilZaehler",
+//                        String.valueOf( toAdopt.flaechenAnteilZaehler().get() ) );
+//                pageSite.setFieldValue( prefix + "flaechenAnteilNenner",
+//                        String.valueOf( toAdopt.flaechenAnteilNenner().get() ) );
+//                pageSite.setFieldValue( prefix + "verkaufteFlaeche", String.valueOf( toAdopt.verkaufteFlaeche().get() ) );
+                pageSite.setFieldValue( prefix + "erbbaurecht", toAdopt.erbbaurecht().get() );
+                pageSite.setFieldValue( prefix + "belastung", toAdopt.belastung().get() );
+
+                // refreshReloadables();
             }
         };
         sfAction.setEnabled( false );
@@ -347,11 +368,9 @@ public class WohnungseigentumFlurstueckeFormEditorPage
                             || (ev.getNewValue() != null && !ev.getNewValue().equals( selectedGemarkung ))) {
                         selectedGemarkung = ev.getNewValue();
                         strassePickList.reloadValues();
-                        strassePickList.setValue( selectedComposite.get() != null ? selectedComposite.get().strasse()
-                                .get() : null );
+                        pageSite.setFieldValue( prefix + "strasse", selectedStrasse );
                         richtwertZonePickList.reloadValues();
-                        richtwertZonePickList.setValue( selectedComposite.get() != null ? selectedComposite.get()
-                                .richtwertZone().get() : null );
+                        pageSite.setFieldValue( prefix + "richtwertZone", selectedRichtwertzone );
                     }
                 }
             }
