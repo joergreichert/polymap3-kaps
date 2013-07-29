@@ -876,16 +876,17 @@ public interface WohnungComposite
         private static Log log = LogFactory.getLog( Mixin.class );
 
 
-//        @Override
-//        public void beforeCompletion()
-//                throws UnitOfWorkCompletionException {
-//            if (objektNummer().get() == null || objektFortfuehrung().get() == null || gebaeudeNummer().get() == null
-//                    || gebaeudeFortfuehrung().get() == null || wohnungsNummer().get() == null
-//                    || wohnungsFortfuehrung().get() == null) {
-//                throw new UnitOfWorkCompletionException( "Alle Nummern und Fortführungen müssen ausgefüllt sein!" );
-//            }
-//        }
-
+        // @Override
+        // public void beforeCompletion()
+        // throws UnitOfWorkCompletionException {
+        // if (objektNummer().get() == null || objektFortfuehrung().get() == null ||
+        // gebaeudeNummer().get() == null
+        // || gebaeudeFortfuehrung().get() == null || wohnungsNummer().get() == null
+        // || wohnungsFortfuehrung().get() == null) {
+        // throw new UnitOfWorkCompletionException(
+        // "Alle Nummern und Fortführungen müssen ausgefüllt sein!" );
+        // }
+        // }
 
         @Override
         public Property<String> schl() {
@@ -915,6 +916,17 @@ public interface WohnungComposite
         }
 
 
+        public static Iterable<WohnungComposite> findWohnungenFor( GebaeudeComposite gebaeude ) {
+            WohnungComposite wohnungTemplate = QueryExpressions.templateFor( WohnungComposite.class );
+            BooleanExpression expr3 = QueryExpressions.and( QueryExpressions.eq( wohnungTemplate.objektNummer(),
+                    gebaeude.objektNummer().get() ), QueryExpressions.eq( wohnungTemplate.objektFortfuehrung(),
+                    gebaeude.objektFortfuehrung().get() ), QueryExpressions.eq( wohnungTemplate.gebaeudeNummer(),
+                    gebaeude.gebaeudeNummer().get() ), QueryExpressions.eq( wohnungTemplate.gebaeudeFortfuehrung(),
+                    gebaeude.gebaeudeFortfuehrung().get() ) );
+            return KapsRepository.instance().findEntities( WohnungComposite.class, expr3, 0, -1 );
+        }
+
+
         public static VertragComposite vertragFor( WohnungComposite wohnung ) {
             return wohnung.flurstueck().get().vertrag().get();
         }
@@ -925,5 +937,6 @@ public interface WohnungComposite
             BooleanExpression expr = QueryExpressions.eq( template.flurstueck(), flurstueck );
             return KapsRepository.instance().findEntities( WohnungComposite.class, expr, 0, -1 );
         }
+
     }
 }

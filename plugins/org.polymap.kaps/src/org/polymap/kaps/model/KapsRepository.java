@@ -54,6 +54,7 @@ import org.polymap.kaps.model.data.FlurstueckComposite;
 import org.polymap.kaps.model.data.FlurstuecksdatenAgrarComposite;
 import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
 import org.polymap.kaps.model.data.GebaeudeArtComposite;
+import org.polymap.kaps.model.data.GebaeudeComposite;
 import org.polymap.kaps.model.data.GemarkungComposite;
 import org.polymap.kaps.model.data.GemeindeComposite;
 import org.polymap.kaps.model.data.KaeuferKreisComposite;
@@ -155,6 +156,8 @@ public class KapsRepository
                             KapsRepository.NAMESPACE, NutzungComposite.NAME ) ),
                     new SimpleEntityProvider<GebaeudeArtComposite>( this, GebaeudeArtComposite.class, new NameImpl(
                             KapsRepository.NAMESPACE, GebaeudeArtComposite.NAME ) ),
+                    new SimpleEntityProvider<GebaeudeComposite>( this, GebaeudeComposite.class, new NameImpl(
+                            KapsRepository.NAMESPACE, GebaeudeComposite.NAME ) ),
 
                     new SimpleEntityProvider<GemeindeComposite>( this, GemeindeComposite.class, new NameImpl(
                             KapsRepository.NAMESPACE, GemeindeComposite.NAME ) ),
@@ -372,7 +375,8 @@ public class KapsRepository
     public Iterable<FlurstueckComposite> findFlurstuecke( GemarkungComposite gemarkung, FlurComposite flur,
             Integer flurstuecksNummer, String unternummer ) {
         FlurstueckComposite template = templateFor( FlurstueckComposite.class );
-        BooleanExpression expr = null;//QueryExpressions.not( QueryExpressions.eq( template.vertrag(), null ));
+        BooleanExpression expr = null;// QueryExpressions.not( QueryExpressions.eq(
+                                      // template.vertrag(), null ));
         if (gemarkung != null) {
             expr = QueryExpressions.eq( template.gemarkung(), gemarkung );
         }

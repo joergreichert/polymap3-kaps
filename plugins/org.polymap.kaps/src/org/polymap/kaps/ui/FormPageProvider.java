@@ -27,6 +27,7 @@ import org.polymap.kaps.model.data.FlurComposite;
 import org.polymap.kaps.model.data.FlurstuecksdatenAgrarComposite;
 import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
 import org.polymap.kaps.model.data.GebaeudeArtComposite;
+import org.polymap.kaps.model.data.GebaeudeComposite;
 import org.polymap.kaps.model.data.GemarkungComposite;
 import org.polymap.kaps.model.data.GemeindeComposite;
 import org.polymap.kaps.model.data.KaeuferKreisComposite;
@@ -76,9 +77,11 @@ public class FormPageProvider
             result.add( new FlurstuecksdatenAgrarBodenwertFormEditorPage( feature, formEditor.getFeatureStore() ) );
         }
         else if (name.equalsIgnoreCase( WohnungseigentumComposite.NAME )) {
-            result.add( new WohnungseigentumObjektdatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
-            result.add( new WohnungseigentumGebaeudeFormEditorPage( feature, formEditor.getFeatureStore() ) );
-            result.add( new WohnungseigentumFlurstueckeFormEditorPage( feature, formEditor.getFeatureStore() ) );
+            result.add( new WohnungseigentumFormEditorPage( feature, formEditor.getFeatureStore() ) );
+        }
+        else if (name.equalsIgnoreCase( GebaeudeComposite.NAME )) {
+            result.add( new GebaeudeGrunddatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
+            result.add( new GebaeudeFlurstueckeFormEditorPage( feature, formEditor.getFeatureStore() ) );
         }
         else if (name.equalsIgnoreCase( WohnungComposite.NAME )) {
             result.add( new WohnungGrunddatenFormEditorPage( feature, formEditor.getFeatureStore() ) );

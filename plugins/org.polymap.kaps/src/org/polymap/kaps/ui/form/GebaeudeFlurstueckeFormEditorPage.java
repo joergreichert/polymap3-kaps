@@ -12,8 +12,6 @@
  */
 package org.polymap.kaps.ui.form;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -56,7 +54,6 @@ import org.polymap.kaps.model.data.GemeindeComposite;
 import org.polymap.kaps.model.data.NutzungComposite;
 import org.polymap.kaps.model.data.RichtwertzoneComposite;
 import org.polymap.kaps.model.data.StrasseComposite;
-import org.polymap.kaps.model.data.WohnungseigentumComposite;
 import org.polymap.kaps.ui.ActionButton;
 import org.polymap.kaps.ui.BooleanFormField;
 import org.polymap.kaps.ui.KapsDefaultFormEditorPageWithFeatureTable;
@@ -64,12 +61,12 @@ import org.polymap.kaps.ui.KapsDefaultFormEditorPageWithFeatureTable;
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
-public class WohnungseigentumFlurstueckeFormEditorPage
+public class GebaeudeFlurstueckeFormEditorPage
         extends KapsDefaultFormEditorPageWithFeatureTable<FlurstueckComposite> {
 
-    private static Log                log    = LogFactory.getLog( WohnungseigentumFlurstueckeFormEditorPage.class );
+    private static Log                log    = LogFactory.getLog( GebaeudeFlurstueckeFormEditorPage.class );
 
-    private WohnungseigentumComposite eigentum;
+    private GebaeudeComposite gebaeude;
 
     private FlurstueckSearcher        sfAction;
 
@@ -83,16 +80,16 @@ public class WohnungseigentumFlurstueckeFormEditorPage
 
     private Object selectedRichtwertzone;
 
-    private Object selectedNutzung;
+//    private Object selectedNutzung;
 
-    private Object selectedArtDesBaugebietes;
+//    private Object selectedArtDesBaugebietes;
 
-    private final static String       prefix = WohnungseigentumFlurstueckeFormEditorPage.class.getSimpleName();
+    private final static String       prefix = GebaeudeFlurstueckeFormEditorPage.class.getSimpleName();
 
-    public WohnungseigentumFlurstueckeFormEditorPage( Feature feature, FeatureStore featureStore ) {
-        super( WohnungseigentumFlurstueckeFormEditorPage.class.getName(), "Flurstücke", feature, featureStore );
+    public GebaeudeFlurstueckeFormEditorPage( Feature feature, FeatureStore featureStore ) {
+        super( GebaeudeFlurstueckeFormEditorPage.class.getName(), "Flurstücke", feature, featureStore );
 
-        eigentum = repository.findEntity( WohnungseigentumComposite.class, feature.getIdentifier().getID() );
+        gebaeude = repository.findEntity( GebaeudeComposite.class, feature.getIdentifier().getID() );
     }
 
 
@@ -100,10 +97,10 @@ public class WohnungseigentumFlurstueckeFormEditorPage
     public void createFormContent( IFormEditorPageSite site ) {
         super.createFormContent( site );
 
-        String nummer = eigentum.objektNummer().get() != null ? eigentum.schl().get() : "neu";
+        String nummer = gebaeude.objektNummer().get() != null ? gebaeude.schl().get() : "neu";
 
-        site.setEditorTitle( formattedTitle( "Wohnungseigentum", nummer, null ) );
-        site.setFormTitle( formattedTitle( "Wohnungseigentum", nummer, getTitle() ) );
+        site.setEditorTitle( formattedTitle( "Gebäude", nummer, null ) );
+        site.setFormTitle( formattedTitle( "Gebäude", nummer, getTitle() ) );
 
         Composite parent = site.getPageBody();
         Control form = createFlurstueckForm( parent );
@@ -118,8 +115,8 @@ public class WohnungseigentumFlurstueckeFormEditorPage
         selectedGemarkung = compositeSelected ? composite.gemarkung().get() : null;
         selectedStrasse = composite != null ? composite.strasse().get() : null;
         selectedRichtwertzone = composite != null ? composite.richtwertZone().get() : null;
-        selectedNutzung = composite != null ? composite.nutzung().get() : null;
-        selectedArtDesBaugebietes = composite != null ? composite.artDesBaugebiets().get() : null;
+//        selectedNutzung = composite != null ? composite.nutzung().get() : null;
+//        selectedArtDesBaugebietes = composite != null ? composite.artDesBaugebiets().get() : null;
 
         super.refreshReloadables();
         // if (openErweiterteDaten != null) {
@@ -496,29 +493,22 @@ public class WohnungseigentumFlurstueckeFormEditorPage
 
 
     public Iterable<FlurstueckComposite> getElements() {
-         Iterable<GebaeudeComposite> allGebaeude = GebaeudeComposite.Mixin.forEntity( eigentum );
-         List<FlurstueckComposite> flurstuecke = new ArrayList<FlurstueckComposite>();
-         for (GebaeudeComposite gebaeude : allGebaeude) {
-            flurstuecke.addAll( gebaeude.flurstuecke().toList() );
-        }
-        return flurstuecke;
+        return gebaeude.flurstuecke().toList();
     }
 
 
     @Override
     protected FlurstueckComposite createNewComposite()
             throws Exception {
-        throw new IllegalStateException("not implemented yet");
-        // TODO die Flurstücke müssen einem Gebäude zugeordnet werden, hier haben wir aber nur das übergeordnete
-        // Wohneigentum
-//        return repository.newEntity( FlurstueckComposite.class, null,
-//                new EntityCreator<FlurstueckComposite>() {
-//
-//                    public void create( FlurstueckComposite prototype )
-//                            throws Exception {
-////                        prototype.objektNummer().set( eigentum.objektNummer().get() );
-////                        prototype.objektFortfuehrung().set( eigentum.objektFortfuehrung().get() );
-//                    }
-//                } );
+
+        final FlurstueckComposite flurstueck = repository.newEntity( FlurstueckComposite.class, null);
+        queue( new UpdateCommand() {
+            
+            @Override
+            public void execute() {
+                gebaeude.flurstuecke().add( flurstueck );
+            }
+        } );
+        return flurstueck;
     }
 }

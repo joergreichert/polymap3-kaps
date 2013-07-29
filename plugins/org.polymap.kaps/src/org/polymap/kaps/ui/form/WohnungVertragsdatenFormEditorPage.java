@@ -249,7 +249,8 @@ public class WohnungVertragsdatenFormEditorPage
                         .get();
                 kaufpreis = vertragsdatenErweitertComposite.bereinigterVollpreis().get();
             }
-            else {
+            // erweiterte Daten kann leer sein
+            if (kaufpreis == null || kaufpreis == 0.0d ) {
                 kaufpreis = vertrag.vollpreis().get();
             }
         }
