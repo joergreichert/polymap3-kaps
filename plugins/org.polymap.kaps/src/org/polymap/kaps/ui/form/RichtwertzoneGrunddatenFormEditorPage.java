@@ -90,7 +90,7 @@ public class RichtwertzoneGrunddatenFormEditorPage
                 // oder zu bearbeiten
                 // Entity mit geom() property ist
                 richtwertzone.geom();
-                
+                // TODO #128
                 GeometryFactory gf = new GeometryFactory();
                 gf.createMultiPolygon( null );
             };
