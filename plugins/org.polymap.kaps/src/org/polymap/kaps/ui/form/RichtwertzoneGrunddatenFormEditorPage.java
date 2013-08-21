@@ -22,8 +22,12 @@ import org.apache.commons.logging.LogFactory;
 import org.qi4j.api.entity.association.Association;
 import org.qi4j.api.property.Property;
 
+import com.vividsolutions.jts.geom.GeometryFactory;
+
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+
+import org.eclipse.jface.action.Action;
 
 import org.polymap.core.data.ui.featuretable.DefaultFeatureTableColumn;
 import org.polymap.core.data.ui.featuretable.FeatureTableViewer;
@@ -71,8 +75,26 @@ public class RichtwertzoneGrunddatenFormEditorPage
         richtwertzone = lookupRichtwertzoneComposite();
     }
 
+
     protected RichtwertzoneComposite lookupRichtwertzoneComposite() {
         return repository.findEntity( RichtwertzoneComposite.class, feature.getIdentifier().getID() );
+    }
+
+
+    @Override
+    public Action[] getEditorActions() {
+        return new Action[] { new Action( "Geometrie bearbeiten" ) {
+
+            public void run() {
+                // TODO hier den digitalisierer starten um eine Geometrie auszuwählen
+                // oder zu bearbeiten
+                // Entity mit geom() property ist
+                richtwertzone.geom();
+                
+                GeometryFactory gf = new GeometryFactory();
+                gf.createMultiPolygon( null );
+            };
+        } };
     }
 
 

@@ -25,6 +25,8 @@ import org.qi4j.api.query.Query;
 import org.qi4j.api.query.QueryExpressions;
 import org.qi4j.api.query.grammar.BooleanExpression;
 
+import com.vividsolutions.jts.geom.MultiPolygon;
+
 import org.polymap.core.qi4j.QiEntity;
 import org.polymap.core.qi4j.event.ModelChangeSupport;
 import org.polymap.core.qi4j.event.PropertyChangeSupport;
@@ -51,6 +53,9 @@ public interface RichtwertzoneComposite
 
     public final static String NAME = "richtwertzone";
 
+    @Optional
+    Property<MultiPolygon> geom();
+    
     // GFZBER VARCHAR(20), leer
     // GFZ-Bereich
     @Optional
