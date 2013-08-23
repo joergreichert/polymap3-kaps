@@ -58,6 +58,9 @@ import org.polymap.kaps.model.data.GebaeudeComposite;
 import org.polymap.kaps.model.data.GemarkungComposite;
 import org.polymap.kaps.model.data.GemeindeComposite;
 import org.polymap.kaps.model.data.KaeuferKreisComposite;
+import org.polymap.kaps.model.data.NHK2010Anbauten;
+import org.polymap.kaps.model.data.NHK2010Baupreisindex;
+import org.polymap.kaps.model.data.NHK2010BewertungComposite;
 import org.polymap.kaps.model.data.NutzungComposite;
 import org.polymap.kaps.model.data.RichtwertzoneZeitraumComposite;
 import org.polymap.kaps.model.data.StrasseComposite;
@@ -172,13 +175,23 @@ public class KapsRepository
 
                     new SimpleEntityProvider<FlurstuecksdatenAgrarComposite>( this,
                             FlurstuecksdatenAgrarComposite.class, new NameImpl( KapsRepository.NAMESPACE,
-                                    FlurstuecksdatenAgrarComposite.NAME ) ), new SimpleEntityProvider<FlurComposite>(
+                                    FlurstuecksdatenAgrarComposite.NAME ) ), 
+                                    new SimpleEntityProvider<FlurComposite>(
                             this, FlurComposite.class, new NameImpl( KapsRepository.NAMESPACE, FlurComposite.NAME ) ),
 
                     new SimpleEntityProvider<WohnungseigentumComposite>( this, WohnungseigentumComposite.class,
                             new NameImpl( KapsRepository.NAMESPACE, WohnungseigentumComposite.NAME ) ),
                     new SimpleEntityProvider<WohnungComposite>( this, WohnungComposite.class, new NameImpl(
                             KapsRepository.NAMESPACE, WohnungComposite.NAME ) ),
+                            
+                            new SimpleEntityProvider<NHK2010Anbauten>( this, NHK2010Anbauten.class, new NameImpl(
+                                    KapsRepository.NAMESPACE, NHK2010Anbauten.NAME ) ),
+                                    new SimpleEntityProvider<NHK2010Baupreisindex>( this, NHK2010Baupreisindex.class, new NameImpl(
+                                            KapsRepository.NAMESPACE, NHK2010Baupreisindex.NAME ) ),
+                                            new SimpleEntityProvider<NHK2010BewertungComposite>( this, NHK2010BewertungComposite.class, new NameImpl(
+                                                    KapsRepository.NAMESPACE, NHK2010BewertungComposite.NAME ) ),
+                                    
+                                            
                     // nicht änderbare Wertelisten
                     // new SimpleEntityProvider<ErschliessungsBeitragComposite>(
                     // this,

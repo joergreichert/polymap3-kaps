@@ -119,7 +119,7 @@ public interface VertragComposite
     // Property<MultiPolygon> geom();
     //
  
-    String NAME = "Vertrag";
+    final static String NAME = "Vertrag";
 
     /** Eingangsnummer. */
     // EINGANGSNR DOUBLE,

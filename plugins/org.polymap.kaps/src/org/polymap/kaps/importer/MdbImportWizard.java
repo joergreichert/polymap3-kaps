@@ -21,7 +21,13 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
 
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+
 import org.polymap.core.operation.OperationSupport;
+import org.polymap.core.qi4j.event.AbstractModelChangeOperation;
 import org.polymap.core.workbench.PolymapWorkbench;
 
 import org.polymap.kaps.KapsPlugin;
@@ -60,11 +66,20 @@ public class MdbImportWizard
 
     public boolean performFinish() {
         try {
-//            MdbImportOperation op = new MdbImportOperation( importPage.dbFile, importPage.tableNames );
-//            MdbImportWohneigentumOperation op = new MdbImportWohneigentumOperation( importPage.dbFile,
-//                    importPage.tableNames );
-            MdbImportBewertungenOperation op = new MdbImportBewertungenOperation( importPage.dbFile,
-                    importPage.tableNames );
+            // MdbImportOperation op =
+            AbstractModelChangeOperation op = new AbstractModelChangeOperation( "WinAKPS importieren" ) {
+
+                @Override
+                protected IStatus doExecute( IProgressMonitor monitor, IAdaptable info )
+                        throws Exception {
+                    new MdbImportOperation( importPage.dbFile, importPage.tableNames ).doExecute( monitor, info );
+                    new MdbImportWohneigentumOperation( importPage.dbFile, importPage.tableNames ).doExecute( monitor,
+                          info );
+                    new MdbImportBewertungenOperation( importPage.dbFile, importPage.tableNames ).doExecute( monitor,
+                            info );
+                    return Status.OK_STATUS;
+                }
+            };
             OperationSupport.instance().execute( op, true, true );
 
             return true;

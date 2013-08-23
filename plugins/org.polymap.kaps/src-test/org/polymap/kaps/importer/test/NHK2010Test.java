@@ -18,8 +18,8 @@ import junit.framework.TestCase;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.polymap.kaps.model.NHK2010GebaeudeartenProvider;
 import org.polymap.kaps.model.data.NHK2010Gebaeudeart;
-import org.polymap.kaps.model.data.NHK2010GebaeudeartenProvider;
 
 
 /**

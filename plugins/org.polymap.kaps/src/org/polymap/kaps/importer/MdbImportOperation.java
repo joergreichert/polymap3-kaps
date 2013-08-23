@@ -101,7 +101,7 @@ public class MdbImportOperation
                     entity.stala().set(
                             findBySchl( VeraeussererBaulandStalaComposite.class, builderRow, "STALA", false ) );
                     entity.stalaAgrar().set(
-                            findBySchl( VeraeussererAgrarLandStalaComposite.class, builderRow, "STALA", false ) );
+                            findBySchl( VeraeussererAgrarLandStalaComposite.class, builderRow, "STALA_AGRAR", false ) );
                     entity.kaeuferKreisStabu().set(
                             findBySchl( KaeuferKreisStaBuComposite.class, builderRow, "STAT_BUND", false ) );
 

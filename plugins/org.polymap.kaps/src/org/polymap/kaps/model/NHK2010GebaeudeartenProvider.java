@@ -10,7 +10,7 @@
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
  * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
  */
-package org.polymap.kaps.model.data;
+package org.polymap.kaps.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,6 +19,8 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import org.polymap.kaps.model.data.NHK2010Gebaeudeart;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
