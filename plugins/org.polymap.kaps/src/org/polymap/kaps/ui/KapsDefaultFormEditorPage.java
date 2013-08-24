@@ -23,6 +23,7 @@ import org.opengis.feature.Feature;
 
 import org.qi4j.api.property.Property;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -69,6 +70,49 @@ public abstract class KapsDefaultFormEditorPage
 
     protected static final int RIGHT   = 100;
 
+    // 5 column layout
+    private static final int                  ONE   = 0;
+
+    private static final int                  TWO   = 20;
+
+    private static final int                  THREE = 40;
+
+    private static final int                  FOUR  = 60;
+
+    private static final int                  FIVE  = 80;
+
+    private static final int                  SIX   = 100;
+
+
+    protected SimpleFormData one() {
+        return new SimpleFormData( SPACING ).left( ONE ).right( TWO );
+    }
+
+
+    protected SimpleFormData two() {
+        return new SimpleFormData( SPACING ).left( TWO ).right( THREE );
+    }
+
+
+    protected SimpleFormData twothree() {
+        return new SimpleFormData( SPACING ).left( TWO ).right( FOUR );
+    }
+
+
+    protected SimpleFormData three() {
+        return new SimpleFormData( SPACING ).left( THREE ).right( FOUR );
+    }
+
+
+    protected SimpleFormData four() {
+        return new SimpleFormData( SPACING ).left( FOUR ).right( FIVE );
+    }
+
+
+    protected SimpleFormData five() {
+        return new SimpleFormData( SPACING ).left( FIVE ).right( SIX );
+    }
+    
     protected KapsRepository   repository;
 
     protected Locale           locale  = Locale.GERMAN;
@@ -271,7 +315,10 @@ public abstract class KapsDefaultFormEditorPage
                 .setEnabled( editable ).create();
     }
 
-
+    protected Control createLabel( Composite parent, String text, SimpleFormData data ) {
+        return createLabel( parent, text, text, data, SWT.LEFT );
+    }
+    
     protected Control createLabel( Composite parent, String text, SimpleFormData data, int style ) {
         return createLabel( parent, text, text, data, style );
     }

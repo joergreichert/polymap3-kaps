@@ -179,21 +179,21 @@ public class MdbImportBewertungenOperation
                         throw new IllegalStateException( "no bewertung found for " + eingangsnummer );
                     }
                     bewertungGebaeude.bewertung().set( nhk2010BewertungComposite );
-                    bewertungGebaeudeImporter.fillEntity( bewertungGebaeude, builderRow );
-
-                    Integer hnr = (Integer)builderRow.get( "HAUPTNR" );
-                    if (hnr != null) {
-                        Integer nr = (Integer)builderRow.get( "NR" );
-                        Integer unternr = (Integer)builderRow.get( "UNTERNR" );
-                        bewertungGebaeude.gebaeudeArt().set(
-                                gebaeudeArtenProvider.gebaeudeFor( hnr, nr, unternr )
-                                        .getNumber() );
-                    }
-
                 }
                 else {
                     throw new IllegalStateException( "no EINGANGSNR found" );
                 }
+                bewertungGebaeudeImporter.fillEntity( bewertungGebaeude, builderRow );
+
+                Integer hnr = (Integer)builderRow.get( "HAUPTNR" );
+                if (hnr != null) {
+                    Integer nr = (Integer)builderRow.get( "NR" );
+                    Integer unternr = (Integer)builderRow.get( "UNTERNR" );
+                    bewertungGebaeude.gebaeudeArtId().set(
+                            gebaeudeArtenProvider.gebaeudeForNumber( hnr, nr, unternr )
+                                    .getId() );
+                }
+                bewertungGebaeude.zweifamilienHaus().set( getBooleanValue( builderRow, "FAMHAUS2"));
                 count++;
             }
             // andernfalls ignorieren

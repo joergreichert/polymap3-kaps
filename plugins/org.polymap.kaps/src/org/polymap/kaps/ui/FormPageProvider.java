@@ -31,6 +31,7 @@ import org.polymap.kaps.model.data.GebaeudeComposite;
 import org.polymap.kaps.model.data.GemarkungComposite;
 import org.polymap.kaps.model.data.GemeindeComposite;
 import org.polymap.kaps.model.data.KaeuferKreisComposite;
+import org.polymap.kaps.model.data.NHK2010BewertungComposite;
 import org.polymap.kaps.model.data.NutzungComposite;
 import org.polymap.kaps.model.data.RichtwertzoneComposite;
 import org.polymap.kaps.model.data.RichtwertzoneZeitraumComposite;
@@ -224,6 +225,9 @@ public class FormPageProvider
         else if (name.equalsIgnoreCase( FlurComposite.NAME )) {
             result.add( new DefaultEntityFormEditorPage( feature, formEditor.getFeatureStore(), FlurComposite.class,
                     KapsRepository.instance(), FlurComposite.NAME ) );
+        }
+        else if (name.equalsIgnoreCase( NHK2010BewertungComposite.NAME )) {
+            result.add( new NHK2010BewertungFormEditorPage( feature, formEditor.getFeatureStore() ) );
         }
         return result;
     }

@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class NHK2010Gebaeudeart {
 
-    private List<NHK2010Gebaeudeart> children;
+    private final List<NHK2010Gebaeudeart> children ;
 
     private Integer                  stufe1;
 
@@ -68,6 +68,8 @@ public class NHK2010Gebaeudeart {
 
     private String                   nutzeinheit;
 
+    private String qualifiedName;
+
 
     public NHK2010Gebaeudeart( int hauptnr, int nummer, int unternummer, String name, String id, Integer gndVon,
             Integer gndBis, Integer korrekturGroesse1, Double korrekturFaktor1, Integer korrekturGroesse2,
@@ -76,6 +78,7 @@ public class NHK2010Gebaeudeart {
         this.nummer = nummer;
         this.unternummer = unternummer;
         this.name = name;
+        this.qualifiedName = name;
         this.id = id;
         this.gndVon = gndVon;
         this.gndBis = gndBis;
@@ -86,15 +89,22 @@ public class NHK2010Gebaeudeart {
         this.korrekturGroesse3 = korrekturGroesse3;
         this.korrekturFaktor3 = korrekturFaktor3;
         this.selectable = id != null;
+        children = new ArrayList<NHK2010Gebaeudeart>();
     }
 
 
     public void add( NHK2010Gebaeudeart child ) {
-        if (children == null) {
-            children = new ArrayList<NHK2010Gebaeudeart>();
-        }
+        child.addNamePrefix(qualifiedName);
         children.add( child );
+    }
 
+
+    /**
+     *
+     * @param name2
+     */
+    private void addNamePrefix( String namePrefix ) {
+        qualifiedName = namePrefix + " - " + qualifiedName;
     }
 
 
@@ -148,6 +158,10 @@ public class NHK2010Gebaeudeart {
     }
 
 
+    public String getQualifiedName() {
+        return qualifiedName;
+    }
+    
     public String getId() {
         return id;
     }

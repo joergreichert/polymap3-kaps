@@ -24,7 +24,6 @@ import org.eclipse.swt.widgets.Control;
 
 import org.eclipse.ui.forms.widgets.Section;
 
-import org.polymap.core.project.ui.util.SimpleFormData;
 import org.polymap.core.runtime.Polymap;
 import org.polymap.core.runtime.event.EventFilter;
 import org.polymap.core.runtime.event.EventManager;
@@ -51,17 +50,6 @@ import org.polymap.kaps.ui.FieldSummation;
 public class FlurstuecksdatenBaulandBodenwertFormEditorPage
         extends FlurstuecksdatenBaulandFormEditorPage {
 
-    private static final int                  ONE   = 0;
-
-    private static final int                  TWO   = 20;
-
-    private static final int                  THREE = 40;
-
-    private static final int                  FOUR  = 60;
-
-    private static final int                  FIVE  = 80;
-
-    private static final int                  SIX   = 100;
 
     private static Log                        log   = LogFactory
                                                             .getLog( FlurstuecksdatenBaulandBodenwertFormEditorPage.class );
@@ -139,36 +127,6 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
                         && ev.getFieldName().equals( vb.bodenpreisBebaut().qualifiedName().name() );
             }
         } );
-    }
-
-
-    protected SimpleFormData one() {
-        return new SimpleFormData( SPACING ).left( ONE ).right( TWO );
-    }
-
-
-    protected SimpleFormData two() {
-        return new SimpleFormData( SPACING ).left( TWO ).right( THREE );
-    }
-
-
-    protected SimpleFormData twothree() {
-        return new SimpleFormData( SPACING ).left( TWO ).right( FOUR );
-    }
-
-
-    protected SimpleFormData three() {
-        return new SimpleFormData( SPACING ).left( THREE ).right( FOUR );
-    }
-
-
-    protected SimpleFormData four() {
-        return new SimpleFormData( SPACING ).left( FOUR ).right( FIVE );
-    }
-
-
-    protected SimpleFormData five() {
-        return new SimpleFormData( SPACING ).left( FIVE ).right( SIX );
     }
 
 

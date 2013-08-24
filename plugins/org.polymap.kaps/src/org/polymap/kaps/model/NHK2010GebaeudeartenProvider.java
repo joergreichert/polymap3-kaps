@@ -20,12 +20,16 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.Viewer;
+
 import org.polymap.kaps.model.data.NHK2010Gebaeudeart;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
-public class NHK2010GebaeudeartenProvider {
+public class NHK2010GebaeudeartenProvider
+        implements ITreeContentProvider {
 
     private static Log                          log          = LogFactory.getLog( NHK2010GebaeudeartenProvider.class );
 
@@ -34,6 +38,8 @@ public class NHK2010GebaeudeartenProvider {
     private final List<NHK2010Gebaeudeart>      rootElements = new ArrayList<NHK2010Gebaeudeart>();
 
     private Map<String, NHK2010Gebaeudeart>     registry     = new HashMap<String, NHK2010Gebaeudeart>();
+
+    private Map<String, NHK2010Gebaeudeart>     idRegistry   = new HashMap<String, NHK2010Gebaeudeart>();
 
 
     private NHK2010GebaeudeartenProvider() {
@@ -88,6 +94,12 @@ public class NHK2010GebaeudeartenProvider {
                 korrekturGroesse3, korrekturFaktor3, korrekturGroesse3, korrekturFaktor3, korrekturGroesse3,
                 korrekturFaktor3 );
         registry.put( art.getNumber(), art );
+        if (id != null) {
+            if (idRegistry.containsKey( id )) {
+                throw new IllegalStateException( "id " + id + " already exists" );
+            }
+            idRegistry.put( id, art );
+        }
         return art;
     }
 
@@ -104,8 +116,13 @@ public class NHK2010GebaeudeartenProvider {
     }
 
 
-    public NHK2010Gebaeudeart gebaeudeFor( Integer hnr, Integer nr, Integer unternr ) {
+    public NHK2010Gebaeudeart gebaeudeForNumber( Integer hnr, Integer nr, Integer unternr ) {
         return registry.get( createKey( hnr, nr, unternr ) );
+    }
+
+
+    public NHK2010Gebaeudeart gebaeudeForId( String id ) {
+        return idRegistry.get( id );
     }
 
 
@@ -639,4 +656,37 @@ public class NHK2010GebaeudeartenProvider {
         setValues( 18, 5, 1, 5, 350, null, null, 11, null );
     }
 
+
+    @Override
+    public Object[] getElements( Object inputElement ) {
+        return rootElements.toArray();
+    }
+
+
+    @Override
+    public Object[] getChildren( Object parentElement ) {
+        return ((NHK2010Gebaeudeart)parentElement).getChildren().toArray();
+    }
+
+
+    @Override
+    public Object getParent( Object element ) {
+        return null;
+    }
+
+
+    @Override
+    public boolean hasChildren( Object element ) {
+        return getChildren( element ).length > 0;
+    }
+
+
+    @Override
+    public void dispose() {
+    }
+
+
+    @Override
+    public void inputChanged( Viewer viewer, Object oldInput, Object newInput ) {
+    }
 }

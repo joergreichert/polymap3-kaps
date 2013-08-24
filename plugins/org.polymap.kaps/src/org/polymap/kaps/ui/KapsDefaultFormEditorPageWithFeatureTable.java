@@ -112,7 +112,7 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
         int TOPSPACING = 20;
         viewer = new FeatureTableViewer( parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL );
         viewer.getTable().setLayoutData(
-                new SimpleFormData().fill().left( 2 ).height( 100 ).right( 90 ).top( top, TOPSPACING ).bottom( 100 ).create() );
+                new SimpleFormData().fill().left( 0 ).height( 100 ).right( 85 ).top( top, TOPSPACING ).bottom( 100 ).create() );
 
         // columns
         EntityType<T> type = addViewerColumns( viewer );
@@ -148,8 +148,8 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
                 }
             };
             addBtn = new ActionButton( parent, addAction );
-            addBtn.setLayoutData( new SimpleFormData().left( viewer.getTable(), SPACING ).top( top, TOPSPACING )
-                    .right( 98, -SPACING ).height( 30 ).create() );
+            addBtn.setLayoutData( new SimpleFormData().left( viewer.getTable(), 6 ).top( top, TOPSPACING )
+                    .right( 100 ).height( 30 ).create() );
         }
 
         DeleteCompositeAction<T> deleteAction = new DeleteCompositeAction<T>() {
@@ -180,8 +180,8 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
             }
         };
         ActionButton delBtn = new ActionButton( parent, deleteAction );
-        delBtn.setLayoutData( new SimpleFormData().left( viewer.getTable(), SPACING )
-                .top( addBtn != null ? addBtn : top, addBtn != null ? SPACING : TOPSPACING ).right( 98, -SPACING )
+        delBtn.setLayoutData( new SimpleFormData().left( viewer.getTable(), 6 )
+                .top( addBtn != null ? addBtn : top, addBtn != null ? SPACING : TOPSPACING ).right( 100 )
                 .height( 30 ).create() );
 
         parent.layout( true );

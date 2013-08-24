@@ -32,18 +32,25 @@ public class NHK2010Test
     
     public void testStufe5VomSchweinestall() {
         NHK2010GebaeudeartenProvider provider = NHK2010GebaeudeartenProvider.instance();
-        NHK2010Gebaeudeart art = provider.gebaeudeFor(18,3,2);
+        NHK2010Gebaeudeart art = provider.gebaeudeForNumber(18,3,2);
         Assert.assertEquals( 570, (int)art.getStufe5());
     }
 
     public void testKrankenhaus() {
         NHK2010GebaeudeartenProvider provider = NHK2010GebaeudeartenProvider.instance();
-        NHK2010Gebaeudeart art = provider.gebaeudeFor(10,1,1);
+        NHK2010Gebaeudeart art = provider.gebaeudeForNumber(10,1,1);
         Assert.assertEquals( 1720, (int)art.getStufe3());
         Assert.assertEquals( 2080, (int)art.getStufe4());
         Assert.assertEquals( 2765, (int)art.getStufe5());
         Assert.assertEquals( 21, (int)art.getBnk());
         Assert.assertEquals( "10.1", art.getId());
         Assert.assertEquals("Krankenhäuser und Kliniken", art.getName());
+    }
+    
+
+    public void testGarageById() {
+        NHK2010GebaeudeartenProvider provider = NHK2010GebaeudeartenProvider.instance();
+        NHK2010Gebaeudeart art = provider.gebaeudeForId("14.3");
+        Assert.assertEquals( 560, (int)art.getStufe3());
     }
 }
