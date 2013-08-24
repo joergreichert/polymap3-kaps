@@ -20,55 +20,58 @@ import java.util.List;
  */
 public class NHK2010Gebaeudeart {
 
-    private final List<NHK2010Gebaeudeart> children ;
+    private final List<NHK2010Gebaeudeart> children;
 
-    private Integer                  stufe1;
+    private Integer                        stufe1;
 
-    private Integer                  stufe2;
+    private Integer                        stufe2;
 
-    private Integer                  stufe3;
+    private Integer                        stufe3;
 
-    private Integer                  stufe4;
+    private Integer                        stufe4;
 
-    private Integer                  stufe5;
+    private Integer                        stufe5;
 
-    private boolean                  selectable = false;
+    private boolean                        selectable = false;
 
-    private Integer                  korrekturGroesse1; // Korrekturfaktoren BGF
+    private Integer                        korrekturGroesse1; // Korrekturfaktoren
+                                                               // BGF
 
-    private Double                   korrekturFaktor1;
+    private Double                         korrekturFaktor1;
 
-    private Integer                  korrekturGroesse2; // Korrekturfaktoren BGF
+    private Integer                        korrekturGroesse2; // Korrekturfaktoren
+                                                               // BGF
 
-    private Double                   korrekturFaktor2;
+    private Double                         korrekturFaktor2;
 
-    private Integer                  korrekturGroesse3; // Korrekturfaktoren BGF
+    private Integer                        korrekturGroesse3; // Korrekturfaktoren
+                                                               // BGF
 
-    private Double                   korrekturFaktor3;
+    private Double                         korrekturFaktor3;
 
-    private final int                hauptnr;
+    private final int                      hauptnr;
 
-    private final int                nummer;
+    private final int                      nummer;
 
-    private final int                unternummer;
+    private final int                      unternummer;
 
-    private final String             name;
+    private final String                   name;
 
-    private final String             id;
+    private final String                   id;
 
-    private final Integer            gndVon;
+    private final Integer                  gndVon;
 
-    private final Integer            gndBis;
+    private final Integer                  gndBis;
 
-    private Integer                  bnk;
+    private Integer                        bnk;
 
-    private Double                   bgfNutz;
+    private Double                         bgfNutz;
 
-    private Double                   briBgf;
+    private Double                         briBgf;
 
-    private String                   nutzeinheit;
+    private String                         nutzeinheit;
 
-    private String qualifiedName;
+    private String                         qualifiedName;
 
 
     public NHK2010Gebaeudeart( int hauptnr, int nummer, int unternummer, String name, String id, Integer gndVon,
@@ -94,13 +97,13 @@ public class NHK2010Gebaeudeart {
 
 
     public void add( NHK2010Gebaeudeart child ) {
-        child.addNamePrefix(qualifiedName);
+        child.addNamePrefix( qualifiedName );
         children.add( child );
     }
 
 
     /**
-     *
+     * 
      * @param name2
      */
     private void addNamePrefix( String namePrefix ) {
@@ -161,7 +164,8 @@ public class NHK2010Gebaeudeart {
     public String getQualifiedName() {
         return qualifiedName;
     }
-    
+
+
     public String getId() {
         return id;
     }
@@ -246,6 +250,43 @@ public class NHK2010Gebaeudeart {
 
     public String getNutzeinheit() {
         return nutzeinheit;
+    }
+
+
+    public Double calculateNHKFor( String selectedGebaeudeStandard ) {
+        if (selectedGebaeudeStandard == null || selectedGebaeudeStandard.isEmpty()) {
+            return null;
+        }
+        if ("1.0".equals( selectedGebaeudeStandard )) {
+            return stufe1.doubleValue();
+        }
+        else if ("1.5".equals( selectedGebaeudeStandard )) {
+            return (stufe1.doubleValue() + stufe2.doubleValue()) / 2;
+        }
+        else if ("2.0".equals( selectedGebaeudeStandard )) {
+            return stufe2.doubleValue();
+        }
+        else if ("2.5".equals( selectedGebaeudeStandard )) {
+            return (stufe2.doubleValue() + stufe3.doubleValue()) / 2;
+        }
+        else if ("3.0".equals( selectedGebaeudeStandard )) {
+            return stufe3.doubleValue();
+        }
+        else if ("3.5".equals( selectedGebaeudeStandard )) {
+            return (stufe3.doubleValue() + stufe4.doubleValue()) / 2;
+        }
+        else if ("4.0".equals( selectedGebaeudeStandard )) {
+            return stufe4.doubleValue();
+        }
+        else if ("4.5".equals( selectedGebaeudeStandard )) {
+            return (stufe4.doubleValue() + stufe5.doubleValue()) / 2;
+        }
+        else if ("5.0".equals( selectedGebaeudeStandard )) {
+            return stufe5.doubleValue();
+        }
+        else {
+            throw new IllegalStateException( "Der Gebäudestandard " + selectedGebaeudeStandard + " ist unbekannt!" );
+        }
     }
 
 }

@@ -12,6 +12,9 @@
  */
 package org.polymap.kaps.ui.form;
 
+import java.util.SortedMap;
+import java.util.TreeMap;
+
 import org.geotools.data.FeatureStore;
 import org.opengis.feature.Feature;
 import org.opengis.feature.type.PropertyDescriptor;
@@ -26,6 +29,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
+import org.eclipse.jface.action.Action;
+
 import org.eclipse.ui.forms.widgets.Section;
 
 import org.polymap.core.data.ui.featuretable.DefaultFeatureTableColumn;
@@ -38,8 +43,12 @@ import org.polymap.core.runtime.Polymap;
 import org.polymap.rhei.data.entityfeature.PropertyDescriptorAdapter;
 import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter;
 import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter.PropertyCallback;
+import org.polymap.rhei.field.CheckboxFormField;
+import org.polymap.rhei.field.FormFieldEvent;
 import org.polymap.rhei.field.IFormFieldLabel;
+import org.polymap.rhei.field.IFormFieldListener;
 import org.polymap.rhei.field.NumberValidator;
+import org.polymap.rhei.field.PicklistFormField;
 import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
@@ -70,7 +79,15 @@ public class NHK2010BewertungFormEditorPage
 
     private NHK2010GebaeudeartSelector  gebaeudeArtAction;
 
-    private Label gebaeudeArtLabel;
+    private Action                      gebaeudeStandardAction;
+
+    private NHK2010Gebaeudeart          selectedGebaeudeArt;
+
+    private IFormFieldListener          gebaeudeArtListener;
+
+    private IFormFieldListener          gebaeudeStandardListener;
+
+    private String                      selectedGebaeudeStandard;
 
 
     public NHK2010BewertungFormEditorPage( Feature feature, FeatureStore featureStore ) {
@@ -83,20 +100,33 @@ public class NHK2010BewertungFormEditorPage
     protected void refreshReloadables()
             throws Exception {
         NHK2010BewertungGebaeudeComposite composite = selectedComposite.get();
+        selectedGebaeudeArt = NHK2010GebaeudeartenProvider.instance().gebaeudeForId(
+                composite != null ? composite.gebaeudeArtId().get() : null );
+        selectedGebaeudeStandard = composite != null ? composite.gebaeudeStandard().get() : null;
 
         super.refreshReloadables();
 
         // diese felder müssen disabled bleiben
         if (formCreated) {
             gebaeudeArtAction.setEnabled( composite != null );
-
+            // TODO
+            gebaeudeStandardAction.setEnabled( false );
             pageSite.setFieldEnabled( prefix + "laufendeNummer", false );
             pageSite.setFieldEnabled( prefix + "gebaeudeArtId", false );
-            
-            if (composite != null) {
-                NHK2010Gebaeudeart art = NHK2010GebaeudeartenProvider.instance().gebaeudeForId( composite.gebaeudeArtId().get() );
-                gebaeudeArtLabel.setText( art != null ? art.getQualifiedName() : "" );                 
-            }
+            pageSite.setFieldEnabled( prefix + "nhk", false );
+            // if (composite != null) {
+            // // NHK2010Gebaeudeart art =
+            // NHK2010GebaeudeartenProvider.instance().gebaeudeForId(
+            // composite.gebaeudeArtId().get() );
+            // // gebaeudeArtLabel.setText( art != null ? art.getQualifiedName() : ""
+            // );
+            //
+            // // selectedGebaeudeArt = art;
+            // } else {
+            // selectedGebaeudeArt = null;
+            // }
+            // gebaeudeStandardField.setEnabled( selectedGebaeudeArt != null );
+            postProcessGebaeudeArtSelection();
         }
     }
 
@@ -180,7 +210,6 @@ public class NHK2010BewertungFormEditorPage
                     throws Exception {
                 assert toAdopt != null;
                 pageSite.setFieldValue( prefix + "gebaeudeArtId", toAdopt.getId() );
-                gebaeudeArtLabel.setText( toAdopt.getQualifiedName() );
             }
         };
         gebaeudeArtAction.setEnabled( false );
@@ -200,156 +229,206 @@ public class NHK2010BewertungFormEditorPage
                             }
                         } ) ).setField( reloadable( new StringFormField() ) ).setEnabled( false )
                 .setLayoutData( two().top( lastLine ).create() ).create();
-//        lastLine = newLine;
-        gebaeudeArtLabel = (Label)createLabel( parent, "", three().right( 100 ).top( lastLine ), SWT.LEFT );
+        // lastLine = newLine;
+        final Label gebaeudeArtLabel = (Label)createLabel( parent, "", three().right( 100 ).top( lastLine ), SWT.LEFT );
         lastLine = gebaeudeArtLabel;
-        // newLine = newFormField( "Zone" ).setEnabled( bewertung.schl().get() ==
-        // null )
-        // .setProperty( new PropertyAdapter( bewertung.schl() ) ).setValidator( new
-        // NotNullValidator() )
-        // .setField( new StringFormField() ).setLayoutData( left().top( lastLine
-        // ).create() ).create();
-        // // TODO einfach immer anlassen ist wohl am einfachsten oder?
-        // // boolean lageEnabled = (gemeinde != null && gemeinde.einwohner().get() >
-        // // 50000);
-        // final Composite lage = newFormField( "Lage (STALA)" )
-        // /* .setEnabled( lageEnabled ) */
-        // .setProperty( new AssociationAdapter<RichtwertZoneLageComposite>(
-        // bewertung.lage() ) )
-        // .setField( namedAssocationsPicklist( RichtwertZoneLageComposite.class ) )
-        // .setLayoutData( right().top( lastLine ).create() ).create();
+
+        // gebäudestandard
+        newLine = createLabel( parent, "Standard", one().right( 10 ).top( lastLine ) );
+        // TODO
+        gebaeudeStandardAction = new Action( "Ermitteln" ) {
+        };
+        // gebaeudeStandardAction = new NHK2010GebaeudeStandardSelector(
+        // pageSite.getToolkit() ) {
         //
-        // lastLine = newLine;
-        // newLine = newFormField( "GFZ-Bereich" ).setProperty( new PropertyAdapter(
-        // bewertung.gfzBereich() ) )
-        // .setField( new StringFormField() ).setLayoutData( right().top( lastLine
-        // ).create() ).create();
-        //
-        // lastLine = newLine;
-        // newLine = newFormField( "Nutzung" )
-        // .setProperty( new AssociationAdapter<NutzungComposite>(
-        // bewertung.nutzung() ) )
-        // .setField( namedAssocationsPicklist( NutzungComposite.class ) )
-        // .setLayoutData( left().top( lastLine ).create() ).create();
-        //
-        // newFormField( "Bodennutzung" )
-        // .setProperty( new AssociationAdapter<BodennutzungComposite>(
-        // bewertung.bodenNutzung() ) )
-        // .setField( namedAssocationsPicklist( BodennutzungComposite.class ) )
-        // .setLayoutData( right().top( lastLine ).create() ).create();
-        //
-        // // site.addFieldListener( gemeindeListener = new IFormFieldListener() {
-        // //
-        // // @Override
-        // // public void fieldChange( FormFieldEvent ev ) {
-        // // if (ev.getFieldName().equals( "gemeinde" )) {
-        // // GemeindeComposite gemeinde = (GemeindeComposite)ev.getNewValue();
-        // // lage.setEnabled( gemeinde != null && gemeinde.einwohner().get() > 50000
-        // );
-        // // }
-        // // }
-        // // } );
-        //
+        // protected void adopt( Double gebaeudeStandard )
+        // throws Exception {
+        // assert gebaeudeStandard != null;
+        // pageSite.setFieldValue( prefix + "gebaeudeArtId", toAdopt.getId() );
+        // gebaeudeArtLabel.setText( toAdopt.getQualifiedName() );
+        // }
+        // };
+        // gebaeudeStandardAction.setEnabled( false );
+        ActionButton gebaeudeStandardActionButton = new ActionButton( parent, gebaeudeStandardAction );
+        gebaeudeStandardActionButton.setLayoutData( one().left( newLine, 0 ).top( lastLine ).height( 16 ).create() );
+        gebaeudeStandardActionButton.setEnabled( false );
+
+        final PicklistFormField gebaeudeStandardPickList = new PicklistFormField(
+                new PicklistFormField.ValueProvider() {
+
+                    @Override
+                    public SortedMap<String, Object> get() {
+                        TreeMap<String, Object> zonen = new TreeMap<String, Object>();
+                        if (selectedGebaeudeArt != null) {
+                            if (selectedGebaeudeArt.getStufe1() != null) {
+                                zonen.put( "1.0 Einfachst", "1.0" );
+                                zonen.put( "1.5 Einfachst - Einfach", "1.5" );
+                                zonen.put( "2.0 Einfach", "2.0" );
+                                zonen.put( "2.5 Einfach - Mittel", "2.5" );
+                            }
+                            zonen.put( "3.0 Mittel", "3.0" );
+                            zonen.put( "3.5 Mittel - Gehoben", "3.5" );
+                            zonen.put( "4.0 Gehoben", "4.0" );
+                            zonen.put( "4.5 Gehoben - Stark gehoben", "4.5" );
+                            zonen.put( "5.0 Stark gehoben", "5.0" );
+                        }
+                        return zonen;
+                    }
+                } );
+
+        newFormField( IFormFieldLabel.NO_LABEL )
+                .setParent( parent )
+                .setProperty(
+                        new ReloadablePropertyAdapter<NHK2010BewertungGebaeudeComposite>( selectedComposite, prefix
+                                + "gebaeudeStandard", new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
+
+                            @Override
+                            public Property get( NHK2010BewertungGebaeudeComposite entity ) {
+                                return entity.gebaeudeStandard();
+                            }
+                        } ) ).setField( reloadable( gebaeudeStandardPickList ) ).setEnabled( false )
+                .setLayoutData( two().top( lastLine ).create() ).create();
+        final Label gebaeudeBnkLabel = (Label)createLabel( parent, "", three().right( 100 ).top( lastLine ), SWT.LEFT );
+
+        // Gebäudestandard - Zusatzdaten
+        lastLine = newLine;
+        // grundrissart
+        newLine = createLabel( parent, "Grundrissart", one().top( lastLine ) );
+        final PicklistFormField grundrissArtPickList = new PicklistFormField( new PicklistFormField.ValueProvider() {
+
+            @Override
+            public SortedMap<String, Object> get() {
+                TreeMap<String, Object> zonen = new TreeMap<String, Object>();
+                zonen.put( "1. Einspänner", "Einspänner" );
+                zonen.put( "2. Zweispänner", "Zweispänner" );
+                zonen.put( "3. Dreispänner", "Dreispänner" );
+                zonen.put( "4. Vierspänner", "Vierspänner" );
+                return zonen;
+            }
+        } );
+
+        newFormField( IFormFieldLabel.NO_LABEL )
+                .setToolTipText( "Grundrissart (nur bei Mehrfamilienhäusern)" )
+                .setParent( parent )
+                .setProperty(
+                        new ReloadablePropertyAdapter<NHK2010BewertungGebaeudeComposite>( selectedComposite, prefix
+                                + "grundrissArt", new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
+
+                            @Override
+                            public Property get( NHK2010BewertungGebaeudeComposite entity ) {
+                                return entity.grundrissArt();
+                            }
+                        } ) ).setField( reloadable( grundrissArtPickList ) ).setEnabled( false )
+                .setLayoutData( two().top( lastLine ).create() ).create();
+
+        newFormField( "Wohnungen" )
+                .setToolTipText( "Anzahl Wohnungen (nur bei Mehrfamilienhäusern)" )
+                .setParent( parent )
+                .setProperty(
+                        new ReloadablePropertyAdapter<NHK2010BewertungGebaeudeComposite>( selectedComposite, prefix
+                                + "anzahlWohnungen", new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
+
+                            @Override
+                            public Property get( NHK2010BewertungGebaeudeComposite entity ) {
+                                return entity.anzahlWohnungen();
+                            }
+                        } ) ).setField( reloadable( new StringFormField() ) ).setEnabled( false )
+                .setLayoutData( three().top( lastLine ).create() ).create();
+
+        newFormField( "Zweifamilienhaus" )
+                .setToolTipText( "Zweifamilienhaus (nur bei Auswahl von Einfamilienhäusern)" )
+                .setParent( parent )
+                .setProperty(
+                        new ReloadablePropertyAdapter<NHK2010BewertungGebaeudeComposite>( selectedComposite, prefix
+                                + "zweifamilienHaus", new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
+
+                            @Override
+                            public Property get( NHK2010BewertungGebaeudeComposite entity ) {
+                                return entity.zweifamilienHaus();
+                            }
+                        } ) ).setField( reloadable( new CheckboxFormField() ) ).setEnabled( false )
+                .setLayoutData( five().top( lastLine ).create() ).create();
+
+        lastLine = newLine;
+
+        pageSite.addFieldListener( gebaeudeArtListener = new IFormFieldListener() {
+
+            @Override
+            public void fieldChange( FormFieldEvent ev ) {
+                if (ev.getEventCode() == VALUE_CHANGE && ev.getFieldName().equalsIgnoreCase( prefix + "gebaeudeArtId" )) {
+                    // if ((ev.getNewValue() == null && selectedGebaeudeArt != null)
+                    // || (ev.getNewValue() != null && !ev.getNewValue().equals(
+                    // selectedGebaeudeArt.getId() ))) {
+                    // selectedGebaeudeArt = toAdopt;
+
+                    selectedGebaeudeArt = NHK2010GebaeudeartenProvider.instance().gebaeudeForId(
+                            (String)ev.getNewValue() );
+                    gebaeudeArtLabel.setText( selectedGebaeudeArt != null ? selectedGebaeudeArt.getQualifiedName() : "" );
+                    gebaeudeBnkLabel.setText( selectedGebaeudeArt != null && selectedGebaeudeArt.getBnk() != null ? "inkl. Baunebenkosten von "
+                            + selectedGebaeudeArt.getBnk() + " %"
+                            : "" );
+
+                    gebaeudeStandardPickList.reloadValues();
+                    pageSite.setFieldValue( prefix + "gebaeudeStandard", selectedComposite != null ? selectedComposite
+                            .get().gebaeudeStandard().get() : "3.0" );
+                    postProcessGebaeudeArtSelection();
+                    // }
+                }
+            }
+        } );
+
+        // NHK BGF Wohnungsgröße
+        lastLine = newFormField( "NHK 2010" )
+                .setToolTipText( "NHK 2010 in €/m² Bruttogrundfläche" )
+                .setParent( parent )
+                .setProperty(
+                        new ReloadablePropertyAdapter<NHK2010BewertungGebaeudeComposite>( selectedComposite, prefix
+                                + "nhk", new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
+
+                            @Override
+                            public Property get( NHK2010BewertungGebaeudeComposite entity ) {
+                                return entity.nhk();
+                            }
+                        } ) ).setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
+                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setEnabled( false ).setLayoutData( one().top( lastLine ).create() ).create();
+
+        pageSite.addFieldListener( gebaeudeStandardListener = new IFormFieldListener() {
+
+            @Override
+            public void fieldChange( FormFieldEvent ev ) {
+                if (ev.getEventCode() == VALUE_CHANGE
+                        && ev.getFieldName().equalsIgnoreCase( prefix + "gebaeudeStandard" )) {
+                    if ((ev.getNewValue() == null && selectedGebaeudeStandard != null)
+                            || (ev.getNewValue() != null && !ev.getNewValue().equals( selectedGebaeudeStandard ))) {
+                        selectedGebaeudeStandard = ev.getNewValue();
+                        // nhk aktualisieren
+                        if (selectedGebaeudeStandard != null) {
+                            pageSite.setFieldValue(
+                                    prefix + "nhk",
+                                    getFormatter( 2 ).format(
+                                            selectedGebaeudeArt.calculateNHKFor( selectedGebaeudeStandard ) ) );
+                        }
+                    }
+                }
+            }
+        } );
+
         lastLine = newLine;
         return newLine;
     }
 
 
-    //
-    //
-    // private Control createZeitraumForm( Composite parent, Control top ) {
-    // Composite newLine, lastLine = null;
-    //
-    // newLine = newFormField( "Bezeichnung" )
-    // .setParent( parent )
-    // .setProperty(
-    // new ReloadablePropertyAdapter<RichtwertzoneZeitraumComposite>(
-    // selectedComposite, prefix
-    // + "name", new PropertyCallback<RichtwertzoneZeitraumComposite>() {
-    //
-    // @Override
-    // public Property get( RichtwertzoneZeitraumComposite entity ) {
-    // return entity.name();
-    // }
-    //
-    // } ) ).setField( reloadable( new StringFormField() ) )
-    // .setLayoutData( left().top( top ).create() ).create();
-    //
-    // lastLine = newLine;
-    // newLine = newFormField( "Gültig ab" )
-    // .setParent( parent )
-    // .setProperty(
-    // new ReloadablePropertyAdapter<RichtwertzoneZeitraumComposite>(
-    // selectedComposite, prefix
-    // + "gueltigAb", new PropertyCallback<RichtwertzoneZeitraumComposite>() {
-    //
-    // @Override
-    // public Property get( RichtwertzoneZeitraumComposite entity ) {
-    // return entity.gueltigAb();
-    // }
-    //
-    // } ) ).setField( reloadable( new DateTimeFormField() ) )// .setValidator(
-    // // new
-    // // NotNullValidator()
-    // // )
-    // .setLayoutData( left().top( lastLine ).create() ).create();
-    // newFormField( "Stichtag" )
-    // .setParent( parent )
-    // .setProperty(
-    // new ReloadablePropertyAdapter<RichtwertzoneZeitraumComposite>(
-    // selectedComposite, prefix
-    // + "stichtag", new PropertyCallback<RichtwertzoneZeitraumComposite>() {
-    //
-    // @Override
-    // public Property get( RichtwertzoneZeitraumComposite entity ) {
-    // return entity.stichtag();
-    // }
-    //
-    // } ) ).setField( reloadable( new DateTimeFormField() ) )// .setValidator(
-    // // new
-    // // NotNullValidator()
-    // // )
-    // .setLayoutData( right().top( lastLine ).create() ).create();
-    //
-    // lastLine = newLine;
-    // newLine = newFormField( "€ pro m²" )
-    // .setParent( parent )
-    // .setProperty(
-    // new ReloadablePropertyAdapter<RichtwertzoneZeitraumComposite>(
-    // selectedComposite, prefix
-    // + "euroQm", new PropertyCallback<RichtwertzoneZeitraumComposite>() {
-    //
-    // @Override
-    // public Property get( RichtwertzoneZeitraumComposite entity ) {
-    // return entity.euroQm();
-    // }
-    //
-    // } ) ).setField( reloadable( new StringFormField(
-    // StringFormField.Style.ALIGN_RIGHT ) ) )
-    // .setValidator( new NumberValidator( Double.class, locale, 12, 2, 1, 2 ) )
-    // .setLayoutData( left().top( lastLine ).create() ).create();
-    //
-    // lastLine = newLine;
-    // newLine = newFormField( "EB" )
-    // .setParent( parent )
-    // .setProperty(
-    // new ReloadablePropertyAdapter<RichtwertzoneZeitraumComposite>(
-    // selectedComposite, prefix
-    // + "erschliessungsBeitrag", new
-    // AssociationCallback<RichtwertzoneZeitraumComposite>() {
-    //
-    // @Override
-    // public Association get( RichtwertzoneZeitraumComposite entity ) {
-    // return entity.erschliessungsBeitrag();
-    // }
-    //
-    // } ) ).setField( reloadable( namedAssocationsPicklist(
-    // ErschliessungsBeitragComposite.class ) ) )
-    // .setLayoutData( left().top( lastLine ).create() ).create();
-    //
-    // return newLine;
-    // }
-    //
+    protected void postProcessGebaeudeArtSelection() {
+        pageSite.setFieldEnabled( prefix + "gebaeudeStandard", selectedGebaeudeArt != null );
+        pageSite.setFieldEnabled( prefix + "grundrissArt", selectedGebaeudeArt != null
+                && (selectedGebaeudeArt.getId().startsWith( "4" ) || selectedGebaeudeArt.getId().startsWith( "5.1" )) );
+        pageSite.setFieldEnabled( prefix + "anzahlWohnungen", selectedGebaeudeArt != null
+                && (selectedGebaeudeArt.getId().startsWith( "4" ) || selectedGebaeudeArt.getId().startsWith( "5.1" )) );
+        pageSite.setFieldEnabled( prefix + "zweifamilienHaus", selectedGebaeudeArt != null
+                && selectedGebaeudeArt.getId().startsWith( "1" ) );
+    }
+
 
     @Override
     protected EntityType addViewerColumns( FeatureTableViewer viewer ) {

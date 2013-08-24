@@ -53,4 +53,16 @@ public class NHK2010Test
         NHK2010Gebaeudeart art = provider.gebaeudeForId("14.3");
         Assert.assertEquals( 560, (int)art.getStufe3());
     }
+    
+
+    public void testNHK() {
+        NHK2010GebaeudeartenProvider provider = NHK2010GebaeudeartenProvider.instance();
+        NHK2010Gebaeudeart art = provider.gebaeudeForId("1.01");
+        Assert.assertEquals( 835, (int)art.getStufe3());
+        Assert.assertEquals( 1005, (int)art.getStufe4());
+
+        Assert.assertEquals( 920.0d, art.calculateNHKFor( "3.5" ));
+        Assert.assertEquals( 1005.0d, art.calculateNHKFor( "4.0" ));
+        
+    }
 }
