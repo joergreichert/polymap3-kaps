@@ -51,7 +51,7 @@ import org.polymap.kaps.model.SchlNamed;
 public interface RichtwertzoneComposite
         extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite, SchlNamed {
 
-    public final static String NAME = "richtwertzone";
+    public final static String NAME = "Richtwertzone";
 
     @Optional
     Property<MultiPolygon> geom();

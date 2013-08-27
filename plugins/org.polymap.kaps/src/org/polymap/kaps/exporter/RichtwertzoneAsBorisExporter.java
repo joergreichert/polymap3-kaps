@@ -41,6 +41,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.vividsolutions.jts.geom.MultiPolygon;
+
 import org.eclipse.rwt.widgets.ExternalBrowser;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -57,6 +59,8 @@ import org.polymap.core.runtime.Polymap;
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.BauweiseComposite;
 import org.polymap.kaps.model.data.BodenRichtwertKennungComposite;
+import org.polymap.kaps.model.data.BodenRichtwertRichtlinieArtDerNutzungComposite;
+import org.polymap.kaps.model.data.BodenRichtwertRichtlinieErgaenzungComposite;
 import org.polymap.kaps.model.data.EntwicklungsZusatzComposite;
 import org.polymap.kaps.model.data.EntwicklungsZustandComposite;
 import org.polymap.kaps.model.data.ErschliessungsBeitragComposite;
@@ -71,8 +75,7 @@ public class RichtwertzoneAsBorisExporter
         extends DefaultFeatureOperation
         implements IFeatureOperation {
 
-    private static Log           log        = LogFactory
-                                                    .getLog( RichtwertzoneAsBorisExporter.class );
+    private static Log          log        = LogFactory.getLog( RichtwertzoneAsBorisExporter.class );
 
     // Locale wegen dem . in 0.00
     private static NumberFormat euroFormat = NumberFormat.getNumberInstance( Locale.ENGLISH );
@@ -82,15 +85,15 @@ public class RichtwertzoneAsBorisExporter
         euroFormat.setMinimumIntegerDigits( 1 );
     }
 
-    private static DateFormat    dateFormat = new SimpleDateFormat( "dd.MM.yyyy" );
+    private static DateFormat   dateFormat = new SimpleDateFormat( "dd.MM.yyyy" );
 
 
     @Override
     public boolean init( IFeatureOperationContext ctx ) {
         super.init( ctx );
         try {
-            return context.featureSource().getSchema().getName().getLocalPart().toLowerCase()
-                    .contains( "richtwertzone" );
+            return context.featureSource().getSchema().getName().getLocalPart()
+                    .equals( RichtwertzoneZeitraumComposite.NAME );
         }
         catch (Exception e) {
             log.warn( "", e );
@@ -102,8 +105,7 @@ public class RichtwertzoneAsBorisExporter
     @Override
     public Status execute( IProgressMonitor monitor )
             throws Exception {
-        monitor.beginTask( context.adapt( FeatureOperationExtension.class ).getLabel(), context
-                .features().size() );
+        monitor.beginTask( context.adapt( FeatureOperationExtension.class ).getLabel(), context.features().size() );
 
         final Date now = new Date();
 
@@ -160,8 +162,7 @@ public class RichtwertzoneAsBorisExporter
                 // String htmlTarget = "../csv/download.html?id=" + id + "&filename="
                 // + filename;
 
-                ExternalBrowser.open( "download_window", url, ExternalBrowser.NAVIGATION_BAR
-                        | ExternalBrowser.STATUS );
+                ExternalBrowser.open( "download_window", url, ExternalBrowser.NAVIGATION_BAR | ExternalBrowser.STATUS );
             }
         } );
 
@@ -173,13 +174,15 @@ public class RichtwertzoneAsBorisExporter
     private void write( FeatureCollection features, OutputStream out, IProgressMonitor monitor )
             throws IOException {
         FeatureIterator it = null;
+        Writer writer = null;
+        CsvListWriter csvWriter = null;
         try {
             // TODO Trennzeichen?
             CsvPreference prefs = new CsvPreference( '"', '|', "\r\n" );
 
-            Writer writer = new OutputStreamWriter( out, "ISO-8859-1" );
+            writer = new OutputStreamWriter( out, "ISO-8859-1" );
 
-            CsvListWriter csvWriter = new CsvListWriter( writer, prefs );
+            csvWriter = new CsvListWriter( writer, prefs );
 
             it = features.features();
             int count = 0;
@@ -202,16 +205,21 @@ public class RichtwertzoneAsBorisExporter
                     noHeaderYet = false;
                 }
 
-                RichtwertzoneZeitraumComposite richtwertzone = repo.findEntity(
-                        RichtwertzoneZeitraumComposite.class, feature.getIdentifier().getID() );
-
+                RichtwertzoneZeitraumComposite richtwertzone = repo.findEntity( RichtwertzoneZeitraumComposite.class,
+                        feature.getIdentifier().getID() );
                 // all properties
                 csvWriter.write( getRow( richtwertzone ) );
+
             }
-            csvWriter.close();
-            writer.close();
+
         }
         finally {
+            if (csvWriter != null) {
+                csvWriter.close();
+            }
+            if (writer != null) {
+                writer.close();
+            }
             if (it != null) {
                 it.close();
             }
@@ -220,11 +228,10 @@ public class RichtwertzoneAsBorisExporter
 
 
     private String[] getHeaders() {
-        return new String[] { "GESL", "GENA", "GASL", "GABE", "GENU", "GEMA", "ORTST", "WNUM",
-                "BRW", "STAG", "BRKE", "BEDW", "BEDW", "BASBE", "BASMA", "YWERT", "XWERT", "BEZUG",
-                "ENTW", "BEIT", "NUTA", "ERGNUTA", "BAUW", "GEZ", "WGFZ", "GRZ", "BMZ", "FLAE",
-                "GTIE", "GBREI", "ERVE", "VERG", "VERF", "YVERG", "XVERG", "BOD", "ACZA", "GRZA",
-                "AUFW", "WEER", "KOORWERT", "KOORVERF", "BEM", "FREI", "BRZNAME", "UMART", "LUMNUM" };
+        return new String[] { "GESL", "GENA", "GASL", "GABE", "GENU", "GEMA", "ORTST", "WNUM", "BRW", "STAG", "BRKE",
+                "BEDW", "BEDW", "BASBE", "BASMA", "YWERT", "XWERT", "BEZUG", "ENTW", "BEIT", "NUTA", "ERGNUTA", "BAUW",
+                "GEZ", "WGFZ", "GRZ", "BMZ", "FLAE", "GTIE", "GBREI", "ERVE", "VERG", "VERF", "YVERG", "XVERG", "BOD",
+                "ACZA", "GRZA", "AUFW", "WEER", "KOORWERT", "KOORVERF", "BEM", "FREI", "BRZNAME", "UMART", "LUMNUM" };
     }
 
 
@@ -438,7 +445,7 @@ public class RichtwertzoneAsBorisExporter
         // (Präsentationskoordinate)
         // freiwillig
         // TODO hier wird ja sicher mal geom() stehen
-        result.add( richtwertzone.rechtsWert().get() );
+        result.add( richtwertzone.hochWert().get() );
 
         // 18
         // Bezugssystem
@@ -471,8 +478,7 @@ public class RichtwertzoneAsBorisExporter
         // L = Fläche der Land- oder Forstwirtschaft
         // SF = Sonstige Fläche
         // Pflicht
-        EntwicklungsZustandComposite entwicklungsZustand = richtwertzone.entwicklungsZustand()
-                .get();
+        EntwicklungsZustandComposite entwicklungsZustand = richtwertzone.entwicklungsZustand().get();
         result.add( entwicklungsZustand != null ? entwicklungsZustand.schl().get() : null );
 
         // 20
@@ -490,8 +496,7 @@ public class RichtwertzoneAsBorisExporter
         // abgabenpflichtig nach Kommunalabgabengesetz
         // Pflicht falls
         // 19=B
-        ErschliessungsBeitragComposite erschliessungsBeitrag = richtwertzoneG
-                .erschliessungsBeitrag().get();
+        ErschliessungsBeitragComposite erschliessungsBeitrag = richtwertzoneG.erschliessungsBeitrag().get();
         result.add( erschliessungsBeitrag != null ? erschliessungsBeitrag.schl().get() : null );
 
         // 21
@@ -503,9 +508,8 @@ public class RichtwertzoneAsBorisExporter
         // ja
         // Art der Nutzung gemäß Anlage 1 zur BRW-RL
         // Pflicht
-
-        // TODO Mapping
-        result.add( "" );
+        BodenRichtwertRichtlinieArtDerNutzungComposite artDerNutzung = richtwertzone.brwrlArt().get();
+        result.add( artDerNutzung != null ? artDerNutzung.schl().get() : null );
         // 22
         // Ergänzung zur Art der Nutzung
         // ErgaenzungArtNutzung
@@ -515,8 +519,8 @@ public class RichtwertzoneAsBorisExporter
         // ja
         // Ergänzung zur Art der Nutzung gemäß Anlage 1 zur BRW-RL
         // Pflicht soweit wertrelevant
-        // TODO Mapping
-        result.add( "" );
+        BodenRichtwertRichtlinieErgaenzungComposite ergaenzung = richtwertzone.brwrlErgaenzung().get();
+        result.add( ergaenzung != null ? ergaenzung.schl().get() : null );
 
         // 23
         // Bauweise
@@ -748,7 +752,9 @@ public class RichtwertzoneAsBorisExporter
         // 8.3
         // Pflicht, falls
         // 11=1
-        result.add( "" );
+        MultiPolygon geom = richtwertzone.geom().get();
+        // TODO
+        result.add( geom != null ? "" : null );
         // 42
         // Koordinatenliste
         // Verfahren
