@@ -66,9 +66,17 @@ public abstract class KapsEntityProvider<T extends Entity>
     }
 
 
+    @Override
     public ReferencedEnvelope getBounds() {
-        return new ReferencedEnvelope( 4000000, 5000000, 5000000, 6000000,
-                getCoordinateReferenceSystem( null ) );
+
+        Property geomProp = getEntityType().getProperty( getDefaultGeometry() );
+        if (geomProp != null) {
+            return super.getBounds();
+        }
+        else {
+            // fake values
+            return new ReferencedEnvelope( 4000000, 5000000, 5000000, 6000000, getCoordinateReferenceSystem( null ) );
+        }
     }
 
 
@@ -93,6 +101,7 @@ public abstract class KapsEntityProvider<T extends Entity>
         return builder.buildFeatureType();
     }
 
+
     @Override
     public Feature buildFeature( T entity, Feature feature, FeatureType schema ) {
         // VertragsArtComposite vertragsArt = entity.vertragsArt().get();
@@ -105,20 +114,19 @@ public abstract class KapsEntityProvider<T extends Entity>
             for (EntityType.Property prop : p) {
                 if (prop instanceof Association) {
                     Association association = (Association)prop;
-                    org.opengis.feature.Property property = feature.getProperty( association
-                            .getName() );
+                    org.opengis.feature.Property property = feature.getProperty( association.getName() );
                     if (property != null) {
                         if (Named.class.isAssignableFrom( association.getType() )) {
                             Named associationValue = (Named)association.getValue( entity );
                             StringBuffer associatedCompositeName = new StringBuffer( "" );
                             if (associationValue != null) {
                                 String name = associationValue.name().get();
-                                
+
                                 EntityType associationType = repo.entityType( association.getType() );
                                 Property schlProperty = associationType.getProperty( "schl" );
                                 String schl = schlProperty != null ? (String)schlProperty
                                         .getValue( (Composite)associationValue ) : null;
-                                        
+
                                 if (schl != null) {
                                     associatedCompositeName.append( schl );
                                 }
@@ -140,6 +148,7 @@ public abstract class KapsEntityProvider<T extends Entity>
         }
         return feature;
     }
+
 
     @Override
     public boolean modifyFeature( T entity, String propName, Object value )
