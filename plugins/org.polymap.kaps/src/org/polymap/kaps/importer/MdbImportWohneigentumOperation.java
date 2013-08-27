@@ -1,6 +1,5 @@
 package org.polymap.kaps.importer;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -77,52 +76,21 @@ public class MdbImportWohneigentumOperation
              * WOHNUNGEN
              */
             sub = new SubMonitor( monitor, 10 );
-            final Map<String, BelastungComposite> allBelastungArt = new HashMap<String, BelastungComposite>();
-            importEntity( db, sub, BelastungComposite.class, new EntityCallback<BelastungComposite>() {
+            importEntity( db, sub, BelastungComposite.class, null );
 
-                @Override
-                public void fillEntity( BelastungComposite entity, Map<String, Object> builderRow ) {
-                    allBelastungArt.put( entity.schl().get(), entity );
-                }
-            } );
             sub = new SubMonitor( monitor, 10 );
-            final Map<String, EtageComposite> allEtageArt = new HashMap<String, EtageComposite>();
-            importEntity( db, sub, EtageComposite.class, new EntityCallback<EtageComposite>() {
+            importEntity( db, sub, EtageComposite.class, null );
+            
+            sub = new SubMonitor( monitor, 10 );
+            importEntity( db, sub, AusstattungComposite.class, null);
 
-                @Override
-                public void fillEntity( EtageComposite entity, Map<String, Object> builderRow ) {
-                    allEtageArt.put( entity.schl().get(), entity );
-                }
-            } );
             sub = new SubMonitor( monitor, 10 );
-            final Map<String, AusstattungComposite> allAusstattung = new HashMap<String, AusstattungComposite>();
-            importEntity( db, sub, AusstattungComposite.class, new EntityCallback<AusstattungComposite>() {
+            importEntity( db, sub, EigentumsartComposite.class, null);
 
-                @Override
-                public void fillEntity( AusstattungComposite entity, Map<String, Object> builderRow ) {
-                    allAusstattung.put( entity.schl().get(), entity );
-                }
-            } );
             sub = new SubMonitor( monitor, 10 );
-            final Map<String, EigentumsartComposite> allEigentumsArt = new HashMap<String, EigentumsartComposite>();
-            importEntity( db, sub, EigentumsartComposite.class, new EntityCallback<EigentumsartComposite>() {
+            importEntity( db, sub, HimmelsrichtungComposite.class, null);
 
-                @Override
-                public void fillEntity( EigentumsartComposite entity, Map<String, Object> builderRow ) {
-                    allEigentumsArt.put( entity.schl().get(), entity );
-                }
-            } );
             sub = new SubMonitor( monitor, 10 );
-            final Map<String, HimmelsrichtungComposite> allHimmelsrichtung = new HashMap<String, HimmelsrichtungComposite>();
-            importEntity( db, sub, HimmelsrichtungComposite.class, new EntityCallback<HimmelsrichtungComposite>() {
-
-                @Override
-                public void fillEntity( HimmelsrichtungComposite entity, Map<String, Object> builderRow ) {
-                    allHimmelsrichtung.put( entity.schl().get(), entity );
-                }
-            } );
-            sub = new SubMonitor( monitor, 10 );
-            final Map<String, WohnungseigentumComposite> allWohnungseigentum = new HashMap<String, WohnungseigentumComposite>();
             importEntity( db, sub, WohnungseigentumComposite.class, new EntityCallback<WohnungseigentumComposite>() {
 
                 @Override
@@ -149,14 +117,14 @@ public class MdbImportWohneigentumOperation
                         bem.append( bem2 );
                     }
                     entity.bemerkungen().set( bem.toString() );
-                    allWohnungseigentum.put( entity.schl().get(), entity );
+//                    allWohnungseigentum.put( entity.schl().get(), entity );
                 }
             } );
 
-            final Map<String, GebaeudeArtComposite> allGebaeudeArt = new HashMap<String, GebaeudeArtComposite>();
-            for (GebaeudeArtComposite gebaeudeArt : repo.findEntities( GebaeudeArtComposite.class, null, 0, 10000 )) {
-                allGebaeudeArt.put( gebaeudeArt.schl().get(), gebaeudeArt );
-            }
+//            final Map<String, GebaeudeArtComposite> allGebaeudeArt = new HashMap<String, GebaeudeArtComposite>();
+//            for (GebaeudeArtComposite gebaeudeArt : repo.findEntities( GebaeudeArtComposite.class, null, 0, 10000 )) {
+//                allGebaeudeArt.put( gebaeudeArt.schl().get(), gebaeudeArt );
+//            }
 
             sub = new SubMonitor( monitor, 10 );
             // final Map<String, GebaeudeComposite> allGebaeude = new HashMap<String,
@@ -168,13 +136,13 @@ public class MdbImportWohneigentumOperation
                     if (entity.sanierungswert().get() == null) {
                         entity.sanierungswert().set( "U" );
                     }
-                    entity.gebaeudeArt().set( find( allGebaeudeArt, builderRow, "GEBART" ) );
+                    entity.gebaeudeArt().set( findSchlNamed( GebaeudeArtComposite.class, builderRow, "GEBART" ) );
                     // allGebaeude.put( entity.schl().get(), entity );
                 }
             } );
 
             sub = new SubMonitor( monitor, 10 );
-            importK_EOBJF( db, sub, allBelastungArt, parentFolder );
+            importK_EOBJF( db, sub, parentFolder );
 
             sub = new SubMonitor( monitor, 10 );
             File wmvaopf = new File( parentFolder, "wohnungen_mit_vertrag_aber_ohne_passendes_flurstueck.txt" );
@@ -203,14 +171,13 @@ public class MdbImportWohneigentumOperation
 
                     Object schl = builderRow.get( "BEWSCHL" );
                     System.out.println( schl );
-                    AusstattungComposite ausstattungComposite = find( allAusstattung, builderRow, "BEWSCHL" );
-                    entity.ausstattung().set( find( allAusstattung, builderRow, "BEWSCHL" ) );
-                    entity.eigentumsArt().set( find( allEigentumsArt, builderRow, "EIGENTART" ) );
-                    entity.etage().set( find( allEtageArt, builderRow, "GESCHOSS" ) );
-                    entity.himmelsrichtung().set( find( allHimmelsrichtung, builderRow, "HIMMELSRI" ) );
-                    entity.gebaeudeArtGarage().set( find( allGebaeudeArt, builderRow, "GEBARTG" ) );
-                    entity.gebaeudeArtStellplatz().set( find( allGebaeudeArt, builderRow, "GEBARTS" ) );
-                    entity.gebaeudeArtAnderes().set( find( allGebaeudeArt, builderRow, "GEBARTN" ) );
+                    entity.ausstattung().set( findSchlNamed( AusstattungComposite.class, builderRow, "BEWSCHL" ) );
+                    entity.eigentumsArt().set( findSchlNamed( EigentumsartComposite.class, builderRow, "EIGENTART" ) );
+                    entity.etage().set( findSchlNamed( EtageComposite.class, builderRow, "GESCHOSS" ) );
+                    entity.himmelsrichtung().set( findSchlNamed( HimmelsrichtungComposite.class, builderRow, "HIMMELSRI" ) );
+                    entity.gebaeudeArtGarage().set( findSchlNamed( GebaeudeArtComposite.class, builderRow, "GEBARTG" ) );
+                    entity.gebaeudeArtStellplatz().set( findSchlNamed( GebaeudeArtComposite.class, builderRow, "GEBARTS" ) );
+                    entity.gebaeudeArtAnderes().set( findSchlNamed( GebaeudeArtComposite.class, builderRow, "GEBARTN" ) );
 
                     String separator = System.getProperty( "line.separator" );
                     // BEM1 und BEM2 zusammenfassen
@@ -375,13 +342,6 @@ public class MdbImportWohneigentumOperation
                         }
                     } );
 
-            // allGebaeude.clear();
-            allWohnungseigentum.clear();
-            allHimmelsrichtung.clear();
-            allEigentumsArt.clear();
-            allAusstattung.clear();
-            allEtageArt.clear();
-            allBelastungArt.clear();
         }
         finally {
             db.close();
@@ -391,8 +351,7 @@ public class MdbImportWohneigentumOperation
     }
 
 
-    protected void importK_EOBJF( Database db, IProgressMonitor monitor,
-            Map<String, BelastungComposite> allBelastungArt, final File parentFolder )
+    protected void importK_EOBJF( Database db, IProgressMonitor monitor, final File parentFolder )
             throws Exception {
         Table table = db.getTable( "K_EOBJF" );
         monitor.beginTask( "Tabelle: " + table.getName(), table.getRowCount() );
@@ -413,7 +372,7 @@ public class MdbImportWohneigentumOperation
             // N, J, NULL
             flurstueck.erbbaurecht().set( (String)builderRow.get( "ERBBAUR" ) );
             // 00 - 06, NULL
-            flurstueck.belastung().set( find( allBelastungArt, builderRow, "BELASTUNG" ) );
+            flurstueck.belastung().set( findSchlNamed( BelastungComposite.class, builderRow, "BELASTUNG" ) );
             flurstueck.flaeche().set( (Double)builderRow.get( "GFLAECHE" ) );
             flurstueck.baublock().set( (String)builderRow.get( "BAUBLOCK" ) );
             flurstueck.kartenBlatt().set( (String)builderRow.get( "KARTBLATT" ) );

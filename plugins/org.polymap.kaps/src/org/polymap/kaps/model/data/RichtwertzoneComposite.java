@@ -86,7 +86,14 @@ public interface RichtwertzoneComposite
     // NUART VARCHAR(2), NUART 00,01,27,28,31,32 Referenz auf K_NUTZ
     @Optional
     Association<NutzungComposite> nutzung();
-
+    
+    // NUTZUNG_ART
+    @Optional
+    Association<BodenRichtwertRichtlinieArtDerNutzungComposite> brwrlArt();
+    
+    // NUTZUNG_ERGAENZ
+    @Optional
+    Association<BodenRichtwertRichtlinieErgaenzungComposite> brwrlErgaenzung();
 
     // GEMEINDE INTEGER DEFAULT 0, Referenz auf Gemeinde 522010 bspw
     @Optional
@@ -105,7 +112,7 @@ public interface RichtwertzoneComposite
     Property<Integer> massstab();
 
 
-    // ENTWZUSTAND VARCHAR(2), leer, nicht importiert
+    // ENTWZUSTAND VARCHAR(2), 
     @Optional
     Association<EntwicklungsZustandComposite> entwicklungsZustand();
 
@@ -176,12 +183,12 @@ public interface RichtwertzoneComposite
     Property<Integer> gruenLandZahl();
 
 
-    // ENTWZUSATZ VARCHAR(2), leer, nicht importiert
+    // ENTWZUSATZ VARCHAR(2), 
     @Optional
     Association<EntwicklungsZusatzComposite> entwicklungsZusatz();
 
 
-    // BAUWEISE VARCHAR(2), leer, nicht importiert
+    // BAUWEISE VARCHAR(2)
     @Optional
     Association<BauweiseComposite> bauweise();
 

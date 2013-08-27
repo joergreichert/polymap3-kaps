@@ -36,15 +36,15 @@ import org.polymap.kaps.model.SchlNamed;
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 @Concerns({ PropertyChangeSupport.Concern.class })
-@Mixins({ BodenRichtwertRichtlinieComposite.Mixin.class, PropertyChangeSupport.Mixin.class,
+@Mixins({ BodenRichtwertRichtlinieErgaenzungComposite.Mixin.class, PropertyChangeSupport.Mixin.class,
         ModelChangeSupport.Mixin.class, QiEntity.Mixin.class
 // JsonState.Mixin.class
 })
 @ImportTable("K_BORIS_KEYS")
-public interface BodenRichtwertRichtlinieComposite
+public interface BodenRichtwertRichtlinieErgaenzungComposite
         extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite, SchlNamed {
 
-    static final String NAME = "Bodenrichtwert-Richtlinie (BRW-RL)";
+    static final String NAME = "BRW-RL - Ergänzung";
     // CREATE TABLE K_BORIS_KEYS (
     // ART_ERGAENZUNG VARCHAR(1), // A oder E mir erstmal egal
     // ENTWZUSTAND VARCHAR(1), // 1 = R,E,B, 2 = LF, 3 = SF
@@ -53,6 +53,10 @@ public interface BodenRichtwertRichtlinieComposite
     // SCHL VARCHAR(5),
     // BEZ VARCHAR(100)
     // );
+
+    @Optional
+    @ImportColumn("SORT1")
+    Property<Integer> sortierung();
 
     @Optional
     @ImportColumn("SCHL")
@@ -78,11 +82,11 @@ public interface BodenRichtwertRichtlinieComposite
      * Methods and transient fields.
      */
     public static abstract class Mixin
-            implements BodenRichtwertRichtlinieComposite {
+            implements BodenRichtwertRichtlinieErgaenzungComposite {
 
         private static Log log = LogFactory.getLog( Mixin.class );
 
-        public Iterable<BodenRichtwertRichtlinieComposite> findBy( EntwicklungsZustandComposite ezc ) {
+        public Iterable<BodenRichtwertRichtlinieErgaenzungComposite> findBy( EntwicklungsZustandComposite ezc ) {
             String ezcSchl = ezc.schl().get();
             String entwicklungsZustand = null;
             if ("R".equals( ezcSchl ) || "E".equals( ezcSchl ) || "B".equals( ezcSchl )) {
@@ -98,8 +102,8 @@ public interface BodenRichtwertRichtlinieComposite
                 throw new IllegalStateException( "no mapping found for " + ezcSchl );
             }
             return KapsRepository.instance().findEntities(
-                    BodenRichtwertRichtlinieComposite.class,
-                    QueryExpressions.eq( QueryExpressions.templateFor( BodenRichtwertRichtlinieComposite.class )
+                    BodenRichtwertRichtlinieErgaenzungComposite.class,
+                    QueryExpressions.eq( QueryExpressions.templateFor( BodenRichtwertRichtlinieErgaenzungComposite.class )
                             .entwickungsZustand(), entwicklungsZustand ), 0, -1 );
         }
     }

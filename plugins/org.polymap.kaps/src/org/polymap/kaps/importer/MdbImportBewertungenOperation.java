@@ -23,7 +23,6 @@ import org.polymap.core.runtime.SubMonitor;
 
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.NHK2010GebaeudeartenProvider;
-import org.polymap.kaps.model.data.BodenRichtwertRichtlinieComposite;
 import org.polymap.kaps.model.data.NHK2010Anbauten;
 import org.polymap.kaps.model.data.NHK2010Baupreisindex;
 import org.polymap.kaps.model.data.NHK2010BewertungComposite;
@@ -55,9 +54,6 @@ public class MdbImportBewertungenOperation
         final Database db = Database.open( dbFile );
         try {
             SubMonitor sub = null;
-            sub = new SubMonitor( monitor, 10 );
-            importEntity( db, monitor, BodenRichtwertRichtlinieComposite.class, null );
-
             sub = new SubMonitor( monitor, 10 );
             importEntity( db, monitor, NHK2010Anbauten.class, new EntityCallback<NHK2010Anbauten>() {
 
@@ -93,7 +89,7 @@ public class MdbImportBewertungenOperation
     }
 
 
-    protected void importNHK2010Bewertung( Database db, IProgressMonitor monitor, final File parentFolder )
+    private void importNHK2010Bewertung( Database db, IProgressMonitor monitor, final File parentFolder )
             throws Exception {
         Table table = db.getTable( "K_BEWERTBGF10" );
         monitor.beginTask( "Tabelle: " + table.getName(), table.getRowCount() );
@@ -190,10 +186,9 @@ public class MdbImportBewertungenOperation
                     Integer nr = (Integer)builderRow.get( "NR" );
                     Integer unternr = (Integer)builderRow.get( "UNTERNR" );
                     bewertungGebaeude.gebaeudeArtId().set(
-                            gebaeudeArtenProvider.gebaeudeForNumber( hnr, nr, unternr )
-                                    .getId() );
+                            gebaeudeArtenProvider.gebaeudeForNumber( hnr, nr, unternr ).getId() );
                 }
-                bewertungGebaeude.zweifamilienHaus().set( getBooleanValue( builderRow, "FAMHAUS2"));
+                bewertungGebaeude.zweifamilienHaus().set( getBooleanValue( builderRow, "FAMHAUS2" ) );
                 count++;
             }
             // andernfalls ignorieren

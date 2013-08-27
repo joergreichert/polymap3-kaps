@@ -143,6 +143,29 @@ public abstract class AbstractMdbImportOperation
     }
 
 
+    protected final <T extends SchlNamed> T findSchlNamed( Class<T> type, Map<String, Object> row, String columnName ) {
+        return findSchlNamed( type, row, columnName, false );
+    }
+
+
+    protected final <T extends SchlNamed> T findSchlNamed( Class<T> type, Map<String, Object> row, String columnName,
+            boolean nullAllowed ) {
+        Object schl = row.get( columnName );
+        if (schl != null) {
+            if (schl instanceof Double) {
+                schl = (Integer)((Double)schl).intValue();
+            }
+            String schlStr = schl.toString();
+            T obj = repo.findSchlNamed( type, schlStr );
+            if (obj == null && !nullAllowed) {
+                throw new IllegalStateException( "no " + columnName + " found for schl '" + schl + "'!" );
+            }
+            return obj;
+        }
+        return null;
+    }
+
+
     protected final <T extends Composite> T find( Map<String, T> all, Map<String, Object> row, String columnName ) {
         return find( all, row, columnName, false );
     }
@@ -228,7 +251,7 @@ public abstract class AbstractMdbImportOperation
             if ((++count % 200) == 0) {
                 monitor.worked( 200 );
                 monitor.setTaskName( "Objekte: " + count );
-                repo.commitChanges();
+                // repo.commitChanges();
             }
         }
         repo.commitChanges();

@@ -12,6 +12,8 @@
  */
 package org.polymap.kaps.importer;
 
+import java.beans.PropertyChangeEvent;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -72,12 +74,18 @@ public class MdbImportWizard
                 @Override
                 protected IStatus doExecute( IProgressMonitor monitor, IAdaptable info )
                         throws Exception {
-//                    new MdbImportOperation( importPage.dbFile, importPage.tableNames ).doExecute( monitor, info );
-//                    new MdbImportWohneigentumOperation( importPage.dbFile, importPage.tableNames ).doExecute( monitor,
-//                          info );
+                    new MdbImportOperation( importPage.dbFile, importPage.tableNames ).doExecute( monitor, info );
+                    new MdbImportWohneigentumOperation( importPage.dbFile, importPage.tableNames ).doExecute( monitor,
+                          info );
                     new MdbImportBewertungenOperation( importPage.dbFile, importPage.tableNames ).doExecute( monitor,
                             info );
                     return Status.OK_STATUS;
+                }
+                
+                @Override
+                public void propertyChange( PropertyChangeEvent ev ) {
+                    // do nothing
+                    // undo not supported
                 }
             };
             OperationSupport.instance().execute( op, true, true );

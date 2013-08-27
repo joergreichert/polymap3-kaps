@@ -47,27 +47,7 @@ import org.polymap.core.qi4j.QiModule;
 import org.polymap.core.qi4j.QiModuleAssembler;
 import org.polymap.core.runtime.Polymap;
 
-import org.polymap.kaps.model.data.BodenRichtwertRichtlinieComposite;
-import org.polymap.kaps.model.data.BodennutzungComposite;
-import org.polymap.kaps.model.data.FlurComposite;
-import org.polymap.kaps.model.data.FlurstueckComposite;
-import org.polymap.kaps.model.data.FlurstuecksdatenAgrarComposite;
-import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
-import org.polymap.kaps.model.data.GebaeudeArtComposite;
-import org.polymap.kaps.model.data.GebaeudeComposite;
-import org.polymap.kaps.model.data.GemarkungComposite;
-import org.polymap.kaps.model.data.GemeindeComposite;
-import org.polymap.kaps.model.data.KaeuferKreisComposite;
-import org.polymap.kaps.model.data.NHK2010Anbauten;
-import org.polymap.kaps.model.data.NHK2010Baupreisindex;
-import org.polymap.kaps.model.data.NHK2010BewertungComposite;
-import org.polymap.kaps.model.data.NutzungComposite;
-import org.polymap.kaps.model.data.RichtwertzoneZeitraumComposite;
-import org.polymap.kaps.model.data.StrasseComposite;
-import org.polymap.kaps.model.data.VertragComposite;
-import org.polymap.kaps.model.data.VertragsArtComposite;
-import org.polymap.kaps.model.data.WohnungComposite;
-import org.polymap.kaps.model.data.WohnungseigentumComposite;
+import org.polymap.kaps.model.data.*;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -151,9 +131,12 @@ public class KapsRepository
                     // KapsRepository.NAMESPACE, "Stala" ) ),
                     new SimpleEntityProvider<KaeuferKreisComposite>( this, KaeuferKreisComposite.class, new NameImpl(
                             KapsRepository.NAMESPACE, KaeuferKreisComposite.NAME ) ),
-                    new SimpleEntityProvider<BodenRichtwertRichtlinieComposite>( this,
-                            BodenRichtwertRichtlinieComposite.class, new NameImpl( KapsRepository.NAMESPACE,
-                                    BodenRichtwertRichtlinieComposite.NAME ) ),
+                    new SimpleEntityProvider<BodenRichtwertRichtlinieErgaenzungComposite>( this,
+                            BodenRichtwertRichtlinieErgaenzungComposite.class, new NameImpl( KapsRepository.NAMESPACE,
+                                    BodenRichtwertRichtlinieErgaenzungComposite.NAME ) ),
+                    new SimpleEntityProvider<BodenRichtwertRichtlinieArtDerNutzungComposite>( this,
+                            BodenRichtwertRichtlinieArtDerNutzungComposite.class, new NameImpl(
+                                    KapsRepository.NAMESPACE, BodenRichtwertRichtlinieArtDerNutzungComposite.NAME ) ),
 
                     new SimpleEntityProvider<NutzungComposite>( this, NutzungComposite.class, new NameImpl(
                             KapsRepository.NAMESPACE, NutzungComposite.NAME ) ),
@@ -175,23 +158,21 @@ public class KapsRepository
 
                     new SimpleEntityProvider<FlurstuecksdatenAgrarComposite>( this,
                             FlurstuecksdatenAgrarComposite.class, new NameImpl( KapsRepository.NAMESPACE,
-                                    FlurstuecksdatenAgrarComposite.NAME ) ), 
-                                    new SimpleEntityProvider<FlurComposite>(
+                                    FlurstuecksdatenAgrarComposite.NAME ) ), new SimpleEntityProvider<FlurComposite>(
                             this, FlurComposite.class, new NameImpl( KapsRepository.NAMESPACE, FlurComposite.NAME ) ),
 
                     new SimpleEntityProvider<WohnungseigentumComposite>( this, WohnungseigentumComposite.class,
                             new NameImpl( KapsRepository.NAMESPACE, WohnungseigentumComposite.NAME ) ),
                     new SimpleEntityProvider<WohnungComposite>( this, WohnungComposite.class, new NameImpl(
                             KapsRepository.NAMESPACE, WohnungComposite.NAME ) ),
-                            
-                            new SimpleEntityProvider<NHK2010Anbauten>( this, NHK2010Anbauten.class, new NameImpl(
-                                    KapsRepository.NAMESPACE, NHK2010Anbauten.NAME ) ),
-                                    new SimpleEntityProvider<NHK2010Baupreisindex>( this, NHK2010Baupreisindex.class, new NameImpl(
-                                            KapsRepository.NAMESPACE, NHK2010Baupreisindex.NAME ) ),
-                                            new SimpleEntityProvider<NHK2010BewertungComposite>( this, NHK2010BewertungComposite.class, new NameImpl(
-                                                    KapsRepository.NAMESPACE, NHK2010BewertungComposite.NAME ) ),
-                                    
-                                            
+
+                    new SimpleEntityProvider<NHK2010Anbauten>( this, NHK2010Anbauten.class, new NameImpl(
+                            KapsRepository.NAMESPACE, NHK2010Anbauten.NAME ) ),
+                    new SimpleEntityProvider<NHK2010Baupreisindex>( this, NHK2010Baupreisindex.class, new NameImpl(
+                            KapsRepository.NAMESPACE, NHK2010Baupreisindex.NAME ) ),
+                    new SimpleEntityProvider<NHK2010BewertungComposite>( this, NHK2010BewertungComposite.class,
+                            new NameImpl( KapsRepository.NAMESPACE, NHK2010BewertungComposite.NAME ) ),
+
                     // nicht änderbare Wertelisten
                     // new SimpleEntityProvider<ErschliessungsBeitragComposite>(
                     // this,
