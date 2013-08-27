@@ -30,7 +30,6 @@ import org.polymap.rhei.form.IFormEditorPageSite;
 import org.polymap.kaps.model.data.BauweiseComposite;
 import org.polymap.kaps.model.data.BodenRichtwertKennungComposite;
 import org.polymap.kaps.model.data.EntwicklungsZusatzComposite;
-import org.polymap.kaps.model.data.EntwicklungsZustandComposite;
 import org.polymap.kaps.model.data.RichtwertzoneComposite;
 import org.polymap.kaps.ui.KapsDefaultFormEditorPage;
 
@@ -97,16 +96,10 @@ public class RichtwertzoneWeitereDatenFormEditorPage
         // .setLayoutData( right().top( lastLine ).create() ).create();
 
         lastLine = newLine;
-        newLine = newFormField( "Entwicklungszustand" )
-                .setProperty(
-                        new AssociationAdapter<EntwicklungsZustandComposite>( richtwertzone.entwicklungsZustand() ) )
-                .setField( namedAssocationsPicklist( EntwicklungsZustandComposite.class ) )
-                .setLayoutData( left().top( lastLine ).create() ).create();
-
         newFormField( "Entwicklungszusatz" )
                 .setProperty( new AssociationAdapter<EntwicklungsZusatzComposite>( richtwertzone.entwicklungsZusatz() ) )
                 .setField( namedAssocationsPicklist( EntwicklungsZusatzComposite.class ) )
-                .setLayoutData( right().top( lastLine ).create() ).create();
+                .setLayoutData( left().top( lastLine ).create() ).create();
 
         lastLine = newLine;
         newLine = newFormField( "Bauweise" )

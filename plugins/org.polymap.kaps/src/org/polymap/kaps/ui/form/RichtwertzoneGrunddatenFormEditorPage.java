@@ -12,6 +12,9 @@
  */
 package org.polymap.kaps.ui.form;
 
+import java.util.SortedMap;
+import java.util.TreeMap;
+
 import org.geotools.data.FeatureStore;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.Feature;
@@ -22,6 +25,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.qi4j.api.entity.association.Association;
 import org.qi4j.api.property.Property;
+import org.qi4j.api.query.QueryExpressions;
 
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
@@ -52,13 +56,19 @@ import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter;
 import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter.AssociationCallback;
 import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter.PropertyCallback;
 import org.polymap.rhei.field.DateTimeFormField;
+import org.polymap.rhei.field.FormFieldEvent;
+import org.polymap.rhei.field.IFormFieldListener;
 import org.polymap.rhei.field.NumberValidator;
+import org.polymap.rhei.field.PicklistFormField;
 import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
 import org.polymap.kaps.KapsPlugin;
 import org.polymap.kaps.model.KapsRepository;
+import org.polymap.kaps.model.data.BodenRichtwertRichtlinieArtDerNutzungComposite;
+import org.polymap.kaps.model.data.BodenRichtwertRichtlinieErgaenzungComposite;
 import org.polymap.kaps.model.data.BodennutzungComposite;
+import org.polymap.kaps.model.data.EntwicklungsZustandComposite;
 import org.polymap.kaps.model.data.ErschliessungsBeitragComposite;
 import org.polymap.kaps.model.data.GemeindeComposite;
 import org.polymap.kaps.model.data.NutzungComposite;
@@ -74,11 +84,19 @@ import org.polymap.kaps.ui.NotNullValidator;
 public class RichtwertzoneGrunddatenFormEditorPage
         extends KapsDefaultFormEditorPageWithFeatureTable<RichtwertzoneZeitraumComposite> {
 
-    private static Log               log    = LogFactory.getLog( RichtwertzoneGrunddatenFormEditorPage.class );
+    private static Log                                     log    = LogFactory
+                                                                          .getLog( RichtwertzoneGrunddatenFormEditorPage.class );
 
-    private final static String      prefix = RichtwertzoneGrunddatenFormEditorPage.class.getSimpleName();
+    private final static String                            prefix = RichtwertzoneGrunddatenFormEditorPage.class
+                                                                          .getSimpleName();
 
-    protected RichtwertzoneComposite richtwertzone;
+    protected RichtwertzoneComposite                       richtwertzone;
+
+    private BodenRichtwertRichtlinieArtDerNutzungComposite selectedNutzung;
+
+    private IFormFieldListener                             nutzungListener;
+
+    private EntwicklungsZustandComposite                   selectedZustand;
 
 
     public RichtwertzoneGrunddatenFormEditorPage( Feature feature, FeatureStore featureStore ) {
@@ -95,41 +113,45 @@ public class RichtwertzoneGrunddatenFormEditorPage
 
     @Override
     public Action[] getEditorActions() {
-        if (true /*richtwertzone.geom().get() == null*/) {
+        if (true /* richtwertzone.geom().get() == null */) {
             Action action = new Action( "Geometrie anlegen" ) {
+
                 public void run() {
                     try {
                         ILayer layer = ((PipelineFeatureSource)fs).getLayer();
                         IMap map = layer.getMap();
                         MapEditor mapEditor = MapEditor.openMap( map, true );
-                        
-                        boolean yes = MessageDialog.openConfirm( PolymapWorkbench.getShellToParentOn(), "Geometrie anlegen", 
-                                "Die Geometrie für die Richtwertzone wird im aktuellen Kartenausschnitt angelegt. " + 
-                                "Diese Standardgeometrie dient als Basis und muss nachbearbeitet werden.\n\n" +
-                                "Ist der aktuelle Kartenausschnitt (etwa) richtig für die Richtwertzone?" );
+
+                        boolean yes = MessageDialog.openConfirm( PolymapWorkbench.getShellToParentOn(),
+                                "Geometrie anlegen",
+                                "Die Geometrie für die Richtwertzone wird im aktuellen Kartenausschnitt angelegt. "
+                                        + "Diese Standardgeometrie dient als Basis und muss nachbearbeitet werden.\n\n"
+                                        + "Ist der aktuelle Kartenausschnitt (etwa) richtig für die Richtwertzone?" );
                         if (yes) {
                             ReferencedEnvelope mapExtent = map.getMaxExtent();
                             GeometryFactory gf = new GeometryFactory();
                             Polygon polygon = (Polygon)gf.toGeometry( mapExtent );
-                            polygon.buffer( mapExtent.getWidth()/20 );
+                            polygon.buffer( mapExtent.getWidth() / 20 );
                             MultiPolygon geom = gf.createMultiPolygon( new Polygon[] { polygon } );
-                            
-                            ModifyFeaturesOperation op = new ModifyFeaturesOperation( layer, fs, 
-                                    feature.getIdentifier().getID(), "geom", geom );
+
+                            ModifyFeaturesOperation op = new ModifyFeaturesOperation( layer, fs, feature
+                                    .getIdentifier().getID(), "geom", geom );
                             OperationSupport.instance().execute( op, true, false );
 
-//                            richtwertzone.geom().set( geom );
-//                            WMSLayer ollayer = ((WMSLayer)mapEditor.findLayer( layer ));
-//                            if (ollayer == null) {
-//                                layer.setVisible( true );
-//                            }
-//                            else {
-//                                ollayer.redraw( true );
-//                            }
+                            // richtwertzone.geom().set( geom );
+                            // WMSLayer ollayer = ((WMSLayer)mapEditor.findLayer(
+                            // layer ));
+                            // if (ollayer == null) {
+                            // layer.setVisible( true );
+                            // }
+                            // else {
+                            // ollayer.redraw( true );
+                            // }
                         }
                     }
                     catch (Exception e) {
-                        PolymapWorkbench.handleError( KapsPlugin.PLUGIN_ID, RichtwertzoneGrunddatenFormEditorPage.this, "Die Geometrie konnte nicht angelegt werden.", e );
+                        PolymapWorkbench.handleError( KapsPlugin.PLUGIN_ID, RichtwertzoneGrunddatenFormEditorPage.this,
+                                "Die Geometrie konnte nicht angelegt werden.", e );
                     }
                 };
             };
@@ -184,16 +206,115 @@ public class RichtwertzoneGrunddatenFormEditorPage
                 .setField( new StringFormField() ).setLayoutData( right().top( lastLine ).create() ).create();
 
         lastLine = newLine;
-        newLine = newFormField( "Nutzung" )
-                .setProperty( new AssociationAdapter<NutzungComposite>( richtwertzone.nutzung() ) )
+        newLine = newFormField( "Entwicklungszustand" )
+                .setProperty(
+                        new AssociationAdapter<EntwicklungsZustandComposite>( richtwertzone.entwicklungsZustand() ) )
+                .setField( namedAssocationsPicklist( EntwicklungsZustandComposite.class ) )
+                .setLayoutData( left().top( lastLine ).create() ).create();
+        selectedZustand = richtwertzone.entwicklungsZustand().get();
+
+        lastLine = newLine;
+        final PicklistFormField artList = new PicklistFormField( new PicklistFormField.ValueProvider() {
+
+            @Override
+            public SortedMap<String, Object> get() {
+                SortedMap<String, Object> values = new TreeMap<String, Object>();
+                if (selectedZustand != null) {
+                    String zustand = selectedZustand.schl().get();
+                    String art = null;
+                    BodenRichtwertRichtlinieArtDerNutzungComposite template = QueryExpressions
+                            .templateFor( BodenRichtwertRichtlinieArtDerNutzungComposite.class );
+                    if ("B".equals( zustand ) || "R".equals( zustand ) || "E".equals( zustand )) {
+                        art = "1";
+                    }
+                    else if ("LF".equals( zustand )) {
+                        art = "2";
+                    }
+                    else {
+                        art = "3";
+                    }
+
+                    for (BodenRichtwertRichtlinieArtDerNutzungComposite be : repository.findEntities(
+                            BodenRichtwertRichtlinieArtDerNutzungComposite.class,
+                            QueryExpressions.eq( template.entwickungsZustand(), art ), 0, 1000 )) {
+                        values.put( be.schl().get() + " - " + be.name().get(), be );
+                    }
+                }
+                return values;
+            }
+        } );
+        newLine = newFormField( "Nutzung BRW-RL" )
+                .setToolTipText( "Art der Nutzung entsprechend Bodenrichtwert-Richtlinie" )
+                .setProperty(
+                        new AssociationAdapter<BodenRichtwertRichtlinieArtDerNutzungComposite>( richtwertzone
+                                .brwrlArt() ) ).setField( artList ).setLayoutData( left().top( lastLine ).create() )
+                .create();
+        selectedNutzung = richtwertzone.brwrlArt().get();
+
+        final PicklistFormField ergaenzungList = new PicklistFormField( new PicklistFormField.ValueProvider() {
+
+            @Override
+            public SortedMap<String, Object> get() {
+                SortedMap<String, Object> values = new TreeMap<String, Object>();
+                if (selectedNutzung != null) {
+                    String art = selectedNutzung.nummer().get();
+                    for (BodenRichtwertRichtlinieErgaenzungComposite be : repository.findEntities(
+                            BodenRichtwertRichtlinieErgaenzungComposite.class, null, 0, 1000 )) {
+                        String ergaenzung = be.nummer().get();
+                        if (ergaenzung.startsWith( art )
+                                || (ergaenzung.equals( "1-4.3" ) && (art.startsWith( "1" ) || art.startsWith( "2" )
+                                        || art.startsWith( "3" ) || art.startsWith( "4" )))) {
+                            // values.put( be.nummer().get() + " " + be.name().get()
+                            // + "(" + be.schl().get() + ")", be );
+                            values.put( be.schl().get() + " - " + be.name().get(), be );
+                        }
+                    }
+                }
+                return values;
+            }
+        } );
+        newFormField( "Ergänzung" )
+                .setToolTipText( "Ergänzung zur Nutzung entprechend Bodenrichtwert-Richtlinie" )
+                .setProperty(
+                        new AssociationAdapter<BodenRichtwertRichtlinieErgaenzungComposite>( richtwertzone
+                                .brwrlErgaenzung() ) ).setField( ergaenzungList )
+                .setLayoutData( right().top( lastLine ).create() ).create();
+
+        pageSite.addFieldListener( nutzungListener = new IFormFieldListener() {
+
+            @Override
+            public void fieldChange( FormFieldEvent ev ) {
+                if (ev.getEventCode() == VALUE_CHANGE) {
+                    if (ev.getFieldName().equalsIgnoreCase( richtwertzone.entwicklungsZustand().qualifiedName().name() )) {
+                        if ((ev.getNewValue() == null && selectedZustand != null)
+                                || !ev.getNewValue().equals( selectedZustand )) {
+                            selectedZustand = ev.getNewValue();
+                            artList.reloadValues();
+                            selectedNutzung = null;
+                            ergaenzungList.reloadValues();
+                        }
+                    }
+                    else if (ev.getFieldName().equalsIgnoreCase( richtwertzone.brwrlArt().qualifiedName().name() )) {
+                        if (ev.getNewValue() != null && !ev.getNewValue().equals( selectedNutzung )) {
+                            selectedNutzung = ev.getNewValue();
+                            ergaenzungList.reloadValues();
+                        }
+                    }
+                }
+            }
+        } );
+
+        lastLine = newLine;
+        newLine = newFormField( "Nutzung" ).setToolTipText( "Wird nicht mehr verwendet, da nicht BRW-RL konform." )
+                .setEnabled( false ).setProperty( new AssociationAdapter<NutzungComposite>( richtwertzone.nutzung() ) )
                 .setField( namedAssocationsPicklist( NutzungComposite.class ) )
                 .setLayoutData( left().top( lastLine ).create() ).create();
 
-        newFormField( "Bodennutzung" )
+        newFormField( "Bodennutzung" ).setToolTipText( "Wird nicht mehr verwendet, da nicht BRW-RL konform." )
+                .setEnabled( false )
                 .setProperty( new AssociationAdapter<BodennutzungComposite>( richtwertzone.bodenNutzung() ) )
                 .setField( namedAssocationsPicklist( BodennutzungComposite.class ) )
                 .setLayoutData( right().top( lastLine ).create() ).create();
-
         // site.addFieldListener( gemeindeListener = new IFormFieldListener() {
         //
         // @Override
