@@ -13,6 +13,7 @@
 package org.polymap.kaps.ui.form;
 
 import org.geotools.data.FeatureStore;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.Feature;
 import org.opengis.feature.type.PropertyDescriptor;
 
@@ -23,16 +24,26 @@ import org.qi4j.api.entity.association.Association;
 import org.qi4j.api.property.Property;
 
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Polygon;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.dialogs.MessageDialog;
 
+import org.polymap.core.data.PipelineFeatureSource;
+import org.polymap.core.data.operations.ModifyFeaturesOperation;
 import org.polymap.core.data.ui.featuretable.DefaultFeatureTableColumn;
 import org.polymap.core.data.ui.featuretable.FeatureTableViewer;
+import org.polymap.core.mapeditor.MapEditor;
 import org.polymap.core.model.EntityType;
+import org.polymap.core.operation.OperationSupport;
+import org.polymap.core.project.ILayer;
+import org.polymap.core.project.IMap;
 import org.polymap.core.qi4j.QiModule.EntityCreator;
+import org.polymap.core.workbench.PolymapWorkbench;
 
 import org.polymap.rhei.data.entityfeature.AssociationAdapter;
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
@@ -45,6 +56,7 @@ import org.polymap.rhei.field.NumberValidator;
 import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
+import org.polymap.kaps.KapsPlugin;
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.BodennutzungComposite;
 import org.polymap.kaps.model.data.ErschliessungsBeitragComposite;
@@ -83,18 +95,48 @@ public class RichtwertzoneGrunddatenFormEditorPage
 
     @Override
     public Action[] getEditorActions() {
-        return new Action[] { new Action( "Geometrie bearbeiten" ) {
+        if (true /*richtwertzone.geom().get() == null*/) {
+            Action action = new Action( "Geometrie anlegen" ) {
+                public void run() {
+                    try {
+                        ILayer layer = ((PipelineFeatureSource)fs).getLayer();
+                        IMap map = layer.getMap();
+                        MapEditor mapEditor = MapEditor.openMap( map, true );
+                        
+                        boolean yes = MessageDialog.openConfirm( PolymapWorkbench.getShellToParentOn(), "Geometrie anlegen", 
+                                "Die Geometrie für die Richtwertzone wird im aktuellen Kartenausschnitt angelegt. " + 
+                                "Diese Standardgeometrie dient als Basis und muss nachbearbeitet werden.\n\n" +
+                                "Ist der aktuelle Kartenausschnitt (etwa) richtig für die Richtwertzone?" );
+                        if (yes) {
+                            ReferencedEnvelope mapExtent = map.getMaxExtent();
+                            GeometryFactory gf = new GeometryFactory();
+                            Polygon polygon = (Polygon)gf.toGeometry( mapExtent );
+                            polygon.buffer( mapExtent.getWidth()/20 );
+                            MultiPolygon geom = gf.createMultiPolygon( new Polygon[] { polygon } );
+                            
+                            ModifyFeaturesOperation op = new ModifyFeaturesOperation( layer, fs, 
+                                    feature.getIdentifier().getID(), "geom", geom );
+                            OperationSupport.instance().execute( op, true, false );
 
-            public void run() {
-                // TODO hier den digitalisierer starten um eine Geometrie auszuwählen
-                // oder zu bearbeiten
-                // Entity mit geom() property ist
-                richtwertzone.geom();
-                // TODO #128
-                GeometryFactory gf = new GeometryFactory();
-                gf.createMultiPolygon( null );
+//                            richtwertzone.geom().set( geom );
+//                            WMSLayer ollayer = ((WMSLayer)mapEditor.findLayer( layer ));
+//                            if (ollayer == null) {
+//                                layer.setVisible( true );
+//                            }
+//                            else {
+//                                ollayer.redraw( true );
+//                            }
+                        }
+                    }
+                    catch (Exception e) {
+                        PolymapWorkbench.handleError( KapsPlugin.PLUGIN_ID, RichtwertzoneGrunddatenFormEditorPage.this, "Die Geometrie konnte nicht angelegt werden.", e );
+                    }
+                };
             };
-        } };
+            action.setToolTipText( "Für importierte Richtwertzonen wird eine Geometrie im aktuellen Kartenausschnitt angelegt" );
+            return new Action[] { action };
+        }
+        return null;
     }
 
 

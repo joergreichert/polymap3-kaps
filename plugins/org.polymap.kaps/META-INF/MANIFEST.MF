@@ -11,6 +11,8 @@ Require-Bundle: org.polymap.core.libs;bundle-version="3.1.0",
  org.polymap.rhei.data;bundle-version="2.0.0",
  org.polymap.core.catalog;bundle-version="3.1.0",
  org.polymap.core.data;bundle-version="3.1.0",
- org.eclipse.rwt.widgets.upload;bundle-version="1.0.0"
+ org.eclipse.rwt.widgets.upload;bundle-version="1.0.0",
+ org.polymap.core.mapeditor;bundle-version="3.1.0",
+ org.polymap.openlayers.rap.widget;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.polymap.kaps.KapsPlugin
