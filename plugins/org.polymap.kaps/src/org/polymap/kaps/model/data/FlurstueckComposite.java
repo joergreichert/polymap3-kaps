@@ -171,7 +171,7 @@ public interface FlurstueckComposite
     // FLSTNR1 INTEGER DEFAULT 0,
     @Optional
     @ImportColumn("FLSTNR1")
-    Property<Integer> nummer();
+    Property<Integer> hauptNummer();
 
 
     // FLSTNR1U VARCHAR(3),
@@ -254,7 +254,7 @@ public interface FlurstueckComposite
                     if (gemarkung().get() != null) {
                         label.append( gemarkung().get().name().get() ).append( " - " );
                     }
-                    label.append( nummer().get() ).append( "/" ).append( unterNummer().get() );
+                    label.append( hauptNummer().get() ).append( "/" ).append( unterNummer().get() );
                     return label.toString();
                 }
             };

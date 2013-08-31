@@ -3,6 +3,7 @@ package org.polymap.kaps.importer;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -19,7 +20,9 @@ import com.healthmarketscience.jackcess.Database;
 import com.healthmarketscience.jackcess.Table;
 
 import org.eclipse.core.commands.operations.IUndoableOperation;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 
 import org.polymap.core.qi4j.QiModule.EntityCreator;
 import org.polymap.core.qi4j.event.AbstractModelChangeOperation;
@@ -37,13 +40,15 @@ public abstract class AbstractMdbImportOperation
         extends AbstractModelChangeOperation
         implements IUndoableOperation {
 
-    private static Log       log = LogFactory.getLog( AbstractMdbImportOperation.class );
+    private static Log                                  log = LogFactory.getLog( AbstractMdbImportOperation.class );
 
-    protected File           dbFile;
+    protected File                                      dbFile;
 
-    protected String[]       tableNames;
+    protected String[]                                  tableNames;
 
-    protected KapsRepository repo;
+    protected KapsRepository                            repo;
+
+    private final Map<Class<?>, Map<String, SchlNamed>> schlCache;
 
 
     public AbstractMdbImportOperation( File dbFile, String[] tableNames, String title ) {
@@ -51,7 +56,21 @@ public abstract class AbstractMdbImportOperation
         this.dbFile = dbFile;
         this.tableNames = tableNames;
         this.repo = KapsRepository.instance();
+        this.schlCache = new WeakHashMap<Class<?>, Map<String, SchlNamed>>();
     }
+
+
+    protected final IStatus doExecute( IProgressMonitor monitor, IAdaptable info )
+            throws Exception {
+        IStatus status = doExecute0( monitor, info );
+        schlCache.clear();
+
+        return status;
+    }
+
+
+    protected abstract IStatus doExecute0( IProgressMonitor monitor, IAdaptable info )
+            throws Exception;
 
 
     protected final RichtwertzoneZeitraumComposite findRichtwertZone( BufferedWriter w,
@@ -148,24 +167,6 @@ public abstract class AbstractMdbImportOperation
     }
 
 
-    protected final <T extends SchlNamed> T findSchlNamed( Class<T> type, Map<String, Object> row, String columnName,
-            boolean nullAllowed ) {
-        Object schl = row.get( columnName );
-        if (schl != null) {
-            if (schl instanceof Double) {
-                schl = (Integer)((Double)schl).intValue();
-            }
-            String schlStr = schl.toString();
-            T obj = repo.findSchlNamed( type, schlStr );
-            if (obj == null && !nullAllowed) {
-                throw new IllegalStateException( "no " + columnName + " found for schl '" + schl + "'!" );
-            }
-            return obj;
-        }
-        return null;
-    }
-
-
     protected final <T extends Composite> T find( Map<String, T> all, Map<String, Object> row, String columnName ) {
         return find( all, row, columnName, false );
     }
@@ -193,17 +194,38 @@ public abstract class AbstractMdbImportOperation
     }
 
 
-    protected final <T extends SchlNamed> T findBySchl( Class<T> type, Map<String, Object> row, String columnName,
+    protected final <T extends SchlNamed> T findSchlNamed( Class<T> type, Map<String, Object> row, String columnName,
             boolean nullAllowed ) {
-        String schl = (String)row.get( columnName );
-        if (schl != null && !schl.isEmpty()) {
-            T named = repo.findSchlNamed( type, schl );
-            if (named == null && !nullAllowed) {
-                throw new IllegalStateException( "no " + type + " found for schl '" + schl + "'!" );
+        Object schl = row.get( columnName );
+        if (schl != null) {
+            if (schl instanceof Double) {
+                schl = (Integer)((Double)schl).intValue();
             }
-            return named;
+            String schlStr = schl.toString();
+            if (!schlStr.isEmpty()) {
+                T obj = findSchlNamed( type, schlStr );
+                if (obj == null && !nullAllowed) {
+                    throw new IllegalStateException( "no " + columnName + " found for schl '" + schl + "'!" );
+                }
+                return obj;
+            }
         }
         return null;
+    }
+
+
+    protected final <T extends SchlNamed> T findSchlNamed( Class<T> type, String schl ) {
+        Map<String, SchlNamed> instances = (Map<String, SchlNamed>)schlCache.get( type );
+        if (instances == null) {
+            instances = new WeakHashMap<String, SchlNamed>();
+            schlCache.put( type, instances );
+        }
+        SchlNamed instance = instances.get( schl );
+        if (instance == null) {
+            instance = repo.findSchlNamed( type, schl );
+            instances.put( schl, instance );
+        }
+        return (T)instance;
     }
 
 

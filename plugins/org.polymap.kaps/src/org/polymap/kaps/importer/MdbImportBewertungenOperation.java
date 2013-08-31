@@ -45,7 +45,7 @@ public class MdbImportBewertungenOperation
     }
 
 
-    protected IStatus doExecute( IProgressMonitor monitor, IAdaptable info )
+    protected IStatus doExecute0( IProgressMonitor monitor, IAdaptable info )
             throws Exception {
         File parentFolder = new File( "kaps" );
         parentFolder.mkdirs();
@@ -189,6 +189,12 @@ public class MdbImportBewertungenOperation
                             gebaeudeArtenProvider.gebaeudeForNumber( hnr, nr, unternr ).getId() );
                 }
                 bewertungGebaeude.zweifamilienHaus().set( getBooleanValue( builderRow, "FAMHAUS2" ) );
+                
+                Long zimmer = (Long)builderRow.get( "ANZZIMMER" );
+                if (zimmer != null) {
+                    bewertungGebaeude.anzahlWohnungen().set( zimmer.doubleValue() );
+                }
+                
                 count++;
             }
             // andernfalls ignorieren

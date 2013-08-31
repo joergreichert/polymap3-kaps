@@ -49,7 +49,7 @@ public class MdbImportOperation
     }
 
 
-    protected IStatus doExecute( IProgressMonitor monitor, IAdaptable info )
+    protected IStatus doExecute0( IProgressMonitor monitor, IAdaptable info )
             throws Exception {
         File parentFolder = new File( "kaps" );
         parentFolder.mkdirs();
@@ -72,9 +72,9 @@ public class MdbImportOperation
                 public void fillEntity( VertragsArtComposite entity, Map<String, Object> builderRow ) {
                     // associate stala
                     entity.stala().set(
-                            findBySchl( VerwandschaftsVerhaeltnisStalaComposite.class, builderRow, "STALA", false ) );
+                            findSchlNamed( VerwandschaftsVerhaeltnisStalaComposite.class, builderRow, "STALA", false ) );
                     // collecting
-//                    allVertragsarten.put( entity.schl().get(), entity );
+                    // allVertragsarten.put( entity.schl().get(), entity );
                 }
             } );
 
@@ -85,11 +85,12 @@ public class MdbImportOperation
                 public void fillEntity( KaeuferKreisComposite entity, Map<String, Object> builderRow ) {
                     // associate stala erstellen
                     entity.stala().set(
-                            findBySchl( VeraeussererBaulandStalaComposite.class, builderRow, "STALA", false ) );
-                    entity.stalaAgrar().set(
-                            findBySchl( VeraeussererAgrarLandStalaComposite.class, builderRow, "STALA_AGRAR", false ) );
+                            findSchlNamed( VeraeussererBaulandStalaComposite.class, builderRow, "STALA", false ) );
+                    entity.stalaAgrar()
+                            .set( findSchlNamed( VeraeussererAgrarLandStalaComposite.class, builderRow, "STALA_AGRAR",
+                                    false ) );
                     entity.kaeuferKreisStabu().set(
-                            findBySchl( KaeuferKreisStaBuComposite.class, builderRow, "STAT_BUND", false ) );
+                            findSchlNamed( KaeuferKreisStaBuComposite.class, builderRow, "STAT_BUND", false ) );
 
                     // collecting
                     // allKKreise.put( entity.schl().get(), entity );
@@ -114,7 +115,7 @@ public class MdbImportOperation
                     entity.kaeuferKreis().set( findSchlNamed( KaeuferKreisComposite.class, builderRow, "KKREIS" ) );
                     // find VKREIS
                     entity.verkaeuferKreis().set( findSchlNamed( KaeuferKreisComposite.class, builderRow, "VKREIS" ) );
-                    
+
                     // fix imports
                     if (builderRow.get( "KANTZ" ) == null) {
                         entity.kaufpreisAnteilZaehler().set( 1.0 );
@@ -182,12 +183,12 @@ public class MdbImportOperation
                 @Override
                 public void fillEntity( NutzungComposite entity, Map<String, Object> builderRow ) {
                     entity.stala().set(
-                            findBySchl( GrundstuecksArtBaulandStalaComposite.class, builderRow, "STALA", false ) );
+                            findSchlNamed( GrundstuecksArtBaulandStalaComposite.class, builderRow, "STALA", false ) );
                     entity.artDerBauflaeche().set(
-                            findBySchl( ArtDerBauflaecheStaBuComposite.class, builderRow, "STAT_BUND_ART", false ) );
+                            findSchlNamed( ArtDerBauflaecheStaBuComposite.class, builderRow, "STAT_BUND_ART", false ) );
                     entity.isAgrar().set( getBooleanValue( builderRow, "AGRAR" ) );
                     entity.isWohneigentum().set( getBooleanValue( builderRow, "STAT_BUND_WE" ) );
-//                    allNutzung.put( entity.schl().get(), entity );
+                    // allNutzung.put( entity.schl().get(), entity );
                 }
             } );
 
@@ -197,12 +198,13 @@ public class MdbImportOperation
                 @Override
                 public void fillEntity( GebaeudeArtComposite entity, Map<String, Object> builderRow ) {
 
-                    entity.gebaeudeArtStabu().set( findSchlNamed( GebaeudeArtStaBuComposite.class, builderRow, "STAT_BUND_ART" ) );
+                    entity.gebaeudeArtStabu().set(
+                            findSchlNamed( GebaeudeArtStaBuComposite.class, builderRow, "STAT_BUND_ART" ) );
                 }
             } );
 
             sub = new SubMonitor( monitor, 10 );
-            importEntity( db, sub, GemeindeComposite.class, null);
+            importEntity( db, sub, GemeindeComposite.class, null );
 
             sub = new SubMonitor( monitor, 10 );
             importEntity( db, sub, StrasseComposite.class, new EntityCallback<StrasseComposite>() {
@@ -218,9 +220,9 @@ public class MdbImportOperation
                 @Override
                 public void fillEntity( BodennutzungComposite entity, Map<String, Object> builderRow ) {
                     // associate stala erstellen
-                    entity.stala()
-                            .set( findBySchl( ArtDesBaugebietesStalaComposite.class, builderRow, "STALA", false ) );
-//                    allBodennutzung.put( entity.schl().get(), entity );
+                    entity.stala().set(
+                            findSchlNamed( ArtDesBaugebietesStalaComposite.class, builderRow, "STALA", false ) );
+                    // allBodennutzung.put( entity.schl().get(), entity );
                 }
             } );
             final FlurComposite flur = repo.newEntity( FlurComposite.class, null, new EntityCreator<FlurComposite>() {
@@ -258,10 +260,10 @@ public class MdbImportOperation
             } );
 
             // bodenrichtwertkennung laden
-            final BodenRichtwertKennungComposite zonal = repo.findSchlNamed( BodenRichtwertKennungComposite.class, "1" );
+            final BodenRichtwertKennungComposite zonal = findSchlNamed( BodenRichtwertKennungComposite.class, "1" );
             // erschließungsbeitrag laden
             // RichtwertzoneLage auf 00
-            final RichtwertZoneLageComposite richtwertZoneLageComposite = repo.findSchlNamed(
+            final RichtwertZoneLageComposite richtwertZoneLageComposite = findSchlNamed(
                     RichtwertZoneLageComposite.class, "00" );
 
             final Map<String, RichtwertzoneComposite> allRichtwertZone = new HashMap<String, RichtwertzoneComposite>();
@@ -278,7 +280,8 @@ public class MdbImportOperation
                                 final Map<String, Object> builderRow )
                                 throws Exception {
 
-                            entity.erschliessungsBeitrag().set( findSchlNamed( ErschliessungsBeitragComposite.class, builderRow, "EB" ) );
+                            entity.erschliessungsBeitrag().set(
+                                    findSchlNamed( ErschliessungsBeitragComposite.class, builderRow, "EB" ) );
 
                             String gemeinde = builderRow.get( "GEMEINDE" ).toString();
                             List<RichtwertzoneZeitraumComposite> list = allRichtwertZoneGueltigkeit.get( gemeinde );
@@ -301,15 +304,17 @@ public class MdbImportOperation
                                                 prototype.gemeinde()
                                                         .set( findSchlNamed( GemeindeComposite.class, builderRow,
                                                                 "GEMEINDE" ) );
-                                                prototype.nutzung().set( findSchlNamed( NutzungComposite.class, builderRow, "NUART" ) );
+                                                prototype.nutzung().set(
+                                                        findSchlNamed( NutzungComposite.class, builderRow, "NUART" ) );
                                                 prototype.bodenNutzung().set(
-                                                        findSchlNamed( BodennutzungComposite.class, builderRow, "NUTZUNG" ) );
+                                                        findSchlNamed( BodennutzungComposite.class, builderRow,
+                                                                "NUTZUNG" ) );
                                                 prototype.lage().set( richtwertZoneLageComposite );
 
                                                 String RIWEKENNUNG = (String)builderRow.get( "RIWEKENNUNG" );
                                                 if (RIWEKENNUNG != null) {
                                                     prototype.bodenrichtwertKennung().set(
-                                                            repo.findSchlNamed( BodenRichtwertKennungComposite.class,
+                                                            findSchlNamed( BodenRichtwertKennungComposite.class,
                                                                     RIWEKENNUNG.trim() ) );
                                                 }
                                                 else {
@@ -319,7 +324,7 @@ public class MdbImportOperation
                                                 String ENTWZUSTAND = (String)builderRow.get( "ENTWZUSTAND" );
                                                 if (ENTWZUSTAND != null) {
                                                     prototype.entwicklungsZustand().set(
-                                                            repo.findSchlNamed( EntwicklungsZustandComposite.class,
+                                                            findSchlNamed( EntwicklungsZustandComposite.class,
                                                                     ENTWZUSTAND.trim() ) );
                                                 }
                                                 // brwrl-art
@@ -336,7 +341,7 @@ public class MdbImportOperation
                                                 String NUTZUNG_ERGAENZ = (String)builderRow.get( "NUTZUNG_ERGAENZ" );
                                                 if (NUTZUNG_ERGAENZ != null) {
                                                     prototype.brwrlErgaenzung().set(
-                                                            repo.findSchlNamed(
+                                                            findSchlNamed(
                                                                     BodenRichtwertRichtlinieErgaenzungComposite.class,
                                                                     NUTZUNG_ERGAENZ.trim() ) );
                                                 }
@@ -344,15 +349,14 @@ public class MdbImportOperation
                                                 String ENTWZUSATZ = (String)builderRow.get( "ENTWZUSATZ" );
                                                 if (ENTWZUSATZ != null) {
                                                     prototype.entwicklungsZusatz().set(
-                                                            repo.findSchlNamed( EntwicklungsZusatzComposite.class,
+                                                            findSchlNamed( EntwicklungsZusatzComposite.class,
                                                                     ENTWZUSATZ.trim() ) );
                                                 }
                                                 // bauweise
                                                 String bauweise = (String)builderRow.get( "BAUWEISE" );
                                                 if (bauweise != null) {
                                                     prototype.bauweise().set(
-                                                            repo.findSchlNamed( BauweiseComposite.class,
-                                                                    bauweise.trim() ) );
+                                                            findSchlNamed( BauweiseComposite.class, bauweise.trim() ) );
                                                 }
                                             }
                                         } );
@@ -414,17 +418,18 @@ public class MdbImportOperation
                     entity.nutzung().set( findSchlNamed( NutzungComposite.class, builderRow, "NUTZUNG" ) );
                     String strasse = (String)builderRow.get( "STRNR" );
                     if (strasse != null) {
-                        entity.strasse().set( repo.findSchlNamed( StrasseComposite.class, strasse ) );
+                        entity.strasse().set( findSchlNamed( StrasseComposite.class, strasse ) );
                     }
                     entity.gebaeudeArt().set( findSchlNamed( GebaeudeArtComposite.class, builderRow, "GEBART" ) );
-                    entity.artDesBaugebiets().set( findSchlNamed( ArtDesBaugebietsComposite.class, builderRow, "BAUGEBART" ) );
+                    entity.artDesBaugebiets().set(
+                            findSchlNamed( ArtDesBaugebietsComposite.class, builderRow, "BAUGEBART" ) );
                     // entity.richtwertZoneG().set( found );
                     entity.gemarkung().set( findSchlNamed( GemarkungComposite.class, builderRow, "GEMARKUNG" ) );
                     entity.flur().set( flur );
 
                     // String gemarkung = (String)builderRow.get( "GEMARKUNG" );
-                    // Integer flurstueckNummer = (Integer)builderRow.get( "FLSTNR1"
-                    // );
+//                    Integer flurstueckNummer = (Integer)builderRow.get( "FLSTNR1" );
+//                    entity.nummer().set( flurstueckNummer );
                     // String unterNummer = (String)builderRow.get( "FLSTNR1U" );
                     // // check if always loaded
                     // String key = gemarkung + "-" + flurstueckNummer + "-" +
@@ -445,10 +450,10 @@ public class MdbImportOperation
                     // allFlurstuecke.put( key, flurstueck );
                     // }
                     // entity.flurstueck().set( flurstueck );
+//                    repo.commitChanges();
                 }
             } );
             // allFlurstuecke.clear();
-
 
             sub = new SubMonitor( monitor, 10 );
             importEntity( db, sub, BodenwertAufteilungTextComposite.class,
@@ -457,7 +462,7 @@ public class MdbImportOperation
                         @Override
                         public void fillEntity( BodenwertAufteilungTextComposite entity, Map<String, Object> builderRow ) {
                             entity.strflaeche().set( getBooleanValue( builderRow, "STRFLAECHE" ) );
-//                            allBodenwertText.put( entity.schl().get(), entity );
+                            // allBodenwertText.put( entity.schl().get(), entity );
                         }
                     } );
 
@@ -510,11 +515,19 @@ public class MdbImportOperation
                                     getBooleanValue( builderRow, "GFZVERWENDEN" ) );
                             // entity.denkmalschutz().set( (String)builderRow.get(
                             // "Denkmalschutz" ) );
-                            entity.bodenwertAufteilung1().set( findSchlNamed( BodenwertAufteilungTextComposite.class, builderRow, "BODWTEXT1", true ) );
-                            entity.bodenwertAufteilung2().set( findSchlNamed( BodenwertAufteilungTextComposite.class, builderRow, "BODWTEXT2", true ) );
-                            entity.bodenwertAufteilung3().set( findSchlNamed( BodenwertAufteilungTextComposite.class, builderRow, "BODWTEXT3", true ) );
-                            entity.bodennutzung().set( findSchlNamed( BodennutzungComposite.class, builderRow, "BONUTZ" ) );
-                            entity.erschliessungsBeitrag().set( findSchlNamed( ErschliessungsBeitragComposite.class, builderRow, "EB" ) );
+                            entity.bodenwertAufteilung1().set(
+                                    findSchlNamed( BodenwertAufteilungTextComposite.class, builderRow, "BODWTEXT1",
+                                            true ) );
+                            entity.bodenwertAufteilung2().set(
+                                    findSchlNamed( BodenwertAufteilungTextComposite.class, builderRow, "BODWTEXT2",
+                                            true ) );
+                            entity.bodenwertAufteilung3().set(
+                                    findSchlNamed( BodenwertAufteilungTextComposite.class, builderRow, "BODWTEXT3",
+                                            true ) );
+                            entity.bodennutzung().set(
+                                    findSchlNamed( BodennutzungComposite.class, builderRow, "BONUTZ" ) );
+                            entity.erschliessungsBeitrag().set(
+                                    findSchlNamed( ErschliessungsBeitragComposite.class, builderRow, "EB" ) );
                             entity.fuerBodenwertaufteilungNichtGeeignet().set(
                                     getBooleanValue( builderRow, "BODWNICHT" ) );
 
@@ -621,7 +634,8 @@ public class MdbImportOperation
                             // entity.sanierungAnfangswert()
                             // .set( value != null && "A".equalsIgnoreCase(
                             // value.toString() ) );
-                            entity.gebaeudeArt().set( findSchlNamed( GebaeudeArtComposite.class, builderRow, "GEBART" ) );
+                            entity.gebaeudeArt()
+                                    .set( findSchlNamed( GebaeudeArtComposite.class, builderRow, "GEBART" ) );
                             // VertragComposite vertrag = repo.findEntity(
                             // VertragComposite.class,
                             // find( allKaufvertrag, builderRow, "EINGANGSNR" ).id()
@@ -658,12 +672,18 @@ public class MdbImportOperation
                                     findRichtwertZone( allRichtwertZoneGueltigkeit, entity, builderRow, "5" ) );
                             entity.richtwertZone6().set(
                                     findRichtwertZone( allRichtwertZoneGueltigkeit, entity, builderRow, "6" ) );
-                            entity.bodennutzung1().set( findSchlNamed( BodennutzungComposite.class, builderRow, "BONU1" ) );
-                            entity.bodennutzung2().set( findSchlNamed( BodennutzungComposite.class, builderRow, "BONU2" ) );
-                            entity.bodennutzung3().set( findSchlNamed( BodennutzungComposite.class, builderRow, "BONU3" ) );
-                            entity.bodennutzung4().set( findSchlNamed( BodennutzungComposite.class, builderRow, "BONU4" ) );
-                            entity.bodennutzung5().set( findSchlNamed( BodennutzungComposite.class, builderRow, "BONU5" ) );
-                            entity.bodennutzung6().set( findSchlNamed( BodennutzungComposite.class, builderRow, "BONU6" ) );
+                            entity.bodennutzung1().set(
+                                    findSchlNamed( BodennutzungComposite.class, builderRow, "BONU1" ) );
+                            entity.bodennutzung2().set(
+                                    findSchlNamed( BodennutzungComposite.class, builderRow, "BONU2" ) );
+                            entity.bodennutzung3().set(
+                                    findSchlNamed( BodennutzungComposite.class, builderRow, "BONU3" ) );
+                            entity.bodennutzung4().set(
+                                    findSchlNamed( BodennutzungComposite.class, builderRow, "BONU4" ) );
+                            entity.bodennutzung5().set(
+                                    findSchlNamed( BodennutzungComposite.class, builderRow, "BONU5" ) );
+                            entity.bodennutzung6().set(
+                                    findSchlNamed( BodennutzungComposite.class, builderRow, "BONU6" ) );
 
                             String separator = System.getProperty( "line.separator" );
                             // BEM1 und BEM2 zusammenfassen

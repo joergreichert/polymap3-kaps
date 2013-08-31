@@ -287,24 +287,26 @@ public class WohnungLiegenschaftzinsFormEditorPage
 
             @Override
             protected Double calculate( ValueProvider values ) {
-                Double flaeche = values.get( wohnung.flurstueck().get().flaeche() );
-                if (flaeche != null) {
-                    Double zaehler = values.get( wohnung.flurstueck().get().flaechenAnteilZaehler() );
-                    Double nenner = values.get( wohnung.flurstueck().get().flaechenAnteilNenner() );
-                    Double preis = values.get( wohnung.bereinigterBodenpreis() );
-                    if (zaehler != null) {
-                        flaeche *= zaehler;
+                if (wohnung.flurstueck().get() != null) {
+                    Double flaeche = values.get( wohnung.flurstueck().get().flaeche() );
+                    if (flaeche != null) {
+                        Double zaehler = values.get( wohnung.flurstueck().get().flaechenAnteilZaehler() );
+                        Double nenner = values.get( wohnung.flurstueck().get().flaechenAnteilNenner() );
+                        Double preis = values.get( wohnung.bereinigterBodenpreis() );
+                        if (zaehler != null) {
+                            flaeche *= zaehler;
+                        }
+                        if (nenner != null && !nenner.equals( Double.valueOf( 0.0d ) )) {
+                            flaeche /= nenner;
+                        }
+                        if (preis != null) {
+                            flaeche *= preis;
+                        }
+                        else {
+                            flaeche = Double.valueOf( 0.0d );
+                        }
+                        return flaeche;
                     }
-                    if (nenner != null && !nenner.equals( Double.valueOf( 0.0d ) )) {
-                        flaeche /= nenner;
-                    }
-                    if (preis != null) {
-                        flaeche *= preis;
-                    }
-                    else {
-                        flaeche = Double.valueOf( 0.0d );
-                    }
-                    return flaeche;
                 }
                 return null;
             }

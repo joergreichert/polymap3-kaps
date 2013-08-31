@@ -89,6 +89,12 @@ public class NHK2010BewertungFormEditorPage
 
     private String                      selectedGebaeudeStandard;
 
+    private IFormFieldListener          zfhListener;
+
+    private IFormFieldListener          grundrissartListener;
+
+    private IFormFieldListener          wohnungsgroesseListener;
+
 
     public NHK2010BewertungFormEditorPage( Feature feature, FeatureStore featureStore ) {
         super( NHK2010BewertungFormEditorPage.class.getName(), "NHK 2010", feature, featureStore );
@@ -114,6 +120,9 @@ public class NHK2010BewertungFormEditorPage
             pageSite.setFieldEnabled( prefix + "laufendeNummer", false );
             pageSite.setFieldEnabled( prefix + "gebaeudeArtId", false );
             pageSite.setFieldEnabled( prefix + "nhk", false );
+            pageSite.setFieldEnabled( prefix + "faktorZweifamilienhaus", false );
+            pageSite.setFieldEnabled( prefix + "faktorWohnungsgroesse", false );
+            pageSite.setFieldEnabled( prefix + "faktorGrundrissart", false );
             // if (composite != null) {
             // // NHK2010Gebaeudeart art =
             // NHK2010GebaeudeartenProvider.instance().gebaeudeForId(
@@ -261,16 +270,16 @@ public class NHK2010BewertungFormEditorPage
                         TreeMap<String, Object> zonen = new TreeMap<String, Object>();
                         if (selectedGebaeudeArt != null) {
                             if (selectedGebaeudeArt.getStufe1() != null) {
-                                zonen.put( "1.0 Einfachst", "1.0" );
+                                zonen.put( "1.0 Einfachst", "1" );
                                 zonen.put( "1.5 Einfachst - Einfach", "1.5" );
-                                zonen.put( "2.0 Einfach", "2.0" );
+                                zonen.put( "2.0 Einfach", "2" );
                                 zonen.put( "2.5 Einfach - Mittel", "2.5" );
                             }
-                            zonen.put( "3.0 Mittel", "3.0" );
+                            zonen.put( "3.0 Mittel", "3" );
                             zonen.put( "3.5 Mittel - Gehoben", "3.5" );
-                            zonen.put( "4.0 Gehoben", "4.0" );
+                            zonen.put( "4.0 Gehoben", "4" );
                             zonen.put( "4.5 Gehoben - Stark gehoben", "4.5" );
-                            zonen.put( "5.0 Stark gehoben", "5.0" );
+                            zonen.put( "5.0 Stark gehoben", "5" );
                         }
                         return zonen;
                     }
@@ -283,7 +292,7 @@ public class NHK2010BewertungFormEditorPage
                                 + "gebaeudeStandard", new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
 
                             @Override
-                            public Property get( NHK2010BewertungGebaeudeComposite entity ) {
+                            public Property<String> get( NHK2010BewertungGebaeudeComposite entity ) {
                                 return entity.gebaeudeStandard();
                             }
                         } ) ).setField( reloadable( gebaeudeStandardPickList ) ).setEnabled( false )
@@ -332,8 +341,9 @@ public class NHK2010BewertungFormEditorPage
                             public Property get( NHK2010BewertungGebaeudeComposite entity ) {
                                 return entity.anzahlWohnungen();
                             }
-                        } ) ).setField( reloadable( new StringFormField() ) ).setEnabled( false )
-                .setLayoutData( three().top( lastLine ).create() ).create();
+                        } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
+                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 10, 0 ) )
+                .setEnabled( false ).setLayoutData( three().top( lastLine ).create() ).create();
 
         newFormField( "Zweifamilienhaus" )
                 .setToolTipText( "Zweifamilienhaus (nur bei Auswahl von Einfamilienhäusern)" )
@@ -369,8 +379,8 @@ public class NHK2010BewertungFormEditorPage
                             : "" );
 
                     gebaeudeStandardPickList.reloadValues();
-                    pageSite.setFieldValue( prefix + "gebaeudeStandard", selectedComposite != null ? selectedComposite
-                            .get().gebaeudeStandard().get() : "3.0" );
+                    pageSite.setFieldValue( prefix + "gebaeudeStandard",
+                            selectedComposite.get() != null ? selectedComposite.get().gebaeudeStandard().get() : "3" );
                     postProcessGebaeudeArtSelection();
                     // }
                 }
@@ -378,7 +388,10 @@ public class NHK2010BewertungFormEditorPage
         } );
 
         // NHK BGF Wohnungsgröße
-        lastLine = newFormField( "NHK 2010" )
+        lastLine = newLine;
+        newLine = createLabel( parent, "NHK 2010", "NHK 2010 in €/m² Bruttogrundfläche", one().top( lastLine ),
+                SWT.LEFT );
+        newFormField( IFormFieldLabel.NO_LABEL )
                 .setToolTipText( "NHK 2010 in €/m² Bruttogrundfläche" )
                 .setParent( parent )
                 .setProperty(
@@ -391,28 +404,224 @@ public class NHK2010BewertungFormEditorPage
                             }
                         } ) ).setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
-                .setEnabled( false ).setLayoutData( one().top( lastLine ).create() ).create();
+                .setEnabled( false ).setLayoutData( two().top( lastLine ).create() ).create();
 
         pageSite.addFieldListener( gebaeudeStandardListener = new IFormFieldListener() {
 
             @Override
             public void fieldChange( FormFieldEvent ev ) {
-                if (ev.getEventCode() == VALUE_CHANGE
-                        && ev.getFieldName().equalsIgnoreCase( prefix + "gebaeudeStandard" )) {
-                    if ((ev.getNewValue() == null && selectedGebaeudeStandard != null)
-                            || (ev.getNewValue() != null && !ev.getNewValue().equals( selectedGebaeudeStandard ))) {
-                        selectedGebaeudeStandard = ev.getNewValue();
-                        // nhk aktualisieren
-                        if (selectedGebaeudeStandard != null) {
-                            pageSite.setFieldValue(
-                                    prefix + "nhk",
-                                    getFormatter( 2 ).format(
-                                            selectedGebaeudeArt.calculateNHKFor( selectedGebaeudeStandard ) ) );
+                if (ev.getEventCode() == VALUE_CHANGE) {
+                    if (ev.getFieldName().equalsIgnoreCase( prefix + "gebaeudeStandard" )) {
+                        if ((ev.getNewValue() == null && selectedGebaeudeStandard != null)
+                                || (ev.getNewValue() != null && !ev.getNewValue().equals( selectedGebaeudeStandard ))) {
+                            selectedGebaeudeStandard = ev.getNewValue();
+                            if (selectedGebaeudeStandard != null) {
+                                pageSite.setFieldValue(
+                                        prefix + "nhk",
+                                        getFormatter( 2 ).format(
+                                                selectedGebaeudeArt.calculateNHKFor( selectedGebaeudeStandard ) ) );
+                            }
+                            else {
+                                pageSite.setFieldValue( prefix + "nhk", null );
+                            }
                         }
                     }
                 }
             }
+
         } );
+
+        newFormField( "BGF" )
+                .setToolTipText( "Bruttogrundfläche" )
+                .setParent( parent )
+                .setProperty(
+                        new ReloadablePropertyAdapter<NHK2010BewertungGebaeudeComposite>( selectedComposite, prefix
+                                + "bruttoGrundFlaeche", new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
+
+                            @Override
+                            public Property<Double> get( NHK2010BewertungGebaeudeComposite entity ) {
+                                return entity.bruttoGrundFlaeche();
+                            }
+                        } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
+                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 10, 0 ) )
+                .setEnabled( true ).setLayoutData( three().top( lastLine ).create() ).create();
+
+        // wird nicht gespeichert und ausgewertet, also vllt. als computed wenn
+        // nachgefragt
+        // newFormField( "Wohnungsgröße" )
+        // .setToolTipText(
+        // "Wohnungsgröße = BGF / Anzahl der Wohnungen bei Mehrfamilienhaus)" )
+        // .setParent( parent )
+        // .setProperty(
+        // new ReloadablePropertyAdapter<NHK2010BewertungGebaeudeComposite>(
+        // selectedComposite, prefix
+        // + "zweifamilienHaus", new
+        // PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
+        //
+        // @Override
+        // public Property get( NHK2010BewertungGebaeudeComposite entity ) {
+        // return entity.zweifamilienHaus();
+        // }
+        // } ) ).setField( reloadable( new CheckboxFormField() ) ).setEnabled( false
+        // )
+        // .setLayoutData( five().top( lastLine ).create() ).create();
+
+        lastLine = newLine;
+        // korrekturFaktorenLabel = (Label)createLabel( parent, "Korrekturfaktor",
+        // "Korrekturfaktoren entsprechend Gebäudeart und Gebäudedaten", one().top(
+        // lastLine ),
+        // SWT.LEFT );
+
+        newLine = newFormField( "Zweifamilienhaus" )
+                .setToolTipText( "Korrekturfaktor Zweifamilienhaus" )
+                .setParent( parent )
+                .setProperty(
+                        new ReloadablePropertyAdapter<NHK2010BewertungGebaeudeComposite>( selectedComposite, prefix
+                                + "faktorZweifamilienhaus", new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
+
+                            @Override
+                            public Property<Double> get( NHK2010BewertungGebaeudeComposite entity ) {
+                                return entity.faktorZweifamilienhaus();
+                            }
+                        } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
+                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2 ) )
+                .setEnabled( false ).setLayoutData( one().top( lastLine ).create() ).create();
+
+        pageSite.addFieldListener( zfhListener = new IFormFieldListener() {
+
+            @Override
+            public void fieldChange( FormFieldEvent ev ) {
+                if (ev.getEventCode() == VALUE_CHANGE
+                        && ev.getFieldName().equalsIgnoreCase( prefix + "zweifamilienHaus" )) {
+                    Boolean value = ev.getNewValue();
+                    if (value != null && value.booleanValue()) {
+                        pageSite.setFieldValue( prefix + "faktorZweifamilienhaus", "1,05" );
+                    } else {
+                        pageSite.setFieldValue( prefix + "faktorZweifamilienhaus", null );                        
+                    }
+                }
+            }
+        } );
+
+        newFormField( "Wohnungsgröße" )
+                .setToolTipText( "Korrekturfaktor Wohnungsgröße" )
+                .setParent( parent )
+                .setProperty(
+                        new ReloadablePropertyAdapter<NHK2010BewertungGebaeudeComposite>( selectedComposite, prefix
+                                + "faktorWohnungsgroesse", new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
+
+                            @Override
+                            public Property<Double> get( NHK2010BewertungGebaeudeComposite entity ) {
+                                return entity.faktorWohnungsgroesse();
+                            }
+                        } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
+                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2 ) )
+                .setEnabled( false ).setLayoutData( three().top( lastLine ).create() ).create();
+
+        pageSite.addFieldListener( wohnungsgroesseListener = new IFormFieldListener() {
+
+            private Double bruttoGrundFlaeche;
+
+            private Double anzahlWohnungen;
+
+
+            @Override
+            public void fieldChange( FormFieldEvent ev ) {
+                if (ev.getEventCode() == VALUE_CHANGE) {
+                    if (ev.getFieldName().equalsIgnoreCase( prefix + "bruttoGrundFlaeche" )) {
+                        this.bruttoGrundFlaeche = (Double)ev.getNewValue();
+                        calculateFaktor();
+                    }
+                    else if (ev.getFieldName().equalsIgnoreCase( prefix + "anzahlWohnungen" )) {
+                        this.anzahlWohnungen = (Double)ev.getNewValue();
+                        calculateFaktor();
+                    }
+                }
+            }
+
+
+            private void calculateFaktor() {
+                Double faktor = null;
+                if (bruttoGrundFlaeche != null && anzahlWohnungen != null && anzahlWohnungen != 0.0d) {
+                    Double wohnungsflaeche = bruttoGrundFlaeche / anzahlWohnungen;
+                    if (wohnungsflaeche <= 35.0d) {
+                        faktor = 1.1d;
+                    }
+                    else if (wohnungsflaeche >= 135.0d) {
+                        faktor = 0.85d;
+                    }
+                    else if (wohnungsflaeche == 50.0d) {
+                        faktor = 1.0d;
+                    }
+                    else if (wohnungsflaeche < 50.0d) {
+                        faktor = 1.1d - (wohnungsflaeche - 35.0d) *  (1.1d - 1.0d) / (50.0d - 35.0d);
+                    } 
+                    else if (wohnungsflaeche < 135.0d) {
+                        faktor = 1.0d - (wohnungsflaeche - 50.0d) *  (1.0d - 0.85d) / (135.0d - 50.0d);
+                    } 
+                }
+                pageSite.setFieldValue( prefix + "faktorWohnungsgroesse",
+                        faktor != null ? getFormatter( 2 ).format( faktor ) : null );
+            }
+        } );
+
+        newFormField( "Grundrißart" )
+                .setToolTipText( "Korrekturfaktor Grundrißart" )
+                .setParent( parent )
+                .setProperty(
+                        new ReloadablePropertyAdapter<NHK2010BewertungGebaeudeComposite>( selectedComposite, prefix
+                                + "faktorGrundrissart", new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
+
+                            @Override
+                            public Property<Double> get( NHK2010BewertungGebaeudeComposite entity ) {
+                                return entity.faktorGrundrissart();
+                            }
+                        } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
+                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2 ) )
+                .setEnabled( false ).setLayoutData( five().top( lastLine ).create() ).create();
+
+        pageSite.addFieldListener( grundrissartListener = new IFormFieldListener() {
+
+            @Override
+            public void fieldChange( FormFieldEvent ev ) {
+                if (ev.getEventCode() == VALUE_CHANGE && ev.getFieldName().equalsIgnoreCase( prefix + "grundrissArt" )) {
+                    String value = ev.getNewValue();
+                    String faktor = null;
+                    if ("Einspänner".equals( value )) {
+                        faktor = "1,05";
+                    }
+                    else if ("Zweispänner".equals( value )) {
+                        faktor = "1,00";
+                    }
+                    else if ("Dreispänner".equals( value )) {
+                        faktor = "0,97";
+                    }
+                    else if ("Vierspänner".equals( value )) {
+                        faktor = "0,95";
+                    }
+                    pageSite.setFieldValue( prefix + "faktorGrundrissart", faktor );
+                }
+            }
+        } );
+
+        lastLine = newLine;
+        newLine = createLabel( parent, "NHK 2010 korrigiert",
+                "NHK 2010 in €/m² Bruttogrundfläche korrigiert entsprechend der Korrekturfaktoren", one()
+                        .top( lastLine ), SWT.LEFT );
+        newFormField( IFormFieldLabel.NO_LABEL )
+                .setToolTipText( "NHK 2010 korrigiert in €/m² Bruttogrundfläche" )
+                .setParent( parent )
+                .setProperty(
+                        new ReloadablePropertyAdapter<NHK2010BewertungGebaeudeComposite>( selectedComposite, prefix
+                                + "nhkKorrigiert", new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
+
+                            @Override
+                            public Property get( NHK2010BewertungGebaeudeComposite entity ) {
+                                return entity.nhkKorrigiert();
+                            }
+                        } ) ).setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
+                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setEnabled( false ).setLayoutData( two().top( lastLine ).create() ).create();
 
         lastLine = newLine;
         return newLine;
@@ -427,6 +636,12 @@ public class NHK2010BewertungFormEditorPage
                 && (selectedGebaeudeArt.getId().startsWith( "4" ) || selectedGebaeudeArt.getId().startsWith( "5.1" )) );
         pageSite.setFieldEnabled( prefix + "zweifamilienHaus", selectedGebaeudeArt != null
                 && selectedGebaeudeArt.getId().startsWith( "1" ) );
+        // reset von zfh, anzahlzimmer und grundrissart und
+        // korrfaktoren
+        pageSite.setFieldValue( prefix + "grundrissArt", null );
+        pageSite.setFieldValue( prefix + "anzahlWohnungen", null );
+        pageSite.setFieldValue( prefix + "zweifamilienHaus", Boolean.FALSE );
+        pageSite.setFieldValue( prefix + "faktorZweifamilienhaus", null );
     }
 
 

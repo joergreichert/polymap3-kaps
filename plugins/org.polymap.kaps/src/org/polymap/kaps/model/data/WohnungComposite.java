@@ -928,7 +928,7 @@ public interface WohnungComposite
 
 
         public static VertragComposite vertragFor( WohnungComposite wohnung ) {
-            return wohnung.flurstueck().get().vertrag().get();
+            return wohnung.flurstueck().get() != null ? wohnung.flurstueck().get().vertrag().get() : null;
         }
 
 

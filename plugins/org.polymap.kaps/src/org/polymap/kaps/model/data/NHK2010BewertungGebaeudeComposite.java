@@ -125,10 +125,9 @@ public interface NHK2010BewertungGebaeudeComposite
     // @Optional
     // @ImportColumn("UNTERNR")
     // Property<Long> UNTERNR();
-//
-//    @Optional
-//    Property<String> gebaeudeArt();
-
+    //
+    // @Optional
+    // Property<String> gebaeudeArt();
 
     //
     // // TODO BERUECK - String
@@ -276,7 +275,7 @@ public interface NHK2010BewertungGebaeudeComposite
 
     // GEBNR1 - String
     @Optional
-    //@ImportColumn("GEBNR1") wird aus Nummer/Unternummer berechnet
+    // @ImportColumn("GEBNR1") wird aus Nummer/Unternummer berechnet
     Property<String> gebaeudeArtId();
 
 
@@ -330,10 +329,21 @@ public interface NHK2010BewertungGebaeudeComposite
 
     // ANZZIMMER - Long
     @Optional
-    @ImportColumn("ANZZIMMER")
-    Property<Long> anzahlWohnungen();
+    //@ImportColumn("ANZZIMMER")
+    Property<Double> anzahlWohnungen();
 
 
+    @Optional
+    Property<Double> faktorGrundrissart();
+
+
+    @Optional
+    Property<Double> faktorWohnungsgroesse();
+
+
+    @Optional
+    Property<Double> faktorZweifamilienhaus();
+    
     //
     // // TODO DACHGEOMETRIE - Double
     // @Optional
@@ -467,5 +477,4 @@ public interface NHK2010BewertungGebaeudeComposite
             return matches;
         }
     }
-
 }

@@ -74,7 +74,7 @@ public abstract class FlurstueckSearcher
 
     private FlurComposite                                flur;
 
-    private Integer                                      nummer;
+    private Integer                                      hauptNummer;
 
     private String                                       unterNummer;
 
@@ -115,7 +115,7 @@ public abstract class FlurstueckSearcher
             // }
             // }
             content = new ArrayList();
-            for (FlurstueckComposite fc : KapsRepository.instance().findFlurstuecke( gemarkung, flur, nummer,
+            for (FlurstueckComposite fc : KapsRepository.instance().findFlurstuecke( gemarkung, flur, hauptNummer,
                     unterNummer )) {
                 content.add( fc );
             }
@@ -189,7 +189,7 @@ public abstract class FlurstueckSearcher
             viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader( "Gemarkung" ) );
             prop = new PropertyDescriptorAdapter( type.getProperty( "flur" ) );
             viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader( "Flur" ) );
-            prop = new PropertyDescriptorAdapter( type.getProperty( "nummer" ) );
+            prop = new PropertyDescriptorAdapter( type.getProperty( "hauptNummer" ) );
             viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader( "Flurstück" ) );
             prop = new PropertyDescriptorAdapter( type.getProperty( "unterNummer" ) );
             viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader( "Unternummer" ) );
@@ -241,8 +241,8 @@ public abstract class FlurstueckSearcher
                 flur = (FlurComposite)ev.getNewValue();
                 setEnabled( true );
             }
-            else if (fieldName.equalsIgnoreCase( prefix + "nummer" )) {
-                nummer = (Integer)ev.getNewValue();
+            else if (fieldName.equalsIgnoreCase( prefix + "hauptNummer" )) {
+                hauptNummer = (Integer)ev.getNewValue();
                 setEnabled( true );
             }
             else if (fieldName.equalsIgnoreCase( prefix + "unterNummer" )) {
@@ -260,7 +260,7 @@ public abstract class FlurstueckSearcher
         setEnabled( false );
         gemarkung = null;
         flur = null;
-        nummer = null;
+        hauptNummer = null;
         unterNummer = null;
     }
 }

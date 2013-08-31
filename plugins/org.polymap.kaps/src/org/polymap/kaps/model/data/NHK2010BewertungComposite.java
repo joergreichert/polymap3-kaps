@@ -22,6 +22,8 @@ import org.qi4j.api.entity.association.Association;
 import org.qi4j.api.entity.association.ManyAssociation;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.property.Property;
+import org.qi4j.api.query.QueryExpressions;
+import org.qi4j.api.query.grammar.BooleanExpression;
 
 import org.polymap.core.qi4j.QiEntity;
 import org.polymap.core.qi4j.event.ModelChangeSupport;
@@ -29,6 +31,7 @@ import org.polymap.core.qi4j.event.PropertyChangeSupport;
 
 import org.polymap.kaps.importer.ImportColumn;
 import org.polymap.kaps.importer.ImportTable;
+import org.polymap.kaps.model.KapsRepository;
 
 /**
  * 
@@ -99,6 +102,13 @@ public interface NHK2010BewertungComposite
             implements NHK2010BewertungComposite {
 
         private static Log log = LogFactory.getLog( Mixin.class );
+
+
+        public final static NHK2010BewertungComposite forVertrag( VertragComposite vertrag ) {
+            NHK2010BewertungComposite template = QueryExpressions.templateFor( NHK2010BewertungComposite.class );
+            BooleanExpression expr = QueryExpressions.eq( template.vertrag(), vertrag );
+            return KapsRepository.instance().findEntities( NHK2010BewertungComposite.class, expr, 0, 1 ).find();
+        }
     }
 
 }

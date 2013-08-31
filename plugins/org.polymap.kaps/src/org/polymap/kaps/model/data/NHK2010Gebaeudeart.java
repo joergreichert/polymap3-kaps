@@ -257,31 +257,31 @@ public class NHK2010Gebaeudeart {
         if (selectedGebaeudeStandard == null || selectedGebaeudeStandard.isEmpty()) {
             return null;
         }
-        if ("1.0".equals( selectedGebaeudeStandard )) {
+        if ("1".equals( selectedGebaeudeStandard )) {
             return stufe1.doubleValue();
         }
         else if ("1.5".equals( selectedGebaeudeStandard )) {
             return (stufe1.doubleValue() + stufe2.doubleValue()) / 2;
         }
-        else if ("2.0".equals( selectedGebaeudeStandard )) {
+        else if ("2".equals( selectedGebaeudeStandard )) {
             return stufe2.doubleValue();
         }
         else if ("2.5".equals( selectedGebaeudeStandard )) {
             return (stufe2.doubleValue() + stufe3.doubleValue()) / 2;
         }
-        else if ("3.0".equals( selectedGebaeudeStandard )) {
+        else if ("3".equals( selectedGebaeudeStandard )) {
             return stufe3.doubleValue();
         }
         else if ("3.5".equals( selectedGebaeudeStandard )) {
             return (stufe3.doubleValue() + stufe4.doubleValue()) / 2;
         }
-        else if ("4.0".equals( selectedGebaeudeStandard )) {
+        else if ("4".equals( selectedGebaeudeStandard )) {
             return stufe4.doubleValue();
         }
         else if ("4.5".equals( selectedGebaeudeStandard )) {
             return (stufe4.doubleValue() + stufe5.doubleValue()) / 2;
         }
-        else if ("5.0".equals( selectedGebaeudeStandard )) {
+        else if ("5".equals( selectedGebaeudeStandard )) {
             return stufe5.doubleValue();
         }
         else {

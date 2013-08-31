@@ -61,6 +61,7 @@ import org.polymap.kaps.model.data.GebaeudeArtComposite;
 import org.polymap.kaps.model.data.GebaeudeComposite;
 import org.polymap.kaps.model.data.GemarkungComposite;
 import org.polymap.kaps.model.data.GemeindeComposite;
+import org.polymap.kaps.model.data.NHK2010BewertungComposite;
 import org.polymap.kaps.model.data.NutzungComposite;
 import org.polymap.kaps.model.data.RichtwertzoneComposite;
 import org.polymap.kaps.model.data.StrasseComposite;
@@ -123,8 +124,10 @@ public class KaufvertragFlurstueckeFormEditorPage
 
         Composite extendedForm = createErweiterteDatenForm( schildForm );
 
-        Section tableSection = newSection( extendedForm, "Auswahl" );
-        createTableForm( (Composite)tableSection.getClient(), extendedForm, true );
+        Composite bewertungForm = createBewertungenForm( extendedForm );
+
+        Section tableSection = newSection( bewertungForm, "Auswahl" );
+        createTableForm( (Composite)tableSection.getClient(), bewertungForm, true );
     }
 
 
@@ -152,7 +155,7 @@ public class KaufvertragFlurstueckeFormEditorPage
     }
 
 
-    public Composite createFlurstueckForm( Composite parent ) {
+    private Composite createFlurstueckForm( Composite parent ) {
 
         Section formSection = newSection( parent, "Flurstücksdaten" );
         parent = (Composite)formSection.getClient();
@@ -185,15 +188,16 @@ public class KaufvertragFlurstueckeFormEditorPage
         Control line1 = newFormField( "Flurstücksnummer" )
                 .setParent( parent )
                 .setProperty(
-                        new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix + "nummer",
+                        new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix + "hauptNummer",
                                 new PropertyCallback<FlurstueckComposite>() {
 
                                     public Property get( FlurstueckComposite entity ) {
-                                        return entity.nummer();
+                                        return entity.hauptNummer();
                                     }
                                 } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
                 .setLayoutData( left().right( 30 ).top( line0 ).create() )
-                .setValidator( new NumberValidator( Integer.class, locale ) ).create();
+                .setValidator( new NumberValidator( Integer.class, locale ) )
+                .create();
 
         newFormField( "/" )
                 .setParent( parent )
@@ -237,7 +241,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                 pageSite.setFieldValue( prefix + "gemarkung", toAdopt.gemarkung().get() );
                 // current.gemarkung().set( toAdopt.gemarkung().get() );
                 pageSite.setFieldValue( prefix + "flur", toAdopt.flur().get() );
-                pageSite.setFieldValue( prefix + "nummer", String.valueOf( toAdopt.nummer().get() ) );
+                pageSite.setFieldValue( prefix + "hauptNummer", String.valueOf( toAdopt.hauptNummer().get() ) );
                 pageSite.setFieldValue( prefix + "unterNummer", toAdopt.unterNummer().get() );
                 pageSite.setFieldValue( prefix + "strasse", toAdopt.strasse().get() );
                 pageSite.setFieldValue( prefix + "hausnummer", toAdopt.hausnummer().get() );
@@ -564,8 +568,10 @@ public class KaufvertragFlurstueckeFormEditorPage
 
     private SimplePickList<WohnungComposite> wohnungPicklist;
 
+    private ActionButton openBewertungen;
 
-    public Section createErweiterteDatenForm( Composite top ) {
+
+    private Section createErweiterteDatenForm( Composite top ) {
 
         Section formSection = newSection( top, "Erweiterte Daten" );
         formSection.setExpanded( false );
@@ -712,6 +718,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                 if (wohnung != null) {
                     final FlurstueckComposite flurstueckComposite = selectedComposite.get();
                     queue( new UpdateCommand() {
+
                         @Override
                         public void execute() {
                             // Adapter der erst beim speichern der
@@ -743,6 +750,43 @@ public class KaufvertragFlurstueckeFormEditorPage
     }
 
 
+    private Section createBewertungenForm( Composite top ) {
+
+        Section formSection = newSection( top, "Bewertungen" );
+        formSection.setExpanded( false );
+        Composite parent = (Composite)formSection.getClient();
+
+        openBewertungen = new ActionButton( parent, new Action( "nach NHK 2010 bewerten" ) {
+            @Override
+            public void run() {
+                NHK2010BewertungComposite bewertungComposite = NHK2010BewertungComposite.Mixin.forVertrag( kaufvertrag );
+                if (bewertungComposite == null) {
+                    bewertungComposite = repository.newEntity( NHK2010BewertungComposite.class, null );
+                    bewertungComposite.vertrag().set( kaufvertrag );
+                }
+                KapsPlugin.openEditor( fs, NHK2010BewertungComposite.NAME, bewertungComposite );
+            }
+        } ) {
+
+            @Override
+            public void setEnabled( boolean enabled ) {
+                if (enabled) {
+                    if (NHK2010BewertungComposite.Mixin.forVertrag( kaufvertrag ) != null) {
+                        setText( "Bewertung nach NHK 2010 anpassen" );
+                    }
+                    else {
+                        setText( "nach NHK 2010 bewerten" );
+                    }
+                }
+                super.setEnabled( enabled );
+            };
+        };
+        openBewertungen.setLayoutData( left().right( 15 ).height( 25 ).top( null ).bottom( 100 ).create() );
+        openBewertungen.setEnabled( true );
+        return formSection;
+    }
+
+
     protected EntityType<FlurstueckComposite> addViewerColumns( FeatureTableViewer viewer ) {
         // entity types
         final KapsRepository repo = KapsRepository.instance();
@@ -753,7 +797,7 @@ public class KaufvertragFlurstueckeFormEditorPage
         viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader( "Gemarkung" ) );
         prop = new PropertyDescriptorAdapter( type.getProperty( "flur" ) );
         viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader( "Flur" ) );
-        prop = new PropertyDescriptorAdapter( type.getProperty( "nummer" ) );
+        prop = new PropertyDescriptorAdapter( type.getProperty( "hauptNummer" ) );
         viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader( "Flurstück" ) );
         prop = new PropertyDescriptorAdapter( type.getProperty( "unterNummer" ) );
         viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader( "Unternummer" ) );

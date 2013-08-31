@@ -197,10 +197,10 @@ public class GebaeudeFlurstueckeFormEditorPage
                 .setParent( parent )
                 .setProperty(
                         new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix
-                                + "nummer", new PropertyCallback<FlurstueckComposite>() {
+                                + "hauptNummer", new PropertyCallback<FlurstueckComposite>() {
 
                             public Property<Integer> get( FlurstueckComposite entity ) {
-                                return entity.nummer();
+                                return entity.hauptNummer();
                             }
                         } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
                 .setLayoutData( left().right( 30 ).top( lastLine ).create() )
@@ -236,7 +236,7 @@ public class GebaeudeFlurstueckeFormEditorPage
                 pageSite.setFieldValue( prefix + "gemarkung", toAdopt.gemarkung().get() );
                 // current.gemarkung().set( toAdopt.gemarkung().get() );
                 pageSite.setFieldValue( prefix + "flur", toAdopt.flur().get() );
-                pageSite.setFieldValue( prefix + "nummer", String.valueOf( toAdopt.nummer().get() ) );
+                pageSite.setFieldValue( prefix + "hauptNummer", String.valueOf( toAdopt.hauptNummer().get() ) );
                 pageSite.setFieldValue( prefix + "unterNummer", toAdopt.unterNummer().get() );
                 pageSite.setFieldValue( prefix + "strasse", toAdopt.strasse().get() );
                 pageSite.setFieldValue( prefix + "hausnummer", toAdopt.hausnummer().get() );
@@ -483,7 +483,7 @@ public class GebaeudeFlurstueckeFormEditorPage
         viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader( "Vertragsnummer" ) );
         prop = new PropertyDescriptorAdapter( type.getProperty( "gemarkung" ) );
         viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader( "Gemarkung" ) );
-        prop = new PropertyDescriptorAdapter( type.getProperty( "nummer" ) );
+        prop = new PropertyDescriptorAdapter( type.getProperty( "hauptNummer" ) );
         viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader( "Flurstück" ) );
         prop = new PropertyDescriptorAdapter( type.getProperty( "unterNummer" ) );
         viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader( "Unternummer" ) );

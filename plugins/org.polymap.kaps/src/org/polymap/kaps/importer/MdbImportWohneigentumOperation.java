@@ -63,7 +63,7 @@ public class MdbImportWohneigentumOperation
     }
 
 
-    protected IStatus doExecute( IProgressMonitor monitor, IAdaptable info )
+    protected IStatus doExecute0( IProgressMonitor monitor, IAdaptable info )
             throws Exception {
         File parentFolder = new File( "kaps" );
         parentFolder.mkdirs();
@@ -170,7 +170,7 @@ public class MdbImportWohneigentumOperation
                     entity.zurAuswertungGeeignet().set( getBooleanValue( builderRow, "VERARBKZ" ) );
 
                     Object schl = builderRow.get( "BEWSCHL" );
-                    System.out.println( schl );
+//                    System.out.println( schl );
                     entity.ausstattung().set( findSchlNamed( AusstattungComposite.class, builderRow, "BEWSCHL" ) );
                     entity.eigentumsArt().set( findSchlNamed( EigentumsartComposite.class, builderRow, "EIGENTART" ) );
                     entity.etage().set( findSchlNamed( EtageComposite.class, builderRow, "GESCHOSS" ) );
@@ -220,7 +220,7 @@ public class MdbImportWohneigentumOperation
                     List<FlurstueckComposite> gFlurstuecke = gebaeude.flurstuecke().toList();
                     for (FlurstueckComposite gFlurstueck : gFlurstuecke) {
                         if (gemarkungSchl.trim().equals( gFlurstueck.gemarkung().get().schl().get() )
-                                && flurstueckNummer.equals( gFlurstueck.nummer().get() )
+                                && flurstueckNummer.equals( gFlurstueck.hauptNummer().get() )
                                 && flurstueckUnternummer.trim().equals( gFlurstueck.unterNummer().get() )) {
                             gebaeudeFlurstueck = gFlurstueck;
                             break;
@@ -242,7 +242,7 @@ public class MdbImportWohneigentumOperation
                         FlurstueckComposite found = null;
                         for (FlurstueckComposite flurstueck : existingFlurstuecke) {
                             if (gemarkungSchl.trim().equals( flurstueck.gemarkung().get().schl().get() )
-                                    && flurstueckNummer.equals( flurstueck.nummer().get() )
+                                    && flurstueckNummer.equals( flurstueck.hauptNummer().get() )
                                     && flurstueckUnternummer.trim().equals( flurstueck.unterNummer().get() )) {
                                 found = flurstueck;
                                 break;
@@ -258,7 +258,7 @@ public class MdbImportWohneigentumOperation
                             if (gebaeudeFlurstueck != null
                                     && gebaeudeFlurstueck.gemarkung().get().schl().get()
                                             .equals( found.gemarkung().get().schl().get() )
-                                    && gebaeudeFlurstueck.nummer().get().equals( found.nummer().get() )
+                                    && gebaeudeFlurstueck.hauptNummer().get().equals( found.hauptNummer().get() )
                                     && gebaeudeFlurstueck.unterNummer().get().equals( found.unterNummer().get() )) {
                                 // belastung und erbbau vom Gebäudegrundstück
                                 // übernehmen
@@ -287,7 +287,6 @@ public class MdbImportWohneigentumOperation
                         // wenn kein Vertrag, pseudoflurstück von Gebäude setzen
                         entity.flurstueck().set( gebaeudeFlurstueck );
                     }
-                    // TODO gebaeude an wohnung setzen
                     repo.commitChanges();
                 }
             } );
@@ -365,9 +364,9 @@ public class MdbImportWohneigentumOperation
 
             FlurstueckComposite flurstueck = repo.newEntity( FlurstueckComposite.class, null );
 
-            flurstueck.gemarkung().set( findBySchl( GemarkungComposite.class, builderRow, "GEM", false ) );
+            flurstueck.gemarkung().set( findSchlNamed( GemarkungComposite.class, builderRow, "GEM", false ) );
             // Integer
-            flurstueck.nummer().set( (Integer)builderRow.get( "FLSTNR" ) );
+            flurstueck.hauptNummer().set( (Integer)builderRow.get( "FLSTNR" ) );
             flurstueck.unterNummer().set( (String)builderRow.get( "FLSTNRU" ) );
             // N, J, NULL
             flurstueck.erbbaurecht().set( (String)builderRow.get( "ERBBAUR" ) );
@@ -380,12 +379,12 @@ public class MdbImportWohneigentumOperation
             flurstueck.hausnummerZusatz().set( (String)builderRow.get( "HZUSNR" ) );
             flurstueck.kartenBlattNummer().set( (String)builderRow.get( "KARTBLATTN" ) );
 
-            flurstueck.flur().set( repo.findSchlNamed( FlurComposite.class, "000" ) );
-            flurstueck.nutzung().set( findBySchl( NutzungComposite.class, builderRow, "NUTZUNG", false ) );
-            flurstueck.strasse().set( findBySchl( StrasseComposite.class, builderRow, "STRNR", false ) );
+            flurstueck.flur().set( findSchlNamed( FlurComposite.class, "000" ) );
+            flurstueck.nutzung().set( findSchlNamed( NutzungComposite.class, builderRow, "NUTZUNG", false ) );
+            flurstueck.strasse().set( findSchlNamed( StrasseComposite.class, builderRow, "STRNR", false ) );
             try {
                 flurstueck.richtwertZone()
-                        .set( findBySchl( RichtwertzoneComposite.class, builderRow, "RIZONE", false ) );
+                        .set( findSchlNamed( RichtwertzoneComposite.class, builderRow, "RIZONE", false ) );
             }
             catch (IllegalStateException ise) {
                 wmvaopfW.write( "Keine Richtwertzone  gefunden für " + builderRow.get( "RIZONE" ) + "\n" );

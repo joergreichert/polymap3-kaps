@@ -379,7 +379,7 @@ public class KapsRepository
             expr = (expr == null) ? in : QueryExpressions.and( expr, in );
         }
         if (flurstuecksNummer != null) {
-            BooleanExpression in = QueryExpressions.eq( template.nummer(), flurstuecksNummer );
+            BooleanExpression in = QueryExpressions.eq( template.hauptNummer(), flurstuecksNummer );
             expr = (expr == null) ? in : QueryExpressions.and( expr, in );
         }
         if (unternummer != null && !unternummer.isEmpty()) {
