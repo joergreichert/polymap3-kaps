@@ -14,6 +14,7 @@ package org.polymap.kaps.model;
 
 import org.geotools.feature.NameImpl;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.FeatureType;
 
@@ -37,7 +38,7 @@ public class RichtwertzoneEntityProvider
 
     public RichtwertzoneEntityProvider( QiModule repo ) {
         super( repo, RichtwertzoneComposite.class, new NameImpl( KapsRepository.NAMESPACE,
-                "Richtwertzone" ) );
+                RichtwertzoneComposite.NAME ) );
     }
 
 
@@ -50,5 +51,13 @@ public class RichtwertzoneEntityProvider
                 new String[] { "gemeinde", "schl", "name", "geom", /*"gueltigAb", "stichtag", "euroQm",*/
                         "gfzBereich" } );
         return filtered;
+    }
+    
+    @Override
+    public Feature buildFeature( RichtwertzoneComposite entity, Feature feature, FeatureType schema ) {
+        Feature ret = super.buildFeature( entity, feature, schema );
+        // FIXME
+        ret.getProperty( "geom" ).setValue( entity.geom().get() );
+        return ret;
     }
 }

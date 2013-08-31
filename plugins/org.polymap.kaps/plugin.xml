@@ -42,5 +42,15 @@
             tooltip="Richtwertzone als CSV im Format BORIS exportieren.">
       </featureOperation>
    </extension>
+   <extension
+         point="org.polymap.core.data.featureOperations">
+      <featureOperation
+            class="org.polymap.kaps.importer.RichtwertzoneKoordinateImporter"
+            icon="icons/import.gif"
+            id="org.polymap.kaps.importer.RichtwertzoneKoordinateImporter"
+            label="In Richtwertzone importieren"
+            tooltip="Geometrie auslesen und in Richtwertzone importieren">
+      </featureOperation>
+   </extension>
 
 </plugin>

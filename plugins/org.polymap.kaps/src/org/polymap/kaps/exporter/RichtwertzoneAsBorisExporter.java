@@ -41,7 +41,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.io.WKTWriter;
 
 import org.eclipse.rwt.widgets.ExternalBrowser;
 
@@ -235,8 +236,12 @@ public class RichtwertzoneAsBorisExporter
     }
 
 
+
     private List getRow( RichtwertzoneZeitraumComposite richtwertzoneG ) {
+    
         RichtwertzoneComposite richtwertzone = richtwertzoneG.zone().get();
+        Polygon geom = richtwertzone.geom().get();
+
         List result = new ArrayList( 41 ) {
 
             @Override
@@ -408,7 +413,7 @@ public class RichtwertzoneAsBorisExporter
         // Angabe zur Kartengrundlage, auf welcher der
         // Bodenrichtwert beschlossen wurde (Basiskarte)
         // freiwillig
-        result.add( richtwertzone.basisKarte().get() );
+        result.add( "TOP.sachsen" );
 
         // 15
         // Basiskarten-Maßstabszahl
@@ -419,7 +424,7 @@ public class RichtwertzoneAsBorisExporter
         // -
         // Maßstabszahl der Basiskarte
         // Pflicht
-        result.add( richtwertzone.massstab().get() );
+        result.add( "25.000" );
 
         // 16
         // Rechtswert/Ostwert
@@ -432,7 +437,8 @@ public class RichtwertzoneAsBorisExporter
         // (Präsentationskoordinate)
         // freiwillig
         // TODO hier wird ja sicher mal geom() stehen
-        result.add( richtwertzone.rechtsWert().get() );
+        
+        result.add( geom != null ? Double.valueOf( geom.getInteriorPoint().getX()).intValue() : "" );
 
         // 17
         // Hochwert/Nordwert
@@ -445,7 +451,7 @@ public class RichtwertzoneAsBorisExporter
         // (Präsentationskoordinate)
         // freiwillig
         // TODO hier wird ja sicher mal geom() stehen
-        result.add( richtwertzone.hochWert().get() );
+        result.add( geom != null ? Double.valueOf( geom.getInteriorPoint().getY()).intValue() : "" );
 
         // 18
         // Bezugssystem
@@ -463,7 +469,8 @@ public class RichtwertzoneAsBorisExporter
         // ETRS89_UTM33
         // Pflicht
         // TODO 3gk3 nehme ich an
-        result.add( "" );
+        
+        result.add( "DE_DHDN_3GK3" );
         // 19
         // Entwicklungszustand
         // entwicklungszustand
@@ -752,9 +759,7 @@ public class RichtwertzoneAsBorisExporter
         // 8.3
         // Pflicht, falls
         // 11=1
-        MultiPolygon geom = richtwertzone.geom().get();
-        // TODO
-        result.add( geom != null ? "" : null );
+        result.add( geom != null ? new WKTWriter().write( geom ) : null );
         // 42
         // Koordinatenliste
         // Verfahren

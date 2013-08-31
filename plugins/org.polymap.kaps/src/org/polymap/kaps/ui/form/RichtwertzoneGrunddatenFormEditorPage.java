@@ -36,6 +36,7 @@ import org.eclipse.swt.widgets.Control;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.resource.ImageDescriptor;
 
 import org.polymap.core.data.PipelineFeatureSource;
 import org.polymap.core.data.operations.ModifyFeaturesOperation;
@@ -113,7 +114,7 @@ public class RichtwertzoneGrunddatenFormEditorPage
 
     @Override
     public Action[] getEditorActions() {
-        if (true /* richtwertzone.geom().get() == null */) {
+        if (richtwertzone.geom().get() == null) {
             Action action = new Action( "Geometrie anlegen" ) {
 
                 public void run() {
@@ -128,10 +129,10 @@ public class RichtwertzoneGrunddatenFormEditorPage
                                         + "Diese Standardgeometrie dient als Basis und muss nachbearbeitet werden.\n\n"
                                         + "Ist der aktuelle Kartenausschnitt (etwa) richtig für die Richtwertzone?" );
                         if (yes) {
-                            ReferencedEnvelope mapExtent = map.getMaxExtent();
+                            ReferencedEnvelope mapExtent = map.getExtent();
                             GeometryFactory gf = new GeometryFactory();
                             Polygon polygon = (Polygon)gf.toGeometry( mapExtent );
-                            polygon.buffer( mapExtent.getWidth() / 20 );
+                            polygon = (Polygon)polygon.buffer( (mapExtent.getWidth() / 20) * -1 );
                             MultiPolygon geom = gf.createMultiPolygon( new Polygon[] { polygon } );
 
                             ModifyFeaturesOperation op = new ModifyFeaturesOperation( layer, fs, feature
@@ -155,7 +156,9 @@ public class RichtwertzoneGrunddatenFormEditorPage
                     }
                 };
             };
-            action.setToolTipText( "Für importierte Richtwertzonen wird eine Geometrie im aktuellen Kartenausschnitt angelegt" );
+            action.setImageDescriptor( ImageDescriptor.createFromURL( KapsPlugin.getDefault().getBundle()
+                    .getResource( "icons/add.gif" ) ) );
+            action.setToolTipText( "Für importierte Richtwertzonen ohne Geometrie wird eine Geometrie im aktuellen Kartenausschnitt angelegt" );
             return new Action[] { action };
         }
         return null;

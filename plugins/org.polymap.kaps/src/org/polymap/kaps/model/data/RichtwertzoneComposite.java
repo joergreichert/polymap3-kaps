@@ -25,7 +25,7 @@ import org.qi4j.api.query.Query;
 import org.qi4j.api.query.QueryExpressions;
 import org.qi4j.api.query.grammar.BooleanExpression;
 
-import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Polygon;
 
 import org.polymap.core.qi4j.QiEntity;
 import org.polymap.core.qi4j.event.ModelChangeSupport;
@@ -54,7 +54,7 @@ public interface RichtwertzoneComposite
     public final static String NAME = "Richtwertzone";
 
     @Optional
-    Property<MultiPolygon> geom();
+    Property<Polygon> geom();
     
     // GFZBER VARCHAR(20), leer
     // GFZ-Bereich
@@ -106,12 +106,6 @@ public interface RichtwertzoneComposite
     Property<String> basisKarte();
 
 
-    // MASSSTAB INTEGER, leer, leer
-    @Optional
-    @ImportColumn("MASSSTAB")
-    Property<Integer> massstab();
-
-
     // ENTWZUSTAND VARCHAR(2), 
     @Optional
     Association<EntwicklungsZustandComposite> entwicklungsZustand();
@@ -159,18 +153,6 @@ public interface RichtwertzoneComposite
     Property<Double> baumassenZahl();
 
 
-    // YWERT DOUBLE, leer
-    @Optional
-    @ImportColumn("YWERT")
-    Property<Double> rechtsWert();
-
-
-    // XWERT DOUBLE, leer
-    @Optional
-    @ImportColumn("XWERT")
-    Property<Double> hochWert();
-
-
     // ACKERZAHL INTEGER, leer
     @Optional
     @ImportColumn("ACKERZAHL")
@@ -198,11 +180,6 @@ public interface RichtwertzoneComposite
     @ImportColumn("WGFZ")
     Property<String> geschossFlaechenZahl();
 
-//    @Optional
-//    ManyAssociation<RichtwertzoneZeitraumComposite> gueltigkeiten();
-
-    // Handbuch Seite 23, 24
-
     /**
      * Methods and transient fields.
      */
@@ -210,24 +187,6 @@ public interface RichtwertzoneComposite
             implements RichtwertzoneComposite {
 
         private static Log log = LogFactory.getLog( Mixin.class );
-
-//        private PropertyInfo schlProperty = new GenericPropertyInfo( RichtwertzoneComposite.class, "schl" );
-//
-//        @Override
-//        public Property<String> schl() {
-//            return new ComputedPropertyInstance<String>( schlProperty ) {
-//
-//                public String get() {
-//                    return zone().get();
-//                }
-//                
-//                @Override
-//                public void set( String newValue )
-//                        throws IllegalArgumentException, IllegalStateException {
-//                        zone().set( newValue );
-//                }
-//            };
-//        }
         
         public static Iterable<RichtwertzoneComposite> findZoneIn( GemeindeComposite gemeinde ) {
             RichtwertzoneComposite template = QueryExpressions
