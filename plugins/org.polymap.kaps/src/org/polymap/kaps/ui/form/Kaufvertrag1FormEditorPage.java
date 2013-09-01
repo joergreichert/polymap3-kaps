@@ -149,7 +149,7 @@ public class Kaufvertrag1FormEditorPage
         line9.setLayoutData( left().top( line8 ).create() );
         site.newFormField( parent, new PropertyAdapter( kaufvertrag.gesplittetEingangsnr() ),
                 new StringFormField(), null, "zugeordneter Vertrag" ).setLayoutData(
-                right().top( line8 ).create() );
+                right().top( line8 ).bottom( 100 ).create() );
 
         // Listener
         site.addFieldListener( vollpreisRefresher = new KaufvertragFormVollpreisRefresher( site, kaufvertrag ) );

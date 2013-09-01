@@ -106,7 +106,7 @@ public class KaufvertragFlurstueckeFormEditorPage
 
 
     public KaufvertragFlurstueckeFormEditorPage( Feature feature, FeatureStore featureStore ) {
-        super( KaufvertragFlurstueckeFormEditorPage.class.getName(), "Flurstücke", feature, featureStore );
+        super( FlurstueckComposite.class, KaufvertragFlurstueckeFormEditorPage.class.getName(), "Flurstücke", feature, featureStore );
 
         kaufvertrag = repository.findEntity( VertragComposite.class, feature.getIdentifier().getID() );
     }

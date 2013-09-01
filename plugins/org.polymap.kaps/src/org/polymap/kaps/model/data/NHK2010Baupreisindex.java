@@ -12,6 +12,10 @@
  */
 package org.polymap.kaps.model.data;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -20,6 +24,7 @@ import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.property.Property;
+import org.qi4j.api.query.QueryExpressions;
 
 import org.polymap.core.qi4j.QiEntity;
 import org.polymap.core.qi4j.event.ModelChangeSupport;
@@ -27,6 +32,7 @@ import org.polymap.core.qi4j.event.PropertyChangeSupport;
 
 import org.polymap.kaps.importer.ImportColumn;
 import org.polymap.kaps.importer.ImportTable;
+import org.polymap.kaps.model.KapsRepository;
 
 /**
  * 
@@ -99,6 +105,68 @@ public interface NHK2010Baupreisindex
             implements NHK2010Baupreisindex {
 
         private static Log log = LogFactory.getLog( Mixin.class );
+
+
+        public final static Values indexFor( String indexType, Date wertErmittlungsStichtag ) {
+            // durchschnitt für 2010 für den Typ berechnen
+            Values result = new Values();
+            NHK2010Baupreisindex template = QueryExpressions.templateFor( NHK2010Baupreisindex.class );
+            KapsRepository repo = KapsRepository.instance();
+            Double summe = 0.0d;
+            Integer count = 0;
+            for (NHK2010Baupreisindex index : repo.findEntities( NHK2010Baupreisindex.class,
+                    QueryExpressions.eq( template.jahr(), 2010 ), 0, 100 )) {
+                count++;
+                summe += indexFor( indexType, index );
+            }
+            result.durchschnitt = summe / count;
+
+            // danach wert für datum und typ finden
+            Calendar cal = GregorianCalendar.getInstance();
+            cal.setTime( wertErmittlungsStichtag);
+            int year = cal.get( Calendar.YEAR );
+            int month = cal.get( Calendar.MONTH ) + 1;
+            Double indexValue = 0.0d;
+            Integer lastMonatBis = -1;
+            for (NHK2010Baupreisindex index : repo.findEntities( NHK2010Baupreisindex.class,
+                    QueryExpressions.eq( template.jahr(), year ), 0, 100 )) {
+                Double currentIndex = indexFor( indexType, index );
+
+                Integer monatBis = index.monatBis().get();
+                Integer monatVon = index.monatVon().get();
+                if (monatVon <= month && monatBis >= month) {
+                    indexValue = currentIndex;
+                    // jahr noch nicht komplett so den höchsten Wert nehmen
+                } else if (monatBis > lastMonatBis) {
+                    indexValue = currentIndex;
+                    lastMonatBis = monatBis;
+                }
+            }
+            result.index = indexValue;
+            result.result = result.index /result.durchschnitt;
+            return result;
+        }
+
+
+        public final static Double indexFor( String indexType, NHK2010Baupreisindex index ) {
+            if ("E".equals( indexType )) {
+                return index.einfamilienGebaeude().get();
+            } else if ("M".equals( indexType )) {
+                return index.mehrfamilienGebaeude().get();
+            } else if ("B".equals( indexType )) {
+                return index.bueroGebaeude().get();
+            } else if ("G".equals( indexType )) {
+                return index.gewerbeBetrieb().get();
+            } else {
+                throw new IllegalStateException("Unknown indexType " + indexType);
+            }
+        }
+    }
+    
+    public static class Values {
+        public Double durchschnitt;
+        public Double index;
+        public Double result;
     }
 
 }

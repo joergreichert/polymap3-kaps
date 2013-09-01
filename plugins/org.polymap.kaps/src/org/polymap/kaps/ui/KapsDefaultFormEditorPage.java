@@ -83,7 +83,21 @@ public abstract class KapsDefaultFormEditorPage
 
     private static final int                  SIX   = 100;
 
+    protected SimpleFormData one3() {
+        return new SimpleFormData( SPACING ).left( 0 ).right( 33 );
+    }
 
+
+    protected SimpleFormData two3() {
+        return new SimpleFormData( SPACING ).left( 33 ).right( 66 );
+    }
+
+
+    protected SimpleFormData three3() {
+        return new SimpleFormData( SPACING ).left( 66 ).right( 100 );
+    }
+
+    
     protected SimpleFormData one() {
         return new SimpleFormData( SPACING ).left( ONE ).right( TWO );
     }

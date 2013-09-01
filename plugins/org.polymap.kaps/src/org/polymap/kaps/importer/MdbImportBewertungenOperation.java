@@ -189,12 +189,21 @@ public class MdbImportBewertungenOperation
                             gebaeudeArtenProvider.gebaeudeForNumber( hnr, nr, unternr ).getId() );
                 }
                 bewertungGebaeude.zweifamilienHaus().set( getBooleanValue( builderRow, "FAMHAUS2" ) );
-                
+
                 Long zimmer = (Long)builderRow.get( "ANZZIMMER" );
                 if (zimmer != null) {
                     bewertungGebaeude.anzahlWohnungen().set( zimmer.doubleValue() );
                 }
-                
+
+                bewertungGebaeude.zeitwertRnd().set( bewertungGebaeude.gebaeudeZeitWert().get() );
+                // alterswertminderung
+                Long gnd = bewertungGebaeude.gesamtNutzungsDauer().get();
+                Long rnd = bewertungGebaeude.restNutzungsDauer().get();
+                if (gnd != null && rnd != null && gnd != 0) {
+                    bewertungGebaeude.altersWertMinderung().set(
+                            (gnd.doubleValue() - rnd.doubleValue()) / gnd.doubleValue() * 100 );
+                }
+
                 count++;
             }
             // andernfalls ignorieren

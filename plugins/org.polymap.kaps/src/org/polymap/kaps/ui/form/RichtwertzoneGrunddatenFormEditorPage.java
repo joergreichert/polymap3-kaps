@@ -101,7 +101,7 @@ public class RichtwertzoneGrunddatenFormEditorPage
 
 
     public RichtwertzoneGrunddatenFormEditorPage( Feature feature, FeatureStore featureStore ) {
-        super( RichtwertzoneGrunddatenFormEditorPage.class.getName(), "Grunddaten", feature, featureStore );
+        super( RichtwertzoneZeitraumComposite.class, RichtwertzoneGrunddatenFormEditorPage.class.getName(), "Grunddaten", feature, featureStore );
 
         richtwertzone = lookupRichtwertzoneComposite();
     }

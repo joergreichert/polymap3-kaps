@@ -273,6 +273,10 @@ public interface NHK2010BewertungGebaeudeComposite
     Property<String> baukostenIndexTyp();
 
 
+    @Optional
+    Property<Double> baukostenIndexWert();
+
+
     // GEBNR1 - String
     @Optional
     // @ImportColumn("GEBNR1") wird aus Nummer/Unternummer berechnet
@@ -329,7 +333,7 @@ public interface NHK2010BewertungGebaeudeComposite
 
     // ANZZIMMER - Long
     @Optional
-    //@ImportColumn("ANZZIMMER")
+    // @ImportColumn("ANZZIMMER")
     Property<Double> anzahlWohnungen();
 
 
@@ -343,7 +347,8 @@ public interface NHK2010BewertungGebaeudeComposite
 
     @Optional
     Property<Double> faktorZweifamilienhaus();
-    
+
+
     //
     // // TODO DACHGEOMETRIE - Double
     // @Optional
@@ -409,6 +414,15 @@ public interface NHK2010BewertungGebaeudeComposite
     @Optional
     @ImportColumn("AUSSTATT2")
     Property<String> gebaeudeStandard();
+
+
+
+    @Optional
+    Property<Double> altersWertMinderung();
+
+
+    @Optional
+    Property<Double> zeitwertRnd();
 
 
     //

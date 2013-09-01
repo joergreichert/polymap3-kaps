@@ -12,6 +12,9 @@
  */
 package org.polymap.kaps.ui.form;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -54,9 +57,12 @@ import org.polymap.rhei.form.IFormEditorPageSite;
 
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.NHK2010GebaeudeartenProvider;
+import org.polymap.kaps.model.data.NHK2010Baupreisindex;
+import org.polymap.kaps.model.data.NHK2010Baupreisindex.Values;
 import org.polymap.kaps.model.data.NHK2010BewertungComposite;
 import org.polymap.kaps.model.data.NHK2010BewertungGebaeudeComposite;
 import org.polymap.kaps.model.data.NHK2010Gebaeudeart;
+import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.ui.ActionButton;
 import org.polymap.kaps.ui.FieldSummation;
 import org.polymap.kaps.ui.KapsDefaultFormEditorPageWithFeatureTable;
@@ -95,9 +101,32 @@ public class NHK2010BewertungFormEditorPage
 
     private IFormFieldListener          wohnungsgroesseListener;
 
+    private IFormFieldListener          korrekturfaktorListener;
+
+    private IFormFieldListener          normalHerstellungsWertListener;
+
+    private IFormFieldListener          gebaeudeZeitWertListener;
+
+    private IFormFieldListener          baukostenIndexWertListener;
+
+    private IFormFieldListener          neuWertListener;
+
+    private IFormFieldListener          gndListener;
+
+    private Action                      baujahrBerechneAction;
+
+    private IFormFieldListener          rndListener;
+
+    private IFormFieldListener          altersWertMinderungListener;
+
+    private IFormFieldListener          zeitwertRndListener;
+
+    private IFormFieldListener          gesamtSumme;
+
 
     public NHK2010BewertungFormEditorPage( Feature feature, FeatureStore featureStore ) {
-        super( NHK2010BewertungFormEditorPage.class.getName(), "NHK 2010", feature, featureStore );
+        super( NHK2010BewertungGebaeudeComposite.class, NHK2010BewertungFormEditorPage.class.getName(), "NHK 2010",
+                feature, featureStore );
 
         bewertung = repository.findEntity( NHK2010BewertungComposite.class, feature.getIdentifier().getID() );
     }
@@ -123,6 +152,13 @@ public class NHK2010BewertungFormEditorPage
             pageSite.setFieldEnabled( prefix + "faktorZweifamilienhaus", false );
             pageSite.setFieldEnabled( prefix + "faktorWohnungsgroesse", false );
             pageSite.setFieldEnabled( prefix + "faktorGrundrissart", false );
+            pageSite.setFieldEnabled( getPropertyName( nameTemplate.baukostenIndexWert() ), false );
+
+            // TODO
+            baujahrBerechneAction.setEnabled( false );
+            pageSite.setFieldEnabled( getPropertyName( nameTemplate.restNutzungsDauer() ), false );
+            pageSite.setFieldEnabled( getPropertyName( nameTemplate.altersWertMinderung() ), false );
+            pageSite.setFieldEnabled( getPropertyName( nameTemplate.zeitwertRnd() ), false );
             // if (composite != null) {
             // // NHK2010Gebaeudeart art =
             // NHK2010GebaeudeartenProvider.instance().gebaeudeForId(
@@ -143,8 +179,10 @@ public class NHK2010BewertungFormEditorPage
     @Override
     public void createFormContent( final IFormEditorPageSite site ) {
         super.createFormContent( site );
-        site.setEditorTitle( formattedTitle( "Bewertung nach NHK 2010", null, null ) );
-        site.setFormTitle( formattedTitle( "Bewertung nach NHK 2010", null, getTitle() ) );
+        VertragComposite vertragComposite = bewertung.vertrag().get();
+        String nummer = vertragComposite != null ? EingangsNummerFormatter.format( vertragComposite.eingangsNr().get() ) : null;
+        site.setEditorTitle( formattedTitle( "Bewertung nach NHK 2010", nummer, null ) );
+        site.setFormTitle( formattedTitle( "Bewertung nach NHK 2010", nummer, getTitle() ) );
 
         Composite parent = site.getPageBody();
 
@@ -171,6 +209,35 @@ public class NHK2010BewertungFormEditorPage
         Control newLine, lastLine = null;
         newLine = createPreisField( "Zeitwerte", "Summe der Gebäudezeitwerte", bewertung.summeZeitwerte(), left()
                 .right( 100 ).top( lastLine ), parent, false );
+        site.addFieldListener( gesamtSumme = new IFormFieldListener() {
+
+            @Override
+            public void fieldChange( FormFieldEvent ev ) {
+                if (ev.getEventCode() == VALUE_CHANGE) {
+                    if (ev.getFieldName().equalsIgnoreCase( getPropertyName( nameTemplate.gebaeudeZeitWert() ) )) {
+                        // zeitwert am aktuellen gebäude hat sich geändert
+                        Double zeitWert = (Double)ev.getNewValue();
+                        Double result = 0.0d;
+                        for (NHK2010BewertungGebaeudeComposite gebaeude : getElements()) {
+                            if (zeitWert != null
+                                    && selectedComposite.get() != null
+                                    && selectedComposite.get().laufendeNummer().get() == gebaeude.laufendeNummer()
+                                            .get()) {
+                                // gewähltes gebäude gefunden
+                                // property nehmen
+                                result += zeitWert;
+                            }
+                            else {
+                                result += gebaeude.gebaeudeZeitWert().get() != null ? gebaeude.gebaeudeZeitWert().get()
+                                        : 0.0d;
+                            }
+                        }
+                        pageSite.setFieldValue( bewertung.summeZeitwerte().qualifiedName().name(),
+                                result != null ? getFormatter( 2 ).format( result ) : null );
+                    }
+                }
+            }
+        } );
 
         lastLine = newLine;
         newLine = createPreisField( "Bauteile", "+/- nicht erfasste Bauteile", bewertung.nichtErfassteBauteile(),
@@ -357,7 +424,7 @@ public class NHK2010BewertungFormEditorPage
                                 return entity.zweifamilienHaus();
                             }
                         } ) ).setField( reloadable( new CheckboxFormField() ) ).setEnabled( false )
-                .setLayoutData( five().top( lastLine ).create() ).create();
+                .setLayoutData( four().top( lastLine ).create() ).create();
 
         lastLine = newLine;
 
@@ -387,65 +454,6 @@ public class NHK2010BewertungFormEditorPage
             }
         } );
 
-        // NHK BGF Wohnungsgröße
-        lastLine = newLine;
-        newLine = createLabel( parent, "NHK 2010", "NHK 2010 in €/m² Bruttogrundfläche", one().top( lastLine ),
-                SWT.LEFT );
-        newFormField( IFormFieldLabel.NO_LABEL )
-                .setToolTipText( "NHK 2010 in €/m² Bruttogrundfläche" )
-                .setParent( parent )
-                .setProperty(
-                        new ReloadablePropertyAdapter<NHK2010BewertungGebaeudeComposite>( selectedComposite, prefix
-                                + "nhk", new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
-
-                            @Override
-                            public Property get( NHK2010BewertungGebaeudeComposite entity ) {
-                                return entity.nhk();
-                            }
-                        } ) ).setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
-                .setEnabled( false ).setLayoutData( two().top( lastLine ).create() ).create();
-
-        pageSite.addFieldListener( gebaeudeStandardListener = new IFormFieldListener() {
-
-            @Override
-            public void fieldChange( FormFieldEvent ev ) {
-                if (ev.getEventCode() == VALUE_CHANGE) {
-                    if (ev.getFieldName().equalsIgnoreCase( prefix + "gebaeudeStandard" )) {
-                        if ((ev.getNewValue() == null && selectedGebaeudeStandard != null)
-                                || (ev.getNewValue() != null && !ev.getNewValue().equals( selectedGebaeudeStandard ))) {
-                            selectedGebaeudeStandard = ev.getNewValue();
-                            if (selectedGebaeudeStandard != null) {
-                                pageSite.setFieldValue(
-                                        prefix + "nhk",
-                                        getFormatter( 2 ).format(
-                                                selectedGebaeudeArt.calculateNHKFor( selectedGebaeudeStandard ) ) );
-                            }
-                            else {
-                                pageSite.setFieldValue( prefix + "nhk", null );
-                            }
-                        }
-                    }
-                }
-            }
-
-        } );
-
-        newFormField( "BGF" )
-                .setToolTipText( "Bruttogrundfläche" )
-                .setParent( parent )
-                .setProperty(
-                        new ReloadablePropertyAdapter<NHK2010BewertungGebaeudeComposite>( selectedComposite, prefix
-                                + "bruttoGrundFlaeche", new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
-
-                            @Override
-                            public Property<Double> get( NHK2010BewertungGebaeudeComposite entity ) {
-                                return entity.bruttoGrundFlaeche();
-                            }
-                        } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 10, 0 ) )
-                .setEnabled( true ).setLayoutData( three().top( lastLine ).create() ).create();
-
         // wird nicht gespeichert und ausgewertet, also vllt. als computed wenn
         // nachgefragt
         // newFormField( "Wohnungsgröße" )
@@ -467,38 +475,45 @@ public class NHK2010BewertungFormEditorPage
         // .setLayoutData( five().top( lastLine ).create() ).create();
 
         lastLine = newLine;
-        // korrekturFaktorenLabel = (Label)createLabel( parent, "Korrekturfaktor",
-        // "Korrekturfaktoren entsprechend Gebäudeart und Gebäudedaten", one().top(
-        // lastLine ),
-        // SWT.LEFT );
 
-        newLine = newFormField( "Zweifamilienhaus" )
-                .setToolTipText( "Korrekturfaktor Zweifamilienhaus" )
+        createLabel( parent, "Korrekturfaktoren", "Korrekturfaktoren entsprechend Gebäudeart und Gebäudedaten", one()
+                .top( lastLine ), SWT.LEFT );
+
+        newLine = newFormField( "Grundrissart" )
+                .setToolTipText( "Korrekturfaktor Grundrissart" )
                 .setParent( parent )
                 .setProperty(
                         new ReloadablePropertyAdapter<NHK2010BewertungGebaeudeComposite>( selectedComposite, prefix
-                                + "faktorZweifamilienhaus", new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
+                                + "faktorGrundrissart", new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
 
                             @Override
                             public Property<Double> get( NHK2010BewertungGebaeudeComposite entity ) {
-                                return entity.faktorZweifamilienhaus();
+                                return entity.faktorGrundrissart();
                             }
                         } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
                 .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2 ) )
-                .setEnabled( false ).setLayoutData( one().top( lastLine ).create() ).create();
+                .setEnabled( false ).setLayoutData( two().top( lastLine ).create() ).create();
 
-        pageSite.addFieldListener( zfhListener = new IFormFieldListener() {
+        pageSite.addFieldListener( grundrissartListener = new IFormFieldListener() {
 
             @Override
             public void fieldChange( FormFieldEvent ev ) {
-                if (ev.getEventCode() == VALUE_CHANGE
-                        && ev.getFieldName().equalsIgnoreCase( prefix + "zweifamilienHaus" )) {
-                    Boolean value = ev.getNewValue();
-                    if (value != null && value.booleanValue()) {
-                        pageSite.setFieldValue( prefix + "faktorZweifamilienhaus", "1,05" );
-                    } else {
-                        pageSite.setFieldValue( prefix + "faktorZweifamilienhaus", null );                        
+                if (ev.getEventCode() == VALUE_CHANGE && ev.getFieldName().equalsIgnoreCase( prefix + "grundrissArt" )) {
+                    String value = ev.getNewValue();
+                    String faktor = null;
+                    if ("Einspänner".equals( value )) {
+                        faktor = "1,05";
                     }
+                    else if ("Zweispänner".equals( value )) {
+                        faktor = "1,00";
+                    }
+                    else if ("Dreispänner".equals( value )) {
+                        faktor = "0,97";
+                    }
+                    else if ("Vierspänner".equals( value )) {
+                        faktor = "0,95";
+                    }
+                    pageSite.setFieldValue( prefix + "faktorGrundrissart", faktor );
                 }
             }
         } );
@@ -554,62 +569,113 @@ public class NHK2010BewertungFormEditorPage
                         faktor = 1.0d;
                     }
                     else if (wohnungsflaeche < 50.0d) {
-                        faktor = 1.1d - (wohnungsflaeche - 35.0d) *  (1.1d - 1.0d) / (50.0d - 35.0d);
-                    } 
+                        faktor = 1.1d - (wohnungsflaeche - 35.0d) * (1.1d - 1.0d) / (50.0d - 35.0d);
+                    }
                     else if (wohnungsflaeche < 135.0d) {
-                        faktor = 1.0d - (wohnungsflaeche - 50.0d) *  (1.0d - 0.85d) / (135.0d - 50.0d);
-                    } 
+                        faktor = 1.0d - (wohnungsflaeche - 50.0d) * (1.0d - 0.85d) / (135.0d - 50.0d);
+                    }
                 }
                 pageSite.setFieldValue( prefix + "faktorWohnungsgroesse",
                         faktor != null ? getFormatter( 2 ).format( faktor ) : null );
             }
         } );
 
-        newFormField( "Grundrißart" )
-                .setToolTipText( "Korrekturfaktor Grundrißart" )
+        newLine = newFormField( "Zweifamilienhaus" )
+                .setToolTipText( "Korrekturfaktor Zweifamilienhaus" )
                 .setParent( parent )
                 .setProperty(
                         new ReloadablePropertyAdapter<NHK2010BewertungGebaeudeComposite>( selectedComposite, prefix
-                                + "faktorGrundrissart", new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
+                                + "faktorZweifamilienhaus", new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
 
                             @Override
                             public Property<Double> get( NHK2010BewertungGebaeudeComposite entity ) {
-                                return entity.faktorGrundrissart();
+                                return entity.faktorZweifamilienhaus();
                             }
                         } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
                 .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2 ) )
-                .setEnabled( false ).setLayoutData( five().top( lastLine ).create() ).create();
+                .setEnabled( false ).setLayoutData( four().top( lastLine ).create() ).create();
 
-        pageSite.addFieldListener( grundrissartListener = new IFormFieldListener() {
+        pageSite.addFieldListener( zfhListener = new IFormFieldListener() {
 
             @Override
             public void fieldChange( FormFieldEvent ev ) {
-                if (ev.getEventCode() == VALUE_CHANGE && ev.getFieldName().equalsIgnoreCase( prefix + "grundrissArt" )) {
-                    String value = ev.getNewValue();
-                    String faktor = null;
-                    if ("Einspänner".equals( value )) {
-                        faktor = "1,05";
+                if (ev.getEventCode() == VALUE_CHANGE
+                        && ev.getFieldName().equalsIgnoreCase( prefix + "zweifamilienHaus" )) {
+                    Boolean value = ev.getNewValue();
+                    if (value != null && value.booleanValue()) {
+                        pageSite.setFieldValue( prefix + "faktorZweifamilienhaus", "1,05" );
                     }
-                    else if ("Zweispänner".equals( value )) {
-                        faktor = "1,00";
+                    else {
+                        pageSite.setFieldValue( prefix + "faktorZweifamilienhaus", null );
                     }
-                    else if ("Dreispänner".equals( value )) {
-                        faktor = "0,97";
-                    }
-                    else if ("Vierspänner".equals( value )) {
-                        faktor = "0,95";
-                    }
-                    pageSite.setFieldValue( prefix + "faktorGrundrissart", faktor );
                 }
             }
         } );
 
+        // NHK BGF Wohnungsgröße
         lastLine = newLine;
-        newLine = createLabel( parent, "NHK 2010 korrigiert",
-                "NHK 2010 in €/m² Bruttogrundfläche korrigiert entsprechend der Korrekturfaktoren", one()
-                        .top( lastLine ), SWT.LEFT );
-        newFormField( IFormFieldLabel.NO_LABEL )
-                .setToolTipText( "NHK 2010 korrigiert in €/m² Bruttogrundfläche" )
+        // newLine = createLabel( parent, , "NHK 2010 in €/m² Bruttogrundfläche",
+        // one().top( lastLine ),
+        // SWT.LEFT );
+        newLine = newFormField( "NHK 2010" )
+                .setToolTipText( "NHK 2010 in €/m² Bruttogrundfläche" )
+                .setParent( parent )
+                .setProperty(
+                        new ReloadablePropertyAdapter<NHK2010BewertungGebaeudeComposite>( selectedComposite, prefix
+                                + "nhk", new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
+
+                            @Override
+                            public Property get( NHK2010BewertungGebaeudeComposite entity ) {
+                                return entity.nhk();
+                            }
+                        } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
+                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setEnabled( false ).setLayoutData( two().top( lastLine, 30 ).create() ).create();
+
+        pageSite.addFieldListener( gebaeudeStandardListener = new IFormFieldListener() {
+
+            @Override
+            public void fieldChange( FormFieldEvent ev ) {
+                if (ev.getEventCode() == VALUE_CHANGE) {
+                    if (ev.getFieldName().equalsIgnoreCase( prefix + "gebaeudeStandard" )) {
+                        if ((ev.getNewValue() == null && selectedGebaeudeStandard != null)
+                                || (ev.getNewValue() != null && !ev.getNewValue().equals( selectedGebaeudeStandard ))) {
+                            selectedGebaeudeStandard = ev.getNewValue();
+                            if (selectedGebaeudeStandard != null) {
+                                pageSite.setFieldValue(
+                                        prefix + "nhk",
+                                        getFormatter( 2 ).format(
+                                                selectedGebaeudeArt.calculateNHKFor( selectedGebaeudeStandard ) ) );
+                            }
+                            else {
+                                pageSite.setFieldValue( prefix + "nhk", null );
+                            }
+                        }
+                    }
+                }
+            }
+
+        } );
+
+        newFormField( "BGF" )
+                .setToolTipText( "Bruttogrundfläche" )
+                .setParent( parent )
+                .setProperty(
+                        new ReloadablePropertyAdapter<NHK2010BewertungGebaeudeComposite>( selectedComposite, prefix
+                                + "bruttoGrundFlaeche", new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
+
+                            @Override
+                            public Property<Double> get( NHK2010BewertungGebaeudeComposite entity ) {
+                                return entity.bruttoGrundFlaeche();
+                            }
+                        } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
+                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 10, 0 ) )
+                .setEnabled( true ).setLayoutData( three().top( lastLine, 30 ).create() ).create();
+
+        lastLine = newLine;
+        newLine = newFormField( "NHK 2010 korrigiert" )
+                .setToolTipText(
+                        "NHK 2010 korrigiert in €/m² Bruttogrundfläche korrigiert entsprechend der Korrekturfaktoren" )
                 .setParent( parent )
                 .setProperty(
                         new ReloadablePropertyAdapter<NHK2010BewertungGebaeudeComposite>( selectedComposite, prefix
@@ -619,12 +685,729 @@ public class NHK2010BewertungFormEditorPage
                             public Property get( NHK2010BewertungGebaeudeComposite entity ) {
                                 return entity.nhkKorrigiert();
                             }
-                        } ) ).setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
+                        } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
                 .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
                 .setEnabled( false ).setLayoutData( two().top( lastLine ).create() ).create();
 
+        pageSite.addFieldListener( korrekturfaktorListener = new IFormFieldListener() {
+
+            private Double faktorGrundrissart;
+
+            private Double faktorWohnungsgroesse;
+
+            private Double faktorZweifamilienhaus;
+
+            private Double nhk;
+
+
+            @Override
+            public void fieldChange( FormFieldEvent ev ) {
+                if (ev.getEventCode() == VALUE_CHANGE) {
+                    if (ev.getFieldName().equalsIgnoreCase( prefix + "faktorGrundrissart" )) {
+                        faktorGrundrissart = (Double)ev.getNewValue();
+                        updateNhk();
+                    }
+                    else if (ev.getFieldName().equalsIgnoreCase( prefix + "faktorWohnungsgroesse" )) {
+                        faktorWohnungsgroesse = (Double)ev.getNewValue();
+                        updateNhk();
+                    }
+                    else if (ev.getFieldName().equalsIgnoreCase( prefix + "faktorZweifamilienhaus" )) {
+                        faktorZweifamilienhaus = (Double)ev.getNewValue();
+                        updateNhk();
+                    }
+                    else if (ev.getFieldName().equalsIgnoreCase( prefix + "nhk" )) {
+                        nhk = (Double)ev.getNewValue();
+                        updateNhk();
+                    }
+                }
+            }
+
+
+            private void updateNhk() {
+                Double nhkKorrigiert = nhk;
+                if (nhkKorrigiert != null && faktorGrundrissart != null) {
+                    nhkKorrigiert *= faktorGrundrissart;
+                }
+                if (nhkKorrigiert != null && faktorWohnungsgroesse != null) {
+                    nhkKorrigiert *= faktorWohnungsgroesse;
+                }
+                if (nhkKorrigiert != null && faktorZweifamilienhaus != null) {
+                    nhkKorrigiert *= faktorZweifamilienhaus;
+                }
+                pageSite.setFieldValue( getPropertyName( nameTemplate.nhkKorrigiert() ),
+                        nhkKorrigiert != null ? getFormatter( 2 ).format( nhkKorrigiert ) : null );
+            }
+        } );
+
+        normalherstellungswert( parent, lastLine );
+
         lastLine = newLine;
+        newLine = baukostenIndex( parent, lastLine );
+
+        lastLine = newLine;
+        newLine = baujahr( parent, lastLine );
+
+        lastLine = newLine;
+        newLine = alterswertMinderung( parent, lastLine );
+
+        lastLine = newLine;
+        newLine = createLabel( parent, "Zu-Abschläge nach §8 Absatz 3 ImmoWertV", one().top( lastLine ) );
+        lastLine = newLine;
+        newLine = immoWertV( parent, lastLine );
+
+        lastLine = newLine;
+        newLine = gebaeudeZeitWert( parent, lastLine );
+
         return newLine;
+    }
+
+
+    private Control immoWertV( Composite parent, Control lastLine ) {
+        TreeMap<String, Object> zonen = new TreeMap<String, Object>();
+        zonen.put( "Modernisierungsrückstau", "Modernisierungsrückstau" );
+        zonen.put( "Wirtschaftliche Überalterung", "Wirtschaftliche Überalterung" );
+        zonen.put( "Besondere Ertragsverhältnisse", "Besondere Ertragsverhältnisse" );
+        zonen.put( "Überdurchschnittlicher Erhaltungszustand", "Überdurchschnittlicher Erhaltungszustand" );
+        zonen.put( "Freilegungskosten", "Freilegungskosten" );
+        zonen.put( "Bodenverunreinigungen", "Bodenverunreinigungen" );
+        zonen.put( "Grundstücksbezogene Rechte/Lasten", "Grundstücksbezogene Rechte/Lasten" );
+
+        Control newLine = createLabel( parent, "Baumängel/schädel", two().top( lastLine ) );
+        newFormField( IFormFieldLabel.NO_LABEL )
+                .setToolTipText( "Zu-/Abschlag in €" )
+                .setParent( parent )
+                .setProperty(
+                        new ReloadablePropertyAdapter<NHK2010BewertungGebaeudeComposite>( selectedComposite,
+                                getPropertyName( nameTemplate.abschlagBaumaengelBetrag() ),
+                                new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
+
+                                    @Override
+                                    public Property<Double> get( NHK2010BewertungGebaeudeComposite entity ) {
+                                        return entity.abschlagBaumaengelBetrag();
+                                    }
+                                } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
+                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setEnabled( false ).setLayoutData( three().top( lastLine ).create() ).create();
+        lastLine = newLine;
+        newLine = createLabel( parent, "Unterhaltungsrückstau", two().top( lastLine ) );
+        newFormField( IFormFieldLabel.NO_LABEL )
+                .setToolTipText( "Zu-/Abschlag in €" )
+                .setParent( parent )
+                .setProperty(
+                        new ReloadablePropertyAdapter<NHK2010BewertungGebaeudeComposite>( selectedComposite,
+                                getPropertyName( nameTemplate.abschlagRueckstauBetrag() ),
+                                new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
+
+                                    @Override
+                                    public Property<Double> get( NHK2010BewertungGebaeudeComposite entity ) {
+                                        return entity.abschlagRueckstauBetrag();
+                                    }
+                                } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
+                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setLayoutData( three().top( lastLine ).create() ).create();
+        lastLine = newLine;
+        newLine = newFormField( IFormFieldLabel.NO_LABEL )
+                .setToolTipText( "Zu-/Abschlag in €" )
+                .setParent( parent )
+                .setProperty(
+                        new ReloadablePropertyAdapter<NHK2010BewertungGebaeudeComposite>( selectedComposite,
+                                getPropertyName( nameTemplate.zuschlagZeile3Bezeichnung() ),
+                                new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
+
+                                    @Override
+                                    public Property<String> get( NHK2010BewertungGebaeudeComposite entity ) {
+                                        return entity.zuschlagZeile3Bezeichnung();
+                                    }
+                                } ) ).setField( reloadable( new PicklistFormField( zonen ) ) )
+                .setLayoutData( two().top( lastLine ).create() ).create();
+        newFormField( IFormFieldLabel.NO_LABEL )
+                .setToolTipText( "Zu-/Abschlag in €" )
+                .setParent( parent )
+                .setProperty(
+                        new ReloadablePropertyAdapter<NHK2010BewertungGebaeudeComposite>( selectedComposite,
+                                getPropertyName( nameTemplate.zuschlagZeile3Betrag() ),
+                                new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
+
+                                    @Override
+                                    public Property<Double> get( NHK2010BewertungGebaeudeComposite entity ) {
+                                        return entity.zuschlagZeile3Betrag();
+                                    }
+                                } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
+                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setLayoutData( three().top( lastLine ).create() ).create();
+        lastLine = newLine;
+        newLine = newFormField( IFormFieldLabel.NO_LABEL )
+                .setToolTipText( "Zu-/Abschlag in €" )
+                .setParent( parent )
+                .setProperty(
+                        new ReloadablePropertyAdapter<NHK2010BewertungGebaeudeComposite>( selectedComposite,
+                                getPropertyName( nameTemplate.zuschlagZeile4Bezeichnung() ),
+                                new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
+
+                                    @Override
+                                    public Property<String> get( NHK2010BewertungGebaeudeComposite entity ) {
+                                        return entity.zuschlagZeile4Bezeichnung();
+                                    }
+                                } ) ).setField( reloadable( new PicklistFormField( zonen ) ) )
+                .setLayoutData( two().top( lastLine ).create() ).create();
+        newFormField( IFormFieldLabel.NO_LABEL )
+                .setToolTipText( "Zu-/Abschlag in €" )
+                .setParent( parent )
+                .setProperty(
+                        new ReloadablePropertyAdapter<NHK2010BewertungGebaeudeComposite>( selectedComposite,
+                                getPropertyName( nameTemplate.zuschlagZeile4Betrag() ),
+                                new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
+
+                                    @Override
+                                    public Property<Double> get( NHK2010BewertungGebaeudeComposite entity ) {
+                                        return entity.zuschlagZeile4Betrag();
+                                    }
+                                } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
+                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setLayoutData( three().top( lastLine ).create() ).create();
+
+        return newLine;
+    }
+
+
+    private Control baukostenIndex( Composite parent, Control lastLine ) {
+        final PicklistFormField baukostenIndexList = new PicklistFormField( new PicklistFormField.ValueProvider() {
+
+            private TreeMap<String, Object> zonen;
+
+
+            @Override
+            public SortedMap<String, Object> get() {
+                if (zonen == null) {
+                    zonen = new TreeMap<String, Object>();
+                    zonen.put( "Einfamiliengebäude", "E" );
+                    zonen.put( "Mehrfamiliengebäude", "M" );
+                    zonen.put( "Bürogebäude", "B" );
+                    zonen.put( "Gewerblicher Betrieb", "G" );
+                }
+                return zonen;
+            }
+        } );
+        Control field = newFormField( "Baukostenindex" )
+                .setToolTipText( "Baukostenindex auf Basis 2010" )
+                .setParent( parent )
+                .setProperty(
+                        new ReloadablePropertyAdapter<NHK2010BewertungGebaeudeComposite>( selectedComposite,
+                                getPropertyName( nameTemplate.baukostenIndexTyp() ),
+                                new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
+
+                                    @Override
+                                    public Property<String> get( NHK2010BewertungGebaeudeComposite entity ) {
+                                        return entity.baukostenIndexTyp();
+                                    }
+                                } ) ).setField( reloadable( baukostenIndexList ) )
+                .setLayoutData( two().top( lastLine ).create() ).create();
+
+        final Composite indexField = newFormField( "" )
+                .setToolTipText( "Baukostenindex auf Basis 2010" )
+                .setParent( parent )
+                .setProperty(
+                        new ReloadablePropertyAdapter<NHK2010BewertungGebaeudeComposite>( selectedComposite,
+                                getPropertyName( nameTemplate.baukostenIndexWert() ),
+                                new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
+
+                                    @Override
+                                    public Property<Double> get( NHK2010BewertungGebaeudeComposite entity ) {
+                                        return entity.baukostenIndexWert();
+                                    }
+                                } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
+                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setEnabled( false ).setLayoutData( three().top( lastLine ).create() ).create();
+
+        pageSite.addFieldListener( baukostenIndexWertListener = new IFormFieldListener() {
+
+            @Override
+            public void fieldChange( FormFieldEvent ev ) {
+                if (ev.getEventCode() == VALUE_CHANGE) {
+                    if (ev.getFieldName().equalsIgnoreCase( getPropertyName( nameTemplate.baukostenIndexTyp() ) )) {
+                        String indexType = (String)ev.getNewValue();
+                        Values result = null;
+
+                        // durchschnitt berechnen, nur wenn verändert
+                        if (indexType != null
+                                && !indexType.isEmpty()
+                                && (selectedComposite.get() != null && !indexType.equals( selectedComposite.get()
+                                        .baukostenIndexTyp().get() ))) {
+                            // TODO Wertermittlungsstichtag festhalten?
+                            result = NHK2010Baupreisindex.Mixin.indexFor( indexType, new Date() );
+
+                            pageSite.setFieldValue( getPropertyName( nameTemplate.baukostenIndexWert() ),
+                                    result != null && result.result != null ? getFormatter( 2 ).format( result.result )
+                                            : null );
+                            indexField
+                                    .setToolTipText( result != null && result.result != null ? "Index: "
+                                            + getFormatter( 2 ).format( result.index ) + " / Durchschnitt 2010: "
+                                            + getFormatter( 2 ).format( result.durchschnitt )
+                                            : "Baukostenindex auf Basis 2010" );
+                        }
+                    }
+                }
+            }
+        } );
+
+        newFormField( "Neuwert" )
+                .setToolTipText( "Normalherstellungswert * Baukostenindex auf Basis 2010" )
+                .setParent( parent )
+                .setProperty(
+                        new ReloadablePropertyAdapter<NHK2010BewertungGebaeudeComposite>( selectedComposite,
+                                getPropertyName( nameTemplate.neuWert() ),
+                                new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
+
+                                    @Override
+                                    public Property<Double> get( NHK2010BewertungGebaeudeComposite entity ) {
+                                        return entity.neuWert();
+                                    }
+                                } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
+                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setEnabled( false ).setLayoutData( four().top( lastLine ).create() ).create();
+        pageSite.addFieldListener( neuWertListener = new IFormFieldListener() {
+
+            private Double normalHerstellungsWert;
+
+            private Double baukostenIndexWert;
+
+
+            @Override
+            public void fieldChange( FormFieldEvent ev ) {
+                if (ev.getEventCode() == VALUE_CHANGE) {
+                    if (ev.getFieldName().equalsIgnoreCase( getPropertyName( nameTemplate.normalHerstellungsWert() ) )) {
+                        normalHerstellungsWert = (Double)ev.getNewValue();
+                        updateNhk();
+                    }
+                    else if (ev.getFieldName().equalsIgnoreCase( getPropertyName( nameTemplate.baukostenIndexWert() ) )) {
+                        baukostenIndexWert = (Double)ev.getNewValue();
+                        updateNhk();
+                    }
+                }
+            }
+
+
+            private void updateNhk() {
+                Double neuwert = normalHerstellungsWert;
+                if (neuwert != null && baukostenIndexWert != null) {
+                    neuwert *= baukostenIndexWert;
+                }
+                pageSite.setFieldValue( getPropertyName( nameTemplate.neuWert() ), neuwert != null ? getFormatter( 2 )
+                        .format( neuwert ) : null );
+            }
+
+        } );
+
+        return field;
+    }
+
+
+    private Control baujahr( Composite parent, Control lastLine ) {
+        final Control field = newFormField( "GND" )
+                .setToolTipText( "Gesamtnutzungsdauer" )
+                .setParent( parent )
+                .setProperty(
+                        new ReloadablePropertyAdapter<NHK2010BewertungGebaeudeComposite>( selectedComposite,
+                                getPropertyName( nameTemplate.gesamtNutzungsDauer() ),
+                                new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
+
+                                    @Override
+                                    public Property<Long> get( NHK2010BewertungGebaeudeComposite entity ) {
+                                        return entity.gesamtNutzungsDauer();
+                                    }
+                                } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
+                .setValidator( new NumberValidator( Long.class, Polymap.getSessionLocale() ) )
+                .setLayoutData( two().top( lastLine ).create() ).create();
+
+        pageSite.addFieldListener( gndListener = new IFormFieldListener() {
+
+            @Override
+            public void fieldChange( FormFieldEvent ev ) {
+                if (ev.getEventCode() == VALUE_CHANGE) {
+                    if (ev.getFieldName().equalsIgnoreCase( getPropertyName( nameTemplate.gebaeudeArtId() ) )) {
+                        String id = (String)ev.getNewValue();
+                        StringBuffer text = new StringBuffer( "Gesamtnutzungsdauer" );
+                        if (id != null) {
+                            NHK2010Gebaeudeart art = NHK2010GebaeudeartenProvider.instance().gebaeudeForId( id );
+                            Integer bis = art.getGndBis();
+                            Integer von = art.getGndVon();
+                            if (von != null && bis != null) {
+                                text.append( ": " ).append( von ).append( " - " ).append( bis ).append( " Jahre" );
+                            }
+
+                        }
+                        field.setToolTipText( text.toString() );
+                    }
+                }
+            }
+
+        } );
+
+        newFormField( "Baujahr" )
+                .setToolTipText( "Tatsächliches Baujahr" )
+                .setParent( parent )
+                .setProperty(
+                        new ReloadablePropertyAdapter<NHK2010BewertungGebaeudeComposite>( selectedComposite,
+                                getPropertyName( nameTemplate.tatsaechlichesBaujahr() ),
+                                new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
+
+                                    @Override
+                                    public Property<Long> get( NHK2010BewertungGebaeudeComposite entity ) {
+                                        return entity.tatsaechlichesBaujahr();
+                                    }
+                                } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
+                .setValidator( new NumberValidator( Long.class, Polymap.getSessionLocale() ) )
+                .setLayoutData( three().top( lastLine ).create() ).create();
+
+        Control bb = newFormField( "Baujahr bereinigt" )
+                .setToolTipText( "Bereinigtes Baujahr" )
+                .setParent( parent )
+                .setProperty(
+                        new ReloadablePropertyAdapter<NHK2010BewertungGebaeudeComposite>( selectedComposite,
+                                getPropertyName( nameTemplate.bereinigtesBaujahr() ),
+                                new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
+
+                                    @Override
+                                    public Property<Long> get( NHK2010BewertungGebaeudeComposite entity ) {
+                                        return entity.bereinigtesBaujahr();
+                                    }
+                                } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
+                .setValidator( new NumberValidator( Long.class, Polymap.getSessionLocale() ) )
+                .setLayoutData( four().top( lastLine ).create() ).create();
+
+        // TODO
+        baujahrBerechneAction = new Action( "Berechnen" ) {
+        };
+        // gebaeudeStandardAction = new NHK2010GebaeudeStandardSelector(
+        // pageSite.getToolkit() ) {
+        //
+        // protected void adopt( Double gebaeudeStandard )
+        // throws Exception {
+        // assert gebaeudeStandard != null;
+        // pageSite.setFieldValue( prefix + "gebaeudeArtId", toAdopt.getId() );
+        // gebaeudeArtLabel.setText( toAdopt.getQualifiedName() );
+        // }
+        // };
+        // gebaeudeStandardAction.setEnabled( false );
+        ActionButton button = new ActionButton( parent, baujahrBerechneAction );
+        button.setLayoutData( five().left( bb, 0 ).width( 80 ).top( lastLine ).height( 16 ).create() );
+        button.setEnabled( false );
+
+        return field;
+    }
+
+
+    private Control alterswertMinderung( Composite parent, Control lastLine ) {
+        final Control field = newFormField( "RND" )
+                .setToolTipText( "Restnutzungsdauer" )
+                .setParent( parent )
+                .setProperty(
+                        new ReloadablePropertyAdapter<NHK2010BewertungGebaeudeComposite>( selectedComposite,
+                                getPropertyName( nameTemplate.restNutzungsDauer() ),
+                                new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
+
+                                    @Override
+                                    public Property<Long> get( NHK2010BewertungGebaeudeComposite entity ) {
+                                        return entity.restNutzungsDauer();
+                                    }
+                                } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
+                .setValidator( new NumberValidator( Long.class, Polymap.getSessionLocale() ) ).setEnabled( false )
+                .setLayoutData( two().top( lastLine ).create() ).create();
+
+        pageSite.addFieldListener( rndListener = new IFormFieldListener() {
+
+            private Long bereinigtesBaujahr;
+
+            private Long tatsaechlichesBaujahr;
+
+            private Long gesamtNutzungsDauer;
+
+
+            @Override
+            public void fieldChange( FormFieldEvent ev ) {
+                if (ev.getEventCode() == VALUE_CHANGE) {
+                    if (ev.getFieldName().equalsIgnoreCase( getPropertyName( nameTemplate.bereinigtesBaujahr() ) )) {
+                        bereinigtesBaujahr = (Long)ev.getNewValue();
+                        update();
+                    }
+                    else if (ev.getFieldName()
+                            .equalsIgnoreCase( getPropertyName( nameTemplate.tatsaechlichesBaujahr() ) )) {
+                        tatsaechlichesBaujahr = (Long)ev.getNewValue();
+                        update();
+                    }
+                    if (ev.getFieldName().equalsIgnoreCase( getPropertyName( nameTemplate.gesamtNutzungsDauer() ) )) {
+                        gesamtNutzungsDauer = (Long)ev.getNewValue();
+                        update();
+                    }
+                }
+            }
+
+
+            private void update() {
+                Long result = bereinigtesBaujahr;
+                if (result == null) {
+                    result = tatsaechlichesBaujahr;
+                }
+                if (result != null && gesamtNutzungsDauer != null) {
+                    // alter berechnen
+                    Calendar cal = new GregorianCalendar();
+                    Long alter = cal.get( Calendar.YEAR ) - result;
+                    // rnd = gnd - alter
+                    result = Math.max( gesamtNutzungsDauer - alter, 0 );
+
+                    pageSite.setFieldValue( getPropertyName( nameTemplate.restNutzungsDauer() ),
+                            result != null ? getFormatter( 0 ).format( result ) : null );
+                }
+                else {
+                    // nicht das Jahr als RND setzen
+                    pageSite.setFieldValue( getPropertyName( nameTemplate.restNutzungsDauer() ), null );
+                }
+            }
+
+        } );
+
+        newFormField( "Alterswertminderung" )
+                .setToolTipText( "Alterswertminderung linear: (GND - RND) / GND * 100" )
+                .setParent( parent )
+                .setProperty(
+                        new ReloadablePropertyAdapter<NHK2010BewertungGebaeudeComposite>( selectedComposite,
+                                getPropertyName( nameTemplate.altersWertMinderung() ),
+                                new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
+
+                                    @Override
+                                    public Property<Double> get( NHK2010BewertungGebaeudeComposite entity ) {
+                                        return entity.altersWertMinderung();
+                                    }
+                                } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
+                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2 ) )
+                .setLayoutData( three().top( lastLine ).create() ).create();
+
+        pageSite.addFieldListener( altersWertMinderungListener = new IFormFieldListener() {
+
+            private Long restNutzungsDauer;
+
+            private Long gesamtNutzungsDauer;
+
+
+            @Override
+            public void fieldChange( FormFieldEvent ev ) {
+                if (ev.getEventCode() == VALUE_CHANGE) {
+                    if (ev.getFieldName().equalsIgnoreCase( getPropertyName( nameTemplate.restNutzungsDauer() ) )) {
+                        restNutzungsDauer = (Long)ev.getNewValue();
+                        update();
+                    }
+                    else if (ev.getFieldName().equalsIgnoreCase( getPropertyName( nameTemplate.gesamtNutzungsDauer() ) )) {
+                        gesamtNutzungsDauer = (Long)ev.getNewValue();
+                        update();
+                    }
+                }
+            }
+
+
+            private void update() {
+                Double result = null;
+
+                if (restNutzungsDauer != null && gesamtNutzungsDauer != null && gesamtNutzungsDauer != 0
+                        && gesamtNutzungsDauer > restNutzungsDauer) {
+                    result = ((gesamtNutzungsDauer.doubleValue() - restNutzungsDauer.doubleValue()) / gesamtNutzungsDauer
+                            .doubleValue()) * 100;
+                }
+                pageSite.setFieldValue( getPropertyName( nameTemplate.altersWertMinderung() ),
+                        result != null ? getFormatter( 2 ).format( result ) : null );
+            }
+
+        } );
+
+        newFormField( "Zeitwert" )
+                .setToolTipText( "Gebäudezeitwert ohne Zu-/Abschläge ImmoWertV" )
+                .setParent( parent )
+                .setProperty(
+                        new ReloadablePropertyAdapter<NHK2010BewertungGebaeudeComposite>( selectedComposite,
+                                getPropertyName( nameTemplate.zeitwertRnd() ),
+                                new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
+
+                                    @Override
+                                    public Property<Double> get( NHK2010BewertungGebaeudeComposite entity ) {
+                                        return entity.zeitwertRnd();
+                                    }
+                                } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
+                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setLayoutData( four().top( lastLine ).create() ).create();
+
+        pageSite.addFieldListener( zeitwertRndListener = new IFormFieldListener() {
+
+            private Double altersWertMinderung;
+
+            private Double neuWert;
+
+
+            @Override
+            public void fieldChange( FormFieldEvent ev ) {
+                if (ev.getEventCode() == VALUE_CHANGE) {
+                    if (ev.getFieldName().equalsIgnoreCase( getPropertyName( nameTemplate.altersWertMinderung() ) )) {
+                        altersWertMinderung = (Double)ev.getNewValue();
+                        update();
+                    }
+                    else if (ev.getFieldName().equalsIgnoreCase( getPropertyName( nameTemplate.neuWert() ) )) {
+                        neuWert = (Double)ev.getNewValue();
+                        update();
+                    }
+                }
+            }
+
+
+            private void update() {
+                Double result = null;
+
+                if (neuWert != null && altersWertMinderung != null) {
+                    result = neuWert / 100 * (100 - altersWertMinderung);
+                }
+                pageSite.setFieldValue( getPropertyName( nameTemplate.zeitwertRnd() ),
+                        result != null ? getFormatter( 2 ).format( result ) : null );
+            }
+
+        } );
+
+        return field;
+    }
+
+
+    private Control normalherstellungswert( Composite parent, Control lastLine ) {
+        Control field = newFormField( "Normalherstellwert" )
+                .setToolTipText( "Normalherstellungswert nach NHK 2010 korrigiert in €" )
+                .setParent( parent )
+                .setProperty(
+                        new ReloadablePropertyAdapter<NHK2010BewertungGebaeudeComposite>( selectedComposite, prefix
+                                + "normalHerstellungsWert", new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
+
+                            @Override
+                            public Property<Double> get( NHK2010BewertungGebaeudeComposite entity ) {
+                                return entity.normalHerstellungsWert();
+                            }
+                        } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
+                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setEnabled( false ).setLayoutData( four().top( lastLine ).create() ).create();
+
+        pageSite.addFieldListener( normalHerstellungsWertListener = new IFormFieldListener() {
+
+            private Double nhkKorrigiert;
+
+            private Double bruttoGrundFlaeche;
+
+
+            @Override
+            public void fieldChange( FormFieldEvent ev ) {
+                if (ev.getEventCode() == VALUE_CHANGE) {
+                    if (ev.getFieldName().equalsIgnoreCase( getPropertyName( nameTemplate.nhkKorrigiert() ) )) {
+                        nhkKorrigiert = (Double)ev.getNewValue();
+                        update();
+                    }
+                    else if (ev.getFieldName().equalsIgnoreCase( getPropertyName( nameTemplate.bruttoGrundFlaeche() ) )) {
+                        bruttoGrundFlaeche = (Double)ev.getNewValue();
+                        update();
+                    }
+                }
+            }
+
+
+            private void update() {
+                Double result = null;
+                if (nhkKorrigiert != null && bruttoGrundFlaeche != null) {
+                    result = nhkKorrigiert * bruttoGrundFlaeche;
+                }
+                pageSite.setFieldValue( getPropertyName( nameTemplate.normalHerstellungsWert() ),
+                        result != null ? getFormatter( 2 ).format( result ) : null );
+            }
+
+        } );
+        return field;
+    }
+
+
+    private Control gebaeudeZeitWert( Composite parent, Control lastLine ) {
+        Control field = newFormField( "Gebäudezeitwert" )
+                .setToolTipText( "Gebäudezeitwert in €" )
+                .setParent( parent )
+                .setProperty(
+                        new ReloadablePropertyAdapter<NHK2010BewertungGebaeudeComposite>( selectedComposite,
+                                getPropertyName( nameTemplate.gebaeudeZeitWert() ),
+                                new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
+
+                                    @Override
+                                    public Property<Double> get( NHK2010BewertungGebaeudeComposite entity ) {
+                                        return entity.gebaeudeZeitWert();
+                                    }
+                                } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
+                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setEnabled( false ).setLayoutData( four().top( lastLine ).bottom( 100 ).create() ).create();
+
+        pageSite.addFieldListener( gebaeudeZeitWertListener = new IFormFieldListener() {
+
+            private Double zeitwertRnd;
+
+            private Double abschlagRueckstauBetrag;
+
+            private Double abschlagBaumaengelBetrag;
+
+            private Double zuschlagZeile3Betrag;
+
+            private Double zuschlagZeile4Betrag;
+
+
+            @Override
+            public void fieldChange( FormFieldEvent ev ) {
+                if (ev.getEventCode() == VALUE_CHANGE) {
+                    if (ev.getFieldName().equalsIgnoreCase( getPropertyName( nameTemplate.zeitwertRnd() ) )) {
+                        zeitwertRnd = (Double)ev.getNewValue();
+                        update();
+                    }
+                    else if (ev.getFieldName().equalsIgnoreCase(
+                            getPropertyName( nameTemplate.abschlagBaumaengelBetrag() ) )) {
+                        abschlagBaumaengelBetrag = (Double)ev.getNewValue();
+                        update();
+                    }
+                    else if (ev.getFieldName().equalsIgnoreCase(
+                            getPropertyName( nameTemplate.abschlagRueckstauBetrag() ) )) {
+                        abschlagRueckstauBetrag = (Double)ev.getNewValue();
+                        update();
+                    }
+                    else if (ev.getFieldName()
+                            .equalsIgnoreCase( getPropertyName( nameTemplate.zuschlagZeile3Betrag() ) )) {
+                        zuschlagZeile3Betrag = (Double)ev.getNewValue();
+                        update();
+                    }
+                    else if (ev.getFieldName()
+                            .equalsIgnoreCase( getPropertyName( nameTemplate.zuschlagZeile4Betrag() ) )) {
+                        zuschlagZeile4Betrag = (Double)ev.getNewValue();
+                        update();
+                    }
+                }
+            }
+
+
+            private void update() {
+                Double result = zeitwertRnd;
+                // Zu/-Abschläge nach ImmoWertV
+                if (result != null && abschlagBaumaengelBetrag != null) {
+                    result += abschlagBaumaengelBetrag;
+                }
+                if (result != null && abschlagRueckstauBetrag != null) {
+                    result += abschlagRueckstauBetrag;
+                }
+                if (result != null && zuschlagZeile3Betrag != null) {
+                    result += zuschlagZeile3Betrag;
+                }
+                if (result != null && zuschlagZeile4Betrag != null) {
+                    result += zuschlagZeile4Betrag;
+                }
+                pageSite.setFieldValue( getPropertyName( nameTemplate.gebaeudeZeitWert() ),
+                        result != null ? getFormatter( 2 ).format( result ) : null );
+            }
+
+        } );
+
+        field = createLabel( parent, "", one().top( field ) );
+        return field;
     }
 
 
@@ -685,5 +1468,10 @@ public class NHK2010BewertungFormEditorPage
                         prototype.laufendeNummer().set( nextNumber );
                     }
                 } );
+    }
+
+
+    private String getPropertyName( Property<?> property ) {
+        return prefix + nameTemplate.toString();
     }
 }

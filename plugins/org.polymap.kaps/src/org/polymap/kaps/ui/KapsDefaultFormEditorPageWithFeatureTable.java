@@ -17,6 +17,9 @@ import java.util.Collection;
 import java.util.List;
 
 import java.beans.PropertyChangeEvent;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
 import org.geotools.data.FeatureStore;
 import org.opengis.feature.Feature;
@@ -50,6 +53,26 @@ import org.polymap.kaps.ui.NamedCompositesFeatureContentProvider.FeatureTableEle
 public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity>
         extends KapsDefaultFormEditorPage {
 
+    
+    public class LastNameInvocationHandler
+            implements InvocationHandler {
+
+        private String lastCall;
+
+        @Override
+        public Object invoke( Object proxy, Method method, Object[] args )
+                throws Throwable {
+            // do nothing
+            if ("toString".equals( method.getName() )) {
+                return lastCall;
+            }
+            lastCall = method.getName();
+            return null;
+        }
+
+    }
+
+
     protected FeatureStore         featureStore;
 
     private FeatureTableViewer     viewer;
@@ -63,12 +86,13 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
     private List<IFormField>       reloadables       = new ArrayList<IFormField>();
 
     private boolean                updatingElements;
+    
+    protected final T nameTemplate;
 
-
-
-    public KapsDefaultFormEditorPageWithFeatureTable( String id, String title, Feature feature,
+    public KapsDefaultFormEditorPageWithFeatureTable( Class<T> type, String id, String title, Feature feature,
             FeatureStore featureStore ) {
         super( id, title, feature, featureStore );
+        nameTemplate = (T)Proxy.newProxyInstance( Thread.currentThread().getContextClassLoader(), new Class[]{type}, new LastNameInvocationHandler() );
     }
 
 
@@ -112,7 +136,8 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
         int TOPSPACING = 20;
         viewer = new FeatureTableViewer( parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL );
         viewer.getTable().setLayoutData(
-                new SimpleFormData().fill().left( 0 ).height( 100 ).right( 85 ).top( top, TOPSPACING ).bottom( 100 ).create() );
+                new SimpleFormData().fill().left( 0 ).height( 100 ).right( 85 ).top( top, TOPSPACING ).bottom( 100 )
+                        .create() );
 
         // columns
         EntityType<T> type = addViewerColumns( viewer );
@@ -143,13 +168,13 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
                     viewer.getTable().select(
                             ((NamedCompositesFeatureContentProvider)viewer.getContentProvider())
                                     .getIndicesForElements( newComposite ) );
-                    //refreshReloadables();
+                    // refreshReloadables();
                     // refreshReloadables is triggered bei selection event();
                 }
             };
             addBtn = new ActionButton( parent, addAction );
-            addBtn.setLayoutData( new SimpleFormData().left( viewer.getTable(), 6 ).top( top, TOPSPACING )
-                    .right( 100 ).height( 30 ).create() );
+            addBtn.setLayoutData( new SimpleFormData().left( viewer.getTable(), 6 ).top( top, TOPSPACING ).right( 100 )
+                    .height( 30 ).create() );
         }
 
         DeleteCompositeAction<T> deleteAction = new DeleteCompositeAction<T>() {
@@ -181,8 +206,8 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
         };
         ActionButton delBtn = new ActionButton( parent, deleteAction );
         delBtn.setLayoutData( new SimpleFormData().left( viewer.getTable(), 6 )
-                .top( addBtn != null ? addBtn : top, addBtn != null ? SPACING : TOPSPACING ).right( 100 )
-                .height( 30 ).create() );
+                .top( addBtn != null ? addBtn : top, addBtn != null ? SPACING : TOPSPACING ).right( 100 ).height( 30 )
+                .create() );
 
         parent.layout( true );
 
@@ -267,7 +292,6 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
         super.doSubmit( monitor );
         dirty = false;
     }
-
 
 
     /**

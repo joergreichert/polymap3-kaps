@@ -87,7 +87,7 @@ public class GebaeudeFlurstueckeFormEditorPage
     private final static String       prefix = GebaeudeFlurstueckeFormEditorPage.class.getSimpleName();
 
     public GebaeudeFlurstueckeFormEditorPage( Feature feature, FeatureStore featureStore ) {
-        super( GebaeudeFlurstueckeFormEditorPage.class.getName(), "Flurstücke", feature, featureStore );
+        super( FlurstueckComposite.class, GebaeudeFlurstueckeFormEditorPage.class.getName(), "Flurstücke", feature, featureStore );
 
         gebaeude = repository.findEntity( GebaeudeComposite.class, feature.getIdentifier().getID() );
     }
