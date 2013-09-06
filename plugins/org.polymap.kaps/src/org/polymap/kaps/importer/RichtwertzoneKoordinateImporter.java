@@ -29,6 +29,8 @@ import org.apache.commons.logging.LogFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 
+import org.eclipse.jface.dialogs.MessageDialog;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 
@@ -37,7 +39,9 @@ import org.polymap.core.data.operation.FeatureOperationExtension;
 import org.polymap.core.data.operation.IFeatureOperation;
 import org.polymap.core.data.operation.IFeatureOperationContext;
 import org.polymap.core.model.CompletionException;
+import org.polymap.core.runtime.Polymap;
 import org.polymap.core.runtime.entity.ConcurrentModificationException;
+import org.polymap.core.workbench.PolymapWorkbench;
 
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.RichtwertzoneComposite;
@@ -80,19 +84,29 @@ public class RichtwertzoneKoordinateImporter
             throws Exception {
         monitor.beginTask( context.adapt( FeatureOperationExtension.class ).getLabel(), context.features().size() );
 
+        String errors = "";
         try {
-            importFeature( context.features(), monitor );
+            errors = importFeature( context.features(), monitor );
         }
         catch (OperationCanceledException e) {
             return Status.Cancel;
         }
 
         monitor.done();
+        if (errors.length() != 0) {
+            final String errors2 = errors;
+            Polymap.getSessionDisplay().asyncExec( new Runnable() {
+                public void run() {
+                    MessageDialog.openError( PolymapWorkbench.getShellToParentOn(), "Fehler beim Import", errors2 );
+                }
+            });
+            return Status.Error;
+        }
         return Status.OK;
     }
 
 
-    private void importFeature( final FeatureCollection features, final IProgressMonitor monitor )
+    private String importFeature( final FeatureCollection features, final IProgressMonitor monitor )
             throws IOException, CompletionException, ConcurrentModificationException {
         FeatureIterator it = null;
         try {
@@ -100,6 +114,7 @@ public class RichtwertzoneKoordinateImporter
             it = features.features();
             int count = 0;
             final KapsRepository repo = KapsRepository.instance();
+            StringBuffer errors = new StringBuffer();
             while (it.hasNext()) {
                 if (monitor.isCanceled()) {
                     throw new OperationCanceledException();
@@ -113,20 +128,23 @@ public class RichtwertzoneKoordinateImporter
                 if (number != null && !number.isEmpty()) {
                     RichtwertzoneComposite richtwertzone = repo.findSchlNamed( RichtwertzoneComposite.class, number );
                     if (richtwertzone == null) {
-                        throw new IllegalStateException( "Keine Richtwertzone für BTS '" + number + "' gefunden." );
+                        errors.append( "- Richtwertzone für BTS '" + number + "' wurde nicht gefunden\n" );
                     }
-                    MultiPolygon mp = (MultiPolygon)feature.getDefaultGeometryProperty().getValue();
-                    if (mp != null) {
-                        if (mp.getNumGeometries() == 1) {
-                            richtwertzone.geom().set( (Polygon)mp.getGeometryN( 0 ) );
-                        }
-                        else if (mp.getNumGeometries() > 1) {
-                            throw new IllegalStateException( "Richtwertzone für BTS '" + number + "' enthält mehr als 1 Polygon." );
+                    else {
+                        MultiPolygon mp = (MultiPolygon)feature.getDefaultGeometryProperty().getValue();
+                        if (mp != null) {
+                            if (mp.getNumGeometries() == 1) {
+                                richtwertzone.geom().set( (Polygon)mp.getGeometryN( 0 ) );
+                            }
+                            else if (mp.getNumGeometries() > 1) {
+                                errors.append( "- Richtwertzone für BTS '" + number + "' enthält mehr als 1 Polygon\n" );
+                            }
                         }
                     }
                 }
             }
             repo.commitChanges();
+            return errors.toString();
         }
         finally {
             if (it != null) {
