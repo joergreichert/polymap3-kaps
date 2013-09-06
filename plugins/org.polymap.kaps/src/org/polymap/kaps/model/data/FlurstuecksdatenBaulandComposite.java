@@ -165,7 +165,6 @@ public interface FlurstuecksdatenBaulandComposite
     Property<Double> bodenpreisQm1();
 
 
-
     // DM1 DOUBLE,
     @Optional
     @ImportColumn("DM1")
@@ -373,9 +372,11 @@ public interface FlurstuecksdatenBaulandComposite
     @ImportColumn("VKWABFAKT")
     Property<Double> verkehrswertFaktor();
 
+
     @Optional
     Property<Double> zwischensummeVerkehrswertfaktor();
-    
+
+
     // ZWSUEK DOUBLE,
     @Optional
     @ImportColumn("ZWSUEK")
@@ -525,11 +526,10 @@ public interface FlurstuecksdatenBaulandComposite
     Property<String> gewart();
 
 
-//    // ERBBAU VARCHAR(1),
-//    @Optional
-//    @ImportColumn("ERBBAU")
-//    Property<String> erbbaurecht();
-
+    // // ERBBAU VARCHAR(1),
+    // @Optional
+    // @ImportColumn("ERBBAU")
+    // Property<String> erbbaurecht();
 
     // TODO WERT1 DOUBLE,
     @Optional
@@ -1009,10 +1009,14 @@ public interface FlurstuecksdatenBaulandComposite
     // @Computed
     Association<RichtwertzoneComposite> richtwertZone();
 
-    
+
     // schalter hab ich vorher nicht gefunden
     @Optional
     Property<Boolean> zurRichtwertermittlungGeeignet();
+
+    // http://polymap.org/kaps/ticket/104#comment:8
+    @Optional
+    Property<Double> differenzGebaeudeZuBodenwert();
     // );
     //
     // CREATE INDEX K_BEVERW_RIWE ON K_BEVERW (GEMEINDE ASC, RIZONE ASC, RIJAHR ASC);

@@ -86,7 +86,7 @@ public class FlurstuecksdatenAgrarGrunddatenFormEditorPage
         } );
 
         lastLine = newLine;
-        newLine = newFormField( "Gebäudeart" ).setEnabled( false )
+        newLine = newFormField( "Gebäudeart" ).setEnabled( vb.gebaeudeArt().get() == null )
                 .setProperty( new AssociationAdapter<GebaeudeArtComposite>( vb.gebaeudeArt() ) )
                 .setField( namedAssocationsPicklist( GebaeudeArtComposite.class ) )
                 .setLayoutData( left().top( lastLine ).create() ).setParent( client ).create();

@@ -335,8 +335,16 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
         site.addFieldListener( anteilBodenwert = new FieldMultiplication( site, 2, vb.faktorBereinigterKaufpreis(), vb
                 .bodenwertGesamt(), vb.kaufpreisAnteilBodenwert() ) );
 
+        createLabel( client, "Differenz Gebäudewert", three().top( lastLine, 12 ), SWT.RIGHT );
+        newFormField( IFormFieldLabel.NO_LABEL )
+                .setToolTipText( "Differenz Gebäude- zu Bodenwert (ehemals Sachwertverfahren 1913)" )
+                .setProperty( new PropertyAdapter( vb.differenzGebaeudeZuBodenwert() ) )
+                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
+                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 4, 1, 4 ) )
+                .setLayoutData( four().top( lastLine ).create() ).setParent( client ).create();
+        
         lastLine = newLine;
-        newLine = createLabel( client, "Faktor geeignet?", one().top( lastLine, 12 ), SWT.RIGHT );
+        newLine = createLabel( client, "Faktor geeignet?", one().top( lastLine, 12 ).bottom( 100 ), SWT.RIGHT );
         newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Faktor für Marktanpassung geeignet?" )
                 .setProperty( new PropertyAdapter( vb.faktorFuerMarktanpassungGeeignet() ) )
                 .setLayoutData( two().top( lastLine ).bottom( 100 ).create() ).setParent( client ).create();
