@@ -75,10 +75,11 @@ public class RichtwertzoneAsBorisExporter
         extends DefaultFeatureOperation
         implements IFeatureOperation {
 
-    private static Log          log        = LogFactory.getLog( RichtwertzoneAsBorisExporter.class );
+    private static Log          log             = LogFactory.getLog( RichtwertzoneAsBorisExporter.class );
 
     // Locale wegen dem . in 0.00
-    private static NumberFormat euroFormat = NumberFormat.getNumberInstance( Locale.ENGLISH );
+    private static NumberFormat euroFormat      = NumberFormat.getNumberInstance( Locale.ENGLISH );
+
     private static NumberFormat euroShortFormat = NumberFormat.getNumberInstance( Locale.ENGLISH );
     static {
         euroFormat.setMaximumFractionDigits( 2 );
@@ -89,7 +90,7 @@ public class RichtwertzoneAsBorisExporter
         euroFormat.setMinimumIntegerDigits( 1 );
     }
 
-    private static DateFormat   dateFormat = new SimpleDateFormat( "dd.MM.yyyy" );
+    private static DateFormat   dateFormat      = new SimpleDateFormat( "dd.MM.yyyy" );
 
 
     @Override
@@ -239,9 +240,8 @@ public class RichtwertzoneAsBorisExporter
     }
 
 
-
     private List getRow( RichtwertzoneZeitraumComposite richtwertzoneG ) {
-    
+
         RichtwertzoneComposite richtwertzone = richtwertzoneG.zone().get();
         Polygon geom = richtwertzone.geom().get();
 
@@ -363,7 +363,8 @@ public class RichtwertzoneAsBorisExporter
         String euroStr = "";
         if (euro != null && euro >= 10.0d) {
             euroStr = euroShortFormat.format( richtwertzoneG.euroQm().get() );
-        } else {
+        }
+        else {
             euroStr = euroFormat.format( richtwertzoneG.euroQm().get() );
         }
         result.add( euroStr );
@@ -445,7 +446,7 @@ public class RichtwertzoneAsBorisExporter
         // Georeferenz der Bodenrichtwertangabe
         // (Präsentationskoordinate)
         // freiwillig
-        result.add( geom != null ? Double.valueOf( geom.getInteriorPoint().getX()).intValue() : "" );
+        result.add( geom != null ? Double.valueOf( geom.getInteriorPoint().getX() ).intValue() : "" );
 
         // 17
         // Hochwert/Nordwert
@@ -457,7 +458,7 @@ public class RichtwertzoneAsBorisExporter
         // Georeferenz der Bodenrichtwertangabe
         // (Präsentationskoordinate)
         // freiwillig
-        result.add( geom != null ? Double.valueOf( geom.getInteriorPoint().getY()).intValue() : "" );
+        result.add( geom != null ? Double.valueOf( geom.getInteriorPoint().getY() ).intValue() : "" );
 
         // 18
         // Bezugssystem
@@ -475,7 +476,7 @@ public class RichtwertzoneAsBorisExporter
         // ETRS89_UTM33
         // Pflicht
         result.add( "DE_DHDN_3GK4" );
-        
+
         // 19
         // Entwicklungszustand
         // entwicklungszustand
@@ -522,7 +523,7 @@ public class RichtwertzoneAsBorisExporter
         // Pflicht
         BodenRichtwertRichtlinieArtDerNutzungComposite artDerNutzung = richtwertzone.brwrlArt().get();
         result.add( artDerNutzung != null ? artDerNutzung.schl().get() : null );
-        
+
         // 22
         // Ergänzung zur Art der Nutzung
         // ErgaenzungArtNutzung
@@ -555,7 +556,7 @@ public class RichtwertzoneAsBorisExporter
         // Pflicht soweit wertrelevant
         BauweiseComposite bauweise = richtwertzone.bauweise().get();
         result.add( bauweise != null ? bauweise.schl().get() : null );
-        
+
         // 24
         // Geschosszahl
         // geschosszahl
@@ -609,7 +610,7 @@ public class RichtwertzoneAsBorisExporter
         // Pflicht soweit wertrelevant
         Double groesse = richtwertzone.grundstuecksGroesse().get();
         result.add( groesse != null ? groesse.intValue() : "" );
-        
+
         // 29
         // Tiefe
         // tiefe
@@ -643,7 +644,7 @@ public class RichtwertzoneAsBorisExporter
         // freiwillig
         // TODO fehlt
         result.add( "" );
-        
+
         // 32
         // Verfahrensgrund
         // verfahrensart
@@ -661,12 +662,13 @@ public class RichtwertzoneAsBorisExporter
         if (entwicklungsZusatz != null) {
             if (entwicklungsZusatz.schl().get().startsWith( "S" )) {
                 verg = "San";
-            } else {
+            }
+            else {
                 verg = "Entw";
             }
         }
         result.add( verg );
-        
+
         // 33
         // Entwicklungs-/Sanierungszusatz
         // EntwicklungsSanierungszusatz
@@ -698,8 +700,9 @@ public class RichtwertzoneAsBorisExporter
         // Georeferenz der Beschriftung zur städtebaulichen
         // Maßnahme (Präsentationskoordinate), historisch
         // freiwillig
-        result.add( entwicklungsZusatz != null && geom != null ? Double.valueOf( geom.getInteriorPoint().getX()).intValue() : "" );
-        
+        result.add( entwicklungsZusatz != null && geom != null ? Double.valueOf( geom.getInteriorPoint().getX() )
+                .intValue() : "" );
+
         // 35
         // Hochwert/Nordwert der Maßnahme
         // nordwertVerf
@@ -710,7 +713,11 @@ public class RichtwertzoneAsBorisExporter
         // Georeferenz der Beschriftung zur städtebaulichen Maß-nahme
         // (Präsentationskoordinate), historisch
         // freiwillig
-        result.add( entwicklungsZusatz != null && geom != null ? Double.valueOf( geom.getInteriorPoint().getY()).intValue() : "" );
+        // TODO ei jedem BRW im San- Gebiet sind zudem die Koordinaten (Feld 34/35)
+        // für die Visualisierung der Beschriftung "San" anzugeben, möglichst nicht
+        // im Mittelpunkt des Polygons, da dort der BRW platziert wird
+        result.add( entwicklungsZusatz != null && geom != null ? Double.valueOf( geom.getInteriorPoint().getY() )
+                .intValue() : "" );
         // 36
         // Bodenart
         // bodenart
@@ -793,8 +800,12 @@ public class RichtwertzoneAsBorisExporter
         // als Rechts- bzw. Ostwert und Hoch- bzw. Nordwert jeweils im Format 7.3
         // oder 8.3, historisch
         // freiwillig
-        result.add( "" );
-        
+        String row42 = "";
+        if (entwicklungsZusatz != null && geom != null && entwicklungsZusatz.schl().get().startsWith( "S" )) {
+            row42 = new WKTWriter().writeFormatted( geom );
+        }
+        result.add( row42 );
+
         // 43
         // Bemerkungen
         // bemerkungen
@@ -805,7 +816,7 @@ public class RichtwertzoneAsBorisExporter
         // Sonstige Hinweise
         // freiwillig
         result.add( "" );
-        
+
         // 44
         // Freies Feld
         // landesspezifischeAngaben
