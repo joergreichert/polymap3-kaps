@@ -43,6 +43,8 @@ public class FieldSummation
 
     private final Map<String, Double>           values;
 
+    private double                              resultValue;
+
 
     public FieldSummation( IFormEditorPageSite site, int fractionDigits, Property<Double> result,
             Property<Double>... summand ) {
@@ -64,7 +66,8 @@ public class FieldSummation
         }
         String fieldName = ev.getFieldName();
         if (terms.keySet().contains( fieldName )) {
-            Double newValue = (Double)ev.getNewValue(); //explizitely deleting this value
+            Double newValue = (Double)ev.getNewValue(); // explizitely deleting this
+                                                        // value
             if (newValue == null) {
                 newValue = Double.valueOf( 0.0d );
             }
@@ -74,8 +77,13 @@ public class FieldSummation
     }
 
 
+    public Double getLastResultValue() {
+        return resultValue;
+    }
+
+
     private void refreshResult() {
-        Double resultValue = 0.0;
+        resultValue = 0.0;
 
         for (String term : terms.keySet()) {
             // value changed, then look here

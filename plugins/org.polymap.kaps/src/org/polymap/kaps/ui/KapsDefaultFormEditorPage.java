@@ -61,7 +61,6 @@ public abstract class KapsDefaultFormEditorPage
         extends DefaultFormEditorPage
         implements IFormEditorPage2 {
 
-
     protected static final int SPACING = 12;
 
     protected static final int LEFT    = 0;
@@ -71,17 +70,17 @@ public abstract class KapsDefaultFormEditorPage
     protected static final int RIGHT   = 100;
 
     // 5 column layout
-    private static final int                  ONE   = 0;
+    protected static final int                  ONE   = 0;
 
-    private static final int                  TWO   = 20;
+    protected static final int                  TWO   = 20;
 
-    private static final int                  THREE = 40;
+    protected static final int                  THREE = 40;
 
-    private static final int                  FOUR  = 60;
+    protected static final int                  FOUR  = 60;
 
-    private static final int                  FIVE  = 80;
+    protected static final int                  FIVE  = 80;
 
-    private static final int                  SIX   = 100;
+    protected static final int                  SIX   = 100;
 
     protected SimpleFormData one3() {
         return new SimpleFormData( SPACING ).left( 0 ).right( 33 );

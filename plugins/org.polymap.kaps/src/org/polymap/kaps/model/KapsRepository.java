@@ -172,6 +172,9 @@ public class KapsRepository
                             KapsRepository.NAMESPACE, NHK2010Baupreisindex.NAME ) ),
                     new SimpleEntityProvider<NHK2010BewertungComposite>( this, NHK2010BewertungComposite.class,
                             new NameImpl( KapsRepository.NAMESPACE, NHK2010BewertungComposite.NAME ) ),
+                    new SimpleEntityProvider<ErmittlungModernisierungsgradComposite>( this,
+                            ErmittlungModernisierungsgradComposite.class, new NameImpl(
+                                    KapsRepository.NAMESPACE, ErmittlungModernisierungsgradComposite.NAME ) ),
 
                     // nicht änderbare Wertelisten
                     // new SimpleEntityProvider<ErschliessungsBeitragComposite>(

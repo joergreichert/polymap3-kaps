@@ -24,10 +24,13 @@ import org.apache.commons.logging.LogFactory;
 
 import org.eclipse.swt.widgets.Composite;
 
+import org.eclipse.jface.action.Action;
+
 import org.eclipse.ui.forms.widgets.Section;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
+import org.polymap.core.project.ui.util.SimpleFormData;
 import org.polymap.core.runtime.Polymap;
 
 import org.polymap.rhei.data.entityfeature.AssociationAdapter;
@@ -40,6 +43,7 @@ import org.polymap.rhei.field.PicklistFormField;
 import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
+import org.polymap.kaps.KapsPlugin;
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.BodennutzungComposite;
 import org.polymap.kaps.model.data.ErschliessungsBeitragComposite;
@@ -48,6 +52,8 @@ import org.polymap.kaps.model.data.GebaeudeArtComposite;
 import org.polymap.kaps.model.data.GemeindeComposite;
 import org.polymap.kaps.model.data.RichtwertzoneComposite;
 import org.polymap.kaps.model.data.RichtwertzoneZeitraumComposite;
+import org.polymap.kaps.model.data.VertragComposite;
+import org.polymap.kaps.ui.ActionButton;
 import org.polymap.kaps.ui.FieldCalculation;
 
 /**
@@ -90,7 +96,23 @@ public class FlurstuecksdatenBaulandGrunddatenFormEditorPage
         Composite newLine, lastLine = null;
         Composite parent = pageSite.getPageBody();
 
+        final VertragComposite kaufvertrag = vb.vertrag().get();
+        String nummer = EingangsNummerFormatter.format( kaufvertrag.eingangsNr().get() );
+        String label = kaufvertrag == null ? "Kein Vertrag zugewiesen" : "Vertrag "
+                + nummer + " öffnen";
+        ActionButton openVertrag = new ActionButton( parent, new Action( label ) {
+
+            @Override
+            public void run() {
+                KapsPlugin.openEditor( fs, VertragComposite.NAME, kaufvertrag );
+            }
+        } );
+        openVertrag.setLayoutData( left().height( 25 ).create() );
+        openVertrag.setEnabled( kaufvertrag != null );
+
+        
         Section section = newSection( parent, "Richtwertberechnung" );
+        section.setLayoutData( new SimpleFormData( SECTION_SPACING ).left( 0 ).right( 100 ).top( openVertrag ).create() );
         Composite client = (Composite)section.getClient();
 
         newLine = newFormField( "Lageklasse" ).setProperty( new PropertyAdapter( vb.lageklasse() ) )

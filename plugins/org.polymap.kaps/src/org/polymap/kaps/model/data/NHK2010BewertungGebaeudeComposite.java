@@ -53,7 +53,7 @@ public interface NHK2010BewertungGebaeudeComposite
 
     @Optional
     @ImportColumn("LFDNR")
-    Property<Long> laufendeNummer();
+    Property<Integer> laufendeNummer();
 
 
     @Optional
@@ -64,31 +64,31 @@ public interface NHK2010BewertungGebaeudeComposite
     // OBJEKTNRFORTF - Long
     @Optional
     @ImportColumn("OBJEKTNRFORTF")
-    Property<Long> objektFortfuehrung();
+    Property<Integer> objektFortfuehrung();
 
 
     // GEBNR - Long
     @Optional
     @ImportColumn("GEBNR")
-    Property<Long> gebaeudeNummer();
+    Property<Integer> gebaeudeNummer();
 
 
     // GEBFORTF - Long
     @Optional
     @ImportColumn("GEBFORTF")
-    Property<Long> gebaeudeFortfuehrung();
+    Property<Integer> gebaeudeFortfuehrung();
 
 
     // WOHNUNGSNR - Long
     @Optional
     @ImportColumn("WOHNUNGSNR")
-    Property<Long> wohnungsNummer();
+    Property<Integer> wohnungsNummer();
 
 
     // FORTF - Long
     @Optional
     @ImportColumn("FORTF")
-    Property<Long> wohnungsFortfuehrung();
+    Property<Integer> wohnungsFortfuehrung();
 
 
     // // TODO ANTRAGNR_GUTACHTEN - String
@@ -198,13 +198,13 @@ public interface NHK2010BewertungGebaeudeComposite
     // BERBAUJ1 - Long
     @Optional
     @ImportColumn("BERBAUJ1")
-    Property<Long> bereinigtesBaujahr();
+    Property<Double> bereinigtesBaujahr();
 
 
     // BAUJ1 - Long
     @Optional
     @ImportColumn("BAUJ1")
-    Property<Long> tatsaechlichesBaujahr();
+    Property<Double> tatsaechlichesBaujahr();
 
 
     // BGF1 - Double
@@ -251,20 +251,20 @@ public interface NHK2010BewertungGebaeudeComposite
 
     // GND - Long
     @Optional
-    @ImportColumn("GND")
-    Property<Long> gesamtNutzungsDauer();
+//    @ImportColumn("GND")
+    Property<Double> gesamtNutzungsDauer();
 
 
     // RND - Long
     @Optional
-    @ImportColumn("RND")
-    Property<Long> restNutzungsDauer();
+//    @ImportColumn("RND")
+    Property<Double> restNutzungsDauer();
 
 
     // ALTER1 - Long
     @Optional
-    @ImportColumn("ALTER1")
-    Property<Long> alter();
+//    @ImportColumn("ALTER1")
+    Property<Double> alter();
 
 
     // WOHNGEB - String

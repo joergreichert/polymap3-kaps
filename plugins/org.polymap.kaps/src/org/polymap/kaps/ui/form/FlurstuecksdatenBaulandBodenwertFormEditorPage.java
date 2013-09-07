@@ -50,9 +50,8 @@ import org.polymap.kaps.ui.FieldSummation;
 public class FlurstuecksdatenBaulandBodenwertFormEditorPage
         extends FlurstuecksdatenBaulandFormEditorPage {
 
-
-    private static Log                        log   = LogFactory
-                                                            .getLog( FlurstuecksdatenBaulandBodenwertFormEditorPage.class );
+    private static Log                        log = LogFactory
+                                                          .getLog( FlurstuecksdatenBaulandBodenwertFormEditorPage.class );
 
     @SuppressWarnings("unused")
     private IFormFieldListener                line1multiplicator;
@@ -260,13 +259,6 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
         section = newSection( section, "Bewertung" );
         client = (Composite)section.getClient();
 
-        lastLine = newLine;
-        newLine = createLabel( client, "Bewertungsmethode", one().top( lastLine, 12 ), SWT.RIGHT );
-        newFormField( IFormFieldLabel.NO_LABEL ).setEnabled( false )
-                .setProperty( new PropertyAdapter( vb.bewertungsMethode() ) )
-                .setLayoutData( two().top( lastLine ).create() ).setParent( client ).create();
-
-        lastLine = newLine;
         newLine = createLabel( client, "Bodenwert", one().top( lastLine, 12 ), SWT.RIGHT );
         newFormField( IFormFieldLabel.NO_LABEL ).setProperty( new PropertyAdapter( vb.bodenwertGesamt() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
@@ -275,14 +267,29 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
         site.addFieldListener( bodenwertSummation = new FieldSummation( site, 2, vb.bodenwertGesamt(), vb.bodenwert1(),
                 vb.bodenwert2(), vb.bodenwert3(), vb.bodenwert4(), vb.bodenwert5(), vb.bodenwert6() ) );
 
-        // lastLine = newLine;
-        createLabel( client, "Sachwert", three().top( lastLine, 12 ), SWT.RIGHT );
+        lastLine = newLine;
+        newLine = createLabel( client, "Wert der baul. Anlagen",
+                "Wert der baulichen Anlagen entsprechend Bewertungsmethode", one().top( lastLine, 12 ), SWT.RIGHT );
+        newFormField( IFormFieldLabel.NO_LABEL )
+                .setToolTipText( "Wert der baulichen Anlagen entsprechend Bewertungsmethode" ).setEnabled( false )
+                .setProperty( new PropertyAdapter( vb.wertDerBaulichenAnlagen() ) )
+                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
+                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setLayoutData( two().top( lastLine ).create() ).setParent( client ).create();
+
+        createLabel( client, "Bewertungsmethode", three().top( lastLine, 12 ), SWT.RIGHT );
+        newFormField( IFormFieldLabel.NO_LABEL ).setEnabled( false )
+                .setProperty( new PropertyAdapter( vb.bewertungsMethode() ) )
+                .setLayoutData( four().top( lastLine ).create() ).setParent( client ).create();
+
+        lastLine = newLine;
+        newLine = createLabel( client, "Sachwert", one().top( lastLine, 12 ), SWT.RIGHT );
         newFormField( IFormFieldLabel.NO_LABEL ).setProperty( new PropertyAdapter( vb.sachwert() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
-                .setLayoutData( four().top( lastLine ).create() ).setParent( client ).setEnabled( false ).create();
-        site.addFieldListener( sachwertSummation = new FieldSummation( site, 2, vb.sachwert(), vb.bodenwert1(), vb
-                .bodenwert2(), vb.bodenwert3(), vb.bodenwert4(), vb.bodenwert5(), vb.bodenwert6() ) );
+                .setLayoutData( two().top( lastLine ).create() ).setParent( client ).setEnabled( false ).create();
+        site.addFieldListener( sachwertSummation = new FieldSummation( site, 2, vb.sachwert(), vb.bodenwertGesamt(), vb
+                .wertDerBaulichenAnlagen() ) );
 
         lastLine = newLine;
         newLine = createLabel( client, "Faktor", one().top( lastLine, 12 ), SWT.RIGHT );
@@ -342,7 +349,7 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 4, 1, 4 ) )
                 .setLayoutData( four().top( lastLine ).create() ).setParent( client ).create();
-        
+
         lastLine = newLine;
         newLine = createLabel( client, "Faktor geeignet?", one().top( lastLine, 12 ).bottom( 100 ), SWT.RIGHT );
         newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Faktor für Marktanpassung geeignet?" )

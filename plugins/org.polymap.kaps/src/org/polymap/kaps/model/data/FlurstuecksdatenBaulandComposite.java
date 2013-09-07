@@ -141,16 +141,16 @@ public interface FlurstuecksdatenBaulandComposite
     Property<Double> bodenpreisBebaut();
 
 
-    // TODO GESBAUWE DOUBLE,
     @Optional
     @ImportColumn("GESBAUWE")
-    Property<Double> GESBAUWE();
+    Property<Double> wertDerBaulichenAnlagen();
 
 
-    // TODO VERFAHREN VARCHAR(36),
+    // Text = "Wert der bauliche Anlagen" o.ä. 
+    // VERFAHREN VARCHAR(36),
     @Optional
     @ImportColumn("VERFAHREN")
-    Property<String> VERFAHREN();
+    Property<String> wertDerBaulichenAnlagenText();
 
 
     // FL1 DOUBLE,

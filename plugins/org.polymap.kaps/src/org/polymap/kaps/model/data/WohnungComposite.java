@@ -26,6 +26,7 @@ import org.qi4j.api.property.Computed;
 import org.qi4j.api.property.ComputedPropertyInstance;
 import org.qi4j.api.property.GenericPropertyInfo;
 import org.qi4j.api.property.Property;
+import org.qi4j.api.query.Query;
 import org.qi4j.api.query.QueryExpressions;
 import org.qi4j.api.query.grammar.BooleanExpression;
 
@@ -918,17 +919,35 @@ public interface WohnungComposite
 
         public static Iterable<WohnungComposite> findWohnungenFor( GebaeudeComposite gebaeude ) {
             WohnungComposite wohnungTemplate = QueryExpressions.templateFor( WohnungComposite.class );
-            BooleanExpression expr3 = QueryExpressions.and( QueryExpressions.eq( wohnungTemplate.objektNummer(),
-                    gebaeude.objektNummer().get() ), QueryExpressions.eq( wohnungTemplate.objektFortfuehrung(),
-                    gebaeude.objektFortfuehrung().get() ), QueryExpressions.eq( wohnungTemplate.gebaeudeNummer(),
-                    gebaeude.gebaeudeNummer().get() ), QueryExpressions.eq( wohnungTemplate.gebaeudeFortfuehrung(),
-                    gebaeude.gebaeudeFortfuehrung().get() ) );
+            BooleanExpression expr3 = QueryExpressions
+                    .and( QueryExpressions.eq( wohnungTemplate.objektNummer(), gebaeude.objektNummer().get() ),
+                            QueryExpressions.eq( wohnungTemplate.objektFortfuehrung(), gebaeude.objektFortfuehrung()
+                                    .get() ), QueryExpressions.eq( wohnungTemplate.gebaeudeNummer(), gebaeude
+                                    .gebaeudeNummer().get() ), QueryExpressions.eq(
+                                    wohnungTemplate.gebaeudeFortfuehrung(), gebaeude.gebaeudeFortfuehrung().get() ) );
             return KapsRepository.instance().findEntities( WohnungComposite.class, expr3, 0, -1 );
         }
 
 
         public static VertragComposite vertragFor( WohnungComposite wohnung ) {
             return wohnung.flurstueck().get() != null ? wohnung.flurstueck().get().vertrag().get() : null;
+        }
+
+
+        public static WohnungComposite forKeys( final Integer objektNummer, final Integer objektFortfuehrung,
+                final Integer gebaeudeNummer, final Integer gebaeudeFortfuehrung, final Integer wohnungsNummer,
+                final Integer wohnungsFortfuehrung ) {
+            WohnungComposite template = QueryExpressions.templateFor( WohnungComposite.class );
+            BooleanExpression expr = QueryExpressions.and(
+                    QueryExpressions.eq( template.objektNummer(), objektNummer ),
+                    QueryExpressions.eq( template.objektFortfuehrung(), objektFortfuehrung ),
+                    QueryExpressions.eq( template.gebaeudeNummer(), gebaeudeNummer ),
+                    QueryExpressions.eq( template.gebaeudeFortfuehrung(), gebaeudeFortfuehrung ),
+                    QueryExpressions.eq( template.wohnungsNummer(), wohnungsNummer ),
+                    QueryExpressions.eq( template.wohnungsFortfuehrung(), wohnungsFortfuehrung ) );
+            Query<WohnungComposite> matches = KapsRepository.instance().findEntities( WohnungComposite.class, expr, 0,
+                    1 );
+            return matches.find();
         }
 
 

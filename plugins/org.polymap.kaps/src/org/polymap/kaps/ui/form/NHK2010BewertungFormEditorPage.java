@@ -33,6 +33,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.dialogs.MessageDialog;
 
 import org.eclipse.ui.forms.widgets.Section;
 
@@ -42,6 +43,7 @@ import org.polymap.core.model.EntityType;
 import org.polymap.core.project.ui.util.SimpleFormData;
 import org.polymap.core.qi4j.QiModule.EntityCreator;
 import org.polymap.core.runtime.Polymap;
+import org.polymap.core.workbench.PolymapWorkbench;
 
 import org.polymap.rhei.data.entityfeature.PropertyDescriptorAdapter;
 import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter;
@@ -55,8 +57,12 @@ import org.polymap.rhei.field.PicklistFormField;
 import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
+import org.polymap.kaps.KapsPlugin;
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.NHK2010GebaeudeartenProvider;
+import org.polymap.kaps.model.data.ErmittlungModernisierungsgradComposite;
+import org.polymap.kaps.model.data.FlurstueckComposite;
+import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
 import org.polymap.kaps.model.data.NHK2010Baupreisindex;
 import org.polymap.kaps.model.data.NHK2010Baupreisindex.Values;
 import org.polymap.kaps.model.data.NHK2010BewertungComposite;
@@ -113,7 +119,7 @@ public class NHK2010BewertungFormEditorPage
 
     private IFormFieldListener          gndListener;
 
-    private Action                      baujahrBerechneAction;
+    private ActionButton                baujahrBerechneAction;
 
     private IFormFieldListener          rndListener;
 
@@ -154,8 +160,7 @@ public class NHK2010BewertungFormEditorPage
             pageSite.setFieldEnabled( prefix + "faktorGrundrissart", false );
             pageSite.setFieldEnabled( getPropertyName( nameTemplate.baukostenIndexWert() ), false );
 
-            // TODO
-            baujahrBerechneAction.setEnabled( false );
+            baujahrBerechneAction.setEnabled( composite != null );
             pageSite.setFieldEnabled( getPropertyName( nameTemplate.restNutzungsDauer() ), false );
             pageSite.setFieldEnabled( getPropertyName( nameTemplate.altersWertMinderung() ), false );
             pageSite.setFieldEnabled( getPropertyName( nameTemplate.zeitwertRnd() ), false );
@@ -179,23 +184,37 @@ public class NHK2010BewertungFormEditorPage
     @Override
     public void createFormContent( final IFormEditorPageSite site ) {
         super.createFormContent( site );
-        VertragComposite vertragComposite = bewertung.vertrag().get();
-        String nummer = vertragComposite != null ? EingangsNummerFormatter.format( vertragComposite.eingangsNr().get() ) : null;
-        site.setEditorTitle( formattedTitle( "Bewertung nach NHK 2010", nummer, null ) );
+
+        final VertragComposite vertragComposite = bewertung.vertrag().get();
+        String nummer = vertragComposite != null ? EingangsNummerFormatter.format( vertragComposite.eingangsNr().get() )
+                : null;
+        site.setEditorTitle( formattedTitle( "NHK 2010", nummer, null ) );
         site.setFormTitle( formattedTitle( "Bewertung nach NHK 2010", nummer, getTitle() ) );
 
         Composite parent = site.getPageBody();
+        String label = vertragComposite == null ? "Kein Vertrag zugewiesen" : "Vertrag " + nummer + " öffnen";
+        ActionButton openVertrag = new ActionButton( parent, new Action( label ) {
+
+            @Override
+            public void run() {
+                KapsPlugin.openEditor( fs, VertragComposite.NAME, vertragComposite );
+            }
+        } );
+        openVertrag.setLayoutData( left().height( 25 ).create() );
+        openVertrag.setEnabled( vertragComposite != null );
 
         Section tableSection = newSection( parent, "Auswahl Gebäude" );
-        tableSection.setLayoutData( new SimpleFormData( SECTION_SPACING ).left( 0 ).right( 50 ).create() );
+        tableSection.setLayoutData( new SimpleFormData( SECTION_SPACING ).left( 0 ).right( 50 ).top( openVertrag )
+                .create() );
         createTableForm( (Composite)tableSection.getClient(), parent, true );
 
         Section sumSection = newSection( parent, "Summen" );
-        sumSection.setLayoutData( new SimpleFormData( SECTION_SPACING ).left( tableSection, 0 ).right( 100 ).create() );
+        sumSection.setLayoutData( new SimpleFormData( SECTION_SPACING ).left( tableSection, 0 ).top( openVertrag )
+                .right( 100 ).create() );
         createSumForm( site, sumSection );
 
         Section formSection = newSection( parent, "Gebäudedaten" );
-        formSection.setLayoutData( new SimpleFormData( SECTION_SPACING ).left( 0 ).right( 100 ).top( tableSection )
+        formSection.setLayoutData( new SimpleFormData( SECTION_SPACING ).left( 0 ).right( 100 ).top( sumSection )
                 .create() );
         createGebaeudeForm( formSection );
 
@@ -249,9 +268,48 @@ public class NHK2010BewertungFormEditorPage
 
         lastLine = newLine;
         newLine = createPreisField( "Gesamtwert", "Gesamtwert der baulichen und sonstigen Anlagen",
-                bewertung.gesamtWert(), left().right( 100 ).bottom( 100 ).top( lastLine ), parent, false );
+                bewertung.gesamtWert(), left().right( 100 ).top( lastLine ), parent, false );
         site.addFieldListener( gesamtWert = new FieldSummation( site, 2, bewertung.gesamtWert(), bewertung
                 .summeZeitwerte(), bewertung.nichtErfassteBauteile(), bewertung.wertDerAussenanlagen() ) );
+
+        lastLine = newLine;
+        final VertragComposite vertrag = bewertung.vertrag().get();
+        String label = vertrag == null ? "Kein Vertrag zugewiesen" : "In Vertrag "
+                + EingangsNummerFormatter.format( vertrag.eingangsNr().get() ) + " übernehmen";
+        ActionButton openErweiterteDaten = new ActionButton( parent, new Action( label ) {
+
+            @Override
+            public void run() {
+                Iterable<FlurstueckComposite> flurstuecke = FlurstueckComposite.Mixin.forEntity( vertrag );
+                int count = 0;
+                for (FlurstueckComposite flurstueck : flurstuecke) {
+                    FlurstuecksdatenBaulandComposite erweitert = FlurstuecksdatenBaulandComposite.Mixin
+                            .forFlurstueck( flurstueck );
+                    if (erweitert != null) {
+                        Double newValue = gesamtWert.getLastResultValue() == null ? bewertung.gesamtWert().get()
+                                : gesamtWert.getLastResultValue();
+                        if (newValue != null && !newValue.equals( erweitert.wertDerBaulichenAnlagen() )) {
+                            count++;
+                            erweitert.wertDerBaulichenAnlagen().set( newValue );
+                            erweitert.bewertungsMethode().set( "NHK 2010" );
+                            KapsPlugin.openEditor( fs, FlurstuecksdatenBaulandComposite.NAME, erweitert );
+                        }
+                    }
+                }
+                if (count > 0) {
+                    MessageDialog.openInformation(
+                            PolymapWorkbench.getShellToParentOn(),
+                            "Wert übernommen",
+                            "Der Gesamtwert der baulichen Anlagen wurde in \"Wert der baulichen Anlagen\" im Reiter \"Boden- und Gebäudewert \" in "
+                                    + count
+                                    + " erweiterte Daten für Flurstücke übernommen. Die erweiterten Daten werden entsprechend angezeigt." );
+                }
+            }
+        } );
+        openErweiterteDaten.setLayoutData( left().height( 25 ).top( lastLine ).bottom( 100 ).create() );
+        openErweiterteDaten.setEnabled( vertrag != null );
+        newLine = openErweiterteDaten;
+
         return section;
     }
 
@@ -273,8 +331,8 @@ public class NHK2010BewertungFormEditorPage
                                 return entity.laufendeNummer();
                             }
                         } ) ).setField( reloadable( new StringFormField() ) )
-                .setValidator( new NumberValidator( Long.class, Polymap.getSessionLocale(), 2, 0 ) ).setEnabled( false )
-                .setLayoutData( two().top( lastLine ).create() ).create();
+                .setValidator( new NumberValidator( Integer.class, Polymap.getSessionLocale(), 2, 0 ) )
+                .setEnabled( false ).setLayoutData( two().top( lastLine ).create() ).create();
 
         // gebäudeart mit selektor
         lastLine = newLine;
@@ -326,7 +384,7 @@ public class NHK2010BewertungFormEditorPage
         // };
         // gebaeudeStandardAction.setEnabled( false );
         ActionButton gebaeudeStandardActionButton = new ActionButton( parent, gebaeudeStandardAction );
-        gebaeudeStandardActionButton.setLayoutData( one().left( newLine, 0 ).top( lastLine ).height( 16 ).create() );
+        gebaeudeStandardActionButton.setLayoutData( one().left( newLine, 0 ).top( lastLine ).height( 25 ).create() );
         gebaeudeStandardActionButton.setEnabled( false );
 
         final PicklistFormField gebaeudeStandardPickList = new PicklistFormField(
@@ -1012,11 +1070,11 @@ public class NHK2010BewertungFormEditorPage
                                 new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
 
                                     @Override
-                                    public Property<Long> get( NHK2010BewertungGebaeudeComposite entity ) {
+                                    public Property<Double> get( NHK2010BewertungGebaeudeComposite entity ) {
                                         return entity.gesamtNutzungsDauer();
                                     }
                                 } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setValidator( new NumberValidator( Long.class, Polymap.getSessionLocale() ) )
+                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 3, 0 ) )
                 .setLayoutData( two().top( lastLine ).create() ).create();
 
         pageSite.addFieldListener( gndListener = new IFormFieldListener() {
@@ -1052,11 +1110,11 @@ public class NHK2010BewertungFormEditorPage
                                 new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
 
                                     @Override
-                                    public Property<Long> get( NHK2010BewertungGebaeudeComposite entity ) {
+                                    public Property<Double> get( NHK2010BewertungGebaeudeComposite entity ) {
                                         return entity.tatsaechlichesBaujahr();
                                     }
                                 } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setValidator( new NumberValidator( Long.class, Polymap.getSessionLocale() ) )
+                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 4, 0 ) )
                 .setLayoutData( three().top( lastLine ).create() ).create();
 
         Control bb = newFormField( "Baujahr bereinigt" )
@@ -1068,16 +1126,46 @@ public class NHK2010BewertungFormEditorPage
                                 new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
 
                                     @Override
-                                    public Property<Long> get( NHK2010BewertungGebaeudeComposite entity ) {
+                                    public Property<Double> get( NHK2010BewertungGebaeudeComposite entity ) {
                                         return entity.bereinigtesBaujahr();
                                     }
                                 } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setValidator( new NumberValidator( Long.class, Polymap.getSessionLocale() ) )
+                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 4, 0 ) )
                 .setLayoutData( four().top( lastLine ).create() ).create();
 
-        // TODO
-        baujahrBerechneAction = new Action( "Berechnen" ) {
-        };
+        baujahrBerechneAction = new ActionButton( parent, new Action( "Berechnen" ) {
+
+            @Override
+            public void run() {
+                NHK2010BewertungGebaeudeComposite gebaeude = selectedComposite.get();
+                if (gebaeude != null) {
+                    if (gebaeude.gesamtNutzungsDauer().get() == null || gebaeude.tatsaechlichesBaujahr().get() == null) {
+                        MessageDialog.openError( PolymapWorkbench.getShellToParentOn(), "Fehlende Daten",
+                                "Bitte geben Sie Gesamtnutzungsdauer und das tatsächliche Baujahr ein, bevor Sie diese Berechnung starten." );
+                    }
+                    else {
+                        ErmittlungModernisierungsgradComposite ermittlung = ErmittlungModernisierungsgradComposite.Mixin
+                                .forNHK2010( gebaeude );
+                        if (ermittlung == null) {
+                            ermittlung = repository.newEntity( ErmittlungModernisierungsgradComposite.class, null );
+                            ermittlung.vertrag().set( bewertung.vertrag().get() );
+                            ermittlung.gebaeudeNummer().set( gebaeude.laufendeNummer().get() );
+                            ermittlung.alterObergrenzeZeile1().set( 40.0d );
+                            ermittlung.alterObergrenzeZeile2().set( 20.0d );
+                            ermittlung.alterObergrenzeZeile3().set( 20.0d );
+                            ermittlung.alterObergrenzeZeile4().set( 15.0d );
+                            ermittlung.alterObergrenzeZeile5().set( 30.0d );
+                            ermittlung.alterObergrenzeZeile6().set( 15.0d );
+                            ermittlung.alterObergrenzeZeile7().set( 15.0d );
+                            ermittlung.alterObergrenzeZeile8().set( 30.0d );
+                        }
+                        ermittlung.gesamtNutzungsDauer().set( gebaeude.gesamtNutzungsDauer().get() );
+                        ermittlung.tatsaechlichesBaujahr().set( gebaeude.tatsaechlichesBaujahr().get() );
+                        KapsPlugin.openEditor( fs, ErmittlungModernisierungsgradComposite.NAME, ermittlung );
+                    }
+                }
+            }
+        } );
         // gebaeudeStandardAction = new NHK2010GebaeudeStandardSelector(
         // pageSite.getToolkit() ) {
         //
@@ -1089,9 +1177,8 @@ public class NHK2010BewertungFormEditorPage
         // }
         // };
         // gebaeudeStandardAction.setEnabled( false );
-        ActionButton button = new ActionButton( parent, baujahrBerechneAction );
-        button.setLayoutData( five().left( bb, 0 ).width( 80 ).top( lastLine ).height( 16 ).create() );
-        button.setEnabled( false );
+        baujahrBerechneAction.setLayoutData( five().left( bb, 0 ).width( 40 ).top( lastLine ).height( 25 ).create() );
+        baujahrBerechneAction.setEnabled( false );
 
         return field;
     }
@@ -1107,36 +1194,36 @@ public class NHK2010BewertungFormEditorPage
                                 new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
 
                                     @Override
-                                    public Property<Long> get( NHK2010BewertungGebaeudeComposite entity ) {
+                                    public Property<Double> get( NHK2010BewertungGebaeudeComposite entity ) {
                                         return entity.restNutzungsDauer();
                                     }
                                 } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setValidator( new NumberValidator( Long.class, Polymap.getSessionLocale() ) ).setEnabled( false )
-                .setLayoutData( two().top( lastLine ).create() ).create();
+                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 3, 0 ) )
+                .setEnabled( false ).setLayoutData( two().top( lastLine ).create() ).create();
 
         pageSite.addFieldListener( rndListener = new IFormFieldListener() {
 
-            private Long bereinigtesBaujahr;
+            private Integer bereinigtesBaujahr;
 
-            private Long tatsaechlichesBaujahr;
+            private Integer tatsaechlichesBaujahr;
 
-            private Long gesamtNutzungsDauer;
+            private Integer gesamtNutzungsDauer;
 
 
             @Override
             public void fieldChange( FormFieldEvent ev ) {
                 if (ev.getEventCode() == VALUE_CHANGE) {
                     if (ev.getFieldName().equalsIgnoreCase( getPropertyName( nameTemplate.bereinigtesBaujahr() ) )) {
-                        bereinigtesBaujahr = (Long)ev.getNewValue();
+                        bereinigtesBaujahr = (Integer)ev.getNewValue();
                         update();
                     }
                     else if (ev.getFieldName()
                             .equalsIgnoreCase( getPropertyName( nameTemplate.tatsaechlichesBaujahr() ) )) {
-                        tatsaechlichesBaujahr = (Long)ev.getNewValue();
+                        tatsaechlichesBaujahr = (Integer)ev.getNewValue();
                         update();
                     }
                     if (ev.getFieldName().equalsIgnoreCase( getPropertyName( nameTemplate.gesamtNutzungsDauer() ) )) {
-                        gesamtNutzungsDauer = (Long)ev.getNewValue();
+                        gesamtNutzungsDauer = (Integer)ev.getNewValue();
                         update();
                     }
                 }
@@ -1144,14 +1231,14 @@ public class NHK2010BewertungFormEditorPage
 
 
             private void update() {
-                Long result = bereinigtesBaujahr;
+                Integer result = bereinigtesBaujahr;
                 if (result == null) {
                     result = tatsaechlichesBaujahr;
                 }
                 if (result != null && gesamtNutzungsDauer != null) {
                     // alter berechnen
                     Calendar cal = new GregorianCalendar();
-                    Long alter = cal.get( Calendar.YEAR ) - result;
+                    Integer alter = cal.get( Calendar.YEAR ) - result;
                     // rnd = gnd - alter
                     result = Math.max( gesamtNutzungsDauer - alter, 0 );
 
@@ -1184,20 +1271,20 @@ public class NHK2010BewertungFormEditorPage
 
         pageSite.addFieldListener( altersWertMinderungListener = new IFormFieldListener() {
 
-            private Long restNutzungsDauer;
+            private Integer restNutzungsDauer;
 
-            private Long gesamtNutzungsDauer;
+            private Integer gesamtNutzungsDauer;
 
 
             @Override
             public void fieldChange( FormFieldEvent ev ) {
                 if (ev.getEventCode() == VALUE_CHANGE) {
                     if (ev.getFieldName().equalsIgnoreCase( getPropertyName( nameTemplate.restNutzungsDauer() ) )) {
-                        restNutzungsDauer = (Long)ev.getNewValue();
+                        restNutzungsDauer = (Integer)ev.getNewValue();
                         update();
                     }
                     else if (ev.getFieldName().equalsIgnoreCase( getPropertyName( nameTemplate.gesamtNutzungsDauer() ) )) {
-                        gesamtNutzungsDauer = (Long)ev.getNewValue();
+                        gesamtNutzungsDauer = (Integer)ev.getNewValue();
                         update();
                     }
                 }
@@ -1461,7 +1548,7 @@ public class NHK2010BewertungFormEditorPage
                     public void create( NHK2010BewertungGebaeudeComposite prototype )
                             throws Exception {
                         prototype.bewertung().set( bewertung );
-                        long nextNumber = 1;
+                        int nextNumber = 1;
                         for (Object o : getElements()) {
                             nextNumber++;
                         }
