@@ -87,7 +87,7 @@ public class KapsPlugin
     }
 
 
-    public static void openEditor( FeatureStore fs, String layerName, Entity composite ) {
+    public static org.polymap.rhei.form.FormEditor openEditor( FeatureStore fs, String layerName, Entity composite ) {
         try {
             IMap map = ((PipelineFeatureSource)fs).getLayer().getMap();
             ILayer layer = Iterables.getOnlyElement( Iterables.filter( map.getLayers(), Layers.hasLabel( layerName ) ) );
@@ -100,11 +100,12 @@ public class KapsPlugin
                 FeatureCollection features = store.getFeatures( DataPlugin.ff.id( Collections.singleton( featureId ) ) );
                 // .features().next();
                 Feature feature = features.features().next();
-                org.polymap.rhei.form.FormEditor.open( store, feature, null, true );
+                return org.polymap.rhei.form.FormEditor.open( store, feature, null, true );
             }
         }
         catch (Exception e) {
             throw new RuntimeException( e );
         }
+        return null;
     }
 }

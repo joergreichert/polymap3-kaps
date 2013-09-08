@@ -15,6 +15,8 @@ package org.polymap.kaps.ui.form;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import java.beans.PropertyChangeEvent;
+
 import org.geotools.data.FeatureStore;
 import org.opengis.feature.Feature;
 
@@ -28,20 +30,28 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 
+import org.eclipse.jface.action.Action;
+
 import org.eclipse.ui.forms.widgets.Section;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.polymap.core.project.ui.util.SimpleFormData;
+import org.polymap.core.runtime.event.EventManager;
 
 import org.polymap.rhei.field.FormFieldEvent;
 import org.polymap.rhei.field.IFormFieldLabel;
 import org.polymap.rhei.field.IFormFieldListener;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
+import org.polymap.kaps.KapsPlugin;
 import org.polymap.kaps.model.data.ErmittlungModernisierungsgradComposite;
+import org.polymap.kaps.model.data.NHK2010BewertungComposite;
+import org.polymap.kaps.model.data.NHK2010BewertungGebaeudeComposite;
 import org.polymap.kaps.model.data.VertragComposite;
+import org.polymap.kaps.ui.ActionButton;
 import org.polymap.kaps.ui.FieldCalculation;
+import org.polymap.kaps.ui.FieldListener;
 import org.polymap.kaps.ui.FieldSummation;
 import org.polymap.kaps.ui.KapsDefaultFormEditorPage;
 
@@ -88,6 +98,10 @@ public class ErmittlungModernisierungsgradFormEditorPage
     private IFormFieldListener                           restnutzungListener;
 
     private final Double                                 heute;
+
+    private FieldListener                                baujahrListener;
+
+    private ActionButton                                 baujahrUebernehmenAction;
 
 
     // private IFormFieldListener gemeindeListener;
@@ -456,6 +470,41 @@ public class ErmittlungModernisierungsgradFormEditorPage
             }
 
         } );
+
+        site.addFieldListener( baujahrListener = new FieldListener( em.bereinigtesBaujahr(), em.neueRestNutzungsDauer() ) );
+        baujahrUebernehmenAction = new ActionButton( client, new Action( "Baujahr übernehmen" ) {
+
+            @Override
+            public void run() {
+                VertragComposite vertrag = em.vertrag().get();
+                if (vertrag != null) {
+                    // NHK oder Ertragswert
+                    NHK2010BewertungComposite nhk2010 = NHK2010BewertungComposite.Mixin.forVertrag( vertrag );
+                    if (nhk2010 != null) {
+                        for (NHK2010BewertungGebaeudeComposite gebaeude : NHK2010BewertungGebaeudeComposite.Mixin
+                                .forBewertung( nhk2010 )) {
+                            if (em.gebaeudeNummer().get() == gebaeude.laufendeNummer().get()) {
+                                KapsPlugin.openEditor( fs, NHK2010BewertungComposite.NAME, nhk2010 );
+                                EventManager.instance().publish(
+                                        new PropertyChangeEvent( gebaeude, gebaeude.bereinigtesBaujahr()
+                                                .qualifiedName().name(), gebaeude.bereinigtesBaujahr().get(),
+                                                baujahrListener.get( em.bereinigtesBaujahr() ) ) );
+                                EventManager.instance().publish(
+                                        new PropertyChangeEvent( gebaeude, gebaeude.gesamtNutzungsDauer()
+                                                .qualifiedName().name(), gebaeude.gesamtNutzungsDauer().get(),
+                                                baujahrListener.get( em.gesamtNutzungsDauer() ) ) );
+                                EventManager.instance().publish(
+                                        new PropertyChangeEvent( gebaeude, gebaeude.restNutzungsDauer()
+                                                .qualifiedName().name(), gebaeude.restNutzungsDauer().get(),
+                                                baujahrListener.get( em.neueRestNutzungsDauer() ) ) );
+                            }
+                        }
+                    }
+
+                }
+            }
+        } );
+        baujahrUebernehmenAction.setLayoutData( three().top( lastLine ).height( 25 ).bottom( 100 ).create() );
     }
 
 

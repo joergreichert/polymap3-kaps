@@ -12,6 +12,10 @@
  */
 package org.polymap.kaps.ui.form;
 
+import java.util.List;
+
+import java.beans.PropertyChangeEvent;
+
 import org.geotools.data.FeatureStore;
 import org.opengis.feature.Feature;
 
@@ -26,6 +30,7 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import org.polymap.core.runtime.Polymap;
 import org.polymap.core.runtime.event.EventFilter;
+import org.polymap.core.runtime.event.EventHandler;
 import org.polymap.core.runtime.event.EventManager;
 
 import org.polymap.rhei.data.entityfeature.AssociationAdapter;
@@ -38,6 +43,7 @@ import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
 import org.polymap.kaps.model.data.BodenwertAufteilungTextComposite;
+import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
 import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.VertragsdatenErweitertComposite;
 import org.polymap.kaps.ui.FieldCalculation;
@@ -126,6 +132,34 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
                         && ev.getFieldName().equals( vb.bodenpreisBebaut().qualifiedName().name() );
             }
         } );
+
+        EventManager.instance().subscribe( this, new EventFilter<PropertyChangeEvent>() {
+
+            public boolean apply( PropertyChangeEvent ev ) {
+                Object source = ev.getSource();
+                return source != null && source instanceof FlurstuecksdatenBaulandComposite && source.equals( vb );
+            }
+        } );
+    }
+
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        EventManager.instance().unsubscribe( this );
+    }
+    
+    @EventHandler(display = true, delay = 1)
+    public void handleExternalEvents(List<PropertyChangeEvent> events) {
+        for (PropertyChangeEvent ev : events) {
+            Object newValue = ev.getNewValue();
+            // double values
+            if (ev.getPropertyName().equals( vb.wertDerBaulichenAnlagen().qualifiedName().name() )) {
+                newValue = newValue != null ? getFormatter( 2 ).format( newValue ) : null; 
+            }
+            pageSite.setFieldValue( ev.getPropertyName(), newValue );
+            System.out.println( ev );
+        }
     }
 
 

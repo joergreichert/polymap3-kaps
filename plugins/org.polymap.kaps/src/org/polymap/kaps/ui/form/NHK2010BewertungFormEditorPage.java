@@ -15,8 +15,11 @@ package org.polymap.kaps.ui.form;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
+import java.beans.PropertyChangeEvent;
 
 import org.geotools.data.FeatureStore;
 import org.opengis.feature.Feature;
@@ -43,6 +46,9 @@ import org.polymap.core.model.EntityType;
 import org.polymap.core.project.ui.util.SimpleFormData;
 import org.polymap.core.qi4j.QiModule.EntityCreator;
 import org.polymap.core.runtime.Polymap;
+import org.polymap.core.runtime.event.EventFilter;
+import org.polymap.core.runtime.event.EventHandler;
+import org.polymap.core.runtime.event.EventManager;
 import org.polymap.core.workbench.PolymapWorkbench;
 
 import org.polymap.rhei.data.entityfeature.PropertyDescriptorAdapter;
@@ -55,6 +61,7 @@ import org.polymap.rhei.field.IFormFieldListener;
 import org.polymap.rhei.field.NumberValidator;
 import org.polymap.rhei.field.PicklistFormField;
 import org.polymap.rhei.field.StringFormField;
+import org.polymap.rhei.form.FormEditor;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
 import org.polymap.kaps.KapsPlugin;
@@ -135,6 +142,49 @@ public class NHK2010BewertungFormEditorPage
                 feature, featureStore );
 
         bewertung = repository.findEntity( NHK2010BewertungComposite.class, feature.getIdentifier().getID() );
+
+        EventManager.instance().subscribe( this, new EventFilter<PropertyChangeEvent>() {
+
+            public boolean apply( PropertyChangeEvent ev ) {
+                Object source = ev.getSource();
+                if (source != null && source instanceof NHK2010BewertungGebaeudeComposite) {
+                    NHK2010BewertungGebaeudeComposite gebaeude = (NHK2010BewertungGebaeudeComposite)source;
+                    if (gebaeude.bewertung().get().equals( bewertung )) {
+                        // gebaeude wurde extern geändert
+                        return true;
+                    }
+                }
+                return false;
+            }
+        } );
+    }
+
+
+    @EventHandler(display = true, delay = 1)
+    public void handleExternalGebaeudeSelection( List<PropertyChangeEvent> events )
+            throws Exception {
+
+        for (PropertyChangeEvent ev : events) {
+
+            NHK2010BewertungGebaeudeComposite gebaeude = (NHK2010BewertungGebaeudeComposite)ev.getSource();
+            if (selectedComposite.get() == null || !selectedComposite.get().equals( gebaeude )) {
+                // neu setzen
+                selectedComposite.set( gebaeude );
+                refreshReloadables();
+            }
+            // GND und Baujahr
+            // System.out.println( ev );
+            pageSite.setFieldValue( prefix + ev.getPropertyName(),
+                    ev.getNewValue() != null ? getFormatter( 0 ).format( ev.getNewValue() ) : null );
+            System.out.println( ev );
+        }
+    }
+
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        EventManager.instance().unsubscribe( this );
     }
 
 
@@ -290,9 +340,16 @@ public class NHK2010BewertungFormEditorPage
                                 : gesamtWert.getLastResultValue();
                         if (newValue != null && !newValue.equals( erweitert.wertDerBaulichenAnlagen() )) {
                             count++;
-                            erweitert.wertDerBaulichenAnlagen().set( newValue );
-                            erweitert.bewertungsMethode().set( "NHK 2010" );
-                            KapsPlugin.openEditor( fs, FlurstuecksdatenBaulandComposite.NAME, erweitert );
+                            FormEditor editor = KapsPlugin.openEditor( fs, FlurstuecksdatenBaulandComposite.NAME,
+                                    erweitert );
+                            editor.setActivePage( FlurstuecksdatenBaulandBodenwertFormEditorPage.class.getName() );
+                            EventManager.instance().publish(
+                                    new PropertyChangeEvent( erweitert, erweitert.wertDerBaulichenAnlagen()
+                                            .qualifiedName().name(), erweitert.wertDerBaulichenAnlagen().get(),
+                                            newValue ) );
+                            EventManager.instance().publish(
+                                    new PropertyChangeEvent( erweitert, erweitert.bewertungsMethode().qualifiedName()
+                                            .name(), erweitert.bewertungsMethode().get(), "NHK2010" ) );
                         }
                     }
                 }
@@ -327,7 +384,7 @@ public class NHK2010BewertungFormEditorPage
                                 + "laufendeNummer", new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
 
                             @Override
-                            public Property get( NHK2010BewertungGebaeudeComposite entity ) {
+                            public Property<Integer> get( NHK2010BewertungGebaeudeComposite entity ) {
                                 return entity.laufendeNummer();
                             }
                         } ) ).setField( reloadable( new StringFormField() ) )
@@ -358,7 +415,7 @@ public class NHK2010BewertungFormEditorPage
                                 + "gebaeudeArtId", new PropertyCallback<NHK2010BewertungGebaeudeComposite>() {
 
                             @Override
-                            public Property get( NHK2010BewertungGebaeudeComposite entity ) {
+                            public Property<String> get( NHK2010BewertungGebaeudeComposite entity ) {
                                 return entity.gebaeudeArtId();
                             }
                         } ) ).setField( reloadable( new StringFormField() ) ).setEnabled( false )
@@ -1203,27 +1260,27 @@ public class NHK2010BewertungFormEditorPage
 
         pageSite.addFieldListener( rndListener = new IFormFieldListener() {
 
-            private Integer bereinigtesBaujahr;
+            private Double bereinigtesBaujahr;
 
-            private Integer tatsaechlichesBaujahr;
+            private Double tatsaechlichesBaujahr;
 
-            private Integer gesamtNutzungsDauer;
+            private Double gesamtNutzungsDauer;
 
 
             @Override
             public void fieldChange( FormFieldEvent ev ) {
                 if (ev.getEventCode() == VALUE_CHANGE) {
                     if (ev.getFieldName().equalsIgnoreCase( getPropertyName( nameTemplate.bereinigtesBaujahr() ) )) {
-                        bereinigtesBaujahr = (Integer)ev.getNewValue();
+                        bereinigtesBaujahr = (Double)ev.getNewValue();
                         update();
                     }
                     else if (ev.getFieldName()
                             .equalsIgnoreCase( getPropertyName( nameTemplate.tatsaechlichesBaujahr() ) )) {
-                        tatsaechlichesBaujahr = (Integer)ev.getNewValue();
+                        tatsaechlichesBaujahr = (Double)ev.getNewValue();
                         update();
                     }
                     if (ev.getFieldName().equalsIgnoreCase( getPropertyName( nameTemplate.gesamtNutzungsDauer() ) )) {
-                        gesamtNutzungsDauer = (Integer)ev.getNewValue();
+                        gesamtNutzungsDauer = (Double)ev.getNewValue();
                         update();
                     }
                 }
@@ -1231,14 +1288,14 @@ public class NHK2010BewertungFormEditorPage
 
 
             private void update() {
-                Integer result = bereinigtesBaujahr;
+                Double result = bereinigtesBaujahr;
                 if (result == null) {
                     result = tatsaechlichesBaujahr;
                 }
                 if (result != null && gesamtNutzungsDauer != null) {
                     // alter berechnen
                     Calendar cal = new GregorianCalendar();
-                    Integer alter = cal.get( Calendar.YEAR ) - result;
+                    Double alter = cal.get( Calendar.YEAR ) - result;
                     // rnd = gnd - alter
                     result = Math.max( gesamtNutzungsDauer - alter, 0 );
 
@@ -1271,20 +1328,20 @@ public class NHK2010BewertungFormEditorPage
 
         pageSite.addFieldListener( altersWertMinderungListener = new IFormFieldListener() {
 
-            private Integer restNutzungsDauer;
+            private Double restNutzungsDauer;
 
-            private Integer gesamtNutzungsDauer;
+            private Double gesamtNutzungsDauer;
 
 
             @Override
             public void fieldChange( FormFieldEvent ev ) {
                 if (ev.getEventCode() == VALUE_CHANGE) {
                     if (ev.getFieldName().equalsIgnoreCase( getPropertyName( nameTemplate.restNutzungsDauer() ) )) {
-                        restNutzungsDauer = (Integer)ev.getNewValue();
+                        restNutzungsDauer = (Double)ev.getNewValue();
                         update();
                     }
                     else if (ev.getFieldName().equalsIgnoreCase( getPropertyName( nameTemplate.gesamtNutzungsDauer() ) )) {
-                        gesamtNutzungsDauer = (Integer)ev.getNewValue();
+                        gesamtNutzungsDauer = (Double)ev.getNewValue();
                         update();
                     }
                 }
