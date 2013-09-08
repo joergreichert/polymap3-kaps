@@ -14,6 +14,7 @@ package org.polymap.kaps.ui.form;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import java.beans.PropertyChangeEvent;
 
@@ -37,6 +38,8 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.polymap.core.project.ui.util.SimpleFormData;
+import org.polymap.core.runtime.event.EventFilter;
+import org.polymap.core.runtime.event.EventHandler;
 import org.polymap.core.runtime.event.EventManager;
 
 import org.polymap.rhei.field.FormFieldEvent;
@@ -49,6 +52,7 @@ import org.polymap.kaps.model.data.ErmittlungModernisierungsgradComposite;
 import org.polymap.kaps.model.data.NHK2010BewertungComposite;
 import org.polymap.kaps.model.data.NHK2010BewertungGebaeudeComposite;
 import org.polymap.kaps.model.data.VertragComposite;
+import org.polymap.kaps.model.data.WohnungComposite;
 import org.polymap.kaps.ui.ActionButton;
 import org.polymap.kaps.ui.FieldCalculation;
 import org.polymap.kaps.ui.FieldListener;
@@ -95,13 +99,17 @@ public class ErmittlungModernisierungsgradFormEditorPage
 
     private IFormFieldListener                           modernisierungText;
 
-    private IFormFieldListener                           restnutzungListener;
+    private FieldCalculation                             restnutzungListener;
 
     private final Double                                 heute;
 
     private FieldListener                                baujahrListener;
 
     private ActionButton                                 baujahrUebernehmenAction;
+
+    private FieldCalculation                             neueRestnutzungListener;
+
+    private FieldCalculation                             bereinigtesBaujahrListener;
 
 
     // private IFormFieldListener gemeindeListener;
@@ -134,11 +142,34 @@ public class ErmittlungModernisierungsgradFormEditorPage
     }
 
 
+    @EventHandler(display = true, delay = 1)
+    public void handleExternalGebaeudeSelection( List<PropertyChangeEvent> events )
+            throws Exception {
+
+        for (PropertyChangeEvent ev : events) {
+            pageSite.setFieldValue( ev.getPropertyName(),
+                    ev.getNewValue() != null ? getFormatter( 0 ).format( ev.getNewValue() ) : null );
+            System.out.println( ev );
+        }
+    }
+
+
     @SuppressWarnings("unchecked")
     @Override
     public void createFormContent( final IFormEditorPageSite site ) {
         super.createFormContent( site );
+        createForm( site );
+        EventManager.instance().subscribe( this, new EventFilter<PropertyChangeEvent>() {
 
+            public boolean apply( PropertyChangeEvent ev ) {
+                Object source = ev.getSource();
+                return source != null && source instanceof ErmittlungModernisierungsgradComposite && source.equals( em );
+            }
+        } );
+    }
+
+
+    private void createForm( final IFormEditorPageSite site ) {
         final VertragComposite vertragComposite = em.vertrag().get();
         if (vertragComposite != null) {
             String nummer = vertragComposite != null ? EingangsNummerFormatter.format( vertragComposite.eingangsNr()
@@ -433,7 +464,19 @@ public class ErmittlungModernisierungsgradFormEditorPage
         lastLine = newLine;
         newLine = createLabel( client, "Restnutzungdauer (ohne Modernisierung)", one().top( lastLine ), SWT.RIGHT );
         createFlaecheField( em.restNutzungsDauer(), two().top( lastLine ), client, false );
+        site.addFieldListener( restnutzungListener = new FieldCalculation( site, 0, em.restNutzungsDauer(), em
+                .tatsaechlichesBaujahr(), em.gesamtNutzungsDauer() ) {
 
+            @Override
+            protected Double calculate( ValueProvider values ) {
+                Double baujahr = values.get( em.tatsaechlichesBaujahr() );
+                Double gnd = values.get( em.gesamtNutzungsDauer() );
+                if (baujahr != null && gnd != null) {
+                    return Math.max( 0, gnd - (heute - baujahr) );
+                }
+                return null;
+            }
+        } );
         lastLine = newLine;
         newLine = createLabel( client, "verlängerte Restnutzungdauer aufgrund Modernisierung", one().top( lastLine ),
                 SWT.RIGHT );
@@ -443,35 +486,43 @@ public class ErmittlungModernisierungsgradFormEditorPage
         newLine = createLabel( client, "Bereinigtes Baujahr", one().top( lastLine ), SWT.RIGHT );
         createFlaecheField( em.bereinigtesBaujahr(), two().top( lastLine ).bottom( 100 ), client, false );
 
-        site.addFieldListener( restnutzungListener = new IFormFieldListener() {
+        site.addFieldListener( neueRestnutzungListener = new FieldCalculation( site, 0, em.neueRestNutzungsDauer(), em
+                .modernisierungsGrad(), em.tatsaechlichesBaujahr(), em.gesamtNutzungsDauer(), em.restNutzungsDauer() ) {
 
             @Override
-            public void fieldChange( FormFieldEvent ev ) {
-                if (ev.getEventCode() != IFormFieldListener.VALUE_CHANGE) {
-                    return;
+            protected Double calculate( ValueProvider values ) {
+                Double grad = values.get( em.modernisierungsGrad() );
+                Double tatsaechlichesBaujahr = values.get( em.tatsaechlichesBaujahr() );
+                Double gnd = values.get( em.gesamtNutzungsDauer() );
+                Double bereinigtesBaujahr = tatsaechlichesBaujahr;
+                Double neueRND = values.get( em.restNutzungsDauer() );
+                if (tatsaechlichesBaujahr != null && gnd != null) {
+                    Double alter = heute - tatsaechlichesBaujahr;
+                    return ErmittlungModernisierungsgradComposite.Mixin.berechneRND( grad, alter, gnd );
+                    // bereinigtesBaujahr = heute - (gnd - neueRND);
                 }
-                String fieldName = ev.getFieldName();
-                if (fieldName.equals( em.modernisierungsGrad().qualifiedName().name() )) {
-                    Double grad = ev.getNewValue();
-                    Double tatsaechlichesBaujahr = em.tatsaechlichesBaujahr().get();
-                    Double gnd = em.gesamtNutzungsDauer().get();
-                    Double bereinigtesBaujahr = tatsaechlichesBaujahr;
-                    Double neueRND = em.restNutzungsDauer().get();
-                    if (tatsaechlichesBaujahr != null && gnd != null) {
-                        Double alter = heute - tatsaechlichesBaujahr;
-                        neueRND = ErmittlungModernisierungsgradComposite.Mixin.berechneRND( grad, alter, gnd );
-                        bereinigtesBaujahr = heute - (gnd - neueRND);
-                    }
-                    pageSite.setFieldValue( em.neueRestNutzungsDauer().qualifiedName().name(),
-                            neueRND != null ? getFormatter( 0 ).format( neueRND ) : null );
-                    pageSite.setFieldValue( em.bereinigtesBaujahr().qualifiedName().name(),
-                            bereinigtesBaujahr != null ? getFormatter( 0 ).format( bereinigtesBaujahr ) : null );
+                return null;
+            }
+
+        } );
+        
+        site.addFieldListener( bereinigtesBaujahrListener = new FieldCalculation( site, 0, em.bereinigtesBaujahr(), em
+                .gesamtNutzungsDauer(), em.neueRestNutzungsDauer() ) {
+
+            @Override
+            protected Double calculate( ValueProvider values ) {
+                Double gnd = values.get( em.gesamtNutzungsDauer() );
+                Double neueRND = values.get( em.neueRestNutzungsDauer() );
+                if (neueRND != null && gnd != null) {
+                    return heute - (gnd - neueRND);
                 }
+                return null;
             }
 
         } );
 
-        site.addFieldListener( baujahrListener = new FieldListener( em.bereinigtesBaujahr(), em.neueRestNutzungsDauer() ) );
+        site.addFieldListener( baujahrListener = new FieldListener( em.bereinigtesBaujahr(),
+                em.neueRestNutzungsDauer(), em.gesamtNutzungsDauer() ) );
         baujahrUebernehmenAction = new ActionButton( client, new Action( "Baujahr übernehmen" ) {
 
             @Override
@@ -494,13 +545,30 @@ public class ErmittlungModernisierungsgradFormEditorPage
                                                 .qualifiedName().name(), gebaeude.gesamtNutzungsDauer().get(),
                                                 baujahrListener.get( em.gesamtNutzungsDauer() ) ) );
                                 EventManager.instance().publish(
-                                        new PropertyChangeEvent( gebaeude, gebaeude.restNutzungsDauer()
-                                                .qualifiedName().name(), gebaeude.restNutzungsDauer().get(),
-                                                baujahrListener.get( em.neueRestNutzungsDauer() ) ) );
+                                        new PropertyChangeEvent( gebaeude, gebaeude.restNutzungsDauer().qualifiedName()
+                                                .name(), gebaeude.restNutzungsDauer().get(), baujahrListener.get( em
+                                                .neueRestNutzungsDauer() ) ) );
                             }
                         }
                     }
-
+                }
+                else {
+                    // wohnung
+                    WohnungComposite wohnung = WohnungComposite.Mixin.forKeys( em.objektNummer().get(), em
+                            .objektFortfuehrung().get(), em.gebaeudeNummer().get(), em.gebaeudeFortfuehrung().get(), em
+                            .wohnungsNummer().get(), em.wohnungsFortfuehrung().get() );
+                    if (wohnung != null) {
+                        KapsPlugin.openEditor( fs, WohnungComposite.NAME, wohnung ).setActivePage(
+                                WohnungGrunddatenFormEditorPage.class.getName() );
+                        EventManager.instance().publish(
+                                new PropertyChangeEvent( wohnung, wohnung.bereinigtesBaujahr().qualifiedName().name(),
+                                        wohnung.bereinigtesBaujahr().get(), baujahrListener.get( em
+                                                .bereinigtesBaujahr() ) ) );
+                        EventManager.instance().publish(
+                                new PropertyChangeEvent( wohnung, wohnung.gesamtNutzungsDauer().qualifiedName().name(),
+                                        wohnung.gesamtNutzungsDauer().get(), baujahrListener.get( em
+                                                .gesamtNutzungsDauer() ) ) );
+                    }
                 }
             }
         } );

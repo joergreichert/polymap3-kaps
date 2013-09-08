@@ -304,4 +304,18 @@ public abstract class AbstractMdbImportOperation
         }
         return row.get( col );
     }
+    
+
+
+    protected Double asDouble( Integer value ) {
+        return asDouble( value, 2020, null );
+    }
+
+
+    protected Double asDouble( Integer value, Integer maxValue, Integer defaultValue ) {
+        if (value != null) {
+            return (value < maxValue) ? value.doubleValue() : (defaultValue != null ? defaultValue.doubleValue() : null);
+        } 
+        return (defaultValue != null) ? defaultValue.doubleValue() : null;
+    }
 }

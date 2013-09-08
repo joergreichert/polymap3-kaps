@@ -136,6 +136,12 @@ public class NHK2010BewertungFormEditorPage
 
     private IFormFieldListener          gesamtSumme;
 
+    private IFormFieldListener          gndbjListener;
+
+    protected Double                    baujahr;
+
+    protected Double                    gnd;
+
 
     public NHK2010BewertungFormEditorPage( Feature feature, FeatureStore featureStore ) {
         super( NHK2010BewertungGebaeudeComposite.class, NHK2010BewertungFormEditorPage.class.getName(), "NHK 2010",
@@ -1190,13 +1196,29 @@ public class NHK2010BewertungFormEditorPage
                 .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 4, 0 ) )
                 .setLayoutData( four().top( lastLine ).create() ).create();
 
+
+        
+        pageSite.addFieldListener( gndbjListener = new IFormFieldListener() {
+
+            @Override
+            public void fieldChange( FormFieldEvent ev ) {
+                if (ev.getEventCode() == VALUE_CHANGE) {
+                    if (ev.getFieldName().equalsIgnoreCase( getPropertyName( nameTemplate.tatsaechlichesBaujahr() ) )) {
+                        baujahr = (Double)ev.getNewValue();
+                    } else if (ev.getFieldName().equalsIgnoreCase( getPropertyName( nameTemplate.gesamtNutzungsDauer() ) )) {
+                        gnd = (Double)ev.getNewValue();
+                    }
+                }
+            }
+        } );
+
         baujahrBerechneAction = new ActionButton( parent, new Action( "Berechnen" ) {
 
             @Override
             public void run() {
                 NHK2010BewertungGebaeudeComposite gebaeude = selectedComposite.get();
                 if (gebaeude != null) {
-                    if (gebaeude.gesamtNutzungsDauer().get() == null || gebaeude.tatsaechlichesBaujahr().get() == null) {
+                    if (gnd == null || baujahr == null) {
                         MessageDialog.openError( PolymapWorkbench.getShellToParentOn(), "Fehlende Daten",
                                 "Bitte geben Sie Gesamtnutzungsdauer und das tatsächliche Baujahr ein, bevor Sie diese Berechnung starten." );
                     }
@@ -1216,24 +1238,20 @@ public class NHK2010BewertungFormEditorPage
                             ermittlung.alterObergrenzeZeile7().set( 15.0d );
                             ermittlung.alterObergrenzeZeile8().set( 30.0d );
                         }
-                        ermittlung.gesamtNutzungsDauer().set( gebaeude.gesamtNutzungsDauer().get() );
-                        ermittlung.tatsaechlichesBaujahr().set( gebaeude.tatsaechlichesBaujahr().get() );
+//                        ermittlung.gesamtNutzungsDauer().set( gnd );
+//                        ermittlung.tatsaechlichesBaujahr().set( baujahr );
                         KapsPlugin.openEditor( fs, ErmittlungModernisierungsgradComposite.NAME, ermittlung );
+                        EventManager.instance().publish(
+                                new PropertyChangeEvent( ermittlung, ermittlung.gesamtNutzungsDauer()
+                                        .qualifiedName().name(), ermittlung.gesamtNutzungsDauer().get(),
+                                        gnd ) );
+                        EventManager.instance().publish(
+                                new PropertyChangeEvent( ermittlung, ermittlung.tatsaechlichesBaujahr().qualifiedName()
+                                        .name(), ermittlung.tatsaechlichesBaujahr().get(), baujahr ) );
                     }
                 }
             }
         } );
-        // gebaeudeStandardAction = new NHK2010GebaeudeStandardSelector(
-        // pageSite.getToolkit() ) {
-        //
-        // protected void adopt( Double gebaeudeStandard )
-        // throws Exception {
-        // assert gebaeudeStandard != null;
-        // pageSite.setFieldValue( prefix + "gebaeudeArtId", toAdopt.getId() );
-        // gebaeudeArtLabel.setText( toAdopt.getQualifiedName() );
-        // }
-        // };
-        // gebaeudeStandardAction.setEnabled( false );
         baujahrBerechneAction.setLayoutData( five().left( bb, 0 ).width( 40 ).top( lastLine ).height( 25 ).create() );
         baujahrBerechneAction.setEnabled( false );
 

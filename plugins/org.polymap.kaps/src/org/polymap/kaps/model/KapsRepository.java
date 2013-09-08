@@ -173,8 +173,10 @@ public class KapsRepository
                     new SimpleEntityProvider<NHK2010BewertungComposite>( this, NHK2010BewertungComposite.class,
                             new NameImpl( KapsRepository.NAMESPACE, NHK2010BewertungComposite.NAME ) ),
                     new SimpleEntityProvider<ErmittlungModernisierungsgradComposite>( this,
-                            ErmittlungModernisierungsgradComposite.class, new NameImpl(
-                                    KapsRepository.NAMESPACE, ErmittlungModernisierungsgradComposite.NAME ) ),
+                            ErmittlungModernisierungsgradComposite.class, new NameImpl( KapsRepository.NAMESPACE,
+                                    ErtragswertverfahrenComposite.NAME ) ),
+                    new SimpleEntityProvider<ErtragswertverfahrenComposite>( this, ErtragswertverfahrenComposite.class,
+                            new NameImpl( KapsRepository.NAMESPACE, ErtragswertverfahrenComposite.NAME ) ),
 
                     // nicht änderbare Wertelisten
                     // new SimpleEntityProvider<ErschliessungsBeitragComposite>(

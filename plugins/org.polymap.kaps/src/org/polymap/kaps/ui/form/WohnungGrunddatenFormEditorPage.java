@@ -12,8 +12,10 @@
  */
 package org.polymap.kaps.ui.form;
 
+import java.util.List;
 import java.util.TreeMap;
 
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import org.geotools.data.FeatureStore;
@@ -24,9 +26,16 @@ import org.apache.commons.logging.LogFactory;
 
 import org.eclipse.swt.widgets.Composite;
 
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.dialogs.MessageDialog;
+
 import org.eclipse.ui.forms.widgets.Section;
 
 import org.polymap.core.runtime.Polymap;
+import org.polymap.core.runtime.event.EventFilter;
+import org.polymap.core.runtime.event.EventHandler;
+import org.polymap.core.runtime.event.EventManager;
+import org.polymap.core.workbench.PolymapWorkbench;
 
 import org.polymap.rhei.data.entityfeature.AssociationAdapter;
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
@@ -38,14 +47,18 @@ import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.field.TextFormField;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
+import org.polymap.kaps.KapsPlugin;
 import org.polymap.kaps.model.data.AusstattungComposite;
 import org.polymap.kaps.model.data.EigentumsartComposite;
+import org.polymap.kaps.model.data.ErmittlungModernisierungsgradComposite;
 import org.polymap.kaps.model.data.EtageComposite;
 import org.polymap.kaps.model.data.FlurstueckComposite;
 import org.polymap.kaps.model.data.HimmelsrichtungComposite;
 import org.polymap.kaps.model.data.WohnungComposite;
+import org.polymap.kaps.ui.ActionButton;
 import org.polymap.kaps.ui.BooleanFormField;
 import org.polymap.kaps.ui.FieldCalculation;
+import org.polymap.kaps.ui.FieldListener;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -71,11 +84,40 @@ public class WohnungGrunddatenFormEditorPage
 
     private IFormFieldListener     richtwertzone;
 
+    private ActionButton           baujahrBerechneAction;
+
+    private FieldListener          gndbjListener;
+
 
     // private IFormFieldListener gemeindeListener;
 
     public WohnungGrunddatenFormEditorPage( Feature feature, FeatureStore featureStore ) {
         super( WohnungGrunddatenFormEditorPage.class.getName(), "Grunddaten", feature, featureStore );
+        EventManager.instance().subscribe( this, new EventFilter<PropertyChangeEvent>() {
+
+            public boolean apply( PropertyChangeEvent ev ) {
+                Object source = ev.getSource();
+                return source != null && source instanceof WohnungComposite && source.equals( wohnung );
+            }
+        } );
+    }
+
+
+    @EventHandler(display = true, delay = 1)
+    public void handleExternalGebaeudeSelection( List<PropertyChangeEvent> events )
+            throws Exception {
+        for (PropertyChangeEvent ev : events) {
+            pageSite.setFieldValue( ev.getPropertyName(),
+                    ev.getNewValue() != null ? getFormatter( 0 ).format( ev.getNewValue() ) : null );
+            System.out.println( ev );
+        }
+    }
+
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        EventManager.instance().unsubscribe( this );
     }
 
 
@@ -91,43 +133,45 @@ public class WohnungGrunddatenFormEditorPage
                 .setProperty( new PropertyAdapter( wohnung.objektNummer() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setValidator( new NotNullNumberValidator( Integer.class, Polymap.getSessionLocale() ) )
-                .setEnabled( wohnung.objektNummer().get() == null ).setLayoutData( left().left( 0 ).right( 15 ).create() ).create();
+                .setEnabled( wohnung.objektNummer().get() == null )
+                .setLayoutData( left().left( 0 ).right( 15 ).create() ).create();
 
         newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Fortführung" )
                 .setProperty( new PropertyAdapter( wohnung.objektFortfuehrung() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setValidator( new NotNullNumberValidator( Integer.class, Polymap.getSessionLocale() ) )
-                .setEnabled( wohnung.objektNummer().get() == null ).setLayoutData( left().left( 16 ).right( 31 ).create() ).create();
+                .setEnabled( wohnung.objektNummer().get() == null )
+                .setLayoutData( left().left( 16 ).right( 31 ).create() ).create();
 
         lastLine = newLine;
         newLine = newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Gebäudenummer" )
                 .setProperty( new PropertyAdapter( wohnung.gebaeudeNummer() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setValidator( new NotNullNumberValidator( Integer.class, Polymap.getSessionLocale() ) )
-                .setEnabled( wohnung.objektNummer().get() == null ).setLayoutData( left().left( 34 ).right( 49 ).create() )
-                .create();
+                .setEnabled( wohnung.objektNummer().get() == null )
+                .setLayoutData( left().left( 34 ).right( 49 ).create() ).create();
 
         newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Fortführung" )
                 .setProperty( new PropertyAdapter( wohnung.gebaeudeFortfuehrung() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setValidator( new NotNullNumberValidator( Integer.class, Polymap.getSessionLocale() ) )
-                .setEnabled( wohnung.objektNummer().get() == null ).setLayoutData( left().left( 50 ).right( 65 ).create() )
-                .create();
+                .setEnabled( wohnung.objektNummer().get() == null )
+                .setLayoutData( left().left( 50 ).right( 65 ).create() ).create();
 
         lastLine = newLine;
         newLine = newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Wohnungsnummer" )
                 .setProperty( new PropertyAdapter( wohnung.wohnungsNummer() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setValidator( new NotNullNumberValidator( Integer.class, Polymap.getSessionLocale() ) )
-                .setEnabled( wohnung.wohnungsNummer().get() == null ).setLayoutData( left().left( 69 ).right( 83 ).create() )
-                .create();
+                .setEnabled( wohnung.wohnungsNummer().get() == null )
+                .setLayoutData( left().left( 69 ).right( 83 ).create() ).create();
 
         newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Fortführung" )
                 .setProperty( new PropertyAdapter( wohnung.wohnungsFortfuehrung() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setValidator( new NotNullNumberValidator( Integer.class, Polymap.getSessionLocale() ) )
-                .setEnabled( wohnung.wohnungsNummer().get() == null ).setLayoutData( left().left( 84 ).right( 100 ).create() )
-                .create();
+                .setEnabled( wohnung.wohnungsNummer().get() == null )
+                .setLayoutData( left().left( 84 ).right( 100 ).create() ).create();
 
         // flurstücke
         lastLine = newLine;
@@ -181,11 +225,63 @@ public class WohnungGrunddatenFormEditorPage
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 0, 1, 0 ) )
                 .setLayoutData( left().top( lastLine ).create() ).setParent( parent ).create();
-        newFormField( "Baujahr bereinigt" ).setToolTipText( "Baujahr bereinigt" )
+        Composite baujahrField = newFormField( "Baujahr bereinigt" ).setToolTipText( "Baujahr bereinigt" )
                 .setProperty( new PropertyAdapter( wohnung.bereinigtesBaujahr() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 0, 1, 0 ) )
-                .setLayoutData( right().top( lastLine ).create() ).setParent( parent ).create();
+                .setLayoutData( right().right( 75 ).top( lastLine ).create() ).setParent( parent ).create();
+
+        site.addFieldListener( gndbjListener = new FieldListener( wohnung.gesamtNutzungsDauer(), wohnung.baujahr() ) );
+
+        // berechnen knopf
+        baujahrBerechneAction = new ActionButton( parent, new Action( "Berechnen" ) {
+
+            @Override
+            public void run() {
+                if (gndbjListener.get( wohnung.gesamtNutzungsDauer() ) == null
+                        || gndbjListener.get( wohnung.baujahr() ) == null) {
+                    MessageDialog.openError( PolymapWorkbench.getShellToParentOn(), "Fehlende Daten",
+                            "Bitte geben Sie Gesamtnutzungsdauer und das tatsächliche Baujahr ein, bevor Sie diese Berechnung starten." );
+                }
+                else {
+                    ErmittlungModernisierungsgradComposite ermittlung = ErmittlungModernisierungsgradComposite.Mixin
+                            .forWohnung( wohnung );
+                    if (ermittlung == null) {
+                        ermittlung = repository.newEntity( ErmittlungModernisierungsgradComposite.class, null );
+                        // ermittlung.vertrag().set( bewertung.vertrag().get() );
+                        ermittlung.objektNummer().set( wohnung.objektNummer().get() );
+                        ermittlung.objektFortfuehrung().set( wohnung.objektFortfuehrung().get() );
+                        ermittlung.gebaeudeNummer().set( wohnung.gebaeudeNummer().get() );
+                        ermittlung.gebaeudeFortfuehrung().set( wohnung.gebaeudeFortfuehrung().get() );
+                        ermittlung.wohnungsNummer().set( wohnung.wohnungsNummer().get() );
+                        ermittlung.wohnungsFortfuehrung().set( wohnung.wohnungsFortfuehrung().get() );
+                        ermittlung.alterObergrenzeZeile1().set( 20.0d );
+                        ermittlung.alterObergrenzeZeile2().set( 20.0d );
+                        ermittlung.alterObergrenzeZeile3().set( 20.0d );
+                        ermittlung.alterObergrenzeZeile4().set( 20.0d );
+                        ermittlung.alterObergrenzeZeile5().set( 20.0d );
+                        ermittlung.alterObergrenzeZeile6().set( 20.0d );
+                        ermittlung.alterObergrenzeZeile7().set( 20.0d );
+                        ermittlung.alterObergrenzeZeile8().set( 20.0d );
+                    }
+                    // ermittlung.gesamtNutzungsDauer().set( gndbjListener.get(
+                    // wohnung.gesamtNutzungsDauer() ) );
+                    // ermittlung.tatsaechlichesBaujahr().set( gndbjListener.get(
+                    // wohnung.baujahr() ) );
+                    KapsPlugin.openEditor( fs, ErmittlungModernisierungsgradComposite.NAME, ermittlung );
+                    EventManager.instance().publish(
+                            new PropertyChangeEvent( ermittlung, ermittlung.gesamtNutzungsDauer().qualifiedName()
+                                    .name(), ermittlung.gesamtNutzungsDauer().get(), gndbjListener.get( wohnung
+                                    .gesamtNutzungsDauer() ) ) );
+                    EventManager.instance().publish(
+                            new PropertyChangeEvent( ermittlung, ermittlung.tatsaechlichesBaujahr().qualifiedName()
+                                    .name(), ermittlung.tatsaechlichesBaujahr().get(), gndbjListener.get( wohnung
+                                    .baujahr() ) ) );
+                }
+            }
+        } );
+        baujahrBerechneAction.setLayoutData( right().left( baujahrField ).top( lastLine ).height( 25 ).create() );
+        baujahrBerechneAction.setEnabled( true );
 
         lastLine = newLine;
         newLine = newFormField( "Etage" ).setProperty( new AssociationAdapter<EtageComposite>( wohnung.etage() ) )

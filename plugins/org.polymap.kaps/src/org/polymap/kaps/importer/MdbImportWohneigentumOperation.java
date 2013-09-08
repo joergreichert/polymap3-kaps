@@ -80,15 +80,15 @@ public class MdbImportWohneigentumOperation
 
             sub = new SubMonitor( monitor, 10 );
             importEntity( db, sub, EtageComposite.class, null );
-            
-            sub = new SubMonitor( monitor, 10 );
-            importEntity( db, sub, AusstattungComposite.class, null);
 
             sub = new SubMonitor( monitor, 10 );
-            importEntity( db, sub, EigentumsartComposite.class, null);
+            importEntity( db, sub, AusstattungComposite.class, null );
 
             sub = new SubMonitor( monitor, 10 );
-            importEntity( db, sub, HimmelsrichtungComposite.class, null);
+            importEntity( db, sub, EigentumsartComposite.class, null );
+
+            sub = new SubMonitor( monitor, 10 );
+            importEntity( db, sub, HimmelsrichtungComposite.class, null );
 
             sub = new SubMonitor( monitor, 10 );
             importEntity( db, sub, WohnungseigentumComposite.class, new EntityCallback<WohnungseigentumComposite>() {
@@ -117,14 +117,16 @@ public class MdbImportWohneigentumOperation
                         bem.append( bem2 );
                     }
                     entity.bemerkungen().set( bem.toString() );
-//                    allWohnungseigentum.put( entity.schl().get(), entity );
+                    // allWohnungseigentum.put( entity.schl().get(), entity );
                 }
             } );
 
-//            final Map<String, GebaeudeArtComposite> allGebaeudeArt = new HashMap<String, GebaeudeArtComposite>();
-//            for (GebaeudeArtComposite gebaeudeArt : repo.findEntities( GebaeudeArtComposite.class, null, 0, 10000 )) {
-//                allGebaeudeArt.put( gebaeudeArt.schl().get(), gebaeudeArt );
-//            }
+            // final Map<String, GebaeudeArtComposite> allGebaeudeArt = new
+            // HashMap<String, GebaeudeArtComposite>();
+            // for (GebaeudeArtComposite gebaeudeArt : repo.findEntities(
+            // GebaeudeArtComposite.class, null, 0, 10000 )) {
+            // allGebaeudeArt.put( gebaeudeArt.schl().get(), gebaeudeArt );
+            // }
 
             sub = new SubMonitor( monitor, 10 );
             // final Map<String, GebaeudeComposite> allGebaeude = new HashMap<String,
@@ -158,6 +160,12 @@ public class MdbImportWohneigentumOperation
                         entity.bebauungsabschlagInProzent().set( abschl.doubleValue() );
                     }
 
+                    entity.baujahr().set( asDouble( (Integer)builderRow.get( "BAUJAHR" ) ) );
+                    Short berbauj = (Short)builderRow.get( "BERBAUJ" );
+                    if (berbauj != null) {
+                        entity.bereinigtesBaujahr().set( asDouble( berbauj.intValue()) );
+                    }    
+
                     entity.mitBebauungsabschlag().set( getBooleanValue( builderRow, "BEBAB" ) );
                     entity.geeignet().set( getBooleanValue( builderRow, "VERWERTEN" ) );
                     entity.schaetzungGarage().set( getBooleanValue( builderRow, "SCHAETZGA" ) );
@@ -170,14 +178,17 @@ public class MdbImportWohneigentumOperation
                     entity.zurAuswertungGeeignet().set( getBooleanValue( builderRow, "VERARBKZ" ) );
 
                     Object schl = builderRow.get( "BEWSCHL" );
-//                    System.out.println( schl );
+                    // System.out.println( schl );
                     entity.ausstattung().set( findSchlNamed( AusstattungComposite.class, builderRow, "BEWSCHL" ) );
                     entity.eigentumsArt().set( findSchlNamed( EigentumsartComposite.class, builderRow, "EIGENTART" ) );
                     entity.etage().set( findSchlNamed( EtageComposite.class, builderRow, "GESCHOSS" ) );
-                    entity.himmelsrichtung().set( findSchlNamed( HimmelsrichtungComposite.class, builderRow, "HIMMELSRI" ) );
+                    entity.himmelsrichtung().set(
+                            findSchlNamed( HimmelsrichtungComposite.class, builderRow, "HIMMELSRI" ) );
                     entity.gebaeudeArtGarage().set( findSchlNamed( GebaeudeArtComposite.class, builderRow, "GEBARTG" ) );
-                    entity.gebaeudeArtStellplatz().set( findSchlNamed( GebaeudeArtComposite.class, builderRow, "GEBARTS" ) );
-                    entity.gebaeudeArtAnderes().set( findSchlNamed( GebaeudeArtComposite.class, builderRow, "GEBARTN" ) );
+                    entity.gebaeudeArtStellplatz().set(
+                            findSchlNamed( GebaeudeArtComposite.class, builderRow, "GEBARTS" ) );
+                    entity.gebaeudeArtAnderes()
+                            .set( findSchlNamed( GebaeudeArtComposite.class, builderRow, "GEBARTN" ) );
 
                     String separator = System.getProperty( "line.separator" );
                     // BEM1 und BEM2 zusammenfassen
@@ -383,8 +394,8 @@ public class MdbImportWohneigentumOperation
             flurstueck.nutzung().set( findSchlNamed( NutzungComposite.class, builderRow, "NUTZUNG", false ) );
             flurstueck.strasse().set( findSchlNamed( StrasseComposite.class, builderRow, "STRNR", false ) );
             try {
-                flurstueck.richtwertZone()
-                        .set( findSchlNamed( RichtwertzoneComposite.class, builderRow, "RIZONE", false ) );
+                flurstueck.richtwertZone().set(
+                        findSchlNamed( RichtwertzoneComposite.class, builderRow, "RIZONE", false ) );
             }
             catch (IllegalStateException ise) {
                 wmvaopfW.write( "Keine Richtwertzone  gefunden für " + builderRow.get( "RIZONE" ) + "\n" );

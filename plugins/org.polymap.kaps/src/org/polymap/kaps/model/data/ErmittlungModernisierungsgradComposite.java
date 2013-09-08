@@ -21,6 +21,7 @@ import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.entity.association.Association;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.property.Property;
+import org.qi4j.api.query.Query;
 import org.qi4j.api.query.QueryExpressions;
 import org.qi4j.api.query.grammar.BooleanExpression;
 
@@ -473,6 +474,22 @@ public interface ErmittlungModernisierungsgradComposite
                 return gnd;
             }
             return result;
+        }
+
+
+        public static ErmittlungModernisierungsgradComposite forWohnung( WohnungComposite wohnung ) {
+            ErmittlungModernisierungsgradComposite template = QueryExpressions
+                    .templateFor( ErmittlungModernisierungsgradComposite.class );
+            BooleanExpression expr = QueryExpressions.and(
+                    QueryExpressions.eq( template.objektNummer(), wohnung.objektNummer().get() ),
+                    QueryExpressions.eq( template.objektFortfuehrung(), wohnung.objektFortfuehrung().get() ),
+                    QueryExpressions.eq( template.gebaeudeNummer(), wohnung.gebaeudeNummer().get() ),
+                    QueryExpressions.eq( template.gebaeudeFortfuehrung(), wohnung.gebaeudeFortfuehrung().get() ),
+                    QueryExpressions.eq( template.wohnungsNummer(), wohnung.wohnungsNummer().get() ),
+                    QueryExpressions.eq( template.wohnungsFortfuehrung(), wohnung.wohnungsFortfuehrung().get() ) );
+            Query<ErmittlungModernisierungsgradComposite> matches = KapsRepository.instance().findEntities(
+                    ErmittlungModernisierungsgradComposite.class, expr, 0, 1 );
+            return matches.find();
         }
     }
 }

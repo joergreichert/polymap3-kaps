@@ -29,6 +29,7 @@ import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.NHK2010GebaeudeartenProvider;
 import org.polymap.kaps.model.data.ErmittlungModernisierungsgradComposite;
 import org.polymap.kaps.model.data.NHK2010Anbauten;
+import org.polymap.kaps.model.data.NHK2010Baupreisindex;
 import org.polymap.kaps.model.data.NHK2010BewertungComposite;
 import org.polymap.kaps.model.data.NHK2010BewertungGebaeudeComposite;
 import org.polymap.kaps.model.data.VertragComposite;
@@ -59,34 +60,29 @@ public class MdbImportBewertungenOperation
         final Database db = Database.open( dbFile );
         try {
             SubMonitor sub = null;
-            // sub = new SubMonitor( monitor, 10 );
-            // importEntity( db, monitor, NHK2010Anbauten.class, new
-            // EntityCallback<NHK2010Anbauten>() {
-            //
-            // @Override
-            // public void fillEntity( NHK2010Anbauten entity, Map<String, Object>
-            // builderRow ) {
-            // // bewertung finden
-            // entity.schl().set( String.valueOf( (Integer)builderRow.get( "SCHL" ) )
-            // );
-            // }
-            // } );
-            // sub = new SubMonitor( monitor, 10 );
-            // importEntity( db, monitor, NHK2010Baupreisindex.class, new
-            // EntityCallback<NHK2010Baupreisindex>() {
-            //
-            // @Override
-            // public void fillEntity( NHK2010Baupreisindex entity, Map<String,
-            // Object> builderRow ) {
-            // // jahr von bis
-            // Double value = (Double)builderRow.get( "JAHR" );
-            // entity.jahr().set( value.intValue() );
-            // value = (Double)builderRow.get( "MONVON" );
-            // entity.monatVon().set( value.intValue() );
-            // value = (Double)builderRow.get( "MONBIS" );
-            // entity.monatBis().set( value.intValue() );
-            // }
-            // } );
+            sub = new SubMonitor( monitor, 10 );
+            importEntity( db, monitor, NHK2010Anbauten.class, new EntityCallback<NHK2010Anbauten>() {
+
+                @Override
+                public void fillEntity( NHK2010Anbauten entity, Map<String, Object> builderRow ) {
+                    // bewertung finden
+                    entity.schl().set( String.valueOf( (Integer)builderRow.get( "SCHL" ) ) );
+                }
+            } );
+            sub = new SubMonitor( monitor, 10 );
+            importEntity( db, monitor, NHK2010Baupreisindex.class, new EntityCallback<NHK2010Baupreisindex>() {
+
+                @Override
+                public void fillEntity( NHK2010Baupreisindex entity, Map<String, Object> builderRow ) {
+                    // jahr von bis
+                    Double value = (Double)builderRow.get( "JAHR" );
+                    entity.jahr().set( value.intValue() );
+                    value = (Double)builderRow.get( "MONVON" );
+                    entity.monatVon().set( value.intValue() );
+                    value = (Double)builderRow.get( "MONBIS" );
+                    entity.monatBis().set( value.intValue() );
+                }
+            } );
 
             sub = new SubMonitor( monitor, 10 );
             importNHK2010Bewertung( db, sub, parentFolder );
@@ -496,18 +492,5 @@ public class MdbImportBewertungenOperation
         monitor.done();
         wmvaopfW.flush();
         wmvaopfW.close();
-    }
-
-
-    private Double asDouble( Integer value ) {
-        return asDouble( value, 2020, null );
-    }
-
-
-    private Double asDouble( Integer value, Integer maxValue, Integer defaultValue ) {
-        if (value != null) {
-            return (value < maxValue) ? value.doubleValue() : (defaultValue != null ? defaultValue.doubleValue() : null);
-        } 
-        return (defaultValue != null) ? defaultValue.doubleValue() : null;
     }
 }
