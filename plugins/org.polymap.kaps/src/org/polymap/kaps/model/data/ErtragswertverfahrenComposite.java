@@ -18,8 +18,11 @@ import org.apache.commons.logging.LogFactory;
 import org.qi4j.api.common.Optional;
 import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.entity.EntityComposite;
+import org.qi4j.api.entity.association.Association;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.property.Property;
+import org.qi4j.api.query.QueryExpressions;
+import org.qi4j.api.query.grammar.BooleanExpression;
 
 import org.polymap.core.qi4j.QiEntity;
 import org.polymap.core.qi4j.event.ModelChangeSupport;
@@ -27,6 +30,7 @@ import org.polymap.core.qi4j.event.PropertyChangeSupport;
 
 import org.polymap.kaps.importer.ImportColumn;
 import org.polymap.kaps.importer.ImportTable;
+import org.polymap.kaps.model.KapsRepository;
 
 /**
  * 
@@ -44,754 +48,600 @@ public interface ErtragswertverfahrenComposite
     final static String NAME = "Ertragswertverfahren";
 
 
-    // TODO B1 - Double
+    // B1 - Double
     @Optional
     @ImportColumn("B1")
-    Property<Double> B1();
+    Property<Double> betriebskostenZeile1();
 
 
-    // TODO B2 - Double
+    // B2 - Double
     @Optional
     @ImportColumn("B2")
-    Property<Double> B2();
+    Property<Double> betriebskostenZeile2();
 
 
-    // TODO B3 - Double
+    // B3 - Double
     @Optional
     @ImportColumn("B3")
-    Property<Double> B3();
+    Property<Double> betriebskostenZeile3();
 
 
-    // TODO B4 - Double
+    // B4 - Double
     @Optional
     @ImportColumn("B4")
-    Property<Double> B4();
+    Property<Double> betriebskostenZeile4();
 
 
-    // TODO B5 - Double
+    // B5 - Double
     @Optional
     @ImportColumn("B5")
-    Property<Double> B5();
+    Property<Double> betriebskostenZeile5();
 
 
-    // TODO B6 - Double
+    // B6 - Double
     @Optional
     @ImportColumn("B6")
-    Property<Double> B6();
+    Property<Double> betriebskostenZeile6();
 
 
-    // TODO B7 - Double
+    // B7 - Double
     @Optional
     @ImportColumn("B7")
-    Property<Double> B7();
+    Property<Double> betriebskostenZeile7();
 
 
-    // TODO T1 - String
+    // T1 - String
     @Optional
     @ImportColumn("T1")
-    Property<String> T1();
+    Property<String> betriebskostenTextZeile9();
 
 
-    // TODO B8 - Double
+    // B8 - Double
     @Optional
     @ImportColumn("B8")
-    Property<Double> B8();
+    Property<Double> betriebskostenZeile8();
 
 
-    // TODO T2 - String
+    // T2 - String
     @Optional
     @ImportColumn("T2")
-    Property<String> T2();
+    Property<String> betriebskostenTextZeile10();
 
 
-    // TODO B9 - Double
+    // B9 - Double
     @Optional
     @ImportColumn("B9")
-    Property<Double> B9();
+    Property<Double> betriebskostenZeile9();
 
 
-    // TODO T3 - String
+    // T3 - String
     @Optional
     @ImportColumn("T3")
-    Property<String> T3();
+    Property<String> betriebskostenTextZeile11();
 
 
-    // TODO B10 - Double
+    // B10 - Double
     @Optional
     @ImportColumn("B10")
-    Property<Double> B10();
+    Property<Double> betriebskostenZeile10();
 
 
-    // TODO SUB - Double
-    @Optional
-    @ImportColumn("SUB")
-    Property<Double> SUB();
-
-
-    // TODO MB - Double
-    @Optional
-    @ImportColumn("MB")
-    Property<Double> MB();
-
-
-    // TODO G1 - String
-    @Optional
-    @ImportColumn("G1")
-    Property<String> G1();
-
-
-    // TODO GJAHR1 - Integer
-    @Optional
-    @ImportColumn("GJAHR1")
-    Property<Integer> GJAHR1();
-
-
-    // TODO F1 - Double
-    @Optional
-    @ImportColumn("F1")
-    Property<Double> F1();
-
-
-    // TODO Q1 - Double
-    @Optional
-    @ImportColumn("Q1")
-    Property<Double> Q1();
-
-
-    // TODO N1 - Double
-    @Optional
-    @ImportColumn("N1")
-    Property<Double> N1();
-
-
-    // TODO G2 - String
-    @Optional
-    @ImportColumn("G2")
-    Property<String> G2();
-
-
-    // TODO GJAHR2 - Integer
-    @Optional
-    @ImportColumn("GJAHR2")
-    Property<Integer> GJAHR2();
-
-
-    // TODO F2 - Double
-    @Optional
-    @ImportColumn("F2")
-    Property<Double> F2();
-
-
-    // TODO Q2 - Double
-    @Optional
-    @ImportColumn("Q2")
-    Property<Double> Q2();
-
-
-    // TODO N2 - Double
-    @Optional
-    @ImportColumn("N2")
-    Property<Double> N2();
-
-
-    // TODO S1 - Double
-    @Optional
-    @ImportColumn("S1")
-    Property<Double> S1();
-
-
-    // TODO S2 - Double
-    @Optional
-    @ImportColumn("S2")
-    Property<Double> S2();
-
-
-    // TODO S3 - Double
-    @Optional
-    @ImportColumn("S3")
-    Property<Double> S3();
-
-
-    // TODO SN - Double
-    @Optional
-    @ImportColumn("SN")
-    Property<Double> SN();
-
-
-    // TODO SAB - Double
-    @Optional
-    @ImportColumn("SAB")
-    Property<Double> SAB();
-
-
-    // TODO SBM - Double
-    @Optional
-    @ImportColumn("SBM")
-    Property<Double> SBM();
-
-
-    // TODO SBMG - Double
-    @Optional
-    @ImportColumn("SBMG")
-    Property<Double> SBMG();
-
-
-    // TODO JB - Double
-    @Optional
-    @ImportColumn("JB")
-    Property<Double> JB();
-
-
-    // TODO JBP - Double
-    @Optional
-    @ImportColumn("JBP")
-    Property<Double> JBP();
-
-
-    // TODO JV - Double
-    @Optional
-    @ImportColumn("JV")
-    Property<Double> JV();
-
-
-    // TODO JVP - Double
-    @Optional
-    @ImportColumn("JVP")
-    Property<Double> JVP();
-
-
-    // TODO JI - Double
-    @Optional
-    @ImportColumn("JI")
-    Property<Double> JI();
-
-
-    // TODO JIP - Double
-    @Optional
-    @ImportColumn("JIP")
-    Property<Double> JIP();
-
-
-    // TODO JM - Double
-    @Optional
-    @ImportColumn("JM")
-    Property<Double> JM();
-
-
-    // TODO JMP - Double
-    @Optional
-    @ImportColumn("JMP")
-    Property<Double> JMP();
-
-
-    // TODO JSB - Double
-    @Optional
-    @ImportColumn("JSB")
-    Property<Double> JSB();
-
-
-    // TODO JSP - Double
-    @Optional
-    @ImportColumn("JSP")
-    Property<Double> JSP();
-
-
-    // TODO JRE - Double
-    @Optional
-    @ImportColumn("JRE")
-    Property<Double> JRE();
-
-
-    // TODO BWANT - Double
-    @Optional
-    @ImportColumn("BWANT")
-    Property<Double> BWANT();
-
-
-    // TODO BWZ - Double
-    @Optional
-    @ImportColumn("BWZ")
-    Property<Double> BWZ();
-
-
-    // TODO BWVZ - Double
-    @Optional
-    @ImportColumn("BWVZ")
-    Property<Double> BWVZ();
-
-
-    // TODO REANT - Double
-    @Optional
-    @ImportColumn("REANT")
-    Property<Double> REANT();
-
-
-    // TODO RN - Double
-    @Optional
-    @ImportColumn("RN")
-    Property<Double> RN();
-
-
-    // TODO VERV - Double
-    @Optional
-    @ImportColumn("VERV")
-    Property<Double> VERV();
-
-
-    // TODO EWB - Double
-    @Optional
-    @ImportColumn("EWB")
-    Property<Double> EWB();
-
-
-    // TODO WEU - Double
-    @Optional
-    @ImportColumn("WEU")
-    Property<Double> WEU();
-
-
-    // TODO BW - Double
-    @Optional
-    @ImportColumn("BW")
-    Property<Double> BW();
-
-
-    // TODO EWERT - Double
-    @Optional
-    @ImportColumn("EWERT")
-    Property<Double> EWERT();
-
-
-    // TODO EWBB - Double
-    @Optional
-    @ImportColumn("EWBB")
-    Property<Double> EWBB();
-
-
-    // TODO BERBAUJ - Integer
-    @Optional
-    @ImportColumn("BERBAUJ")
-    Property<Integer> BERBAUJ();
-
-
-    // TODO G3 - String
-    @Optional
-    @ImportColumn("G3")
-    Property<String> G3();
-
-
-    // TODO GJAHR3 - Integer
-    @Optional
-    @ImportColumn("GJAHR3")
-    Property<Integer> GJAHR3();
-
-
-    // TODO F3 - Double
-    @Optional
-    @ImportColumn("F3")
-    Property<Double> F3();
-
-
-    // TODO Q3 - Double
-    @Optional
-    @ImportColumn("Q3")
-    Property<Double> Q3();
-
-
-    // TODO N3 - Double
-    @Optional
-    @ImportColumn("N3")
-    Property<Double> N3();
-
-
-    // TODO JT1 - String
-    @Optional
-    @ImportColumn("JT1")
-    Property<String> JT1();
-
-
-    // TODO JT2 - String
-    @Optional
-    @ImportColumn("JT2")
-    Property<String> JT2();
-
-
-    // TODO JT3 - String
-    @Optional
-    @ImportColumn("JT3")
-    Property<String> JT3();
-
-
-    // TODO G4 - String
-    @Optional
-    @ImportColumn("G4")
-    Property<String> G4();
-
-
-    // TODO GJAHR4 - Integer
-    @Optional
-    @ImportColumn("GJAHR4")
-    Property<Integer> GJAHR4();
-
-
-    // TODO F4 - Double
-    @Optional
-    @ImportColumn("F4")
-    Property<Double> F4();
-
-
-    // TODO Q4 - Double
-    @Optional
-    @ImportColumn("Q4")
-    Property<Double> Q4();
-
-
-    // TODO G5 - String
-    @Optional
-    @ImportColumn("G5")
-    Property<String> G5();
-
-
-    // TODO GJAHR5 - Integer
-    @Optional
-    @ImportColumn("GJAHR5")
-    Property<Integer> GJAHR5();
-
-
-    // TODO F5 - Double
-    @Optional
-    @ImportColumn("F5")
-    Property<Double> F5();
-
-
-    // TODO Q5 - Double
-    @Optional
-    @ImportColumn("Q5")
-    Property<Double> Q5();
-
-
-    // TODO G6 - String
-    @Optional
-    @ImportColumn("G6")
-    Property<String> G6();
-
-
-    // TODO GJAHR6 - Integer
-    @Optional
-    @ImportColumn("GJAHR6")
-    Property<Integer> GJAHR6();
-
-
-    // TODO F6 - Double
-    @Optional
-    @ImportColumn("F6")
-    Property<Double> F6();
-
-
-    // TODO Q6 - Double
-    @Optional
-    @ImportColumn("Q6")
-    Property<Double> Q6();
-
-
-    // TODO G7 - String
-    @Optional
-    @ImportColumn("G7")
-    Property<String> G7();
-
-
-    // TODO GJAHR7 - Integer
-    @Optional
-    @ImportColumn("GJAHR7")
-    Property<Integer> GJAHR7();
-
-
-    // TODO F7 - Double
-    @Optional
-    @ImportColumn("F7")
-    Property<Double> F7();
-
-
-    // TODO Q7 - Double
-    @Optional
-    @ImportColumn("Q7")
-    Property<Double> Q7();
-
-
-    // TODO N4 - Double
-    @Optional
-    @ImportColumn("N4")
-    Property<Double> N4();
-
-
-    // TODO N5 - Double
-    @Optional
-    @ImportColumn("N5")
-    Property<Double> N5();
-
-
-    // TODO N6 - Double
-    @Optional
-    @ImportColumn("N6")
-    Property<Double> N6();
-
-
-    // TODO N7 - Double
-    @Optional
-    @ImportColumn("N7")
-    Property<Double> N7();
-
-
-    // TODO BMG - Double
-    @Optional
-    @ImportColumn("BMG")
-    Property<Double> BMG();
-
-
-    // TODO JXT - String
-    @Optional
-    @ImportColumn("JXT")
-    Property<String> JXT();
-
-
-    // TODO JX - Double
-    @Optional
-    @ImportColumn("JX")
-    Property<Double> JX();
-
-
-    // TODO JXP - Double
-    @Optional
-    @ImportColumn("JXP")
-    Property<Double> JXP();
-
-
-    // TODO EINGANGSNR - Double
-    @Optional
-    @ImportColumn("EINGANGSNR")
-    Property<Double> EINGANGSNR();
-
-
-    // TODO B11 - Double
+    // B11 - Double
     @Optional
     @ImportColumn("B11")
-    Property<Double> B11();
+    Property<Double> betriebskostenZeile11();
 
 
-    // TODO GN - Double
+    // MB - Double
+    @Optional
+    @ImportColumn("MB")
+    Property<Double> betriebskostenSummeMonatlich();
+
+
+    // G1 - String
+    @Optional
+    Association<EtageComposite> etageZeile1();
+
+
+    // F1 - Double
+    @Optional
+    @ImportColumn("F1")
+    Property<Double> flaecheZeile1();
+
+
+    // Q1 - Double
+    @Optional
+    @ImportColumn("Q1")
+    Property<Double> mieteQmZeile1();
+
+
+    // N1 - Double
+    @Optional
+    @ImportColumn("N1")
+    Property<Double> miete1();
+
+
+    // G2 - String
+    @Optional
+    Association<EtageComposite> etageZeile2();
+
+
+    // F2 - Double
+    @Optional
+    @ImportColumn("F2")
+    Property<Double> flaecheZeile2();
+
+
+    // Q2 - Double
+    @Optional
+    @ImportColumn("Q2")
+    Property<Double> mieteQmZeile2();
+
+
+    // N2 - Double
+    @Optional
+    @ImportColumn("N2")
+    Property<Double> miete2();
+
+
+    // S1 - Double
+    @Optional
+    @ImportColumn("S1")
+    Property<Double> miete8();
+
+
+    // S2 - Double
+    @Optional
+    @ImportColumn("S2")
+    Property<Double> miete9();
+
+
+    // S3 - Double
+    @Optional
+    @ImportColumn("S3")
+    Property<Double> miete10();
+
+
+    //
+    //
+    // // SN - Double
+    // @Optional
+    // @ImportColumn("SN")
+    // Property<Double> summeMiete();
+    //
+    //
+    // // TODO SAB - Double
+    // @Optional
+    // @ImportColumn("SAB")
+    // Property<Double> SAB();
+
+    // SBM - Double
+    @Optional
+    @ImportColumn("SBM")
+    Property<Double> nettoRohertragProMonat();
+
+    @Optional
+    Property<Double> nettoRohertragProJahr();
+
+
+    // SBMG - Double
+    @Optional
+    @ImportColumn("SBMG")
+    Property<Double> bruttoRohertragProMonat();
+
+    @Optional
+    Property<Double> bruttoRohertragProJahr();
+
+    // JB - Double
+    @Optional
+    @ImportColumn("JB")
+    Property<Double> jahresBetriebskosten();
+    
+    @Optional
+    @ImportColumn("JB")
+    Property<Double> jahresBetriebskostenE();
+
+    // JV - Double
+    @Optional
+    @ImportColumn("JV")
+    Property<Double> verwaltungskosten();
+
+
+    // JI - Double
+    @Optional
+    @ImportColumn("JI")
+    Property<Double> Instandhaltungskosten();
+
+
+    // JM - Double
+    @Optional
+    @ImportColumn("JM")
+    Property<Double> mietausfallWagnis();
+
+
+    // JSB - Double
+    @Optional
+    @ImportColumn("JSB")
+    Property<Double> summeBewirtschaftskosten();
+
+
+    // JSP - Double
+    @Optional
+    @ImportColumn("JSP")
+    Property<Double> summeBewirtschaftskostenInProzent();
+
+
+    // JRE - Double
+    @Optional
+    @ImportColumn("JRE")
+    Property<Double> jahresReinErtrag();
+
+
+    // BWANT - Double
+    @Optional
+    @ImportColumn("BWANT")
+    Property<Double> bodenwertAnteil();
+
+
+    // BWZ - Double
+    @Optional
+    @ImportColumn("BWZ")
+    Property<Double> bodenwertAnteilLiegenschaftsZins();
+
+
+    // BWVZ - Double
+    @Optional
+    @ImportColumn("BWVZ")
+    Property<Double> bodenwertAnteilLiegenschaftsZinsBetrag();
+
+
+    // REANT - Double
+    @Optional
+    @ImportColumn("REANT")
+    Property<Double> anteilDerBaulichenAnlagenAmJahresreinertrag();
+
+
+    // RN - Double
+    @Optional
+    @ImportColumn("RN")
+    Property<Double> restnutzungsDauer();
+
+
+    // VERV - Double
+    @Optional
+    @ImportColumn("VERV")
+    Property<Double> vervielvaeltiger();
+
+
+    // EWB - Double
+    @Optional
+    @ImportColumn("EWB")
+    Property<Double> ertragswertDerBaulichenAnlagen();
+
+
+    // WEU - Double
+    @Optional
+    @ImportColumn("WEU")
+    Property<Double> wertbeeinflussendeUmstaende();
+
+
+    // BW - Double
+    @Optional
+    @ImportColumn("BW")
+    Property<Double> bodenwert();
+
+
+    // EWERT - Double
+    @Optional
+    @ImportColumn("EWERT")
+    Property<Double> ertragswert();
+
+
+    // EWBB - Double
+    @Optional
+    @ImportColumn("EWBB")
+    Property<Double> ertragswertDerBaulichenAnlagenZwischensumme();
+
+
+    // BERBAUJ - Integer
+    @Optional
+    Property<Double> bereinigtesBaujahr();
+
+
+    // G3 - String
+    @Optional
+    Association<EtageComposite> etageZeile3();
+
+
+    // F3 - Double
+    @Optional
+    @ImportColumn("F3")
+    Property<Double> flaecheZeile3();
+
+
+    // Q3 - Double
+    @Optional
+    @ImportColumn("Q3")
+    Property<Double> mieteQmZeile3();
+
+
+    // N3 - Double
+    @Optional
+    @ImportColumn("N3")
+    Property<Double> miete3();
+
+
+    // JT1 - String
+    @Optional
+    @ImportColumn("JT1")
+    Property<String> ertraegeZeile8();
+
+
+    // JT2 - String
+    @Optional
+    @ImportColumn("JT2")
+    Property<String> ertraegeZeile9();
+
+
+    // JT3 - String
+    @Optional
+    @ImportColumn("JT3")
+    Property<String> ertraegeZeile10();
+
+
+    // G4 - String
+    @Optional
+    Association<EtageComposite> etageZeile4();
+
+
+    // F4 - Double
+    @Optional
+    @ImportColumn("F4")
+    Property<Double> flaecheZeile4();
+
+
+    // Q4 - Double
+    @Optional
+    @ImportColumn("Q4")
+    Property<Double> mieteQmZeile4();
+
+
+    // G5 - String
+    @Optional
+    Association<EtageComposite> etageZeile5();
+
+
+    // F5 - Double
+    @Optional
+    @ImportColumn("F5")
+    Property<Double> flaecheZeile5();
+
+
+    // Q5 - Double
+    @Optional
+    @ImportColumn("Q5")
+    Property<Double> mieteQmZeile5();
+
+
+    // G6 - String
+    @Optional
+    Association<EtageComposite> etageZeile6();
+
+
+    // F6 - Double
+    @Optional
+    @ImportColumn("F6")
+    Property<Double> flaecheZeile6();
+
+
+    // Q6 - Double
+    @Optional
+    @ImportColumn("Q6")
+    Property<Double> mieteQmZeile6();
+
+
+    // G7 - String
+    @Optional
+    Association<EtageComposite> etageZeile7();
+
+
+    // F7 - Double
+    @Optional
+    @ImportColumn("F7")
+    Property<Double> flaecheZeile7();
+
+
+    // Q7 - Double
+    @Optional
+    @ImportColumn("Q7")
+    Property<Double> mieteQmZeile7();
+
+
+    // N4 - Double
+    @Optional
+    @ImportColumn("N4")
+    Property<Double> miete4();
+
+
+    // N5 - Double
+    @Optional
+    @ImportColumn("N5")
+    Property<Double> miete5();
+
+
+    // N6 - Double
+    @Optional
+    @ImportColumn("N6")
+    Property<Double> miete6();
+
+
+    // N7 - Double
+    @Optional
+    @ImportColumn("N7")
+    Property<Double> miete7();
+
+
+    // // TODO BMG - Double
+    // @Optional
+    // @ImportColumn("BMG")
+    // Property<Double> BMG();
+
+    // JXT - String
+    @Optional
+    @ImportColumn("JXT")
+    Property<String> bewirtschaftskostenZeile5Text();
+
+
+    // JX - Double
+    @Optional
+    @ImportColumn("JX")
+    Property<Double> bewirtschaftskostenZeile5();
+
+
+    // EINGANGSNR - Double
+    @Optional
+    Association<VertragComposite> vertrag();
+
+
+    // GN - Double
     @Optional
     @ImportColumn("GN")
-    Property<Double> GN();
+    Property<Double> gesamtNutzungsDauer();
 
 
-    // TODO pauschal - String
+    // pauschal - String
     @Optional
-    @ImportColumn("pauschal")
-    Property<String> pauschal();
+    // @ImportColumn("pauschal")
+    Property<Boolean> pauschalBetriebskosten();
 
 
-    // TODO pauschalbew - String
+    // pauschalbew - String
     @Optional
-    @ImportColumn("pauschalbew")
-    Property<String> pauschalbew();
+    // @ImportColumn("pauschalbew")
+    Property<Boolean> pauschalBewirtschaftungskosten();
 
 
-    // TODO DMEURO - String
-    @Optional
-    @ImportColumn("DMEURO")
-    Property<String> DMEURO();
-
-
-    // TODO Prozentertrag - Double
+    // Prozentertrag - Double
     @Optional
     @ImportColumn("Prozentertrag")
-    Property<Double> Prozentertrag();
+    Property<Double> jahresRohErtragProzent();
 
 
-    // TODO JBetriebskosten - Double
-    @Optional
-    @ImportColumn("JBetriebskosten")
-    Property<Double> JBetriebskosten();
-
-
-    // TODO LIEZINS - Double
+    // LIEZINS - Double
     @Optional
     @ImportColumn("LIEZINS")
-    Property<Double> LIEZINS();
+    Property<Double> liegenschaftsZins();
 
 
-    // TODO LIZI - String
+    // LIZI - String
     @Optional
-    @ImportColumn("LIZI")
-    Property<String> LIZI();
+    // @ImportColumn("LIZI")
+    Property<Boolean> liziVerwenden();
 
 
-    // TODO INNEN - String
+    // INNEN - String
     @Optional
-    @ImportColumn("INNEN")
-    Property<String> INNEN();
+    // @ImportColumn("INNEN")
+    Property<Boolean> innenBereich();
 
 
-    // TODO GEWART - String
+    // GEWART - String
     @Optional
     @ImportColumn("GEWART")
-    Property<String> GEWART();
+    Property<String> artDesGewerbes();
 
 
-    // TODO GEWANT - Double
+    // GEWANT - Double
     @Optional
     @ImportColumn("GEWANT")
-    Property<Double> GEWANT();
+    Property<Double> anteilDesGewerbes();
 
 
-    // TODO GRART - Double
+    // GRART - Double
     @Optional
     @ImportColumn("GRART")
-    Property<Double> GRART();
+    Property<Double> grundstuecksArt();
 
 
-    // TODO EURO_UMSTELL - String
+    //
+    // // TODO BETRPAUSCH - String
+    // @Optional
+    // @ImportColumn("BETRPAUSCH")
+    // Property<String> BETRPAUSCH();
+
+    // ANGABEPROZ - String
     @Optional
-    @ImportColumn("EURO_UMSTELL")
-    Property<String> EURO_UMSTELL();
+    // @ImportColumn("ANGABEPROZ")
+    Property<Boolean> bewirtschaftskostenInProzent();
 
 
-    // TODO BETRPAUSCH - String
+    //
+    // // TODO GEWICHT - Long
+    // @Optional
+    // @ImportColumn("GEWICHT")
+    // Property<Long> GEWICHT();
+
+    // BAUJAHR - Long
     @Optional
-    @ImportColumn("BETRPAUSCH")
-    Property<String> BETRPAUSCH();
+    // @ImportColumn("BAUJAHR")
+    Property<Double> tatsaechlichesBaujahr();
 
 
-    // TODO ANGABEPROZ - String
+    // BWANT_IND - String
     @Optional
-    @ImportColumn("ANGABEPROZ")
-    Property<String> ANGABEPROZ();
+    Property<Boolean> bodenwertAnteilIndividuell();
 
 
-    // TODO GEWICHT - Long
+    // GESMIETE_EING - String
     @Optional
-    @ImportColumn("GEWICHT")
-    Property<Long> GEWICHT();
+    Property<Boolean> eingabeGesamtMiete();
 
 
-    // TODO BAUJAHR - Long
-    @Optional
-    @ImportColumn("BAUJAHR")
-    Property<Long> BAUJAHR();
-
-
-    // TODO BWANT_IND - String
-    @Optional
-    @ImportColumn("BWANT_IND")
-    Property<String> BWANT_IND();
-
-
-    // TODO GESMIETE_EING - String
-    @Optional
-    @ImportColumn("GESMIETE_EING")
-    Property<String> GESMIETE_EING();
-
-
-    // TODO WBU_BEZ - String
+    // WBU_BEZ - String
     @Optional
     @ImportColumn("WBU_BEZ")
-    Property<String> WBU_BEZ();
+    Property<String> wertbeeinflussendeUmstaendeText();
 
 
-    // TODO FREILEGUNG - Double
+    // FREILEGUNG - Double
     @Optional
     @ImportColumn("FREILEGUNG")
-    Property<Double> FREILEGUNG();
+    Property<Double> freilegung();
 
 
-    // TODO MAKLERBW - String
+    // WOHNFL1 - String
     @Optional
-    @ImportColumn("MAKLERBW")
-    Property<String> MAKLERBW();
+    Property<Boolean> wohnflaecheZeile1();
 
 
-    // TODO EFAKTOR1 - Double
+    // WOHNFL2 - String
     @Optional
-    @ImportColumn("EFAKTOR1")
-    Property<Double> EFAKTOR1();
+    Property<Boolean> wohnflaecheZeile2();
 
 
-    // TODO EWERT1 - Double
+    // WOHNFL3 - String
     @Optional
-    @ImportColumn("EWERT1")
-    Property<Double> EWERT1();
+    Property<Boolean> wohnflaecheZeile3();
 
 
-    // TODO EFAKTOR2 - Double
+    // WOHNFL4 - String
     @Optional
-    @ImportColumn("EFAKTOR2")
-    Property<Double> EFAKTOR2();
+    Property<Boolean> wohnflaecheZeile4();
 
 
-    // TODO EWERT2 - Double
+    // WOHNFL5 - String
     @Optional
-    @ImportColumn("EWERT2")
-    Property<Double> EWERT2();
+    Property<Boolean> wohnflaecheZeile5();
 
 
-    // TODO ABSCHL_METHODE_NEU - String
+    // WOHNFL6 - String
     @Optional
-    @ImportColumn("ABSCHL_METHODE_NEU")
-    Property<String> ABSCHL_METHODE_NEU();
+    Property<Boolean> wohnflaecheZeile6();
 
 
-    // TODO ANTRAGNR_GUTACHTEN - String
+    // WOHNFL7 - String
     @Optional
-    @ImportColumn("ANTRAGNR_GUTACHTEN")
-    Property<String> ANTRAGNR_GUTACHTEN();
-
-
-    // TODO GUTACHTNR_GUTACHTEN - String
-    @Optional
-    @ImportColumn("GUTACHTNR_GUTACHTEN")
-    Property<String> GUTACHTNR_GUTACHTEN();
-
-
-    // TODO WOHNFL1 - String
-    @Optional
-    @ImportColumn("WOHNFL1")
-    Property<String> WOHNFL1();
-
-
-    // TODO WOHNFL2 - String
-    @Optional
-    @ImportColumn("WOHNFL2")
-    Property<String> WOHNFL2();
-
-
-    // TODO WOHNFL3 - String
-    @Optional
-    @ImportColumn("WOHNFL3")
-    Property<String> WOHNFL3();
-
-
-    // TODO WOHNFL4 - String
-    @Optional
-    @ImportColumn("WOHNFL4")
-    Property<String> WOHNFL4();
-
-
-    // TODO WOHNFL5 - String
-    @Optional
-    @ImportColumn("WOHNFL5")
-    Property<String> WOHNFL5();
-
-
-    // TODO WOHNFL6 - String
-    @Optional
-    @ImportColumn("WOHNFL6")
-    Property<String> WOHNFL6();
-
-
-    // TODO WOHNFL7 - String
-    @Optional
-    @ImportColumn("WOHNFL7")
-    Property<String> WOHNFL7();
+    Property<Boolean> wohnflaecheZeile7();
 
 
     public static abstract class Mixin
@@ -799,6 +649,12 @@ public interface ErtragswertverfahrenComposite
 
         private static Log log = LogFactory.getLog( Mixin.class );
 
+
+        public static ErtragswertverfahrenComposite forVertrag( VertragComposite vertrag ) {
+            ErtragswertverfahrenComposite template = QueryExpressions.templateFor( ErtragswertverfahrenComposite.class );
+            BooleanExpression expr = QueryExpressions.eq( template.vertrag(), vertrag );
+            return KapsRepository.instance().findEntities( ErtragswertverfahrenComposite.class, expr, 0, 1 ).find();
+        }
     }
 
 }

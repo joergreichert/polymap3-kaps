@@ -174,7 +174,7 @@ public class KapsRepository
                             new NameImpl( KapsRepository.NAMESPACE, NHK2010BewertungComposite.NAME ) ),
                     new SimpleEntityProvider<ErmittlungModernisierungsgradComposite>( this,
                             ErmittlungModernisierungsgradComposite.class, new NameImpl( KapsRepository.NAMESPACE,
-                                    ErtragswertverfahrenComposite.NAME ) ),
+                                    ErmittlungModernisierungsgradComposite.NAME ) ),
                     new SimpleEntityProvider<ErtragswertverfahrenComposite>( this, ErtragswertverfahrenComposite.class,
                             new NameImpl( KapsRepository.NAMESPACE, ErtragswertverfahrenComposite.NAME ) ),
 

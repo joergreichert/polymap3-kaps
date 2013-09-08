@@ -53,6 +53,7 @@ import org.polymap.kaps.KapsPlugin;
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.ArtDesBaugebietsComposite;
 import org.polymap.kaps.model.data.BelastungComposite;
+import org.polymap.kaps.model.data.ErtragswertverfahrenComposite;
 import org.polymap.kaps.model.data.FlurComposite;
 import org.polymap.kaps.model.data.FlurstueckComposite;
 import org.polymap.kaps.model.data.FlurstuecksdatenAgrarComposite;
@@ -570,6 +571,8 @@ public class KaufvertragFlurstueckeFormEditorPage
 
     private ActionButton openBewertungen;
 
+    private ActionButton openErtragswert;
+
 
     private Section createErweiterteDatenForm( Composite top ) {
 
@@ -781,8 +784,36 @@ public class KaufvertragFlurstueckeFormEditorPage
                 super.setEnabled( enabled );
             };
         };
-        openBewertungen.setLayoutData( left().right( 15 ).height( 25 ).top( null ).bottom( 100 ).create() );
+        openBewertungen.setLayoutData( left().right(25).height( 25 ).top( null ).bottom( 100 ).create() );
         openBewertungen.setEnabled( true );
+        
+        openErtragswert = new ActionButton( parent, new Action( "nach Ertragswertverfahren - normal bewerten" ) {
+            @Override
+            public void run() {
+                ErtragswertverfahrenComposite bewertungComposite = ErtragswertverfahrenComposite.Mixin.forVertrag( kaufvertrag );
+                if (bewertungComposite == null) {
+                    bewertungComposite = repository.newEntity( ErtragswertverfahrenComposite.class, null );
+                    bewertungComposite.vertrag().set( kaufvertrag );
+                }
+                KapsPlugin.openEditor( fs, ErtragswertverfahrenComposite.NAME, bewertungComposite );
+            }
+        } ) {
+
+            @Override
+            public void setEnabled( boolean enabled ) {
+                if (enabled) {
+                    if (ErtragswertverfahrenComposite.Mixin.forVertrag( kaufvertrag ) != null) {
+                        setText( "Bewertung nach Ertragswertverfahren - normal anpassen" );
+                    }
+                    else {
+                        setText( "nach Ertragswertverfahren - normal bewerten" );
+                    }
+                }
+                super.setEnabled( enabled );
+            };
+        };
+        openErtragswert.setLayoutData( left().left( openBewertungen, 5 ).width( 25 ).height( 25 ).top( null ).bottom( 100 ).create() );
+        openErtragswert.setEnabled( true );
         return formSection;
     }
 

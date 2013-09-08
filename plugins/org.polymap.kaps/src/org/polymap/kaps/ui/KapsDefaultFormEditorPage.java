@@ -39,6 +39,7 @@ import org.polymap.core.runtime.Polymap;
 import org.polymap.core.workbench.PolymapWorkbench;
 
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
+import org.polymap.rhei.field.CheckboxFormField;
 import org.polymap.rhei.field.IFormFieldLabel;
 import org.polymap.rhei.field.IFormFieldListener;
 import org.polymap.rhei.field.NumberValidator;
@@ -70,17 +71,18 @@ public abstract class KapsDefaultFormEditorPage
     protected static final int RIGHT   = 100;
 
     // 5 column layout
-    protected static final int                  ONE   = 0;
+    protected static final int ONE     = 0;
 
-    protected static final int                  TWO   = 20;
+    protected static final int TWO     = 20;
 
-    protected static final int                  THREE = 40;
+    protected static final int THREE   = 40;
 
-    protected static final int                  FOUR  = 60;
+    protected static final int FOUR    = 60;
 
-    protected static final int                  FIVE  = 80;
+    protected static final int FIVE    = 80;
 
-    protected static final int                  SIX   = 100;
+    protected static final int SIX     = 100;
+
 
     protected SimpleFormData one3() {
         return new SimpleFormData( SPACING ).left( 0 ).right( 33 );
@@ -96,7 +98,7 @@ public abstract class KapsDefaultFormEditorPage
         return new SimpleFormData( SPACING ).left( 66 ).right( 100 );
     }
 
-    
+
     protected SimpleFormData one() {
         return new SimpleFormData( SPACING ).left( ONE ).right( TWO );
     }
@@ -125,16 +127,19 @@ public abstract class KapsDefaultFormEditorPage
     protected SimpleFormData five() {
         return new SimpleFormData( SPACING ).left( FIVE ).right( SIX );
     }
-    
-    protected KapsRepository   repository;
 
-    protected Locale           locale  = Locale.GERMAN;
+    protected KapsRepository repository;
+
+    protected Locale         locale = Locale.GERMAN;
+
 
     protected interface UpdateCommand {
+
         void execute();
     }
-    
-    private List<UpdateCommand> updates = new ArrayList<UpdateCommand>(); 
+
+    private List<UpdateCommand> updates = new ArrayList<UpdateCommand>();
+
 
     public KapsDefaultFormEditorPage( String id, String title, Feature feature, FeatureStore featureStore ) {
         super( id, title, feature, featureStore );
@@ -213,13 +218,15 @@ public abstract class KapsDefaultFormEditorPage
     }
 
 
-    protected final void queue(UpdateCommand command) {
+    protected final void queue( UpdateCommand command ) {
         updates.add( command );
-        
+
         pageSite.fireEvent( ((FormPage)pageSite).getEditor(), id, IFormFieldListener.VALUE_CHANGE, null );
-//        and fire  pageSite.fireEvent( command, "queueUpdateCommand", IFormFieldListener.VALUE_CHANGE, command );
+        // and fire pageSite.fireEvent( command, "queueUpdateCommand",
+        // IFormFieldListener.VALUE_CHANGE, command );
     }
-    
+
+
     @Override
     public void doLoad( final IProgressMonitor monitor )
             throws Exception {
@@ -227,21 +234,25 @@ public abstract class KapsDefaultFormEditorPage
         // computed fields from re-set
         assert Display.getCurrent() != null;
         Polymap.getSessionDisplay().asyncExec( new Runnable() {
+
             public void run() {
                 try {
                     afterDoLoad( monitor );
                 }
                 catch (Exception e) {
-                    PolymapWorkbench.handleError( KapsPlugin.PLUGIN_ID, this, "An error occured while creating the new page.", e );
+                    PolymapWorkbench.handleError( KapsPlugin.PLUGIN_ID, this,
+                            "An error occured while creating the new page.", e );
                 }
             }
-        });
+        } );
         updates.clear();
     }
-    
+
+
     public void afterDoLoad( IProgressMonitor monitor )
             throws Exception {
     }
+
 
     @Override
     public void dispose() {
@@ -261,7 +272,7 @@ public abstract class KapsDefaultFormEditorPage
 
     @Override
     public boolean isDirty() {
-        
+
         return !updates.isEmpty();
     }
 
@@ -315,7 +326,8 @@ public abstract class KapsDefaultFormEditorPage
             SimpleFormData data, Composite parent, boolean editable ) {
         return createNumberField( label, tooltip, property, data, parent, editable, 0 );
     }
-    
+
+
     private Composite createNumberField( String label, String tooltip, Property<Double> property, SimpleFormData data,
             Composite parent, boolean editable, int fractionDigits ) {
         return newFormField( label )
@@ -328,10 +340,12 @@ public abstract class KapsDefaultFormEditorPage
                 .setEnabled( editable ).create();
     }
 
+
     protected Control createLabel( Composite parent, String text, SimpleFormData data ) {
         return createLabel( parent, text, text, data, SWT.LEFT );
     }
-    
+
+
     protected Control createLabel( Composite parent, String text, SimpleFormData data, int style ) {
         return createLabel( parent, text, text, data, style );
     }
@@ -343,5 +357,19 @@ public abstract class KapsDefaultFormEditorPage
         // label.setForeground( FormEditorToolkit.labelForeground );
         label.setLayoutData( data.create() );
         return label;
+    }
+
+
+    protected Composite createTextField( Property<String> property, SimpleFormData data, Composite client ) {
+        return newFormField( IFormFieldLabel.NO_LABEL ).setEnabled( true )
+                .setProperty( new PropertyAdapter( property ) ).setField( new StringFormField() )
+                .setLayoutData( data.create() ).setParent( client ).create();
+    }
+
+
+    protected Composite createBooleanField( Property<Boolean> property, SimpleFormData data, Composite client ) {
+        return newFormField( IFormFieldLabel.NO_LABEL ).setEnabled( true )
+                .setProperty( new PropertyAdapter( property ) ).setField( new CheckboxFormField() )
+                .setLayoutData( data.create() ).setParent( client ).create();
     }
 }

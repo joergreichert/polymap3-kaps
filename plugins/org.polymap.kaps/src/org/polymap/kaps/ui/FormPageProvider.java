@@ -24,6 +24,7 @@ import org.polymap.rhei.form.IFormPageProvider;
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.BodennutzungComposite;
 import org.polymap.kaps.model.data.ErmittlungModernisierungsgradComposite;
+import org.polymap.kaps.model.data.ErtragswertverfahrenComposite;
 import org.polymap.kaps.model.data.FlurComposite;
 import org.polymap.kaps.model.data.FlurstuecksdatenAgrarComposite;
 import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
@@ -83,6 +84,10 @@ public class FormPageProvider
         }
         else if (name.equalsIgnoreCase( ErmittlungModernisierungsgradComposite.NAME )) {
             result.add( new ErmittlungModernisierungsgradFormEditorPage( feature, formEditor.getFeatureStore() ) );
+        }
+        else if (name.equalsIgnoreCase( ErtragswertverfahrenComposite.NAME )) {
+            result.add( new ErtragswertverfahrenBetriebskostenFormEditorPage( feature, formEditor.getFeatureStore() ) );
+            result.add( new ErtragswertverfahrenErtraegeFormEditorPage( feature, formEditor.getFeatureStore() ) );
         }
         else if (name.equalsIgnoreCase( GebaeudeComposite.NAME )) {
             result.add( new GebaeudeGrunddatenFormEditorPage( feature, formEditor.getFeatureStore() ) );

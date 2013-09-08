@@ -122,21 +122,7 @@ public class ErmittlungModernisierungsgradFormEditorPage
             throw new IllegalStateException(
                     "Zum Ermitteln von Modernisierungsgraden nutzen Sie bitte immer die 'Berechnen' Funktionen aus den Formularen." );
         }
-        // EventManager.instance().subscribe( bodenpreisListener = new
-        // IFormFieldListener() {
-        //
-        // @Override
-        // public void fieldChange( FormFieldEvent ev ) {
-        // bodenpreisBebaut = (Double)ev.getNewValue();
-        // }
-        // }, new EventFilter<FormFieldEvent>() {
-        //
-        // public boolean apply( FormFieldEvent ev ) {
-        // return ev.getEventCode() == IFormFieldListener.VALUE_CHANGE
-        // && ev.getFieldName().equals( vb.bodenpreisBebaut().qualifiedName().name()
-        // );
-        // }
-        // } );
+
         final Calendar cal = new GregorianCalendar();
         heute = new Integer( cal.get( Calendar.YEAR ) ).doubleValue();
     }
@@ -166,6 +152,13 @@ public class ErmittlungModernisierungsgradFormEditorPage
                 return source != null && source instanceof ErmittlungModernisierungsgradComposite && source.equals( em );
             }
         } );
+    }
+
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        EventManager.instance().unsubscribe( this );
     }
 
 
@@ -505,7 +498,7 @@ public class ErmittlungModernisierungsgradFormEditorPage
             }
 
         } );
-        
+
         site.addFieldListener( bereinigtesBaujahrListener = new FieldCalculation( site, 0, em.bereinigtesBaujahr(), em
                 .gesamtNutzungsDauer(), em.neueRestNutzungsDauer() ) {
 

@@ -74,9 +74,9 @@ public class MdbImportWizard
                 @Override
                 protected IStatus doExecute( IProgressMonitor monitor, IAdaptable info )
                         throws Exception {
-                    new MdbImportOperation( importPage.dbFile, importPage.tableNames ).doExecute( monitor, info );
-                    new MdbImportWohneigentumOperation( importPage.dbFile, importPage.tableNames ).doExecute( monitor,
-                          info );
+//                    new MdbImportOperation( importPage.dbFile, importPage.tableNames ).doExecute( monitor, info );
+//                    new MdbImportWohneigentumOperation( importPage.dbFile, importPage.tableNames ).doExecute( monitor,
+//                          info );
                     new MdbImportBewertungenOperation( importPage.dbFile, importPage.tableNames ).doExecute( monitor,
                             info );
                     return Status.OK_STATUS;

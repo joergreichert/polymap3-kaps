@@ -28,8 +28,9 @@ import org.polymap.core.runtime.SubMonitor;
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.NHK2010GebaeudeartenProvider;
 import org.polymap.kaps.model.data.ErmittlungModernisierungsgradComposite;
+import org.polymap.kaps.model.data.ErtragswertverfahrenComposite;
+import org.polymap.kaps.model.data.EtageComposite;
 import org.polymap.kaps.model.data.NHK2010Anbauten;
-import org.polymap.kaps.model.data.NHK2010Baupreisindex;
 import org.polymap.kaps.model.data.NHK2010BewertungComposite;
 import org.polymap.kaps.model.data.NHK2010BewertungGebaeudeComposite;
 import org.polymap.kaps.model.data.VertragComposite;
@@ -60,35 +61,97 @@ public class MdbImportBewertungenOperation
         final Database db = Database.open( dbFile );
         try {
             SubMonitor sub = null;
-            sub = new SubMonitor( monitor, 10 );
-            importEntity( db, monitor, NHK2010Anbauten.class, new EntityCallback<NHK2010Anbauten>() {
+            // sub = new SubMonitor( monitor, 10 );
+            // importEntity( db, monitor, NHK2010Anbauten.class, new
+            // EntityCallback<NHK2010Anbauten>() {
+            //
+            // @Override
+            // public void fillEntity( NHK2010Anbauten entity, Map<String, Object>
+            // builderRow ) {
+            // // bewertung finden
+            // entity.schl().set( String.valueOf( (Integer)builderRow.get( "SCHL" ) )
+            // );
+            // }
+            // } );
+            // sub = new SubMonitor( monitor, 10 );
+            // importEntity( db, monitor, NHK2010Baupreisindex.class, new
+            // EntityCallback<NHK2010Baupreisindex>() {
+            //
+            // @Override
+            // public void fillEntity( NHK2010Baupreisindex entity, Map<String,
+            // Object> builderRow ) {
+            // // jahr von bis
+            // Double value = (Double)builderRow.get( "JAHR" );
+            // entity.jahr().set( value.intValue() );
+            // value = (Double)builderRow.get( "MONVON" );
+            // entity.monatVon().set( value.intValue() );
+            // value = (Double)builderRow.get( "MONBIS" );
+            // entity.monatBis().set( value.intValue() );
+            // }
+            // } );
+            //
+            // sub = new SubMonitor( monitor, 10 );
+            // importNHK2010Bewertung( db, sub, parentFolder );
+            //
+            // sub = new SubMonitor( monitor, 10 );
+            // importModernisierungsgrad( db, sub, parentFolder );
 
-                @Override
-                public void fillEntity( NHK2010Anbauten entity, Map<String, Object> builderRow ) {
-                    // bewertung finden
-                    entity.schl().set( String.valueOf( (Integer)builderRow.get( "SCHL" ) ) );
-                }
-            } );
             sub = new SubMonitor( monitor, 10 );
-            importEntity( db, monitor, NHK2010Baupreisindex.class, new EntityCallback<NHK2010Baupreisindex>() {
+            importEntity( db, monitor, ErtragswertverfahrenComposite.class,
+                    new EntityCallback<ErtragswertverfahrenComposite>() {
 
-                @Override
-                public void fillEntity( NHK2010Baupreisindex entity, Map<String, Object> builderRow ) {
-                    // jahr von bis
-                    Double value = (Double)builderRow.get( "JAHR" );
-                    entity.jahr().set( value.intValue() );
-                    value = (Double)builderRow.get( "MONVON" );
-                    entity.monatVon().set( value.intValue() );
-                    value = (Double)builderRow.get( "MONBIS" );
-                    entity.monatBis().set( value.intValue() );
-                }
-            } );
+                        @Override
+                        public void fillEntity( ErtragswertverfahrenComposite entity, Map<String, Object> builderRow ) {
 
-            sub = new SubMonitor( monitor, 10 );
-            importNHK2010Bewertung( db, sub, parentFolder );
+                            // Geschosse
+                            entity.etageZeile1().set( findSchlNamed( EtageComposite.class, builderRow, "G1", false ) );
+                            entity.etageZeile2().set( findSchlNamed( EtageComposite.class, builderRow, "G2", false ) );
+                            entity.etageZeile3().set( findSchlNamed( EtageComposite.class, builderRow, "G3", false ) );
+                            entity.etageZeile4().set( findSchlNamed( EtageComposite.class, builderRow, "G4", false ) );
+                            entity.etageZeile5().set( findSchlNamed( EtageComposite.class, builderRow, "G5", false ) );
+                            entity.etageZeile6().set( findSchlNamed( EtageComposite.class, builderRow, "G6", false ) );
+                            entity.etageZeile7().set( findSchlNamed( EtageComposite.class, builderRow, "G7", false ) );
 
-            sub = new SubMonitor( monitor, 10 );
-            importModernisierungsgrad( db, sub, parentFolder );
+                            Short berbauj = (Short)builderRow.get( "BERBAUJ" );
+                            if (berbauj != null) {
+                                entity.bereinigtesBaujahr().set( asDouble( berbauj.intValue() ) );
+                            }
+                            entity.tatsaechlichesBaujahr().set( asDouble( (Integer)builderRow.get( "BAUJAHR" ) ) );
+
+                            Double eingangsnummer = (Double)builderRow.get( "EINGANGSNR" );
+                            VertragComposite vertragTemplate = QueryExpressions.templateFor( VertragComposite.class );
+                            BooleanExpression expr = QueryExpressions.eq( vertragTemplate.eingangsNr(),
+                                    eingangsnummer.intValue() );
+                            VertragComposite vertrag = KapsRepository.instance()
+                                    .findEntities( VertragComposite.class, expr, 0, 1 ).find();
+                            if (vertrag == null) {
+                                throw new IllegalStateException( "no vertrag found for " + eingangsnummer );
+                            }
+                            entity.vertrag().set( vertrag );
+
+                            entity.pauschalBetriebskosten().set( getBooleanValue( builderRow, "pauschal" ) );
+                            entity.pauschalBetriebskosten().set( getBooleanValue( builderRow, "pauschalbew" ) );
+                            entity.liziVerwenden().set( getBooleanValue( builderRow, "LIZI" ) );
+                            entity.innenBereich().set( getBooleanValue( builderRow, "INNEN" ) );
+                            entity.bewirtschaftskostenInProzent().set( getBooleanValue( builderRow, "ANGABEPROZ" ) );
+                            entity.bodenwertAnteilIndividuell().set( getBooleanValue( builderRow, "BWANT_IND" ) );
+                            entity.eingabeGesamtMiete().set( getBooleanValue( builderRow, "GESMIETE_EING" ) );
+                            entity.wohnflaecheZeile1().set( getBooleanValue( builderRow, "WOHNFL1" ) );
+                            entity.wohnflaecheZeile2().set( getBooleanValue( builderRow, "WOHNFL2" ) );
+                            entity.wohnflaecheZeile3().set( getBooleanValue( builderRow, "WOHNFL3" ) );
+                            entity.wohnflaecheZeile4().set( getBooleanValue( builderRow, "WOHNFL4" ) );
+                            entity.wohnflaecheZeile5().set( getBooleanValue( builderRow, "WOHNFL5" ) );
+                            entity.wohnflaecheZeile6().set( getBooleanValue( builderRow, "WOHNFL6" ) );
+                            entity.wohnflaecheZeile7().set( getBooleanValue( builderRow, "WOHNFL7" ) );
+                            
+                            if (entity.nettoRohertragProMonat().get() != null) {
+                                entity.nettoRohertragProJahr().set( 12 * entity.nettoRohertragProMonat().get() );
+                            }
+                            if (entity.bruttoRohertragProMonat().get() != null) {
+                                entity.bruttoRohertragProJahr().set( 12 * entity.bruttoRohertragProMonat().get() );
+                            }
+                        }
+                    } );
         }
         finally {
             db.close();
@@ -241,8 +304,8 @@ public class MdbImportBewertungenOperation
                 ErmittlungModernisierungsgradComposite.class, table );
 
         Calendar cal = new GregorianCalendar();
-        double currentYear = new Integer(cal.get( Calendar.YEAR )).doubleValue();
-        
+        double currentYear = new Integer( cal.get( Calendar.YEAR ) ).doubleValue();
+
         Map<String, Object> builderRow = null;
         int count = 0;
         while ((builderRow = table.getNextRow()) != null) {
@@ -389,7 +452,7 @@ public class MdbImportBewertungenOperation
 
                 b.bereinigtesBaujahr().set( asDouble( (Integer)builderRow.get( "BERBAUJ" ) ) );
                 b.gesamtNutzungsDauer().set( asDouble( (Integer)builderRow.get( "GND" ) ) );
-                
+
                 // modernisierungsgrad berechnen
                 Double grad = 0.0d;
                 if (b.auswirkungZeile1().get() != null) {
@@ -469,7 +532,8 @@ public class MdbImportBewertungenOperation
                     double gnd = b.gesamtNutzungsDauer().get();
                     if (alter >= gnd) {
                         b.restNutzungsDauer().set( 0.0d );
-                    } else {
+                    }
+                    else {
                         b.restNutzungsDauer().set( gnd - alter );
                     }
                 }
@@ -478,11 +542,13 @@ public class MdbImportBewertungenOperation
                     double gnd = b.gesamtNutzungsDauer().get();
                     if (alter >= gnd) {
                         b.neueRestNutzungsDauer().set( 0.0d );
-                    } else {
+                    }
+                    else {
                         b.neueRestNutzungsDauer().set( gnd - alter );
                     }
-                } else {
-                    b.neueRestNutzungsDauer().set( b.restNutzungsDauer().get());
+                }
+                else {
+                    b.neueRestNutzungsDauer().set( b.restNutzungsDauer().get() );
                 }
                 count++;
             }
