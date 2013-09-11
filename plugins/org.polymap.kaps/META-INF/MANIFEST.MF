@@ -16,3 +16,4 @@ Require-Bundle: org.polymap.core.libs;bundle-version="3.1.0",
  org.polymap.openlayers.rap.widget;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.polymap.kaps.KapsPlugin
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7

@@ -70,7 +70,8 @@ public class RichtwertzoneKoordinateImporter
     public boolean init( IFeatureOperationContext ctx ) {
         super.init( ctx );
         try {
-            return context.featureSource().getSchema().getName().getLocalPart().startsWith( "Bodenrichtwertzonen" );
+            return context.featureSource().getSchema().getName().getLocalPart().toLowerCase()
+                    .startsWith( "richtwertzonen" );
         }
         catch (Exception e) {
             log.warn( "", e );
@@ -96,10 +97,11 @@ public class RichtwertzoneKoordinateImporter
         if (errors.length() != 0) {
             final String errors2 = errors;
             Polymap.getSessionDisplay().asyncExec( new Runnable() {
+
                 public void run() {
                     MessageDialog.openError( PolymapWorkbench.getShellToParentOn(), "Fehler beim Import", errors2 );
                 }
-            });
+            } );
             return Status.Error;
         }
         return Status.OK;
