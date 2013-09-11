@@ -220,6 +220,7 @@ public interface ErtragswertverfahrenComposite
     @ImportColumn("SBM")
     Property<Double> nettoRohertragProMonat();
 
+
     @Optional
     Property<Double> nettoRohertragProJahr();
 
@@ -229,17 +230,25 @@ public interface ErtragswertverfahrenComposite
     @ImportColumn("SBMG")
     Property<Double> bruttoRohertragProMonat();
 
+
     @Optional
     Property<Double> bruttoRohertragProJahr();
+
 
     // JB - Double
     @Optional
     @ImportColumn("JB")
     Property<Double> jahresBetriebskosten();
-    
+
+
     @Optional
     @ImportColumn("JB")
     Property<Double> jahresBetriebskostenE();
+
+
+    @Optional
+    // betriebskosten nochmal in Bewirtschaftungskosten
+    Property<Double> anteiligeBetriebskosten();
 
     // JV - Double
     @Optional
@@ -250,7 +259,7 @@ public interface ErtragswertverfahrenComposite
     // JI - Double
     @Optional
     @ImportColumn("JI")
-    Property<Double> Instandhaltungskosten();
+    Property<Double> instandhaltungskosten();
 
 
     // JM - Double
@@ -656,5 +665,4 @@ public interface ErtragswertverfahrenComposite
             return KapsRepository.instance().findEntities( ErtragswertverfahrenComposite.class, expr, 0, 1 ).find();
         }
     }
-
 }

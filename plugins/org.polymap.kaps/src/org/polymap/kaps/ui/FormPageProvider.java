@@ -88,6 +88,8 @@ public class FormPageProvider
         else if (name.equalsIgnoreCase( ErtragswertverfahrenComposite.NAME )) {
             result.add( new ErtragswertverfahrenBetriebskostenFormEditorPage( feature, formEditor.getFeatureStore() ) );
             result.add( new ErtragswertverfahrenErtraegeFormEditorPage( feature, formEditor.getFeatureStore() ) );
+            result.add( new ErtragswertverfahrenBewirtschaftungskostenFormEditorPage( feature, formEditor
+                    .getFeatureStore() ) );
         }
         else if (name.equalsIgnoreCase( GebaeudeComposite.NAME )) {
             result.add( new GebaeudeGrunddatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
@@ -133,7 +135,7 @@ public class FormPageProvider
         }
         else if (name.equalsIgnoreCase( NutzungComposite.NAME )) {
             result.add( new DefaultEntityFormEditorPage( feature, formEditor.getFeatureStore(), NutzungComposite.class,
-                    KapsRepository.instance(), NutzungComposite.NAME )  {
+                    KapsRepository.instance(), NutzungComposite.NAME ) {
 
                 @Override
                 protected String labelFor( String name ) {
@@ -154,7 +156,8 @@ public class FormPageProvider
                     }
                     return super.labelFor( name );
                 }
-                
+
+
                 @Override
                 protected String tooltipFor( String name ) {
                     if ("artDerBauflaeche".equals( name )) {
@@ -169,7 +172,7 @@ public class FormPageProvider
         }
         else if (name.equalsIgnoreCase( VertragsArtComposite.NAME )) {
             result.add( new DefaultEntityFormEditorPage( feature, formEditor.getFeatureStore(),
-                    VertragsArtComposite.class, KapsRepository.instance(), VertragsArtComposite.NAME ){
+                    VertragsArtComposite.class, KapsRepository.instance(), VertragsArtComposite.NAME ) {
 
                 @Override
                 protected String labelFor( String name ) {
@@ -181,7 +184,8 @@ public class FormPageProvider
                     }
                     return super.labelFor( name );
                 }
-                
+
+
                 @Override
                 protected String tooltipFor( String name ) {
                     if ("stala".equals( name )) {
@@ -189,7 +193,7 @@ public class FormPageProvider
                     }
                     return super.labelFor( name );
                 }
-            }  );
+            } );
         }
         else if (name.equalsIgnoreCase( KaeuferKreisComposite.NAME )) {
             result.add( new DefaultEntityFormEditorPage( feature, formEditor.getFeatureStore(),
@@ -211,7 +215,8 @@ public class FormPageProvider
                     }
                     return super.labelFor( name );
                 }
-                
+
+
                 @Override
                 protected String tooltipFor( String name ) {
                     if ("stala".equals( name )) {

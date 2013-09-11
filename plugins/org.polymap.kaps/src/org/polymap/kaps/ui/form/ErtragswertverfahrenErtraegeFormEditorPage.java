@@ -36,6 +36,7 @@ import org.polymap.core.runtime.event.EventHandler;
 import org.polymap.core.runtime.event.EventManager;
 
 import org.polymap.rhei.data.entityfeature.AssociationAdapter;
+import org.polymap.rhei.field.FormFieldEvent;
 import org.polymap.rhei.field.IFormFieldLabel;
 import org.polymap.rhei.field.IFormFieldListener;
 import org.polymap.rhei.form.IFormEditorPage2;
@@ -84,7 +85,7 @@ public class ErtragswertverfahrenErtraegeFormEditorPage
 
     private FieldCalculation    rohertragMonatCalculation;
 
-    private Double jahresBetriebskosten;
+    private Double              jahresBetriebskosten;
 
 
     // private FieldListener fieldListener;
@@ -95,7 +96,7 @@ public class ErtragswertverfahrenErtraegeFormEditorPage
         super( ErtragswertverfahrenErtraegeFormEditorPage.class.getName(), "Erträge", feature, featureStore );
 
         jahresBetriebskosten = vb.jahresBetriebskosten().get();
-        
+
         EventManager.instance().subscribe( this, new EventFilter<PropertyChangeEvent>() {
 
             public boolean apply( PropertyChangeEvent ev ) {
@@ -127,8 +128,8 @@ public class ErtragswertverfahrenErtraegeFormEditorPage
     @Override
     public void afterDoLoad( IProgressMonitor monitor )
             throws Exception {
-            pageSite.setFieldValue( vb.jahresBetriebskostenE().qualifiedName().name(), jahresBetriebskosten != null ? getFormatter( 2 )
-                    .format( jahresBetriebskosten ) : null  );
+        pageSite.setFieldValue( vb.jahresBetriebskostenE().qualifiedName().name(),
+                jahresBetriebskosten != null ? getFormatter( 2 ).format( jahresBetriebskosten ) : null );
     }
 
 
@@ -138,10 +139,11 @@ public class ErtragswertverfahrenErtraegeFormEditorPage
         for (PropertyChangeEvent ev : events) {
             if (ev.getPropertyName().equals( vb.jahresBetriebskostenE().qualifiedName().name() )) {
                 if (initialized) {
-                pageSite.setFieldValue( ev.getPropertyName(),
-                        ev.getNewValue() != null ? getFormatter( 2 ).format( ev.getNewValue() ) : null );
-                } else {
-                  jahresBetriebskosten = (Double)ev.getNewValue();  
+                    pageSite.setFieldValue( ev.getPropertyName(),
+                            ev.getNewValue() != null ? getFormatter( 2 ).format( ev.getNewValue() ) : null );
+                }
+                else {
+                    jahresBetriebskosten = (Double)ev.getNewValue();
                 }
                 System.out.println( ev );
             }
@@ -156,8 +158,11 @@ public class ErtragswertverfahrenErtraegeFormEditorPage
         // EventManager.instance().unsubscribe( fieldListener );
     }
 
-    private boolean initialized = false;
-    
+    private boolean            initialized = false;
+
+    private IFormFieldListener anteiligeKostenListener;
+
+
     @SuppressWarnings("unchecked")
     @Override
     public void createFormContent( final IFormEditorPageSite site ) {
@@ -284,6 +289,27 @@ public class ErtragswertverfahrenErtraegeFormEditorPage
         site.addFieldListener( rohertragBruttoJahrCalculation = new FieldSummation( site, 2, vb
                 .bruttoRohertragProJahr(), vb.nettoRohertragProJahr(), vb.jahresBetriebskostenE() ) );
 
+        site.addFieldListener( anteiligeKostenListener = new IFormFieldListener() {
+
+            @Override
+            public void fieldChange( FormFieldEvent ev ) {
+                if (ev.getEventCode() == IFormFieldListener.VALUE_CHANGE) {
+                    if (ev.getFieldName().equals( vb.bruttoRohertragProJahr().qualifiedName().name() )) {
+                        // Reiter 3 informieren
+                        EventManager.instance().publish(
+                                new PropertyChangeEvent( vb, vb.bruttoRohertragProJahr().qualifiedName().name(), vb
+                                        .bruttoRohertragProJahr().get(), (Double)ev.getNewValue() ) );
+                    }
+//                    else if (ev.getFieldName().equals( vb.jahresBetriebskostenE().qualifiedName().name() )) {
+//                        // Reiter 3 informieren
+//                        EventManager.instance().publish(
+//                                new PropertyChangeEvent( vb, vb.jahresBetriebskostenE().qualifiedName().name(), vb
+//                                        .jahresBetriebskostenE().get(), (Double)ev.getNewValue() ) );
+//                    }
+                }
+            }
+        } );
+
         lastLine = newLine;
         newLine = createLabel( client, "monatlicher Rohertrag (brutto) in €", one().right( 83 ).top( lastLine ),
                 SWT.RIGHT );
@@ -297,7 +323,7 @@ public class ErtragswertverfahrenErtraegeFormEditorPage
                 return v != null ? v / 12 : null;
             }
         } );
-        
+
         initialized = true;
     }
 

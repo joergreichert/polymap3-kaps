@@ -203,21 +203,22 @@ public class ErtragswertverfahrenBetriebskostenFormEditorPage
     }
 
     private void enablePauschal( IFormEditorPageSite site, Boolean pauschal ) {
-        site.setFieldEnabled( vb.betriebskostenZeile1().qualifiedName().name(), !pauschal );
-        site.setFieldEnabled( vb.betriebskostenZeile2().qualifiedName().name(), !pauschal );
-        site.setFieldEnabled( vb.betriebskostenZeile3().qualifiedName().name(), !pauschal );
-        site.setFieldEnabled( vb.betriebskostenZeile4().qualifiedName().name(), !pauschal );
-        site.setFieldEnabled( vb.betriebskostenZeile5().qualifiedName().name(), !pauschal );
-        site.setFieldEnabled( vb.betriebskostenZeile6().qualifiedName().name(), !pauschal );
-        site.setFieldEnabled( vb.betriebskostenZeile7().qualifiedName().name(), !pauschal );
-        site.setFieldEnabled( vb.betriebskostenZeile8().qualifiedName().name(), !pauschal );
-        site.setFieldEnabled( vb.betriebskostenZeile9().qualifiedName().name(), !pauschal );
-        site.setFieldEnabled( vb.betriebskostenZeile10().qualifiedName().name(), !pauschal );
-        site.setFieldEnabled( vb.betriebskostenZeile11().qualifiedName().name(), !pauschal );
-        site.setFieldEnabled( vb.betriebskostenTextZeile9().qualifiedName().name(), !pauschal );
-        site.setFieldEnabled( vb.betriebskostenTextZeile10().qualifiedName().name(), !pauschal );
-        site.setFieldEnabled( vb.betriebskostenTextZeile11().qualifiedName().name(), !pauschal );
-        site.setFieldEnabled( vb.jahresBetriebskosten().qualifiedName().name(), pauschal );
+        boolean b = pauschal == null ? false : pauschal.booleanValue();
+        site.setFieldEnabled( vb.betriebskostenZeile1().qualifiedName().name(), !b );
+        site.setFieldEnabled( vb.betriebskostenZeile2().qualifiedName().name(), !b );
+        site.setFieldEnabled( vb.betriebskostenZeile3().qualifiedName().name(), !b );
+        site.setFieldEnabled( vb.betriebskostenZeile4().qualifiedName().name(), !b );
+        site.setFieldEnabled( vb.betriebskostenZeile5().qualifiedName().name(), !b );
+        site.setFieldEnabled( vb.betriebskostenZeile6().qualifiedName().name(), !b );
+        site.setFieldEnabled( vb.betriebskostenZeile7().qualifiedName().name(), !b );
+        site.setFieldEnabled( vb.betriebskostenZeile8().qualifiedName().name(), !b );
+        site.setFieldEnabled( vb.betriebskostenZeile9().qualifiedName().name(), !b );
+        site.setFieldEnabled( vb.betriebskostenZeile10().qualifiedName().name(), !b );
+        site.setFieldEnabled( vb.betriebskostenZeile11().qualifiedName().name(), !b );
+        site.setFieldEnabled( vb.betriebskostenTextZeile9().qualifiedName().name(), !b );
+        site.setFieldEnabled( vb.betriebskostenTextZeile10().qualifiedName().name(), !b );
+        site.setFieldEnabled( vb.betriebskostenTextZeile11().qualifiedName().name(), !b );
+        site.setFieldEnabled( vb.jahresBetriebskosten().qualifiedName().name(), b );
     }
 
     @Override

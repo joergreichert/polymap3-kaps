@@ -130,7 +130,7 @@ public class MdbImportBewertungenOperation
                             entity.vertrag().set( vertrag );
 
                             entity.pauschalBetriebskosten().set( getBooleanValue( builderRow, "pauschal" ) );
-                            entity.pauschalBetriebskosten().set( getBooleanValue( builderRow, "pauschalbew" ) );
+                            entity.pauschalBewirtschaftungskosten().set( getBooleanValue( builderRow, "pauschalbew" ) );
                             entity.liziVerwenden().set( getBooleanValue( builderRow, "LIZI" ) );
                             entity.innenBereich().set( getBooleanValue( builderRow, "INNEN" ) );
                             entity.bewirtschaftskostenInProzent().set( getBooleanValue( builderRow, "ANGABEPROZ" ) );
@@ -150,6 +150,8 @@ public class MdbImportBewertungenOperation
                             if (entity.bruttoRohertragProMonat().get() != null) {
                                 entity.bruttoRohertragProJahr().set( 12 * entity.bruttoRohertragProMonat().get() );
                             }
+                            entity.jahresBetriebskostenE().set( entity.jahresBetriebskosten().get() );
+                            entity.anteiligeBetriebskosten().set( entity.jahresBetriebskosten().get() );
                         }
                     } );
         }
