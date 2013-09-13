@@ -31,6 +31,7 @@ import org.polymap.kaps.model.KapsEntityProvider;
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.FlurstuecksdatenAgrarComposite;
 import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
+import org.polymap.kaps.model.data.GebaeudeComposite;
 import org.polymap.kaps.model.data.NutzungComposite;
 import org.polymap.kaps.model.data.RichtwertzoneComposite;
 import org.polymap.kaps.model.data.RichtwertzoneZeitraumComposite;
@@ -96,6 +97,10 @@ public class FilterProvider
                 }
                 else if (type.isAssignableFrom( NutzungComposite.class )) {
                     result.add( new DefaultEntityFilter( layer, type, repo ) );
+                }
+                else if (type.isAssignableFrom( GebaeudeComposite.class )) {
+                    result.add( new DefaultEntityFilter( layer, type, repo, "objektNummer", "objektFortfuehrung",
+                            "gebaeudeNummer", "gebaeudeFortfuehrung", "gebaeudeArt", "baujahr" ) );
                 }
 
                 else {
