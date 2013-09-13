@@ -14,7 +14,7 @@ package org.polymap.kaps.ui;
 
 import java.util.Date;
 
-import org.qi4j.api.property.Property;
+import org.opengis.feature.Property;
 
 /**
  * 
@@ -24,16 +24,19 @@ import org.qi4j.api.property.Property;
 public class DateMustAfterValidator
         extends DateCompareValidator {
 
-    public DateMustAfterValidator( Property<Date> otherDateProperty, String errorMessage ) {
+    public DateMustAfterValidator( Property otherDateProperty, String errorMessage ) {
         super(otherDateProperty, errorMessage);
     }
 
 
     @Override
     public String validate( Object fieldValue ) {
+        if (fieldValue == null) {
+            return "Dieses Attribut darf nicht leer sein";
+        }
         Date currentDate = (Date)fieldValue;
         if (currentDate != null) {
-            Date otherDate = otherDateProperty.get();
+            Date otherDate = (Date)otherDateProperty.getValue();
             if (otherDate != null && !currentDate.after( otherDate )) {
                 return errorMessage;
             }

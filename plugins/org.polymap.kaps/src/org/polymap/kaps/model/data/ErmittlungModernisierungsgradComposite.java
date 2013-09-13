@@ -492,4 +492,11 @@ public interface ErmittlungModernisierungsgradComposite
             return matches.find();
         }
     }
+
+    @Optional
+    Association<NHK2010BewertungGebaeudeComposite> nhk2010();
+
+
+    @Optional
+    Association<WohnungComposite> wohnung();
 }

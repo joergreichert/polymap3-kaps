@@ -27,15 +27,14 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.polymap.core.project.ui.util.SimpleFormData;
-import org.polymap.core.runtime.event.EventFilter;
 import org.polymap.core.runtime.event.EventManager;
 
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
 import org.polymap.rhei.field.CheckboxFormField;
 import org.polymap.rhei.field.DateTimeFormField;
-import org.polymap.rhei.field.FormFieldEvent;
 import org.polymap.rhei.field.IFormFieldLabel;
 import org.polymap.rhei.field.IFormFieldListener;
+import org.polymap.rhei.form.FormEditor;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
 import org.polymap.kaps.ui.FieldCalculation;
@@ -70,7 +69,7 @@ public class WohnungLiegenschaftzinsFormEditorPage
     private FieldCalculation            berPreis;
 
     @SuppressWarnings("unused")
-    private FieldListener               fieldListener;
+    private FieldListener         fieldListener;
 
     @SuppressWarnings("unused")
     private FieldCalculation            jahresRohertrag;
@@ -102,7 +101,7 @@ public class WohnungLiegenschaftzinsFormEditorPage
 
     // private IFormFieldListener gemeindeListener;
 
-    public WohnungLiegenschaftzinsFormEditorPage( Feature feature, FeatureStore featureStore ) {
+    public WohnungLiegenschaftzinsFormEditorPage( final FormEditor editor, Feature feature, FeatureStore featureStore ) {
         super( WohnungLiegenschaftzinsFormEditorPage.class.getName(), "Liegenschaftszins", feature, featureStore );
         EventManager.instance().subscribe(
                 fieldListener = new FieldListener( wohnung.wohnflaeche(), /*
@@ -113,15 +112,21 @@ public class WohnungLiegenschaftzinsFormEditorPage
                                                                            * bruchteilZaehler
                                                                            * (),
                                                                            */wohnung.bereinigterVollpreis(),
-                        wohnung.kaufpreis(), wohnung.baujahr(), wohnung.gesamtNutzungsDauer() ),
-                new EventFilter<FormFieldEvent>() {
+                        wohnung.kaufpreis(), wohnung.baujahr(), wohnung.gesamtNutzungsDauer() ) {
 
-                    public boolean apply( FormFieldEvent ev ) {
-                        return ev.getEventCode() == IFormFieldListener.VALUE_CHANGE;
-                    }
-                } );
+                            @Override
+                            protected void onChangedValue( IFormEditorPageSite site, String fieldName, Object value ) {
+                                // TODO Auto-generated method stub
+                                throw new RuntimeException( "not yet implemented." );
+                            }
+
+                }, new FieldListener.EventFilter( editor ) );
     }
 
+    @Override
+    public void dispose() {
+        EventManager.instance().unsubscribe( fieldListener );
+    }
 
     protected SimpleFormData one() {
         return new SimpleFormData( SPACING ).left( ONE ).right( TWO );

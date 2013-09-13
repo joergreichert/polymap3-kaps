@@ -12,7 +12,6 @@
  */
 package org.polymap.kaps.ui.form;
 
-import java.util.List;
 import java.util.TreeMap;
 
 import java.beans.PropertyChangeEvent;
@@ -32,8 +31,6 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.forms.widgets.Section;
 
 import org.polymap.core.runtime.Polymap;
-import org.polymap.core.runtime.event.EventFilter;
-import org.polymap.core.runtime.event.EventHandler;
 import org.polymap.core.runtime.event.EventManager;
 import org.polymap.core.workbench.PolymapWorkbench;
 
@@ -93,32 +90,32 @@ public class WohnungGrunddatenFormEditorPage
 
     public WohnungGrunddatenFormEditorPage( Feature feature, FeatureStore featureStore ) {
         super( WohnungGrunddatenFormEditorPage.class.getName(), "Grunddaten", feature, featureStore );
-        EventManager.instance().subscribe( this, new EventFilter<PropertyChangeEvent>() {
-
-            public boolean apply( PropertyChangeEvent ev ) {
-                Object source = ev.getSource();
-                return source != null && source instanceof WohnungComposite && source.equals( wohnung );
-            }
-        } );
+//        EventManager.instance().subscribe( this, new EventFilter<PropertyChangeEvent>() {
+//
+//            public boolean apply( PropertyChangeEvent ev ) {
+//                Object source = ev.getSource();
+//                return source != null && source instanceof WohnungComposite && source.equals( wohnung );
+//            }
+//        } );
     }
-
-
-    @EventHandler(display = true, delay = 1)
-    public void handleExternalGebaeudeSelection( List<PropertyChangeEvent> events )
-            throws Exception {
-        for (PropertyChangeEvent ev : events) {
-            pageSite.setFieldValue( ev.getPropertyName(),
-                    ev.getNewValue() != null ? getFormatter( 0 ).format( ev.getNewValue() ) : null );
-            System.out.println( ev );
-        }
-    }
-
-
-    @Override
-    public void dispose() {
-        super.dispose();
-        EventManager.instance().unsubscribe( this );
-    }
+//
+//
+//    @EventHandler(display = true, delay = 1)
+//    public void handleExternalGebaeudeSelection( List<PropertyChangeEvent> events )
+//            throws Exception {
+//        for (PropertyChangeEvent ev : events) {
+//            pageSite.setFieldValue( ev.getPropertyName(),
+//                    ev.getNewValue() != null ? getFormatter( 0 ).format( ev.getNewValue() ) : null );
+//            System.out.println( ev );
+//        }
+//    }
+//
+//
+//    @Override
+//    public void dispose() {
+//        super.dispose();
+//        EventManager.instance().unsubscribe( this );
+//    }
 
 
     @SuppressWarnings("unchecked")
@@ -231,7 +228,7 @@ public class WohnungGrunddatenFormEditorPage
                 .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 0, 1, 0 ) )
                 .setLayoutData( right().right( 75 ).top( lastLine ).create() ).setParent( parent ).create();
 
-        site.addFieldListener( gndbjListener = new FieldListener( wohnung.gesamtNutzungsDauer(), wohnung.baujahr() ) );
+        site.addFieldListener( gndbjListener = new DefaultFieldListener( wohnung.gesamtNutzungsDauer(), wohnung.baujahr() ) );
 
         // berechnen knopf
         baujahrBerechneAction = new ActionButton( parent, new Action( "Berechnen" ) {
@@ -248,6 +245,7 @@ public class WohnungGrunddatenFormEditorPage
                             .forWohnung( wohnung );
                     if (ermittlung == null) {
                         ermittlung = repository.newEntity( ErmittlungModernisierungsgradComposite.class, null );
+                        ermittlung.wohnung().set( wohnung );
                         // ermittlung.vertrag().set( bewertung.vertrag().get() );
                         ermittlung.objektNummer().set( wohnung.objektNummer().get() );
                         ermittlung.objektFortfuehrung().set( wohnung.objektFortfuehrung().get() );

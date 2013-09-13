@@ -72,12 +72,12 @@ public class FormPageProvider
         else if (name.equalsIgnoreCase( FlurstuecksdatenBaulandComposite.NAME )) {
             result.add( new FlurstuecksdatenBaulandGrunddatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
             result.add( new FlurstuecksdatenBaulandBodenwertFormEditorPage( feature, formEditor.getFeatureStore() ) );
-            result.add( new FlurstuecksdatenBaulandRichtwertFormEditorPage( feature, formEditor.getFeatureStore() ) );
+            result.add( new FlurstuecksdatenBaulandRichtwertFormEditorPage( formEditor, feature, formEditor.getFeatureStore() ) );
             result.add( new FlurstuecksdatenBaulandSonstigesFormEditorPage( feature, formEditor.getFeatureStore() ) );
         }
         else if (name.equalsIgnoreCase( FlurstuecksdatenAgrarComposite.NAME )) {
-            result.add( new FlurstuecksdatenAgrarGrunddatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
-            result.add( new FlurstuecksdatenAgrarBodenwertFormEditorPage( feature, formEditor.getFeatureStore() ) );
+            result.add( new FlurstuecksdatenAgrarGrunddatenFormEditorPage( formEditor, feature, formEditor.getFeatureStore() ) );
+            result.add( new FlurstuecksdatenAgrarBodenwertFormEditorPage( formEditor, feature, formEditor.getFeatureStore() ) );
         }
         else if (name.equalsIgnoreCase( WohnungseigentumComposite.NAME )) {
             result.add( new WohnungseigentumFormEditorPage( feature, formEditor.getFeatureStore() ) );
@@ -97,8 +97,8 @@ public class FormPageProvider
         }
         else if (name.equalsIgnoreCase( WohnungComposite.NAME )) {
             result.add( new WohnungGrunddatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
-            result.add( new WohnungVertragsdatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
-            result.add( new WohnungLiegenschaftzinsFormEditorPage( feature, formEditor.getFeatureStore() ) );
+            result.add( new WohnungVertragsdatenFormEditorPage( formEditor, feature, formEditor.getFeatureStore() ) );
+            result.add( new WohnungLiegenschaftzinsFormEditorPage( formEditor, feature, formEditor.getFeatureStore() ) );
         }
         else if (name.equalsIgnoreCase( GebaeudeArtComposite.NAME )) {
             result.add( new DefaultEntityFormEditorPage( feature, formEditor.getFeatureStore(),

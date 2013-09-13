@@ -12,6 +12,8 @@
  */
 package org.polymap.kaps.model;
 
+import java.util.Date;
+
 import org.geotools.feature.NameImpl;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.opengis.feature.Feature;
@@ -47,8 +49,7 @@ public class KaufvertragEntityProvider
 
 
     public KaufvertragEntityProvider( QiModule repo ) {
-        super( repo, VertragComposite.class, new NameImpl( KapsRepository.NAMESPACE,
-                VertragComposite.NAME ) );
+        super( repo, VertragComposite.class, new NameImpl( KapsRepository.NAMESPACE, VertragComposite.NAME ) );
     }
 
 
@@ -70,9 +71,8 @@ public class KaufvertragEntityProvider
         type = builder.buildFeatureType();
 
         // aussortieren für die Tabelle
-        SimpleFeatureType filtered = SimpleFeatureTypeBuilder.retype( (SimpleFeatureType)type,
-                new String[] { "eingangsNr", "vertragsDatum", "vertragsArt", "eingangsDatum",
-                        "kaufpreis" } );
+        SimpleFeatureType filtered = SimpleFeatureTypeBuilder.retype( (SimpleFeatureType)type, new String[] {
+                "eingangsNr", "vertragsDatum", "vertragsArt", "eingangsDatum", "kaufpreis" } );
         return filtered;
     }
 
@@ -88,5 +88,27 @@ public class KaufvertragEntityProvider
                     EingangsNummerFormatter.format( entity.eingangsNr().get().toString() ) );
         }
         return feature;
+    }
+
+
+    @Override
+    public boolean modifyFeature( VertragComposite entity, String propName, Object value )
+            throws Exception {
+        // set defaults
+        if (value == null) {
+            if (entity.kaufpreis().qualifiedName().name().equals( propName )) {
+                entity.kaufpreis().set( new Double( 0.0 ) );
+                return true;
+            }
+            if (entity.vertragsDatum().qualifiedName().name().equals( propName )) {
+                entity.vertragsDatum().set( new Date() );
+                return true;
+            }
+            if (entity.eingangsDatum().qualifiedName().name().equals( propName )) {
+                entity.eingangsDatum().set( new Date() );
+                return true;
+            }
+        }
+        return super.modifyFeature( entity, propName, value );
     }
 }

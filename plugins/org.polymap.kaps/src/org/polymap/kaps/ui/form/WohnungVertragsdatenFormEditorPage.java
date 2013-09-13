@@ -27,18 +27,17 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.polymap.core.runtime.Polymap;
-import org.polymap.core.runtime.event.EventFilter;
 import org.polymap.core.runtime.event.EventManager;
 
 import org.polymap.rhei.data.entityfeature.AssociationAdapter;
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
 import org.polymap.rhei.field.CheckboxFormField;
-import org.polymap.rhei.field.FormFieldEvent;
 import org.polymap.rhei.field.IFormFieldLabel;
 import org.polymap.rhei.field.IFormFieldListener;
 import org.polymap.rhei.field.NumberValidator;
 import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.field.TextFormField;
+import org.polymap.rhei.form.FormEditor;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
 import org.polymap.kaps.KapsPlugin;
@@ -70,17 +69,25 @@ public class WohnungVertragsdatenFormEditorPage
 
     // private IFormFieldListener gemeindeListener;
 
-    public WohnungVertragsdatenFormEditorPage( Feature feature, FeatureStore featureStore ) {
+    public WohnungVertragsdatenFormEditorPage( final FormEditor editor, Feature feature, FeatureStore featureStore ) {
         super( WohnungVertragsdatenFormEditorPage.class.getName(), "Vertragsdaten", feature, featureStore );
-        EventManager.instance().subscribe( fieldListener = new FieldListener( wohnung.wohnflaeche() ),
-                new EventFilter<FormFieldEvent>() {
+        EventManager.instance().subscribe( fieldListener = new FieldListener( wohnung.wohnflaeche() ) {
 
-                    public boolean apply( FormFieldEvent ev ) {
-                        return ev.getEventCode() == IFormFieldListener.VALUE_CHANGE;
-                    }
-                } );
+            @Override
+            protected void onChangedValue( IFormEditorPageSite site, String fieldName, Object value ) {
+                if (fieldName.equals( wohnung.wohnflaeche().qualifiedName().name() )) {
+                    site.fireEvent( this, wohnung.wohnflaeche().qualifiedName().name(),
+                            IFormFieldListener.VALUE_CHANGE, value );
+                }
+            }
+        }, new FieldListener.EventFilter( editor ) );
     }
 
+
+    @Override
+    public void dispose() {
+        EventManager.instance().unsubscribe( fieldListener );
+    }
 
     @SuppressWarnings("unchecked")
     @Override
@@ -250,7 +257,7 @@ public class WohnungVertragsdatenFormEditorPage
                 kaufpreis = vertragsdatenErweitertComposite.bereinigterVollpreis().get();
             }
             // erweiterte Daten kann leer sein
-            if (kaufpreis == null || kaufpreis == 0.0d ) {
+            if (kaufpreis == null || kaufpreis == 0.0d) {
                 kaufpreis = vertrag.vollpreis().get();
             }
         }
@@ -258,9 +265,6 @@ public class WohnungVertragsdatenFormEditorPage
             pageSite.setFieldValue( wohnung.kaufpreis().qualifiedName().name(), getFormatter( 2 ).format( kaufpreis ) );
         }
 
-        if (fieldListener.get( wohnung.wohnflaeche() ) != null) {
-            pageSite.fireEvent( this, wohnung.wohnflaeche().qualifiedName().name(), IFormFieldListener.VALUE_CHANGE,
-                    fieldListener.get( wohnung.wohnflaeche() ) );
-        }
+        fieldListener.flush( pageSite );
     }
 }

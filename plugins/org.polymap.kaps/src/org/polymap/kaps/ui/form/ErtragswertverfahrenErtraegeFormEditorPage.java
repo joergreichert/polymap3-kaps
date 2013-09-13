@@ -88,7 +88,7 @@ public class ErtragswertverfahrenErtraegeFormEditorPage
     private Double              jahresBetriebskosten;
 
 
-    // private FieldListener fieldListener;
+    // private InterEditorListener fieldListener;
 
     // private IFormFieldListener gemeindeListener;
 
@@ -104,7 +104,7 @@ public class ErtragswertverfahrenErtraegeFormEditorPage
                 return source != null && source instanceof ErtragswertverfahrenComposite && source.equals( vb );
             }
         } );
-        // EventManager.instance().subscribe( fieldListener = new FieldListener(
+        // EventManager.instance().subscribe( fieldListener = new InterEditorListener(
         // vb.jahresBetriebskosten() ),
         // new EventFilter<FormFieldEvent>() {
         //

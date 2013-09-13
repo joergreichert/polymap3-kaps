@@ -652,6 +652,8 @@ public interface ErtragswertverfahrenComposite
     @Optional
     Property<Boolean> wohnflaecheZeile7();
 
+    @Optional
+    Property<Double> bereinigterKaufpreis();
 
     public static abstract class Mixin
             implements ErtragswertverfahrenComposite {

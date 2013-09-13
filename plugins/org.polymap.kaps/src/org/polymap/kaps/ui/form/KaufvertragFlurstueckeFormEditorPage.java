@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.dialogs.MessageDialog;
 
 import org.eclipse.ui.forms.widgets.Section;
 
@@ -37,6 +38,7 @@ import org.polymap.core.data.ui.featuretable.FeatureTableViewer;
 import org.polymap.core.model.EntityType;
 import org.polymap.core.qi4j.QiModule.EntityCreator;
 import org.polymap.core.runtime.Polymap;
+import org.polymap.core.workbench.PolymapWorkbench;
 
 import org.polymap.rhei.data.entityfeature.PropertyDescriptorAdapter;
 import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter;
@@ -71,6 +73,7 @@ import org.polymap.kaps.model.data.WohnungComposite;
 import org.polymap.kaps.ui.ActionButton;
 import org.polymap.kaps.ui.BooleanFormField;
 import org.polymap.kaps.ui.KapsDefaultFormEditorPageWithFeatureTable;
+import org.polymap.kaps.ui.NotNullValidator;
 import org.polymap.kaps.ui.SimplePickList;
 
 /**
@@ -107,7 +110,8 @@ public class KaufvertragFlurstueckeFormEditorPage
 
 
     public KaufvertragFlurstueckeFormEditorPage( Feature feature, FeatureStore featureStore ) {
-        super( FlurstueckComposite.class, KaufvertragFlurstueckeFormEditorPage.class.getName(), "Flurstücke", feature, featureStore );
+        super( FlurstueckComposite.class, KaufvertragFlurstueckeFormEditorPage.class.getName(), "Flurstücke", feature,
+                featureStore );
 
         kaufvertrag = repository.findEntity( VertragComposite.class, feature.getIdentifier().getID() );
     }
@@ -121,14 +125,15 @@ public class KaufvertragFlurstueckeFormEditorPage
         site.setFormTitle( formattedTitle( "Kaufvertrag", kaufvertrag.eingangsNr().get(), getTitle() ) );
 
         Composite parent = site.getPageBody();
-        Composite schildForm = createFlurstueckForm( parent );
+
+        Section tableSection = newSection( null, "Auswahl" );
+        createTableForm( (Composite)tableSection.getClient(), null, true );
+
+        Composite schildForm = createFlurstueckForm( tableSection );
 
         Composite extendedForm = createErweiterteDatenForm( schildForm );
 
         Composite bewertungForm = createBewertungenForm( extendedForm );
-
-        Section tableSection = newSection( bewertungForm, "Auswahl" );
-        createTableForm( (Composite)tableSection.getClient(), bewertungForm, true );
     }
 
 
@@ -150,9 +155,10 @@ public class KaufvertragFlurstueckeFormEditorPage
             wohnungPicklist.setEnabled( composite != null );
             createWohnung.setEnabled( composite != null );
             searchWohnung.setEnabled( composite != null );
+
+            // das muss disabled bleiben
+            pageSite.setFieldEnabled( prefix + "verkaufteFlaeche", false );
         }
-        // das muss disabled bleiben
-        pageSite.setFieldEnabled( prefix + "verkaufteFlaeche", false );
     }
 
 
@@ -171,7 +177,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                                         return entity.gemarkung();
                                     }
                                 } ) )
-                .setField( reloadable( namedAssocationsPicklist( GemarkungComposite.class, true ) ) )
+                .setField( reloadable( namedAssocationsPicklist( GemarkungComposite.class, true ) ) ).setValidator( new NotNullValidator() )
                 .setLayoutData( left().create() ).create();
 
         newFormField( "Flur" )
@@ -197,8 +203,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                                     }
                                 } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
                 .setLayoutData( left().right( 30 ).top( line0 ).create() )
-                .setValidator( new NumberValidator( Integer.class, locale ) )
-                .create();
+                .setValidator( new NotNullNumberValidator( Integer.class, locale ) ).create();
 
         newFormField( "/" )
                 .setParent( parent )
@@ -358,7 +363,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                                         return entity.richtwertZone();
                                     }
                                 } ) ).setField( reloadable( richtwertZonePickList ) )
-                .setLayoutData( left().top( line2 ).create() ).create();
+                .setValidator( new NotNullValidator() ).setLayoutData( left().top( line2 ).create() ).create();
 
         pageSite.addFieldListener( gemarkungListener = new IFormFieldListener() {
 
@@ -414,7 +419,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                                     public Association get( FlurstueckComposite entity ) {
                                         return entity.nutzung();
                                     }
-                                } ) ).setField( reloadable( namedAssocationsPicklist( NutzungComposite.class ) ) )
+                                } ) ).setField( reloadable( namedAssocationsPicklist( NutzungComposite.class ) ) ).setValidator( new NotNullValidator() )
                 .setLayoutData( left().top( line3 ).create() ).create();
 
         newFormField( "Gebäudeart" )
@@ -569,9 +574,9 @@ public class KaufvertragFlurstueckeFormEditorPage
 
     private SimplePickList<WohnungComposite> wohnungPicklist;
 
-    private ActionButton openBewertungen;
+    private ActionButton                     openBewertungen;
 
-    private ActionButton openErtragswert;
+    private ActionButton                     openErtragswert;
 
 
     private Section createErweiterteDatenForm( Composite top ) {
@@ -579,6 +584,7 @@ public class KaufvertragFlurstueckeFormEditorPage
         Section formSection = newSection( top, "Erweiterte Daten" );
         formSection.setExpanded( false );
         Composite parent = (Composite)formSection.getClient();
+        final IFormEditorPageSite site = pageSite;
 
         openErweiterteDatenAgrar = new ActionButton( parent, new Action( "Daten Agrarland anlegen" ) {
 
@@ -586,16 +592,23 @@ public class KaufvertragFlurstueckeFormEditorPage
             public void run() {
                 FlurstueckComposite flurstueck = selectedComposite.get();
                 if (flurstueck != null) {
-                    FlurstuecksdatenAgrarComposite agrar = FlurstuecksdatenAgrarComposite.Mixin
-                            .forFlurstueck( flurstueck );
-                    if (agrar == null) {
-                        agrar = repository.newEntity( FlurstuecksdatenAgrarComposite.class, null );
-                        agrar.flurstueck().set( flurstueck );
-                        agrar.vertrag().set( flurstueck.vertrag().get() );
-                        // agrar.richtwertZone1().set(
-                        // flurstueck.richtwertZone().get() );
+                    if (site.isDirty()) {
+                        MessageDialog.openInformation( PolymapWorkbench.getShellToParentOn(), "Formular speichern",
+                                "Bitte speichern Sie zuerst die Daten in diesem Formular, bevor Sie das nächste Formular öffnen." );
                     }
-                    KapsPlugin.openEditor( fs, FlurstuecksdatenAgrarComposite.NAME, agrar );
+                    else {
+                        FlurstuecksdatenAgrarComposite agrar = FlurstuecksdatenAgrarComposite.Mixin
+                                .forFlurstueck( flurstueck );
+                        if (agrar == null) {
+
+                            agrar = repository.newEntity( FlurstuecksdatenAgrarComposite.class, null );
+                            agrar.flurstueck().set( flurstueck );
+                            agrar.vertrag().set( flurstueck.vertrag().get() );
+                            // agrar.richtwertZone1().set(
+                            // flurstueck.richtwertZone().get() );
+                        }
+                        KapsPlugin.openEditor( fs, FlurstuecksdatenAgrarComposite.NAME, agrar );
+                    }
                 }
             }
 
@@ -624,15 +637,22 @@ public class KaufvertragFlurstueckeFormEditorPage
             public void run() {
                 FlurstueckComposite flurstueck = selectedComposite.get();
                 if (flurstueck != null) {
-                    FlurstuecksdatenBaulandComposite bauland = FlurstuecksdatenBaulandComposite.Mixin
-                            .forFlurstueck( flurstueck );
-                    if (bauland == null) {
-                        bauland = repository.newEntity( FlurstuecksdatenBaulandComposite.class, null );
-                        bauland.flurstueck().set( flurstueck );
-                        bauland.vertrag().set( flurstueck.vertrag().get() );
-                        bauland.richtwertZone().set( flurstueck.richtwertZone().get() );
+                    if (site.isDirty()) {
+                        MessageDialog.openInformation( PolymapWorkbench.getShellToParentOn(), "Formular speichern",
+                                "Bitte speichern Sie zuerst die Daten in diesem Formular, bevor Sie das nächste Formular öffnen." );
                     }
-                    KapsPlugin.openEditor( fs, FlurstuecksdatenBaulandComposite.NAME, bauland );
+                    else {
+
+                        FlurstuecksdatenBaulandComposite bauland = FlurstuecksdatenBaulandComposite.Mixin
+                                .forFlurstueck( flurstueck );
+                        if (bauland == null) {
+                            bauland = repository.newEntity( FlurstuecksdatenBaulandComposite.class, null );
+                            bauland.flurstueck().set( flurstueck );
+                            bauland.vertrag().set( flurstueck.vertrag().get() );
+                            bauland.richtwertZone().set( flurstueck.richtwertZone().get() );
+                        }
+                        KapsPlugin.openEditor( fs, FlurstuecksdatenBaulandComposite.NAME, bauland );
+                    }
                 }
             }
 
@@ -760,6 +780,7 @@ public class KaufvertragFlurstueckeFormEditorPage
         Composite parent = (Composite)formSection.getClient();
 
         openBewertungen = new ActionButton( parent, new Action( "nach NHK 2010 bewerten" ) {
+
             @Override
             public void run() {
                 NHK2010BewertungComposite bewertungComposite = NHK2010BewertungComposite.Mixin.forVertrag( kaufvertrag );
@@ -784,13 +805,15 @@ public class KaufvertragFlurstueckeFormEditorPage
                 super.setEnabled( enabled );
             };
         };
-        openBewertungen.setLayoutData( left().right(25).height( 25 ).top( null ).bottom( 100 ).create() );
+        openBewertungen.setLayoutData( left().right( 25 ).height( 25 ).top( null ).bottom( 100 ).create() );
         openBewertungen.setEnabled( true );
-        
+
         openErtragswert = new ActionButton( parent, new Action( "nach Ertragswertverfahren - normal bewerten" ) {
+
             @Override
             public void run() {
-                ErtragswertverfahrenComposite bewertungComposite = ErtragswertverfahrenComposite.Mixin.forVertrag( kaufvertrag );
+                ErtragswertverfahrenComposite bewertungComposite = ErtragswertverfahrenComposite.Mixin
+                        .forVertrag( kaufvertrag );
                 if (bewertungComposite == null) {
                     bewertungComposite = repository.newEntity( ErtragswertverfahrenComposite.class, null );
                     bewertungComposite.vertrag().set( kaufvertrag );
@@ -812,7 +835,8 @@ public class KaufvertragFlurstueckeFormEditorPage
                 super.setEnabled( enabled );
             };
         };
-        openErtragswert.setLayoutData( left().left( openBewertungen, 5 ).width( 25 ).height( 25 ).top( null ).bottom( 100 ).create() );
+        openErtragswert.setLayoutData( left().left( openBewertungen, 5 ).width( 25 ).height( 25 ).top( null )
+                .bottom( 100 ).create() );
         openErtragswert.setEnabled( true );
         return formSection;
     }

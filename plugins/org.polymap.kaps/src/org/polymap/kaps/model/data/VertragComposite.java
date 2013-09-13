@@ -27,9 +27,12 @@ import org.qi4j.api.property.Computed;
 import org.qi4j.api.property.Property;
 import org.qi4j.api.unitofwork.UnitOfWorkCompletionException;
 
+import org.eclipse.jface.util.PropertyChangeEvent;
+
 import org.polymap.core.qi4j.QiEntity;
 import org.polymap.core.qi4j.event.ModelChangeSupport;
 import org.polymap.core.qi4j.event.PropertyChangeSupport;
+import org.polymap.core.runtime.event.EventManager;
 
 import org.polymap.kaps.importer.ImportColumn;
 import org.polymap.kaps.importer.ImportTable;
@@ -347,6 +350,7 @@ public interface VertragComposite
                 throws UnitOfWorkCompletionException {
             if (eingangsNr().get() == null) {
                 eingangsNr().set( KapsRepository.instance().highestEingangsNummer(vertragsDatum().get()) );
+                EventManager.instance().publish( new PropertyChangeEvent( this, eingangsNr().qualifiedName().name(), null, eingangsNr().get() ) );
             }
         }
 

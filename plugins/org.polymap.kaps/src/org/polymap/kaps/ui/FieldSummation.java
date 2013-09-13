@@ -29,6 +29,8 @@ import org.polymap.rhei.form.IFormEditorPageSite;
 public class FieldSummation
         implements IFormFieldListener {
 
+//    private static Log           F               log = LogFactory.getLog( FieldSummation.class );
+
     private final IFormEditorPageSite           site;
 
     private final Property<Double>              result;
@@ -65,6 +67,8 @@ public class FieldSummation
             return;
         }
         String fieldName = ev.getFieldName();
+//        log.info( "field changed for " + fieldName + " on site " + site + " to " + ev.getNewValue() + " on source " + ev.getSource() +  " and editor " + ev.getEditor());
+        
         if (terms.keySet().contains( fieldName )) {
             Double newValue = (Double)ev.getNewValue(); // explizitely deleting this
                                                         // value

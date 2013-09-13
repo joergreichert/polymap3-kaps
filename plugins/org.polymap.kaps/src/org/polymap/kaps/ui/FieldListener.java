@@ -15,16 +15,49 @@ package org.polymap.kaps.ui;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.qi4j.api.property.Property;
 
 import org.polymap.rhei.field.FormFieldEvent;
 import org.polymap.rhei.field.IFormFieldListener;
+import org.polymap.rhei.form.FormEditor;
+import org.polymap.rhei.form.IFormEditorPageSite;
 
 /**
+ * the only job of this listener is to store all field events, from within this
+ * editor to support the lazy loading of different tabs
+ * 
+ * the method flush should be called from afterDoLoad() in den Page
+ * 
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
-public class FieldListener
+public abstract class FieldListener
         implements IFormFieldListener {
+
+    /**
+     * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
+     */
+    public static class EventFilter
+            implements org.polymap.core.runtime.event.EventFilter<FormFieldEvent> {
+
+        private static Log       log = LogFactory.getLog( EventFilter.class );
+
+        private final FormEditor editor;
+
+
+        public EventFilter( final FormEditor editor ) {
+            this.editor = editor;
+        }
+
+
+        public boolean apply( FormFieldEvent ev ) {
+            return ev.getEventCode() == IFormFieldListener.VALUE_CHANGE && ev.getEditor() == editor;
+        }
+    }
+
+    private static Log                log    = LogFactory.getLog( FieldListener.class );
 
     private final Map<String, Object> values = new HashMap<String, Object>();
 
@@ -40,30 +73,46 @@ public class FieldListener
 
     private final Map<String, Property<?>> terms;
 
+    private boolean                        blocked = false;
+
 
     public FieldListener( Property... operators ) {
         terms = new HashMap<String, Property<?>>();
         for (Property<?> term : operators) {
             terms.put( term.qualifiedName().name(), term );
         }
-        for (Property term : operators) {
-            put( term, term.get() );
-        }
+        // for (Property term : operators) {
+        // put( term, term.get() );
+        // }
     }
 
 
     @Override
     public void fieldChange( FormFieldEvent ev ) {
-        if (ev.getEventCode() != IFormFieldListener.VALUE_CHANGE) {
+        if (!blocked && ev.getEventCode() != IFormFieldListener.VALUE_CHANGE) {
             return;
         }
+//        log.info( "field change for " + ev.toString() + " on  " + this );
         String fieldName = ev.getFieldName();
         if (terms.keySet().contains( fieldName )) {
-            Double newValue = (Double)ev.getNewValue(); //explizitely deleting this value
-            if (newValue == null) {
-                newValue = Double.valueOf( 0.0d );
-            }
-            put( terms.get( fieldName ), newValue );
+            put( terms.get( fieldName ), ev.getNewValue() );
         }
     }
+
+    public void unBlock() {
+        blocked = false;
+    }
+    
+    public final void flush( IFormEditorPageSite site ) {
+        // after flush, no more events would be tracked
+        blocked = true;
+        for (String fieldName : values.keySet()) {
+            log.info( "Flush for site " + site.toString() + " and field " + fieldName + " and Value "
+                    + values.get( fieldName ) );
+            onChangedValue( site, fieldName, values.get( fieldName ) );
+        }
+    }
+
+
+    protected abstract void onChangedValue( IFormEditorPageSite site, String fieldName, Object value );
 }

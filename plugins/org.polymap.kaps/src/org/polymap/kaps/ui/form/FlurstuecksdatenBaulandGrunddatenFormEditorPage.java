@@ -14,6 +14,7 @@ package org.polymap.kaps.ui.form;
 
 import java.util.TreeMap;
 
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import org.geotools.data.FeatureStore;
@@ -32,6 +33,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.polymap.core.project.ui.util.SimpleFormData;
 import org.polymap.core.runtime.Polymap;
+import org.polymap.core.runtime.event.EventManager;
 
 import org.polymap.rhei.data.entityfeature.AssociationAdapter;
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
@@ -98,8 +100,7 @@ public class FlurstuecksdatenBaulandGrunddatenFormEditorPage
 
         final VertragComposite kaufvertrag = vb.vertrag().get();
         String nummer = EingangsNummerFormatter.format( kaufvertrag.eingangsNr().get() );
-        String label = kaufvertrag == null ? "Kein Vertrag zugewiesen" : "Vertrag "
-                + nummer + " öffnen";
+        String label = kaufvertrag == null ? "Kein Vertrag zugewiesen" : "Vertrag " + nummer + " öffnen";
         ActionButton openVertrag = new ActionButton( parent, new Action( label ) {
 
             @Override
@@ -110,7 +111,6 @@ public class FlurstuecksdatenBaulandGrunddatenFormEditorPage
         openVertrag.setLayoutData( left().height( 25 ).create() );
         openVertrag.setEnabled( kaufvertrag != null );
 
-        
         Section section = newSection( parent, "Richtwertberechnung" );
         section.setLayoutData( new SimpleFormData( SECTION_SPACING ).left( 0 ).right( 100 ).top( openVertrag ).create() );
         Composite client = (Composite)section.getClient();
@@ -195,10 +195,10 @@ public class FlurstuecksdatenBaulandGrunddatenFormEditorPage
                 if (ev.getEventCode() == IFormFieldListener.VALUE_CHANGE
                         && ev.getFieldName().equals( vb.richtwertZoneG().qualifiedName().name() )) {
                     RichtwertzoneZeitraumComposite rzc = (RichtwertzoneZeitraumComposite)ev.getNewValue();
-                    pageSite.setFieldValue( vb.richtwert().qualifiedName().name(),
-                            rzc != null && rzc.euroQm().get() != null ? getFormatter( 2 ).format( rzc.euroQm().get() ) : "0" );
+                    pageSite.setFieldValue( vb.richtwert().qualifiedName().name(), rzc != null
+                            && rzc.euroQm().get() != null ? getFormatter( 2 ).format( rzc.euroQm().get() ) : "0" );
                     pageSite.setFieldValue( vb.erschliessungsBeitrag().qualifiedName().name(), rzc != null ? rzc
-                            .erschliessungsBeitrag().get() : null);
+                            .erschliessungsBeitrag().get() : null );
                 }
             }
         } );
@@ -394,6 +394,10 @@ public class FlurstuecksdatenBaulandGrunddatenFormEditorPage
                     if (abschlag != null) {
                         bodenpreis -= abschlag;
                     }
+                    // trigger calculation on next tab before save
+                    EventManager.instance().publish(
+                            new PropertyChangeEvent( vb, vb.bodenpreisBebaut().qualifiedName().name(), vb
+                                    .bodenpreisBebaut().get(), bodenpreis ) );
                     return bodenpreis;
                 }
                 return null;

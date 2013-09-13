@@ -256,9 +256,9 @@ public class KapsRepository
             public void create( VertragComposite prototype )
                     throws Exception {
                 prototype.eingangsDatum().set( new Date() );
-                prototype.kaufpreis().set( 0.0d );
-                prototype.kaufpreisAnteilZaehler().set( 1.0 );
-                prototype.kaufpreisAnteilNenner().set( 1.0 );
+//                prototype.kaufpreis().set( new Double(0.0d)  );
+                prototype.kaufpreisAnteilZaehler().set(new Double(1.0)  );
+                prototype.kaufpreisAnteilNenner().set( new Double(1.0) );
                 prototype.fuerGewosGeeignet().set( Boolean.TRUE );
                 prototype.fuerAuswertungGeeignet().set( Boolean.TRUE );
 

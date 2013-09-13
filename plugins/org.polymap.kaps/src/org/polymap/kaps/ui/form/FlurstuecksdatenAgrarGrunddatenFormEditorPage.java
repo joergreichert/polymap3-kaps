@@ -32,6 +32,7 @@ import org.polymap.rhei.field.IFormFieldListener;
 import org.polymap.rhei.field.NumberValidator;
 import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.field.TextFormField;
+import org.polymap.rhei.form.FormEditor;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
 import org.polymap.kaps.model.data.GebaeudeArtComposite;
@@ -46,8 +47,10 @@ public class FlurstuecksdatenAgrarGrunddatenFormEditorPage
 
     private IFormFieldListener listener;
 
+//    private IFormFieldListener informer;
 
-    public FlurstuecksdatenAgrarGrunddatenFormEditorPage( Feature feature, FeatureStore featureStore ) {
+
+    public FlurstuecksdatenAgrarGrunddatenFormEditorPage( FormEditor formEditor, Feature feature, FeatureStore featureStore ) {
         super( FlurstuecksdatenAgrarGrunddatenFormEditorPage.class.getName(), "Grunddaten", feature, featureStore );
     }
 
@@ -71,9 +74,8 @@ public class FlurstuecksdatenAgrarGrunddatenFormEditorPage
 
         lastLine = newLine;
         newLine = newFormField( "ist bebaut" ).setToolTipText( "Agrarland ist bebaut" )
-                .setField( new CheckboxFormField() )
-                .setProperty( new PropertyAdapter( vb.istBebaut() ) ).setLayoutData( left().top( lastLine ).create() )
-                .setParent( client ).create();
+                .setField( new CheckboxFormField() ).setProperty( new PropertyAdapter( vb.istBebaut() ) )
+                .setLayoutData( left().top( lastLine ).create() ).setParent( client ).create();
         pageSite.addFieldListener( listener = new IFormFieldListener() {
 
             @Override
@@ -115,6 +117,8 @@ public class FlurstuecksdatenAgrarGrunddatenFormEditorPage
                 .setField( new TextFormField() ).setEnabled( false )
                 .setLayoutData( left().right( 100 ).height( 50 ).top( lastLine ).create() ).setParent( client )
                 .create();
+
+//        site.addFieldListener( informer = new InterEditorPublisher(vb.gesamtBauWert()));
     }
 
 

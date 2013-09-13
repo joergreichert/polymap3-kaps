@@ -899,6 +899,12 @@ public interface WohnungComposite
                             + gebaeudeFortfuehrung().get() + "/" + wohnungsNummer().get() + "/"
                             + wohnungsFortfuehrung().get();
                 }
+                
+                @Override
+                public void set( String anIgnoredValue )
+                        throws IllegalArgumentException, IllegalStateException {
+                    // really ignore
+                }
             };
         }
 

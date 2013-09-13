@@ -12,12 +12,10 @@
  */
 package org.polymap.kaps.ui;
 
-import java.util.Date;
+import org.opengis.feature.Property;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.qi4j.api.property.Property;
 
 import org.polymap.rhei.field.IFormFieldValidator;
 
@@ -28,7 +26,7 @@ public abstract class DateCompareValidator implements IFormFieldValidator {
 
     private static Log             log = LogFactory.getLog( DateMustBeforeValidator.class );
 
-    protected final Property<Date> otherDateProperty;
+    protected final Property otherDateProperty;
 
     protected final String         errorMessage;
 
@@ -36,7 +34,7 @@ public abstract class DateCompareValidator implements IFormFieldValidator {
     /**
      * 
      */
-    public DateCompareValidator( Property<Date> laterDateProperty, String errorMessage ) {
+    public DateCompareValidator( Property laterDateProperty, String errorMessage ) {
         this.otherDateProperty = laterDateProperty;
         this.errorMessage = errorMessage;
 

@@ -27,7 +27,6 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.polymap.core.project.ui.util.SimpleFormData;
-import org.polymap.core.runtime.event.EventFilter;
 import org.polymap.core.runtime.event.EventManager;
 
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
@@ -35,6 +34,7 @@ import org.polymap.rhei.field.FormFieldEvent;
 import org.polymap.rhei.field.IFormFieldLabel;
 import org.polymap.rhei.field.IFormFieldListener;
 import org.polymap.rhei.field.TextFormField;
+import org.polymap.rhei.form.FormEditor;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
 import org.polymap.kaps.ui.FieldCalculation;
@@ -60,7 +60,7 @@ public class FlurstuecksdatenBaulandRichtwertFormEditorPage
 
     private IFormFieldListener bodenpreis;
 
-    protected Double           bodenpreisBebaut;
+    // protected Double bodenpreisBebaut;
 
     // private IFormFieldListener bodenpreisListener;
 
@@ -83,18 +83,52 @@ public class FlurstuecksdatenBaulandRichtwertFormEditorPage
 
     // private IFormFieldListener gemeindeListener;
 
-    public FlurstuecksdatenBaulandRichtwertFormEditorPage( Feature feature, FeatureStore featureStore ) {
+    public FlurstuecksdatenBaulandRichtwertFormEditorPage( final FormEditor editor, Feature feature,
+            FeatureStore featureStore ) {
         super( FlurstuecksdatenBaulandRichtwertFormEditorPage.class.getName(), "Richtwert", feature, featureStore );
 
         EventManager.instance().subscribe(
                 fieldListener = new FieldListener( vb.bodenwertBereinigt1(), vb.bebAbschlag(),
-                        vb.richtwertAbschlagProzent(), vb.richtwertZuschlagProzent(), vb.erschliessungsKosten() ),
-                new EventFilter<FormFieldEvent>() {
+                        vb.richtwertAbschlagProzent(), vb.richtwertZuschlagProzent(), vb.erschliessungsKosten() ) {
 
-                    public boolean apply( FormFieldEvent ev ) {
-                        return ev.getEventCode() == IFormFieldListener.VALUE_CHANGE;
+                    @Override
+                    protected void onChangedValue( IFormEditorPageSite site, String fieldName, Object value ) {
+                        // bodenpreis vom 1. tab könnte sich geändert haben, also neu
+                        // berechnen
+                        if (fieldName.equals( vb.bodenwertBereinigt1().qualifiedName().name() ) && value != null
+                                && value != vb.bodenpreisAbgleichAufBaupreisBebaut().get()) {
+                            // vb.bodenpreisAbgleichAufBaupreisBebaut().set(
+                            // bodenpreisBebaut );
+                            site.setFieldValue( vb.bodenpreisAbgleichAufBaupreisBebaut().qualifiedName().name(),
+                                    value != null ? getFormatter( 2 ).format( (Double)value ) : null );
+                        }
+                        else if (fieldName.equals( vb.bebAbschlag().qualifiedName().name() )) {
+                            site.fireEvent( this, vb.bebAbschlag().qualifiedName().name(),
+                                    IFormFieldListener.VALUE_CHANGE, value );
+                        }
+                        if (fieldName.equals( vb.richtwertAbschlagProzent().qualifiedName().name() )) {
+                            site.fireEvent( this, vb.richtwertAbschlagProzent().qualifiedName().name(),
+                                    IFormFieldListener.VALUE_CHANGE, value );
+                        }
+                        if (fieldName.equals( vb.richtwertZuschlagProzent().qualifiedName().name() )) {
+                            site.fireEvent( this, vb.richtwertZuschlagProzent().qualifiedName().name(),
+                                    IFormFieldListener.VALUE_CHANGE, value );
+                        }
+                        if (fieldName.equals( vb.erschliessungsKosten().qualifiedName().name() )) {
+                            // vb.zwischensummeEK().set( fieldListener.get(
+                            // vb.erschliessungsKosten() ) );
+                            site.setFieldValue( vb.zwischensummeEK().qualifiedName().name(),
+                                    value != null ? getFormatter( 2 ).format( (Double)value ) : null );
+                        }
                     }
-                } );
+
+                }, new FieldListener.EventFilter( editor ) );
+    }
+
+
+    @Override
+    public void dispose() {
+        EventManager.instance().unsubscribe( fieldListener );
     }
 
 
@@ -338,29 +372,6 @@ public class FlurstuecksdatenBaulandRichtwertFormEditorPage
             throws Exception {
         super.afterDoLoad( monitor );
 
-        // bodenpreis vom 1. tab könnte sich geändert haben, also neu berechnen
-        Double bodenpreisBebaut = fieldListener.get( vb.bodenwertBereinigt1() );
-        if (bodenpreisBebaut != null && bodenpreisBebaut != vb.bodenpreisAbgleichAufBaupreisBebaut().get()) {
-            //vb.bodenpreisAbgleichAufBaupreisBebaut().set( bodenpreisBebaut );
-            pageSite.setFieldValue( vb.bodenpreisAbgleichAufBaupreisBebaut().qualifiedName().name(), getFormatter( 2 )
-                    .format( bodenpreisBebaut ) );
-        }
-        if (fieldListener.get( vb.bebAbschlag() ) != null) {
-            pageSite.fireEvent( this, vb.bebAbschlag().qualifiedName().name(), IFormFieldListener.VALUE_CHANGE,
-                    fieldListener.get( vb.bebAbschlag() ) );
-        }
-        if (fieldListener.get( vb.richtwertAbschlagProzent() ) != null) {
-            pageSite.fireEvent( this, vb.richtwertAbschlagProzent().qualifiedName().name(),
-                    IFormFieldListener.VALUE_CHANGE, fieldListener.get( vb.richtwertAbschlagProzent() ) );
-        }
-        if (fieldListener.get( vb.richtwertZuschlagProzent() ) != null) {
-            pageSite.fireEvent( this, vb.richtwertZuschlagProzent().qualifiedName().name(),
-                    IFormFieldListener.VALUE_CHANGE, fieldListener.get( vb.richtwertZuschlagProzent() ) );
-        }
-        if (fieldListener.get( vb.erschliessungsKosten() ) != null) {
-            vb.zwischensummeEK().set( fieldListener.get( vb.erschliessungsKosten() ) );
-            pageSite.setFieldValue( vb.zwischensummeEK().qualifiedName().name(),
-                    getFormatter( 2 ).format( fieldListener.get( vb.erschliessungsKosten() ) ) );
-        }
+        fieldListener.flush( pageSite );
     }
 }

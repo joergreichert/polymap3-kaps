@@ -372,4 +372,8 @@ public abstract class KapsDefaultFormEditorPage
                 .setProperty( new PropertyAdapter( property ) ).setField( new CheckboxFormField() )
                 .setLayoutData( data.create() ).setParent( client ).create();
     }
+    
+    public final IFormEditorPageSite getPageSite() {
+        return pageSite;
+    }
 }

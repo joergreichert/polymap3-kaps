@@ -12,8 +12,16 @@
  */
 package org.polymap.kaps.ui.form;
 
+import java.util.List;
+
+import java.beans.PropertyChangeEvent;
+
 import org.geotools.data.FeatureStore;
 import org.opengis.feature.Feature;
+
+import org.polymap.core.runtime.event.EventFilter;
+import org.polymap.core.runtime.event.EventHandler;
+import org.polymap.core.runtime.event.EventManager;
 
 import org.polymap.rhei.form.IFormEditorPage;
 import org.polymap.rhei.form.IFormEditorPageSite;
@@ -30,12 +38,47 @@ public abstract class KaufvertragFormEditorPage
 
     protected VertragComposite kaufvertrag;
 
-    public KaufvertragFormEditorPage( String id, String title, Feature feature,
-            FeatureStore featureStore ) {
+
+    public KaufvertragFormEditorPage( String id, String title, Feature feature, FeatureStore featureStore ) {
         super( id, title, feature, featureStore );
 
-        kaufvertrag = repository.findEntity( VertragComposite.class, feature
-                .getIdentifier().getID() );
+        kaufvertrag = repository.findEntity( VertragComposite.class, feature.getIdentifier().getID() );
+
+        EventManager.instance().subscribe( this, new EventFilter<PropertyChangeEvent>() {
+
+            public boolean apply( PropertyChangeEvent ev ) {
+                Object source = ev.getSource();
+                return source != null && source instanceof VertragComposite && source.equals( kaufvertrag );
+            }
+        } );
+    }
+
+
+    @EventHandler(display = true, delay = 1)
+    public void handleEingangsnummer( List<PropertyChangeEvent> events )
+            throws Exception {
+        for (PropertyChangeEvent ev : events) {
+            if (ev.getPropertyName().equals( kaufvertrag.eingangsNr().qualifiedName().name() )) {
+                Integer nummer = (Integer)ev.getNewValue();
+                updateEingangsNummer( nummer );
+            }
+        }
+    }
+
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        EventManager.instance().unsubscribe( this );
+    }
+
+
+    protected void updateEingangsNummer( Integer nummer ) {
+        String nummerF = EingangsNummerFormatter.format( nummer );
+        if (pageSite != null) {
+            pageSite.setEditorTitle( formattedTitle( "Vertrag", nummerF, null ) );
+            pageSite.setFormTitle( formattedTitle( "Vertrag", nummerF, getTitle() ) );
+        }
     }
 
 
@@ -43,10 +86,8 @@ public abstract class KaufvertragFormEditorPage
     public void createFormContent( IFormEditorPageSite site ) {
         super.createFormContent( site );
 
-        site.setEditorTitle( formattedTitle( "Vertrag", kaufvertrag.eingangsNr().get(), null ) );
-        site.setFormTitle( formattedTitle( "Vertrag", kaufvertrag.eingangsNr().get(),
-                getTitle() ) );
-
+        String nummerF = EingangsNummerFormatter.format( kaufvertrag.eingangsNr().get() );
+        pageSite.setEditorTitle( formattedTitle( "Vertrag", nummerF, null ) );
+        pageSite.setFormTitle( formattedTitle( "Vertrag", nummerF, getTitle() ) );
     }
-
 }

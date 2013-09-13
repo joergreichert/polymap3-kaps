@@ -34,6 +34,7 @@ import org.polymap.kaps.model.data.NHK2010Anbauten;
 import org.polymap.kaps.model.data.NHK2010BewertungComposite;
 import org.polymap.kaps.model.data.NHK2010BewertungGebaeudeComposite;
 import org.polymap.kaps.model.data.VertragComposite;
+import org.polymap.kaps.model.data.VertragsdatenErweitertComposite;
 import org.polymap.kaps.model.data.WohnungComposite;
 
 /**
@@ -143,7 +144,7 @@ public class MdbImportBewertungenOperation
                             entity.wohnflaecheZeile5().set( getBooleanValue( builderRow, "WOHNFL5" ) );
                             entity.wohnflaecheZeile6().set( getBooleanValue( builderRow, "WOHNFL6" ) );
                             entity.wohnflaecheZeile7().set( getBooleanValue( builderRow, "WOHNFL7" ) );
-                            
+
                             if (entity.nettoRohertragProMonat().get() != null) {
                                 entity.nettoRohertragProJahr().set( 12 * entity.nettoRohertragProMonat().get() );
                             }
@@ -152,6 +153,11 @@ public class MdbImportBewertungenOperation
                             }
                             entity.jahresBetriebskostenE().set( entity.jahresBetriebskosten().get() );
                             entity.anteiligeBetriebskosten().set( entity.jahresBetriebskosten().get() );
+
+                            VertragsdatenErweitertComposite ev = vertrag.erweiterteVertragsdaten().get();
+                            if (ev != null) {
+                                entity.bereinigterKaufpreis().set( ev.bereinigterVollpreis().get() );
+                            }
                         }
                     } );
         }
@@ -494,6 +500,7 @@ public class MdbImportBewertungenOperation
                         for (NHK2010BewertungGebaeudeComposite gebaeude : NHK2010BewertungGebaeudeComposite.Mixin
                                 .forBewertung( nhk2010 )) {
                             if (b.gebaeudeNummer().get() == gebaeude.laufendeNummer().get()) {
+                                b.nhk2010().set(gebaeude);
                                 if (b.bereinigtesBaujahr().get() == null) {
                                     b.bereinigtesBaujahr().set( gebaeude.bereinigtesBaujahr().get() );
                                 }
@@ -515,6 +522,7 @@ public class MdbImportBewertungenOperation
                                 + b.wohnungsFortfuehrung().get() );
                     }
                     else {
+                        b.wohnung().set(wohnung);
                         if (b.bereinigtesBaujahr().get() == null) {
                             b.bereinigtesBaujahr().set( wohnung.bereinigtesBaujahr().get() );
                         }
@@ -524,6 +532,7 @@ public class MdbImportBewertungenOperation
                 }
                 else if ("frm_ertragswertn".equals( type )) {
                     // TODO ertragswertverfahren ergänzen
+                    // TODO IMPORTb.ertragswertVerfahren().set(ev);
                 }
 
                 if (b.gesamtNutzungsDauer().get() == null) {

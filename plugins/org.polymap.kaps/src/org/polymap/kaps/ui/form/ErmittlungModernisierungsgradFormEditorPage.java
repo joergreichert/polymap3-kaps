@@ -14,7 +14,6 @@ package org.polymap.kaps.ui.form;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.List;
 
 import java.beans.PropertyChangeEvent;
 
@@ -39,7 +38,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.polymap.core.project.ui.util.SimpleFormData;
 import org.polymap.core.runtime.event.EventFilter;
-import org.polymap.core.runtime.event.EventHandler;
 import org.polymap.core.runtime.event.EventManager;
 
 import org.polymap.rhei.field.FormFieldEvent;
@@ -55,7 +53,6 @@ import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.WohnungComposite;
 import org.polymap.kaps.ui.ActionButton;
 import org.polymap.kaps.ui.FieldCalculation;
-import org.polymap.kaps.ui.FieldListener;
 import org.polymap.kaps.ui.FieldSummation;
 import org.polymap.kaps.ui.KapsDefaultFormEditorPage;
 
@@ -103,7 +100,7 @@ public class ErmittlungModernisierungsgradFormEditorPage
 
     private final Double                                 heute;
 
-    private FieldListener                                baujahrListener;
+    private DefaultFieldListener                                baujahrListener;
 
     private ActionButton                                 baujahrUebernehmenAction;
 
@@ -127,17 +124,17 @@ public class ErmittlungModernisierungsgradFormEditorPage
         heute = new Integer( cal.get( Calendar.YEAR ) ).doubleValue();
     }
 
-
-    @EventHandler(display = true, delay = 1)
-    public void handleExternalGebaeudeSelection( List<PropertyChangeEvent> events )
-            throws Exception {
-
-        for (PropertyChangeEvent ev : events) {
-            pageSite.setFieldValue( ev.getPropertyName(),
-                    ev.getNewValue() != null ? getFormatter( 0 ).format( ev.getNewValue() ) : null );
-            System.out.println( ev );
-        }
-    }
+//
+//    @EventHandler(display = true, delay = 1)
+//    public void handleExternalGebaeudeSelection( List<PropertyChangeEvent> events )
+//            throws Exception {
+//
+//        for (PropertyChangeEvent ev : events) {
+//            pageSite.setFieldValue( ev.getPropertyName(),
+//                    ev.getNewValue() != null ? getFormatter( 0 ).format( ev.getNewValue() ) : null );
+//            System.out.println( ev );
+//        }
+//    }
 
 
     @SuppressWarnings("unchecked")
@@ -514,12 +511,14 @@ public class ErmittlungModernisierungsgradFormEditorPage
 
         } );
 
-        site.addFieldListener( baujahrListener = new FieldListener( em.bereinigtesBaujahr(),
+        site.addFieldListener( baujahrListener = new DefaultFieldListener( em.bereinigtesBaujahr(),
                 em.neueRestNutzungsDauer(), em.gesamtNutzungsDauer() ) );
+        
         baujahrUebernehmenAction = new ActionButton( client, new Action( "Baujahr übernehmen" ) {
 
             @Override
             public void run() {
+                // TODO echte Referenz nutzen
                 VertragComposite vertrag = em.vertrag().get();
                 if (vertrag != null) {
                     // NHK oder Ertragswert

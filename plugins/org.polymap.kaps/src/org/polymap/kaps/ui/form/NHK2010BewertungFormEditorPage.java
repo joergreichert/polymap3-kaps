@@ -1228,6 +1228,7 @@ public class NHK2010BewertungFormEditorPage
                         if (ermittlung == null) {
                             ermittlung = repository.newEntity( ErmittlungModernisierungsgradComposite.class, null );
                             ermittlung.vertrag().set( bewertung.vertrag().get() );
+                            ermittlung.nhk2010().set( selectedComposite.get() );
                             ermittlung.gebaeudeNummer().set( gebaeude.laufendeNummer().get() );
                             ermittlung.alterObergrenzeZeile1().set( 40.0d );
                             ermittlung.alterObergrenzeZeile2().set( 20.0d );

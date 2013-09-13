@@ -31,7 +31,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.polymap.core.project.ui.util.SimpleFormData;
 import org.polymap.core.runtime.Polymap;
-import org.polymap.core.runtime.event.EventFilter;
 import org.polymap.core.runtime.event.EventManager;
 
 import org.polymap.rhei.data.entityfeature.AssociationAdapter;
@@ -43,6 +42,7 @@ import org.polymap.rhei.field.IFormFieldListener;
 import org.polymap.rhei.field.NumberValidator;
 import org.polymap.rhei.field.PicklistFormField;
 import org.polymap.rhei.field.StringFormField;
+import org.polymap.rhei.form.FormEditor;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
 import org.polymap.kaps.model.KapsRepository;
@@ -137,19 +137,39 @@ public class FlurstuecksdatenAgrarBodenwertFormEditorPage
 
     // private IFormFieldListener gemeindeListener;
 
-    public FlurstuecksdatenAgrarBodenwertFormEditorPage( Feature feature, FeatureStore featureStore ) {
+    public FlurstuecksdatenAgrarBodenwertFormEditorPage( final FormEditor formEditor, Feature feature,
+            FeatureStore featureStore ) {
         super( FlurstuecksdatenAgrarBodenwertFormEditorPage.class.getName(), "Bodenwertaufteilung", feature,
                 featureStore );
 
         zonen = searchZonen();
 
-        EventManager.instance().subscribe( fieldListener = new FieldListener( vb.gesamtBauWert() ),
-                new EventFilter<FormFieldEvent>() {
+        EventManager.instance().subscribe( fieldListener = new FieldListener( vb.gesamtBauWert() ) {
 
-                    public boolean apply( FormFieldEvent ev ) {
-                        return ev.getEventCode() == IFormFieldListener.VALUE_CHANGE;
-                    }
-                } );
+            @Override
+            protected void onChangedValue( IFormEditorPageSite site, String fieldName, Object value ) {
+                site.fireEvent( formEditor, vb.gesamtBauWert().qualifiedName().name(), IFormFieldListener.VALUE_CHANGE,
+                        fieldListener.get( vb.gesamtBauWert() ) );
+            }
+        }, new FieldListener.EventFilter(formEditor));
+        // InterEditorListener( this, vb.gesamtBauWert() ) {
+        //
+        // @Override
+        // protected void onNewValue( IFormEditorPageSite site, String fieldName,
+        // Object value ) {
+        // if (fieldName.equals( vb.gesamtBauWert().qualifiedName().name() )) {
+        // pageSite.fireEvent( site, vb.gesamtBauWert().qualifiedName().name(),
+        // IFormFieldListener.VALUE_CHANGE, fieldListener.get( vb.gesamtBauWert() )
+        // );
+        // }
+        // }
+        // }, new InterEditorListener.EventFilter( vb ) );
+    }
+
+
+    @Override
+    public void dispose() {
+        EventManager.instance().unsubscribe( fieldListener );
     }
 
 
@@ -551,7 +571,7 @@ public class FlurstuecksdatenAgrarBodenwertFormEditorPage
             }
             // find zeitraum
             RichtwertzoneZeitraumComposite zeitraum = RichtwertzoneZeitraumComposite.Mixin.findZeitraumFor( zone, vb
-                    .vertrag().get().eingangsDatum().get() );
+                    .vertrag().get().vertragsDatum().get() );
             if (zeitraum != null) {
                 zonen.put(
                         prefix + " - " + zone.name().get() + "("
@@ -574,10 +594,6 @@ public class FlurstuecksdatenAgrarBodenwertFormEditorPage
             // vb.richtwertZone1().set( zone );
             pageSite.setFieldValue( vb.richtwertZone1().qualifiedName().name(), zone );
         }
-        // daten vom 1. tab könnte sich geändert haben, also neu berechnen
-        if (fieldListener.get( vb.gesamtBauWert() ) != null) {
-            pageSite.fireEvent( this, vb.gesamtBauWert().qualifiedName().name(), IFormFieldListener.VALUE_CHANGE,
-                    fieldListener.get( vb.gesamtBauWert() ) );
-        }
+        fieldListener.flush( pageSite );
     }
 }

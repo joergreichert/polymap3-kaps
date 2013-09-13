@@ -28,6 +28,8 @@ import org.eclipse.swt.widgets.Control;
 
 import org.eclipse.ui.forms.widgets.Section;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+
 import org.polymap.core.runtime.Polymap;
 import org.polymap.core.runtime.event.EventFilter;
 import org.polymap.core.runtime.event.EventHandler;
@@ -35,6 +37,7 @@ import org.polymap.core.runtime.event.EventManager;
 
 import org.polymap.rhei.data.entityfeature.AssociationAdapter;
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
+import org.polymap.rhei.field.CheckboxFormField;
 import org.polymap.rhei.field.FormFieldEvent;
 import org.polymap.rhei.field.IFormFieldLabel;
 import org.polymap.rhei.field.IFormFieldListener;
@@ -119,20 +122,6 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
         super( FlurstuecksdatenBaulandBodenwertFormEditorPage.class.getName(), "Boden- und Gebäudewert", feature,
                 featureStore );
 
-        EventManager.instance().subscribe( bodenpreisListener = new IFormFieldListener() {
-
-            @Override
-            public void fieldChange( FormFieldEvent ev ) {
-                bodenpreisBebaut = (Double)ev.getNewValue();
-            }
-        }, new EventFilter<FormFieldEvent>() {
-
-            public boolean apply( FormFieldEvent ev ) {
-                return ev.getEventCode() == IFormFieldListener.VALUE_CHANGE
-                        && ev.getFieldName().equals( vb.bodenpreisBebaut().qualifiedName().name() );
-            }
-        } );
-
         EventManager.instance().subscribe( this, new EventFilter<PropertyChangeEvent>() {
 
             public boolean apply( PropertyChangeEvent ev ) {
@@ -148,17 +137,45 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
         super.dispose();
         EventManager.instance().unsubscribe( this );
     }
-    
+
+
     @EventHandler(display = true, delay = 1)
-    public void handleExternalEvents(List<PropertyChangeEvent> events) {
+    public void handleExternalEvents( List<PropertyChangeEvent> events ) {
         for (PropertyChangeEvent ev : events) {
             Object newValue = ev.getNewValue();
-            // double values
             if (ev.getPropertyName().equals( vb.wertDerBaulichenAnlagen().qualifiedName().name() )) {
-                newValue = newValue != null ? getFormatter( 2 ).format( newValue ) : null; 
+                newValue = newValue != null ? getFormatter( 2 ).format( newValue ) : null;
+                pageSite.setFieldValue( ev.getPropertyName(), newValue );
             }
-            pageSite.setFieldValue( ev.getPropertyName(), newValue );
+            else if (ev.getPropertyName().equals( vb.bewertungsMethode().qualifiedName().name() )) {
+                pageSite.setFieldValue( ev.getPropertyName(), newValue );
+            }
+            // wert kann vor dem Öffnen des Formulars schon geändert sein
+            else if (ev.getPropertyName().equals( vb.bodenpreisBebaut().qualifiedName().name() )) {
+                bodenpreisBebaut = (Double)ev.getNewValue();
+                newValue = newValue != null ? getFormatter( 2 ).format( newValue ) : null;
+                if (pageSite != null) {
+                    pageSite.setFieldValue( vb.bodenpreisQm1().qualifiedName().name(),
+                            getFormatter( 2 ).format( bodenpreisBebaut ) );
+                }
+            }
             System.out.println( ev );
+        }
+    }
+
+
+    @Override
+    public void afterDoLoad( IProgressMonitor monitor )
+            throws Exception {
+        super.afterDoLoad( monitor );
+        // bodenpreis vom 1. tab könnte sich geändert haben, also neu berechnen
+        if (bodenpreisBebaut == null) {
+            bodenpreisBebaut = vb.bodenpreisBebaut().get();
+        }
+        if (bodenpreisBebaut != null && bodenpreisBebaut != vb.bodenpreisQm1().get()) {
+            // vb.bodenpreisQm1().set( bodenpreisBebaut );
+            pageSite.setFieldValue( vb.bodenpreisQm1().qualifiedName().name(),
+                    getFormatter( 2 ).format( bodenpreisBebaut ) );
         }
     }
 
@@ -278,7 +295,7 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
         newFormField( IFormFieldLabel.NO_LABEL ).setEnabled( false )
                 .setProperty( new PropertyAdapter( vb.flurstueck().get().verkaufteFlaeche() ) )
                 .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
-                .setField( new StringFormField() ).setLayoutData( two().top( lastLine ).bottom( 100 ).create() )
+                .setField( new StringFormField(StringFormField.Style.ALIGN_RIGHT) ).setLayoutData( two().top( lastLine ).bottom( 100 ).create() )
                 .setParent( client ).create();
 
         // createPreisField( vb.bodenwertGesamt(), four().top( lastLine ), client,
@@ -326,6 +343,15 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
                 .wertDerBaulichenAnlagen() ) );
 
         lastLine = newLine;
+        newLine = createLabel( client, "Differenz Gebäudewert", one().top( lastLine, 12 ), SWT.RIGHT );
+        newFormField( IFormFieldLabel.NO_LABEL )
+                .setToolTipText( "Differenz Gebäude- zu Bodenwert (ehemals Sachwertverfahren 1913)" )
+                .setProperty( new PropertyAdapter( vb.differenzGebaeudeZuBodenwert() ) )
+                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
+                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setLayoutData( two().top( lastLine ).create() ).setParent( client ).create();
+        
+        lastLine = newLine;
         newLine = createLabel( client, "Faktor", one().top( lastLine, 12 ), SWT.RIGHT );
         newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Faktor bereinigter Kaufpreis/Sachwert" )
                 .setProperty( new PropertyAdapter( vb.faktorBereinigterKaufpreis() ) )
@@ -334,7 +360,7 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
                 .setLayoutData( two().top( lastLine ).create() ).setParent( client ).setEnabled( false ).create();
 
         site.addFieldListener( bereinCalculator = new FieldCalculation( site, 4, vb.faktorBereinigterKaufpreis(), vb
-                .bodenwertGesamt() ) {
+                .bodenwertGesamt(), vb.differenzGebaeudeZuBodenwert() ) {
 
             @Override
             protected Double calculate( org.polymap.kaps.ui.FieldCalculation.ValueProvider values ) {
@@ -349,8 +375,10 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
                     }
                 }
                 Double bodenwert = values.get( vb.bodenwertGesamt() );
+                Double differenz = values.get( vb.differenzGebaeudeZuBodenwert() );
+//                faktor = kaufpreis / bodenwert - gebäudewert
                 if (kaufpreis != null && bodenwert != null && bodenwert != 0.0d) {
-                    return kaufpreis / bodenwert;
+                    return  (differenz != null ? kaufpreis - differenz : kaufpreis) / bodenwert;
                 }
                 return null;
             }
@@ -376,27 +404,11 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
         site.addFieldListener( anteilBodenwert = new FieldMultiplication( site, 2, vb.faktorBereinigterKaufpreis(), vb
                 .bodenwertGesamt(), vb.kaufpreisAnteilBodenwert() ) );
 
-        createLabel( client, "Differenz Gebäudewert", three().top( lastLine, 12 ), SWT.RIGHT );
-        newFormField( IFormFieldLabel.NO_LABEL )
-                .setToolTipText( "Differenz Gebäude- zu Bodenwert (ehemals Sachwertverfahren 1913)" )
-                .setProperty( new PropertyAdapter( vb.differenzGebaeudeZuBodenwert() ) )
-                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 4, 1, 4 ) )
-                .setLayoutData( four().top( lastLine ).create() ).setParent( client ).create();
-
         lastLine = newLine;
         newLine = createLabel( client, "Faktor geeignet?", one().top( lastLine, 12 ).bottom( 100 ), SWT.RIGHT );
-        newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Faktor für Marktanpassung geeignet?" )
+        newFormField( IFormFieldLabel.NO_LABEL ).setField( new CheckboxFormField() )
+                .setToolTipText( "Faktor für Marktanpassung geeignet?" )
                 .setProperty( new PropertyAdapter( vb.faktorFuerMarktanpassungGeeignet() ) )
                 .setLayoutData( two().top( lastLine ).bottom( 100 ).create() ).setParent( client ).create();
-
-        // bodenpreis vom 1. tab könnte sich geändert haben, also neu berechnen
-        if (bodenpreisBebaut == null) {
-            bodenpreisBebaut = vb.bodenpreisBebaut().get();
-        }
-        if (bodenpreisBebaut != null && bodenpreisBebaut != vb.bodenpreisQm1().get()) {
-            vb.bodenpreisQm1().set( bodenpreisBebaut );
-            site.setFieldValue( vb.bodenpreisQm1().qualifiedName().name(), getFormatter( 2 ).format( bodenpreisBebaut ) );
-        }
     }
 }
