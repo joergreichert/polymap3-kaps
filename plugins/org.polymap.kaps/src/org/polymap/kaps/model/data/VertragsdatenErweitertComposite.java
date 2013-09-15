@@ -20,9 +20,6 @@ import org.qi4j.api.common.UseDefaults;
 import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.mixin.Mixins;
-import org.qi4j.api.property.Computed;
-import org.qi4j.api.property.ComputedPropertyInstance;
-import org.qi4j.api.property.GenericPropertyInfo;
 import org.qi4j.api.property.Property;
 import org.qi4j.api.query.Query;
 import org.qi4j.api.query.QueryExpressions;
@@ -53,8 +50,9 @@ public interface VertragsdatenErweitertComposite
 
     // KAUFPREIS DOUBLE,
     @Optional
-    @Computed
-    Property<Double> vollpreis();
+    @ImportColumn("KAUFPREIS")
+    @UseDefaults
+    Property<Double> basispreis();
 
 
     // ZUSCHLAG DOUBLE,
@@ -97,28 +95,6 @@ public interface VertragsdatenErweitertComposite
             implements VertragsdatenErweitertComposite {
 
         private static Log log = LogFactory.getLog( Mixin.class );
-
-
-        @Override
-        public Property<Double> vollpreis() {
-            return new ComputedPropertyInstance<Double>( new GenericPropertyInfo(
-                    VertragsdatenErweitertComposite.class, "vollpreis" ) ) {
-
-                @Override
-                public Double get() {
-                    VertragComposite kaufvertrag = kaufvertrag();
-                    return kaufvertrag != null ? kaufvertrag.vollpreis().get() : null;
-                }
-
-
-                @Override
-                public void set( Double anIgnoredValue )
-                        throws IllegalArgumentException, IllegalStateException {
-                    // ignored
-                }
-            };
-        }
-
 
         private VertragComposite kaufvertrag() {
             VertragComposite template = QueryExpressions.templateFor( VertragComposite.class );

@@ -33,6 +33,7 @@ import org.polymap.rhei.form.IFormEditorPageSite;
 
 import org.polymap.kaps.model.data.KaeuferKreisComposite;
 import org.polymap.kaps.model.data.VertragsArtComposite;
+import org.polymap.kaps.ui.FieldCalculation;
 import org.polymap.kaps.ui.NotNullValidator;
 
 /**
@@ -71,10 +72,10 @@ public class Kaufvertrag1FormEditorPage
 
         // Datums
         Composite line2 = site.newFormField( parent, new PropertyAdapter( kaufvertrag.vertragsDatum() ),
-                new DateTimeFormField(), new NotNullValidator(), 
-//                new DateMustBeforeValidator( kd,
-//                        "Das Vertragsdatum muss vor dem Eingangsdatum liegen." ), 
-                        "Vertragsdatum" );
+                new DateTimeFormField(), new NotNullValidator(),
+                // new DateMustBeforeValidator( kd,
+                // "Das Vertragsdatum muss vor dem Eingangsdatum liegen." ),
+                "Vertragsdatum" );
         line2.setLayoutData( left().top( eingangsNr ).create() );
 
         site.newFormField( parent, new PropertyAdapter( kaufvertrag.eingangsDatum() ), new DateTimeFormField(),
@@ -145,6 +146,21 @@ public class Kaufvertrag1FormEditorPage
                 null, "zugeordneter Vertrag" ).setLayoutData( right().top( line8 ).bottom( 100 ).create() );
 
         // Listener
-        site.addFieldListener( vollpreisRefresher = new KaufvertragFormVollpreisRefresher( site, kaufvertrag ) );
+        site.addFieldListener( vollpreisRefresher = new FieldCalculation( site, 2, kaufvertrag.vollpreis(), kaufvertrag
+                .kaufpreis(), kaufvertrag.kaufpreisAnteilNenner(), kaufvertrag.kaufpreisAnteilZaehler() ) {
+
+            @Override
+            protected Double calculate( ValueProvider values ) {
+                Double kp = values.get( kaufvertrag.kaufpreis() );
+                Double n = values.get( kaufvertrag.kaufpreisAnteilNenner() );
+                Double z = values.get( kaufvertrag.kaufpreisAnteilZaehler() );
+
+                if (kp != null && n != null && z != null && z != 0) {
+                    return kp * n / z;
+                }
+                return null;
+            }
+
+        } );
     }
 }

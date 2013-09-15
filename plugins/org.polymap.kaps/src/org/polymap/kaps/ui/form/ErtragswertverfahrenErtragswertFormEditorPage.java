@@ -12,9 +12,8 @@
  */
 package org.polymap.kaps.ui.form;
 
-import java.util.List;
-
-import java.beans.PropertyChangeEvent;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import org.geotools.data.FeatureStore;
 import org.opengis.feature.Feature;
@@ -22,24 +21,38 @@ import org.opengis.feature.Feature;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.qi4j.api.entity.Entity;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.dialogs.MessageDialog;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.polymap.core.project.ui.util.SimpleFormData;
-import org.polymap.core.runtime.event.EventFilter;
-import org.polymap.core.runtime.event.EventHandler;
 import org.polymap.core.runtime.event.EventManager;
+import org.polymap.core.workbench.PolymapWorkbench;
 
 import org.polymap.rhei.field.IFormFieldLabel;
+import org.polymap.rhei.form.FormEditor;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
-import org.polymap.kaps.model.data.ErtragswertverfahrenComposite;
+import org.polymap.kaps.KapsPlugin;
+import org.polymap.kaps.model.data.ErmittlungModernisierungsgradComposite;
+import org.polymap.kaps.model.data.FlurstueckComposite;
+import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
 import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.VertragsdatenErweitertComposite;
+import org.polymap.kaps.ui.ActionButton;
 import org.polymap.kaps.ui.FieldCalculation;
+import org.polymap.kaps.ui.FieldListener;
+import org.polymap.kaps.ui.FieldMultiplication;
+import org.polymap.kaps.ui.FieldSummation;
+import org.polymap.kaps.ui.InterEditorListener;
+import org.polymap.kaps.ui.InterEditorPropertyChangeEvent;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -47,56 +60,80 @@ import org.polymap.kaps.ui.FieldCalculation;
 public class ErtragswertverfahrenErtragswertFormEditorPage
         extends ErtragswertverfahrenFormEditorPage {
 
-    private static Log       log         = LogFactory.getLog( ErtragswertverfahrenErtragswertFormEditorPage.class );
+    private static Log             log         = LogFactory
+                                                       .getLog( ErtragswertverfahrenErtragswertFormEditorPage.class );
 
-    private boolean          initialized = false;
+    private boolean                initialized = false;
 
-    private Double           jahresReinErtrag;
+    private FieldCalculation       bwanteilbetragListener;
 
-    private FieldCalculation bwanteilbetragListener;
+    private FieldCalculation       bwanteilReinertragListener;
 
-    private FieldCalculation bwanteilReinertragListener;
+    private FieldListener          fieldListener;
+
+    private FieldSummation         ertragsWert;
+
+    private FieldCalculation       bwAbzglFreilegung;
+
+    private FieldSummation         ewbazListener;
+
+    private FieldCalculation       vervievaeltigerListener;
+
+    private FieldCalculation       rndListener;
+
+    private FieldMultiplication    ertragsWertBauListener;
+
+    private ActionButton           baujahrBerechneAction;
+
+    private NonFiringFieldListener gndbjListener;
+
+    private final FormEditor       formEditor;
+
+    private InterEditorListener    editorListener;
+
+    private NonFiringFieldListener ertragsWertListener;
 
 
     // private IFormFieldListener gemeindeListener;
 
-    public ErtragswertverfahrenErtragswertFormEditorPage( Feature feature, FeatureStore featureStore ) {
+    public ErtragswertverfahrenErtragswertFormEditorPage( FormEditor formEditor, Feature feature,
+            FeatureStore featureStore ) {
         super( ErtragswertverfahrenErtragswertFormEditorPage.class.getName(), "Ertragswert", feature, featureStore );
+        this.formEditor = formEditor;
 
-        jahresReinErtrag = vb.jahresReinErtrag().get();
+        EventManager.instance().subscribe(
+                fieldListener = new FieldListener( vb.jahresBetriebskosten(), vb.jahresReinErtrag() ),
+                new FieldListener.EventFilter( formEditor ) );
 
-        EventManager.instance().subscribe( this, new EventFilter<PropertyChangeEvent>() {
+        EventManager.instance().subscribe(
+                editorListener = new InterEditorListener( vb.bereinigtesBaujahr(), vb.bodenwertAnteil(),
+                        vb.bereinigterKaufpreis() ) {
 
-            public boolean apply( PropertyChangeEvent ev ) {
-                Object source = ev.getSource();
-                return source != null && source instanceof ErtragswertverfahrenComposite && source.equals( vb );
-            }
-        } );
-    }
-
-
-    @EventHandler(display = true, delay = 1)
-    public void handleExternalGebaeudeSelection( List<PropertyChangeEvent> events )
-            throws Exception {
-        for (PropertyChangeEvent ev : events) {
-            if (ev.getPropertyName().equals( vb.jahresReinErtrag().qualifiedName().name() )) {
-                jahresReinErtrag = (Double)ev.getNewValue();
-                if (bwanteilbetragListener != null) {
-                    bwanteilbetragListener.refreshResult();
-                }
-                System.out.println( ev );
-            }
-        }
+                    @Override
+                    protected void onChangedValue( IFormEditorPageSite site, Entity entity, String fieldName,
+                            Object value ) {
+                        if (fieldName.equals( vb.bereinigtesBaujahr().qualifiedName().name() )) {
+                            site.setFieldValue( fieldName, value != null ? getFormatter( 0 ).format( value ) : null );
+                        }
+                        else if (fieldName.equals( vb.bodenwertAnteil().qualifiedName().name() )) {
+                            site.setFieldValue( fieldName, value != null ? getFormatter( 2 ).format( value ) : null );
+                        }
+                        else if (fieldName.equals( vb.bereinigterKaufpreis().qualifiedName().name() )) {
+                            site.setFieldValue( fieldName, value != null ? getFormatter( 2 ).format( value ) : null );
+                        }
+                    }
+                }, new InterEditorListener.EventFilter( vb ) );
     }
 
 
     @Override
     public void dispose() {
         super.dispose();
-        EventManager.instance().unsubscribe( this );
-        // EventManager.instance().unsubscribe( fieldListener );
+        EventManager.instance().unsubscribe( editorListener );
+        EventManager.instance().unsubscribe( fieldListener );
     }
-    
+
+
     @Override
     public void afterDoLoad( IProgressMonitor monitor )
             throws Exception {
@@ -108,16 +145,9 @@ public class ErtragswertverfahrenErtragswertFormEditorPage
             pageSite.setFieldValue( vb.bereinigterKaufpreis().qualifiedName().name(), preis != null ? getFormatter( 2 )
                     .format( preis ) : null );
         }
-        //
-        //
-        // pageSite.setFieldValue(
-        // vb.anteiligeBetriebskosten().qualifiedName().name(),
-        // anteiligeBetriebskosten != null ? getFormatter( 2 ).format(
-        // anteiligeBetriebskosten ) : null );
-        bwanteilbetragListener.refreshResult();
+        fieldListener.flush( pageSite );
+        editorListener.flush( pageSite );
     }
-
-
 
 
     @SuppressWarnings("unchecked")
@@ -135,22 +165,21 @@ public class ErtragswertverfahrenErtragswertFormEditorPage
         Composite client = parent;
 
         newLine = createLabel( client, "bereinigter Kaufpreis", one().top( lastLine, 20 ), SWT.RIGHT );
-        createPreisField( vb.bereinigterKaufpreis(), two().top( lastLine, 20 ), client, false );
+        createPreisField( vb.bereinigterKaufpreis(), three().top( lastLine, 20 ), client, false );
 
         lastLine = newLine;
         newLine = createLabel( client, "Bodenwertanteil", one().top( lastLine ), SWT.RIGHT );
-        createPreisField( vb.bodenwertAnteil(), two().top( lastLine ), client, false );
-        // TODO berechnen beim afterDoLoad
+        createPreisField( vb.bodenwertAnteil(), three().top( lastLine ), client, false );
 
         lastLine = newLine;
         newLine = createLabel( client, "Freilegungskosten", one().top( lastLine ), SWT.RIGHT );
-        createPreisField( vb.freilegung(), one().left( newLine ).top( lastLine ), client, true );
+        createPreisField( vb.freilegung(), three().top( lastLine ), client, true );
 
         lastLine = newLine;
         newLine = createLabel( client, "Liegenschaftszins", one().top( lastLine ), SWT.RIGHT );
-        createPreisField( vb.bodenwertAnteilLiegenschaftsZins(), one().left( newLine ).top( lastLine ), client, true );
+        createPreisField( vb.bodenwertAnteilLiegenschaftsZins(), two().top( lastLine ), client, true );
         createPreisField( IFormFieldLabel.NO_LABEL, "Liegenschaftszins in % von (Bodenwertanteil - Freilegung)",
-                vb.bodenwertAnteilLiegenschaftsZinsBetrag(), two().top( lastLine ), client, false );
+                vb.bodenwertAnteilLiegenschaftsZinsBetrag(), three().top( lastLine ), client, false );
         site.addFieldListener( bwanteilbetragListener = new FieldCalculation( site, 2, vb
                 .bodenwertAnteilLiegenschaftsZinsBetrag(), vb.bodenwertAnteilLiegenschaftsZins(), vb.freilegung(), vb
                 .bodenwertAnteil() ) {
@@ -173,44 +202,199 @@ public class ErtragswertverfahrenErtragswertFormEditorPage
 
         lastLine = newLine;
         newLine = createLabel( client, "Anteil der baulichen Anlage am Reinertrag", one().top( lastLine ), SWT.RIGHT );
-        createPreisField( vb.anteilDerBaulichenAnlagenAmJahresreinertrag(), two().top( lastLine ), client, true );
+        createPreisField( vb.anteilDerBaulichenAnlagenAmJahresreinertrag(), three().top( lastLine ), client, true );
         site.addFieldListener( bwanteilReinertragListener = new FieldCalculation( site, 2, vb
-                .anteilDerBaulichenAnlagenAmJahresreinertrag(), vb.bodenwertAnteilLiegenschaftsZinsBetrag() ) {
+                .anteilDerBaulichenAnlagenAmJahresreinertrag(), vb.bodenwertAnteilLiegenschaftsZinsBetrag(), vb
+                .jahresReinErtrag() ) {
 
             @Override
             protected Double calculate( ValueProvider values ) {
                 Double bwant = values.get( vb.bodenwertAnteilLiegenschaftsZinsBetrag() );
-                Double result = null;
+                Double jahresReinErtrag = values.get( vb.jahresReinErtrag() );
                 if (jahresReinErtrag != null && bwant != null) {
-                    result = jahresReinErtrag - bwant;
+                    return jahresReinErtrag - bwant;
                 }
-                return result;
+                return jahresReinErtrag;
             }
         } );
 
         lastLine = newLine;
         newLine = createLabel( client, "Gesamtnutzungsdauer", one().top( lastLine, 30 ), SWT.RIGHT );
-        createFlaecheField( vb.gesamtNutzungsDauer(), two().top( lastLine, 30 ), client, true );
+        createFlaecheField( vb.gesamtNutzungsDauer(), three().top( lastLine, 30 ), client, true );
 
         lastLine = newLine;
-        newLine = createLabel( client, "tatsächliches Baujahr", one().top( lastLine ), SWT.RIGHT );
-        createFlaecheField( vb.tatsaechlichesBaujahr(), two().top( lastLine ), client, true );
+        newLine = createLabel( client, "Baujahr tatsächlich/bereinigt", one().top( lastLine ), SWT.RIGHT );
+        createFlaecheField( IFormFieldLabel.NO_LABEL, "tatsächliches Baujahr", vb.tatsaechlichesBaujahr(),
+                two().top( lastLine ), client, true );
+        createFlaecheField( IFormFieldLabel.NO_LABEL, "bereinigtes Baujahr", vb.bereinigtesBaujahr(),
+                three().top( lastLine ), client, true );
 
-        lastLine = newLine;
-        newLine = createLabel( client, "bereinigtes Baujahr", one().top( lastLine ), SWT.RIGHT );
-        createFlaecheField( vb.bereinigtesBaujahr(), two().top( lastLine ), client, true );
-        // TODO berechnen
-        
+        site.addFieldListener( gndbjListener = new NonFiringFieldListener( vb.gesamtNutzungsDauer(), vb
+                .tatsaechlichesBaujahr() ) );
+        baujahrBerechneAction = new ActionButton( parent, new Action( "Berechnen" ) {
+
+            @Override
+            public void run() {
+                if (gndbjListener.get( vb.gesamtNutzungsDauer() ) == null
+                        || gndbjListener.get( vb.tatsaechlichesBaujahr() ) == null) {
+                    MessageDialog.openError( PolymapWorkbench.getShellToParentOn(), "Fehlende Daten",
+                            "Bitte geben Sie Gesamtnutzungsdauer und das tatsächliche Baujahr ein, bevor Sie diese Berechnung starten." );
+                }
+                else {
+                    ErmittlungModernisierungsgradComposite ermittlung = ErmittlungModernisierungsgradComposite.Mixin
+                            .forErtragswertverfahren( vb );
+                    if (ermittlung == null) {
+                        ermittlung = repository.newEntity( ErmittlungModernisierungsgradComposite.class, null );
+                        ermittlung.vertrag().set( vb.vertrag().get() );
+                        ermittlung.ertragswertVerfahren().set( vb );
+                        ermittlung.alterObergrenzeZeile1().set( 40.0d );
+                        ermittlung.alterObergrenzeZeile2().set( 20.0d );
+                        ermittlung.alterObergrenzeZeile3().set( 20.0d );
+                        ermittlung.alterObergrenzeZeile4().set( 15.0d );
+                        ermittlung.alterObergrenzeZeile5().set( 30.0d );
+                        ermittlung.alterObergrenzeZeile6().set( 15.0d );
+                        ermittlung.alterObergrenzeZeile7().set( 15.0d );
+                        ermittlung.alterObergrenzeZeile8().set( 30.0d );
+                    }
+                    // ermittlung.gesamtNutzungsDauer().set( gnd );
+                    // ermittlung.tatsaechlichesBaujahr().set( baujahr );
+                    FormEditor targetEditor = KapsPlugin.openEditor( fs, ErmittlungModernisierungsgradComposite.NAME,
+                            ermittlung );
+                    EventManager.instance().publish(
+                            new InterEditorPropertyChangeEvent( formEditor, targetEditor, ermittlung, ermittlung
+                                    .gesamtNutzungsDauer().qualifiedName().name(), ermittlung.gesamtNutzungsDauer()
+                                    .get(), gndbjListener.get( vb.gesamtNutzungsDauer() ) ) );
+                    EventManager.instance().publish(
+                            new InterEditorPropertyChangeEvent( formEditor, targetEditor, ermittlung, ermittlung
+                                    .tatsaechlichesBaujahr().qualifiedName().name(), ermittlung.tatsaechlichesBaujahr()
+                                    .get(), gndbjListener.get( vb.tatsaechlichesBaujahr() ) ) );
+                }
+            }
+
+        } );
+        baujahrBerechneAction.setLayoutData( four().width( 40 ).top( lastLine ).height( 25 ).create() );
+        baujahrBerechneAction.setEnabled( true );
+
         lastLine = newLine;
         newLine = createLabel( client, "Restnutzungsdauer", one().top( lastLine ), SWT.RIGHT );
-        createFlaecheField( vb.restnutzungsDauer(), two().top( lastLine ), client, false );
-        // TODO berechnen oder übernehmen
-        
+        createFlaecheField( vb.restnutzungsDauer(), three().top( lastLine ), client, false );
+        site.addFieldListener( rndListener = new FieldCalculation( site, 0, vb.restnutzungsDauer(), vb
+                .bereinigtesBaujahr(), vb.gesamtNutzungsDauer() ) {
+
+            @Override
+            protected Double calculate( ValueProvider values ) {
+                Double gnd = values.get( vb.gesamtNutzungsDauer() );
+                Double baujahr = values.get( vb.bereinigtesBaujahr() );
+                if (gnd != null && baujahr != null) {
+                    final Calendar cal = new GregorianCalendar();
+                    Double heute = new Integer( cal.get( Calendar.YEAR ) ).doubleValue();
+                    return Math.max( 0.0d, gnd - (heute - baujahr) );
+                }
+                return null;
+            }
+        } );
+
         lastLine = newLine;
         newLine = createLabel( client, "Vervielfältiger", one().top( lastLine ), SWT.RIGHT );
-        createFlaecheField( vb.vervielvaeltiger(), two().top( lastLine ), client, false );
-        // TODO berechnen
+        createNumberField( IFormFieldLabel.NO_LABEL, null, vb.vervielvaeltiger(), three().top( lastLine ), client,
+                false, 4 );
+        site.addFieldListener( vervievaeltigerListener = new FieldCalculation( site, 4, vb.vervielvaeltiger(), vb
+                .restnutzungsDauer(), vb.bodenwertAnteilLiegenschaftsZins() ) {
+
+            @Override
+            protected Double calculate( ValueProvider values ) {
+                Double LiZins = values.get( vb.bodenwertAnteilLiegenschaftsZins() );
+                Double RND = values.get( vb.restnutzungsDauer() );
+                if (LiZins != null && RND != null) {
+                    return (Math.pow( 1 + LiZins / 100, RND ) - 1) / (Math.pow( 1 + LiZins / 100, RND ) * LiZins / 100);
+                }
+                return null;
+            }
+        } );
+
+        lastLine = newLine;
+        newLine = createLabel( client, "Ertragswert der baulichen Anlagen", one().top( lastLine, 30 ), SWT.RIGHT );
+        createPreisField( vb.ertragswertDerBaulichenAnlagen(), three().top( lastLine, 30 ), client, false );
+        site.addFieldListener( ertragsWertBauListener = new FieldMultiplication( site, 2, vb.vervielvaeltiger(), vb
+                .anteilDerBaulichenAnlagenAmJahresreinertrag(), vb.ertragswertDerBaulichenAnlagen() ) );
+
+        lastLine = newLine;
+        newLine = createLabel( client, "sonstige wertbeeinflussende Umstände", one().top( lastLine ), SWT.RIGHT );
+        createTextField( vb.wertbeeinflussendeUmstaendeText(), two().top( lastLine ), client );
+        createPreisField( vb.wertbeeinflussendeUmstaende(), three().top( lastLine ), client, true );
+
+        lastLine = newLine;
+        newLine = createLabel( client, "Zwischensumme", one().top( lastLine ), SWT.RIGHT );
+        createPreisField( vb.ertragswertDerBaulichenAnlagenZwischensumme(), three().top( lastLine ), client, false );
+        site.addFieldListener( ewbazListener = new FieldSummation( site, 2, vb
+                .ertragswertDerBaulichenAnlagenZwischensumme(), vb.ertragswertDerBaulichenAnlagen(), vb
+                .wertbeeinflussendeUmstaende() ) );
+
+        lastLine = newLine;
+        newLine = createLabel( client, "Bodenwert abzüglich Freilegung", one().top( lastLine ), SWT.RIGHT );
+        createPreisField( vb.bodenwertAbzglFreilegung(), three().top( lastLine ), client, false );
+        site.addFieldListener( bwAbzglFreilegung = new FieldCalculation( site, 2, vb.bodenwertAbzglFreilegung(), vb
+                .bodenwertAnteil(), vb.freilegung() ) {
+
+            @Override
+            protected Double calculate( ValueProvider values ) {
+                Double bw = values.get( vb.bodenwertAnteil() );
+                Double freilegung = values.get( vb.freilegung() );
+                return bw != null ? (freilegung != null ? bw - freilegung : bw) : null;
+            }
+        } );
+
+        lastLine = newLine;
+        newLine = createLabel( client, "Ertragswert", one().top( lastLine, 30 ), SWT.RIGHT );
+        createPreisField( vb.ertragswert(), three().top( lastLine, 30 ).bottom( 100 ), client, false );
+        site.addFieldListener( ertragsWert = new FieldSummation( site, 2, vb.ertragswert(), vb
+                .bodenwertAbzglFreilegung(), vb.ertragswertDerBaulichenAnlagenZwischensumme() ) );
         
+        site.addFieldListener( ertragsWertListener = new NonFiringFieldListener( vb.ertragswert() ) );
+        
+        final VertragComposite vertrag = vb.vertrag().get();
+        String label = vertrag == null ? "kein Vertrag" : "Übernehmen";
+        ActionButton openErweiterteDaten = new ActionButton( parent, new Action( label ) {
+
+            @Override
+            public void run() {
+                Iterable<FlurstueckComposite> flurstuecke = FlurstueckComposite.Mixin.forEntity( vertrag );
+                int count = 0;
+                for (FlurstueckComposite flurstueck : flurstuecke) {
+                    FlurstuecksdatenBaulandComposite erweitert = FlurstuecksdatenBaulandComposite.Mixin
+                            .forFlurstueck( flurstueck );
+                    if (erweitert != null) {
+                        Double newValue = ertragsWertListener.get( vb.ertragswert() );
+                        if (newValue != null) { // && !newValue.equals( erweitert.wertDerBaulichenAnlagen() )) {
+                            count++;
+                            FormEditor editor = KapsPlugin.openEditor( fs, FlurstuecksdatenBaulandComposite.NAME,
+                                    erweitert );
+                            editor.setActivePage( FlurstuecksdatenBaulandBodenwertFormEditorPage.class.getName() );
+                            EventManager.instance().publish(
+                                    new InterEditorPropertyChangeEvent( formEditor, editor, erweitert, erweitert
+                                            .wertDerBaulichenAnlagen().qualifiedName().name(), erweitert
+                                            .wertDerBaulichenAnlagen().get(), newValue ) );
+                            EventManager.instance().publish(
+                                    new InterEditorPropertyChangeEvent( formEditor, editor, erweitert, erweitert
+                                            .bewertungsMethode().qualifiedName().name(), erweitert.bewertungsMethode()
+                                            .get(), "Ertragswert-normal" ) );
+                        }
+                    }
+                }
+                if (count > 0) {
+                    MessageDialog.openInformation(
+                            PolymapWorkbench.getShellToParentOn(),
+                            "Wert übernommen",
+                            "Der Gesamtwert der baulichen Anlagen wurde in \"Wert der baulichen Anlagen\" im Reiter \"Boden- und Gebäudewert \" in "
+                                    + count
+                                    + " " + FlurstuecksdatenBaulandComposite.NAME + " übernommen. Die Formulare werden entsprechend angezeigt." );
+                }
+            }
+        } );
+        openErweiterteDaten.setToolTipText( vertrag == null ? "Kein Vertrag zugewiesen" : "In Vertrag "
+                + EingangsNummerFormatter.format( vertrag.eingangsNr().get() ) + " übernehmen" );
+        openErweiterteDaten.setLayoutData( four().height( 25 ).width(40).top( lastLine, 30 ).create() );
+        openErweiterteDaten.setEnabled( vertrag != null );
     }
 
 
@@ -225,4 +409,15 @@ public class ErtragswertverfahrenErtragswertFormEditorPage
         return new SimpleFormData( SPACING ).left( 45 ).right( 60 );
     }
 
+
+    @Override
+    protected SimpleFormData three() {
+        return new SimpleFormData( SPACING ).left( 60 ).right( 75 );
+    }
+
+
+    @Override
+    protected SimpleFormData four() {
+        return new SimpleFormData( SPACING ).left( 75 ).right( 90 );
+    }
 }

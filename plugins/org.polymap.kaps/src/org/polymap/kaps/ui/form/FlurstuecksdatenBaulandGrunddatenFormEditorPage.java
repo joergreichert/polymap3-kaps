@@ -14,7 +14,6 @@ package org.polymap.kaps.ui.form;
 
 import java.util.TreeMap;
 
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import org.geotools.data.FeatureStore;
@@ -33,7 +32,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.polymap.core.project.ui.util.SimpleFormData;
 import org.polymap.core.runtime.Polymap;
-import org.polymap.core.runtime.event.EventManager;
 
 import org.polymap.rhei.data.entityfeature.AssociationAdapter;
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
@@ -43,6 +41,7 @@ import org.polymap.rhei.field.IFormFieldListener;
 import org.polymap.rhei.field.NumberValidator;
 import org.polymap.rhei.field.PicklistFormField;
 import org.polymap.rhei.field.StringFormField;
+import org.polymap.rhei.field.TextFormField;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
 import org.polymap.kaps.KapsPlugin;
@@ -351,6 +350,10 @@ public class FlurstuecksdatenBaulandGrunddatenFormEditorPage
             }
         } );
 
+        newFormField( "Bemerkung" ).setToolTipText( "Bemerkung gesamt" )
+                .setProperty( new PropertyAdapter( vb.bemerkungen() ) ).setField( new TextFormField() )
+                .setLayoutData( right().top( lastLine ).height( 80 ).create() ).setParent( client ).create();
+
         lastLine = newLine;
         newLine = newFormField( "Beb.-abschlag in %" ).setProperty( new PropertyAdapter( vb.bebAbschlag() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
@@ -394,10 +397,6 @@ public class FlurstuecksdatenBaulandGrunddatenFormEditorPage
                     if (abschlag != null) {
                         bodenpreis -= abschlag;
                     }
-                    // trigger calculation on next tab before save
-                    EventManager.instance().publish(
-                            new PropertyChangeEvent( vb, vb.bodenpreisBebaut().qualifiedName().name(), vb
-                                    .bodenpreisBebaut().get(), bodenpreis ) );
                     return bodenpreis;
                 }
                 return null;

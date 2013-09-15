@@ -14,7 +14,6 @@ package org.polymap.kaps.ui.form;
 
 import java.util.TreeMap;
 
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import org.geotools.data.FeatureStore;
@@ -23,12 +22,16 @@ import org.opengis.feature.Feature;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.qi4j.api.entity.Entity;
+
 import org.eclipse.swt.widgets.Composite;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
 
 import org.eclipse.ui.forms.widgets.Section;
+
+import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.polymap.core.runtime.Polymap;
 import org.polymap.core.runtime.event.EventManager;
@@ -42,6 +45,7 @@ import org.polymap.rhei.field.NumberValidator;
 import org.polymap.rhei.field.PicklistFormField;
 import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.field.TextFormField;
+import org.polymap.rhei.form.FormEditor;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
 import org.polymap.kaps.KapsPlugin;
@@ -56,6 +60,8 @@ import org.polymap.kaps.ui.ActionButton;
 import org.polymap.kaps.ui.BooleanFormField;
 import org.polymap.kaps.ui.FieldCalculation;
 import org.polymap.kaps.ui.FieldListener;
+import org.polymap.kaps.ui.InterEditorListener;
+import org.polymap.kaps.ui.InterEditorPropertyChangeEvent;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -63,59 +69,59 @@ import org.polymap.kaps.ui.FieldListener;
 public class WohnungGrunddatenFormEditorPage
         extends WohnungFormEditorPage {
 
-    private static Log             log = LogFactory.getLog( WohnungGrunddatenFormEditorPage.class );
+    private static Log                log = LogFactory.getLog( WohnungGrunddatenFormEditorPage.class );
 
-    private PropertyChangeListener compositeListener;
+    private PropertyChangeListener    compositeListener;
 
-    private IFormFieldListener     publisher;
+    private IFormFieldListener        publisher;
 
-    private FieldCalculation       riwezuschlag;
+    private FieldCalculation          riwezuschlag;
 
-    private FieldCalculation       riweabschlag;
+    private FieldCalculation          riweabschlag;
 
-    private FieldCalculation       preisunbebaut;
+    private FieldCalculation          preisunbebaut;
 
-    private FieldCalculation       bebabschlag;
+    private FieldCalculation          bebabschlag;
 
-    private FieldCalculation       bodenpreisbebaut;
+    private FieldCalculation          bodenpreisbebaut;
 
-    private IFormFieldListener     richtwertzone;
+    private IFormFieldListener        richtwertzone;
 
-    private ActionButton           baujahrBerechneAction;
+    private ActionButton              baujahrBerechneAction;
 
-    private FieldListener          gndbjListener;
+    private FieldListener             gndbjListener;
+
+    private FormEditor                formEditor;
+
+    private final InterEditorListener editorListener;
 
 
-    // private IFormFieldListener gemeindeListener;
-
-    public WohnungGrunddatenFormEditorPage( Feature feature, FeatureStore featureStore ) {
+    public WohnungGrunddatenFormEditorPage( FormEditor formEditor, Feature feature, FeatureStore featureStore ) {
         super( WohnungGrunddatenFormEditorPage.class.getName(), "Grunddaten", feature, featureStore );
-//        EventManager.instance().subscribe( this, new EventFilter<PropertyChangeEvent>() {
-//
-//            public boolean apply( PropertyChangeEvent ev ) {
-//                Object source = ev.getSource();
-//                return source != null && source instanceof WohnungComposite && source.equals( wohnung );
-//            }
-//        } );
+        this.formEditor = formEditor;
+        EventManager.instance().subscribe( editorListener = new InterEditorListener( wohnung.bereinigtesBaujahr() ) {
+
+            @Override
+            protected void onChangedValue( IFormEditorPageSite site, Entity entity, String fieldName, Object value ) {
+                pageSite.setFieldValue( fieldName, value != null ? getFormatter( 0 ).format( value ) : null );
+            }
+
+        }, new InterEditorListener.EventFilter( wohnung ) );
     }
-//
-//
-//    @EventHandler(display = true, delay = 1)
-//    public void handleExternalGebaeudeSelection( List<PropertyChangeEvent> events )
-//            throws Exception {
-//        for (PropertyChangeEvent ev : events) {
-//            pageSite.setFieldValue( ev.getPropertyName(),
-//                    ev.getNewValue() != null ? getFormatter( 0 ).format( ev.getNewValue() ) : null );
-//            System.out.println( ev );
-//        }
-//    }
-//
-//
-//    @Override
-//    public void dispose() {
-//        super.dispose();
-//        EventManager.instance().unsubscribe( this );
-//    }
+
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        EventManager.instance().unsubscribe( editorListener );
+    }
+
+
+    @Override
+    public void afterDoLoad( IProgressMonitor monitor )
+            throws Exception {
+        editorListener.flush( pageSite );
+    }
 
 
     @SuppressWarnings("unchecked")
@@ -228,7 +234,8 @@ public class WohnungGrunddatenFormEditorPage
                 .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 0, 1, 0 ) )
                 .setLayoutData( right().right( 75 ).top( lastLine ).create() ).setParent( parent ).create();
 
-        site.addFieldListener( gndbjListener = new DefaultFieldListener( wohnung.gesamtNutzungsDauer(), wohnung.baujahr() ) );
+        site.addFieldListener( gndbjListener = new NonFiringFieldListener( wohnung.gesamtNutzungsDauer(), wohnung
+                .baujahr() ) );
 
         // berechnen knopf
         baujahrBerechneAction = new ActionButton( parent, new Action( "Berechnen" ) {
@@ -266,15 +273,16 @@ public class WohnungGrunddatenFormEditorPage
                     // wohnung.gesamtNutzungsDauer() ) );
                     // ermittlung.tatsaechlichesBaujahr().set( gndbjListener.get(
                     // wohnung.baujahr() ) );
-                    KapsPlugin.openEditor( fs, ErmittlungModernisierungsgradComposite.NAME, ermittlung );
+                    FormEditor targetEditor = KapsPlugin.openEditor( fs, ErmittlungModernisierungsgradComposite.NAME,
+                            ermittlung );
                     EventManager.instance().publish(
-                            new PropertyChangeEvent( ermittlung, ermittlung.gesamtNutzungsDauer().qualifiedName()
-                                    .name(), ermittlung.gesamtNutzungsDauer().get(), gndbjListener.get( wohnung
-                                    .gesamtNutzungsDauer() ) ) );
+                            new InterEditorPropertyChangeEvent( formEditor, targetEditor, ermittlung, ermittlung
+                                    .gesamtNutzungsDauer().qualifiedName().name(), ermittlung.gesamtNutzungsDauer()
+                                    .get(), gndbjListener.get( wohnung.gesamtNutzungsDauer() ) ) );
                     EventManager.instance().publish(
-                            new PropertyChangeEvent( ermittlung, ermittlung.tatsaechlichesBaujahr().qualifiedName()
-                                    .name(), ermittlung.tatsaechlichesBaujahr().get(), gndbjListener.get( wohnung
-                                    .baujahr() ) ) );
+                            new InterEditorPropertyChangeEvent( formEditor, targetEditor, ermittlung, ermittlung
+                                    .tatsaechlichesBaujahr().qualifiedName().name(), ermittlung.tatsaechlichesBaujahr()
+                                    .get(), gndbjListener.get( wohnung.baujahr() ) ) );
                 }
             }
         } );

@@ -166,6 +166,7 @@ public class MdbImportOperation
                     // // prototype, builderRow );
                     // }
                     // } );
+                    vdec.basispreis().set( entity.kaufpreis().get() );
                     entity.erweiterteVertragsdaten().set( vdec );
 
                     // find also Verkaufsverträge alt und geplittete

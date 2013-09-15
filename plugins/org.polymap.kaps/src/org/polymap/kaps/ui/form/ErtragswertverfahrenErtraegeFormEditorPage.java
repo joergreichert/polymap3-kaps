@@ -12,10 +12,6 @@
  */
 package org.polymap.kaps.ui.form;
 
-import java.util.List;
-
-import java.beans.PropertyChangeEvent;
-
 import org.geotools.data.FeatureStore;
 import org.opengis.feature.Feature;
 
@@ -31,20 +27,18 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.polymap.core.project.ui.util.SimpleFormData;
-import org.polymap.core.runtime.event.EventFilter;
-import org.polymap.core.runtime.event.EventHandler;
 import org.polymap.core.runtime.event.EventManager;
 
 import org.polymap.rhei.data.entityfeature.AssociationAdapter;
-import org.polymap.rhei.field.FormFieldEvent;
 import org.polymap.rhei.field.IFormFieldLabel;
 import org.polymap.rhei.field.IFormFieldListener;
+import org.polymap.rhei.form.FormEditor;
 import org.polymap.rhei.form.IFormEditorPage2;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
-import org.polymap.kaps.model.data.ErtragswertverfahrenComposite;
 import org.polymap.kaps.model.data.EtageComposite;
 import org.polymap.kaps.ui.FieldCalculation;
+import org.polymap.kaps.ui.FieldListener;
 import org.polymap.kaps.ui.FieldMultiplication;
 import org.polymap.kaps.ui.FieldSummation;
 
@@ -85,83 +79,43 @@ public class ErtragswertverfahrenErtraegeFormEditorPage
 
     private FieldCalculation    rohertragMonatCalculation;
 
-    private Double              jahresBetriebskosten;
+    private FieldListener       fieldListener;
 
+
+    // private Double jahresBetriebskosten;
 
     // private InterEditorListener fieldListener;
 
     // private IFormFieldListener gemeindeListener;
 
-    public ErtragswertverfahrenErtraegeFormEditorPage( Feature feature, FeatureStore featureStore ) {
+    public ErtragswertverfahrenErtraegeFormEditorPage( FormEditor formEditor, Feature feature, FeatureStore featureStore ) {
         super( ErtragswertverfahrenErtraegeFormEditorPage.class.getName(), "Erträge", feature, featureStore );
 
-        jahresBetriebskosten = vb.jahresBetriebskosten().get();
-
-        EventManager.instance().subscribe( this, new EventFilter<PropertyChangeEvent>() {
-
-            public boolean apply( PropertyChangeEvent ev ) {
-                Object source = ev.getSource();
-                return source != null && source instanceof ErtragswertverfahrenComposite && source.equals( vb );
-            }
-        } );
-        // EventManager.instance().subscribe( fieldListener = new InterEditorListener(
-        // vb.jahresBetriebskosten() ),
-        // new EventFilter<FormFieldEvent>() {
-        //
-        // @Override
-        // public boolean apply( FormFieldEvent input ) {
-        // Object source = input.getSource();
-        // if (input.getEventCode() == IFormFieldListener.VALUE_CHANGE) {
-        // if (source != null && source instanceof ErtragswertverfahrenComposite &&
-        // source.equals( vb )) {
-        // return true;
-        // }
-        // }
-        // return false;
-        // }
-        // }
-        //
-        // );
+        EventManager.instance().subscribe(
+                fieldListener = new FieldListener( vb.jahresBetriebskosten(), vb.bruttoRohertragProJahr() ),
+                new FieldListener.EventFilter( formEditor ) );
     }
 
 
     @Override
     public void afterDoLoad( IProgressMonitor monitor )
             throws Exception {
-        pageSite.setFieldValue( vb.jahresBetriebskostenE().qualifiedName().name(),
-                jahresBetriebskosten != null ? getFormatter( 2 ).format( jahresBetriebskosten ) : null );
-    }
-
-
-    @EventHandler(display = true, delay = 1)
-    public void handleExternalGebaeudeSelection( List<PropertyChangeEvent> events )
-            throws Exception {
-        for (PropertyChangeEvent ev : events) {
-            if (ev.getPropertyName().equals( vb.jahresBetriebskostenE().qualifiedName().name() )) {
-                if (initialized) {
-                    pageSite.setFieldValue( ev.getPropertyName(),
-                            ev.getNewValue() != null ? getFormatter( 2 ).format( ev.getNewValue() ) : null );
-                }
-                else {
-                    jahresBetriebskosten = (Double)ev.getNewValue();
-                }
-                System.out.println( ev );
-            }
-        }
+        fieldListener.flush( pageSite );
     }
 
 
     @Override
     public void dispose() {
         super.dispose();
-        EventManager.instance().unsubscribe( this );
-        // EventManager.instance().unsubscribe( fieldListener );
+        EventManager.instance().unsubscribe( fieldListener );
     }
 
-    private boolean            initialized = false;
+    private boolean        initialized = false;
 
-    private IFormFieldListener anteiligeKostenListener;
+    private FieldSummation jahresBetriebskostenListener;
 
+
+    // private IFormFieldListener anteiligeKostenListener;
 
     @SuppressWarnings("unchecked")
     @Override
@@ -281,6 +235,8 @@ public class ErtragswertverfahrenErtraegeFormEditorPage
         lastLine = newLine;
         newLine = createLabel( client, "jährliche Betriebskosten in €", one().right( 83 ).top( lastLine ), SWT.RIGHT );
         createPreisField( vb.jahresBetriebskostenE(), five().top( lastLine ), client, false );
+        site.addFieldListener( jahresBetriebskostenListener = new FieldSummation( site, 2, vb.jahresBetriebskostenE(),
+                vb.jahresBetriebskosten() ) );
 
         lastLine = newLine;
         newLine = createLabel( client, "jährlicher Rohertrag (brutto) in €", one().right( 83 ).top( lastLine ),
@@ -288,27 +244,6 @@ public class ErtragswertverfahrenErtraegeFormEditorPage
         createPreisField( vb.bruttoRohertragProJahr(), five().top( lastLine ), client, false );
         site.addFieldListener( rohertragBruttoJahrCalculation = new FieldSummation( site, 2, vb
                 .bruttoRohertragProJahr(), vb.nettoRohertragProJahr(), vb.jahresBetriebskostenE() ) );
-
-        site.addFieldListener( anteiligeKostenListener = new IFormFieldListener() {
-
-            @Override
-            public void fieldChange( FormFieldEvent ev ) {
-                if (ev.getEventCode() == IFormFieldListener.VALUE_CHANGE) {
-                    if (ev.getFieldName().equals( vb.bruttoRohertragProJahr().qualifiedName().name() )) {
-                        // Reiter 3 informieren
-                        EventManager.instance().publish(
-                                new PropertyChangeEvent( vb, vb.bruttoRohertragProJahr().qualifiedName().name(), vb
-                                        .bruttoRohertragProJahr().get(), (Double)ev.getNewValue() ) );
-                    }
-//                    else if (ev.getFieldName().equals( vb.jahresBetriebskostenE().qualifiedName().name() )) {
-//                        // Reiter 3 informieren
-//                        EventManager.instance().publish(
-//                                new PropertyChangeEvent( vb, vb.jahresBetriebskostenE().qualifiedName().name(), vb
-//                                        .jahresBetriebskostenE().get(), (Double)ev.getNewValue() ) );
-//                    }
-                }
-            }
-        } );
 
         lastLine = newLine;
         newLine = createLabel( client, "monatlicher Rohertrag (brutto) in €", one().right( 83 ).top( lastLine ),

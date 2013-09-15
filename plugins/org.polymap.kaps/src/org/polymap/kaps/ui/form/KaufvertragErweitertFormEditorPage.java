@@ -19,15 +19,22 @@ import org.eclipse.swt.widgets.Composite;
 
 import org.eclipse.ui.forms.widgets.Section;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+
 import org.polymap.core.runtime.Polymap;
+import org.polymap.core.runtime.event.EventManager;
 
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
 import org.polymap.rhei.field.NumberValidator;
 import org.polymap.rhei.field.StringFormField;
+import org.polymap.rhei.form.FormEditor;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
 import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.VertragsdatenErweitertComposite;
+import org.polymap.kaps.ui.FieldCalculation;
+import org.polymap.kaps.ui.FieldListener;
+import org.polymap.kaps.ui.FieldSummation;
 
 /**
  * Erweiterte Vertragsdaten, Vertragsanteil Kaufpreis mit Zu- Abschlag
@@ -38,80 +45,112 @@ public class KaufvertragErweitertFormEditorPage
         extends KaufvertragFormEditorPage {
 
     private final VertragsdatenErweitertComposite erweiterteVertragsdaten;
-    private KaufpreisBereinigtRefresher refresher;
-    
-    public KaufvertragErweitertFormEditorPage( Feature feature, FeatureStore featureStore ) {
-        super( KaufvertragErweitertFormEditorPage.class.getName(), "Zu-/Abschlag", feature,
-                featureStore );
-        
-        erweiterteVertragsdaten = getErweiterteVertragsdaten(kaufvertrag);
+
+    private FieldCalculation                      refresher;
+
+    private FieldListener                         fieldListener;
+
+    private FieldSummation                        vollpreis;
+
+
+    public KaufvertragErweitertFormEditorPage( FormEditor formEditor, Feature feature, FeatureStore featureStore ) {
+        super( KaufvertragErweitertFormEditorPage.class.getName(), "Zu-/Abschlag", feature, featureStore );
+
+        erweiterteVertragsdaten = getOrCreateErweiterteVertragsdaten( kaufvertrag );
+        EventManager.instance().subscribe( fieldListener = new FieldListener( kaufvertrag.vollpreis() ),
+                new FieldListener.EventFilter( formEditor ) );
+    }
+
+
+    @Override
+    public void dispose() {
+        EventManager.instance().unsubscribe( fieldListener );
+    }
+
+
+    @Override
+    public void afterDoLoad( IProgressMonitor monitor )
+            throws Exception {
+        fieldListener.flush( pageSite );
     }
 
 
     @Override
     public void createFormContent( final IFormEditorPageSite site ) {
         super.createFormContent( site );
-        
+
         Composite newLine, lastLine = null;
-        Composite parent = pageSite.getPageBody();
-        
+        Composite parent = site.getPageBody();
+
         Section section = newSection( parent, "Vollpreisberechnung" );
         Composite client = (Composite)section.getClient();
         newLine = newFormField( "Vollpreis" ).setEnabled( false )
-                .setProperty( new PropertyAdapter( erweiterteVertragsdaten.vollpreis() ) )
+                .setProperty( new PropertyAdapter( erweiterteVertragsdaten.basispreis() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
-                .setLayoutData( left().top( lastLine ).create() ).setParent( client )
-                .create();
+                .setLayoutData( left().top( lastLine ).create() ).setParent( client ).create();
+        site.addFieldListener( vollpreis = new FieldSummation( site, 2, erweiterteVertragsdaten.basispreis(),
+                kaufvertrag.vollpreis() ) );
 
         lastLine = newLine;
         newLine = newFormField( "Zuschlag" ).setProperty( new PropertyAdapter( erweiterteVertragsdaten.zuschlag() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
-                .setLayoutData( left().top( lastLine ).create() ).setParent( client )
-                .create();
+                .setLayoutData( left().top( lastLine ).create() ).setParent( client ).create();
 
         newFormField( "Bemerkung Zuschlag" )
                 .setProperty( new PropertyAdapter( erweiterteVertragsdaten.zuschlagBemerkung() ) )
-                .setField( new StringFormField() ).setLayoutData( right().top( lastLine ).create() )
-                .setParent( client ).create();
+                .setField( new StringFormField() ).setLayoutData( right().top( lastLine ).create() ).setParent( client )
+                .create();
 
         lastLine = newLine;
         newLine = newFormField( "Abschlag" ).setProperty( new PropertyAdapter( erweiterteVertragsdaten.abschlag() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
-                .setLayoutData( left().top( lastLine ).create() ).setParent( client )
-                .create();
+                .setLayoutData( left().top( lastLine ).create() ).setParent( client ).create();
 
         newFormField( "Bemerkung Abschlag" )
                 .setProperty( new PropertyAdapter( erweiterteVertragsdaten.abschlagBemerkung() ) )
-                .setField( new StringFormField() ).setLayoutData( right().top( lastLine ).create() )
-                .setParent( client ).create();
+                .setField( new StringFormField() ).setLayoutData( right().top( lastLine ).create() ).setParent( client )
+                .create();
 
         lastLine = newLine;
         // TODO Refresher
         newLine = newFormField( "bereinigter Vollpreis" )
-                .setProperty( new PropertyAdapter( erweiterteVertragsdaten.bereinigterVollpreis() ) ).setEnabled( false )
-                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
+                .setProperty( new PropertyAdapter( erweiterteVertragsdaten.bereinigterVollpreis() ) )
+                .setEnabled( false ).setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
-                .setLayoutData( left().top( lastLine ).bottom( 100 ).create() ).setParent( client )
-                .create();
-        
-        
-        site.addFieldListener( refresher = new KaufpreisBereinigtRefresher( site, erweiterteVertragsdaten ) );
+                .setLayoutData( left().top( lastLine ).bottom( 100 ).create() ).setParent( client ).create();
+
+        site.addFieldListener( refresher = new FieldCalculation( site, 2, erweiterteVertragsdaten
+                .bereinigterVollpreis(), erweiterteVertragsdaten.basispreis(), erweiterteVertragsdaten.zuschlag(),
+                erweiterteVertragsdaten.abschlag() ) {
+
+            @Override
+            protected Double calculate( ValueProvider values ) {
+                Double result = values.get( erweiterteVertragsdaten.basispreis() );
+                Double n = values.get( erweiterteVertragsdaten.zuschlag() );
+                Double z = values.get( erweiterteVertragsdaten.abschlag() );
+
+                if (result != null && n != null) {
+                    result += n;
+                }
+                if (result != null && z != null) {
+                    result -= z;
+                }
+                return result;
+            }
+
+        } );
     }
+    
 
-
-    /**
-     *
-     * @param kaufvertrag
-     * @return
-     */
-    private VertragsdatenErweitertComposite getErweiterteVertragsdaten( VertragComposite kaufvertrag ) {
+    private VertragsdatenErweitertComposite getOrCreateErweiterteVertragsdaten( VertragComposite kaufvertrag ) {
         VertragsdatenErweitertComposite vdec = kaufvertrag.erweiterteVertragsdaten().get();
         if (vdec == null) {
             vdec = repository.newEntity( VertragsdatenErweitertComposite.class, null );
             kaufvertrag.erweiterteVertragsdaten().set( vdec );
+            vdec.basispreis().set( kaufvertrag.kaufpreis().get() );
         }
         return vdec;
     }

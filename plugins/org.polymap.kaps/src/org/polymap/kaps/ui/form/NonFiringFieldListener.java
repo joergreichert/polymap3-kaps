@@ -26,13 +26,13 @@ import org.polymap.kaps.ui.FieldListener;
  * only to store values and not to fire them again
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
-public class DefaultFieldListener
+public class NonFiringFieldListener
         extends FieldListener {
 
-    private static Log log = LogFactory.getLog( DefaultFieldListener.class );
+    private static Log log = LogFactory.getLog( NonFiringFieldListener.class );
 
     
-    public DefaultFieldListener(Property... operators) {
+    public NonFiringFieldListener(Property... operators) {
         super( operators );
     }
 

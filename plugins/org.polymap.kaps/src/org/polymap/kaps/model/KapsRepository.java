@@ -261,7 +261,9 @@ public class KapsRepository
                 prototype.kaufpreisAnteilNenner().set( new Double(1.0) );
                 prototype.fuerGewosGeeignet().set( Boolean.TRUE );
                 prototype.fuerAuswertungGeeignet().set( Boolean.TRUE );
-
+//                VertragsdatenErweitertComposite  vdec = newEntity( VertragsdatenErweitertComposite.class, null );
+//                prototype.erweiterteVertragsdaten().set( vdec );
+//                    vdec.basispreis().set( prototype.kaufpreis().get() );
                 // eingangsnummer erst beim Speichern setzen!
 
                 if (creator != null) {

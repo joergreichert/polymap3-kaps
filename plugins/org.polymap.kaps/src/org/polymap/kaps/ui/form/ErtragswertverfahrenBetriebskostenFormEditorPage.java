@@ -12,8 +12,6 @@
  */
 package org.polymap.kaps.ui.form;
 
-import java.beans.PropertyChangeEvent;
-
 import org.geotools.data.FeatureStore;
 import org.opengis.feature.Feature;
 
@@ -27,7 +25,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.jface.action.Action;
 
 import org.polymap.core.project.ui.util.SimpleFormData;
-import org.polymap.core.runtime.event.EventManager;
 
 import org.polymap.rhei.field.FormFieldEvent;
 import org.polymap.rhei.field.IFormFieldListener;
@@ -37,7 +34,6 @@ import org.polymap.kaps.KapsPlugin;
 import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.ui.ActionButton;
 import org.polymap.kaps.ui.FieldCalculation;
-import org.polymap.kaps.ui.FieldMultiplication;
 import org.polymap.kaps.ui.FieldSummation;
 
 /**
@@ -66,16 +62,14 @@ public class ErtragswertverfahrenBetriebskostenFormEditorPage
     @SuppressWarnings("unused")
     private IFormFieldListener  line6multiplicator;
 
-    private FieldMultiplication line7multiplicator;
-
     private FieldSummation      betriebsKostenJahrSummation;
 
     private FieldCalculation    betriebskostenSummeMonatlichCalculation;
 
     private IFormFieldListener  pauschalListener;
 
+    private boolean summePauschal;
 
-    // private IFormFieldListener gemeindeListener;
 
     public ErtragswertverfahrenBetriebskostenFormEditorPage( Feature feature, FeatureStore featureStore ) {
         super( ErtragswertverfahrenBetriebskostenFormEditorPage.class.getName(), "Betriebskosten", feature,
@@ -175,7 +169,16 @@ public class ErtragswertverfahrenBetriebskostenFormEditorPage
                 .betriebskostenZeile1(), vb.betriebskostenZeile2(), vb.betriebskostenZeile3(), vb
                 .betriebskostenZeile4(), vb.betriebskostenZeile5(), vb.betriebskostenZeile6(), vb
                 .betriebskostenZeile7(), vb.betriebskostenZeile8(), vb.betriebskostenZeile9(), vb
-                .betriebskostenZeile10(), vb.betriebskostenZeile11() ) );
+                .betriebskostenZeile10(), vb.betriebskostenZeile11() ) {
+
+            @Override
+            public void refreshResult() {
+                if (!summePauschal) {
+                    // ansonsten pauschale Eingabe und keine Berechnung
+                    super.refreshResult();                    
+                }    
+            } 
+        } );
 
         lastLine = newLine;
         newLine = createLabel( client, "monatliche anteilige Betriebskosten in € in €", one().top( lastLine ),
@@ -187,14 +190,6 @@ public class ErtragswertverfahrenBetriebskostenFormEditorPage
             @Override
             protected Double calculate( ValueProvider values ) {
                 Double v = values.get( vb.jahresBetriebskosten() );
-                
-                // FIXME
-                // Reiter 2 informieren
-                EventManager.instance().publish(
-                        new PropertyChangeEvent( vb, vb.jahresBetriebskostenE()
-                                .qualifiedName().name(), vb.jahresBetriebskostenE().get(),
-                                v ) );
-                
                 return v != null ? v / 12 : null;
             }
         } );
@@ -203,22 +198,22 @@ public class ErtragswertverfahrenBetriebskostenFormEditorPage
     }
 
     private void enablePauschal( IFormEditorPageSite site, Boolean pauschal ) {
-        boolean b = pauschal == null ? false : pauschal.booleanValue();
-        site.setFieldEnabled( vb.betriebskostenZeile1().qualifiedName().name(), !b );
-        site.setFieldEnabled( vb.betriebskostenZeile2().qualifiedName().name(), !b );
-        site.setFieldEnabled( vb.betriebskostenZeile3().qualifiedName().name(), !b );
-        site.setFieldEnabled( vb.betriebskostenZeile4().qualifiedName().name(), !b );
-        site.setFieldEnabled( vb.betriebskostenZeile5().qualifiedName().name(), !b );
-        site.setFieldEnabled( vb.betriebskostenZeile6().qualifiedName().name(), !b );
-        site.setFieldEnabled( vb.betriebskostenZeile7().qualifiedName().name(), !b );
-        site.setFieldEnabled( vb.betriebskostenZeile8().qualifiedName().name(), !b );
-        site.setFieldEnabled( vb.betriebskostenZeile9().qualifiedName().name(), !b );
-        site.setFieldEnabled( vb.betriebskostenZeile10().qualifiedName().name(), !b );
-        site.setFieldEnabled( vb.betriebskostenZeile11().qualifiedName().name(), !b );
-        site.setFieldEnabled( vb.betriebskostenTextZeile9().qualifiedName().name(), !b );
-        site.setFieldEnabled( vb.betriebskostenTextZeile10().qualifiedName().name(), !b );
-        site.setFieldEnabled( vb.betriebskostenTextZeile11().qualifiedName().name(), !b );
-        site.setFieldEnabled( vb.jahresBetriebskosten().qualifiedName().name(), b );
+        summePauschal = pauschal == null ? false : pauschal.booleanValue();
+        site.setFieldEnabled( vb.betriebskostenZeile1().qualifiedName().name(), !summePauschal );
+        site.setFieldEnabled( vb.betriebskostenZeile2().qualifiedName().name(), !summePauschal );
+        site.setFieldEnabled( vb.betriebskostenZeile3().qualifiedName().name(), !summePauschal );
+        site.setFieldEnabled( vb.betriebskostenZeile4().qualifiedName().name(), !summePauschal );
+        site.setFieldEnabled( vb.betriebskostenZeile5().qualifiedName().name(), !summePauschal );
+        site.setFieldEnabled( vb.betriebskostenZeile6().qualifiedName().name(), !summePauschal );
+        site.setFieldEnabled( vb.betriebskostenZeile7().qualifiedName().name(), !summePauschal );
+        site.setFieldEnabled( vb.betriebskostenZeile8().qualifiedName().name(), !summePauschal );
+        site.setFieldEnabled( vb.betriebskostenZeile9().qualifiedName().name(), !summePauschal );
+        site.setFieldEnabled( vb.betriebskostenZeile10().qualifiedName().name(), !summePauschal );
+        site.setFieldEnabled( vb.betriebskostenZeile11().qualifiedName().name(), !summePauschal );
+        site.setFieldEnabled( vb.betriebskostenTextZeile9().qualifiedName().name(), !summePauschal );
+        site.setFieldEnabled( vb.betriebskostenTextZeile10().qualifiedName().name(), !summePauschal );
+        site.setFieldEnabled( vb.betriebskostenTextZeile11().qualifiedName().name(), !summePauschal );
+        site.setFieldEnabled( vb.jahresBetriebskosten().qualifiedName().name(), summePauschal );
     }
 
     @Override

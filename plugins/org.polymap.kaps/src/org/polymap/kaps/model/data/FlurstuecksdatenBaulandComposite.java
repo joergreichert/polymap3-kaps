@@ -1017,6 +1017,11 @@ public interface FlurstuecksdatenBaulandComposite
     // http://polymap.org/kaps/ticket/104#comment:8
     @Optional
     Property<Double> differenzGebaeudeZuBodenwert();
+    
+
+    @Optional
+    Property<String> bemerkungen();
+
     // );
     //
     // CREATE INDEX K_BEVERW_RIWE ON K_BEVERW (GEMEINDE ASC, RIZONE ASC, RIJAHR ASC);

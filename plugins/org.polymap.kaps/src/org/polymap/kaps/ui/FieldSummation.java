@@ -86,7 +86,7 @@ public class FieldSummation
     }
 
 
-    private void refreshResult() {
+    protected void refreshResult() {
         resultValue = 0.0;
 
         for (String term : terms.keySet()) {

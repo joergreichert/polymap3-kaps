@@ -30,7 +30,11 @@ import org.polymap.kaps.model.NHK2010GebaeudeartenProvider;
 import org.polymap.kaps.model.data.ErmittlungModernisierungsgradComposite;
 import org.polymap.kaps.model.data.ErtragswertverfahrenComposite;
 import org.polymap.kaps.model.data.EtageComposite;
+import org.polymap.kaps.model.data.FlurstueckComposite;
+import org.polymap.kaps.model.data.FlurstuecksdatenAgrarComposite;
+import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
 import org.polymap.kaps.model.data.NHK2010Anbauten;
+import org.polymap.kaps.model.data.NHK2010Baupreisindex;
 import org.polymap.kaps.model.data.NHK2010BewertungComposite;
 import org.polymap.kaps.model.data.NHK2010BewertungGebaeudeComposite;
 import org.polymap.kaps.model.data.VertragComposite;
@@ -62,40 +66,36 @@ public class MdbImportBewertungenOperation
         final Database db = Database.open( dbFile );
         try {
             SubMonitor sub = null;
-            // sub = new SubMonitor( monitor, 10 );
-            // importEntity( db, monitor, NHK2010Anbauten.class, new
-            // EntityCallback<NHK2010Anbauten>() {
-            //
-            // @Override
-            // public void fillEntity( NHK2010Anbauten entity, Map<String, Object>
-            // builderRow ) {
-            // // bewertung finden
-            // entity.schl().set( String.valueOf( (Integer)builderRow.get( "SCHL" ) )
-            // );
-            // }
-            // } );
-            // sub = new SubMonitor( monitor, 10 );
-            // importEntity( db, monitor, NHK2010Baupreisindex.class, new
-            // EntityCallback<NHK2010Baupreisindex>() {
-            //
-            // @Override
-            // public void fillEntity( NHK2010Baupreisindex entity, Map<String,
-            // Object> builderRow ) {
-            // // jahr von bis
-            // Double value = (Double)builderRow.get( "JAHR" );
-            // entity.jahr().set( value.intValue() );
-            // value = (Double)builderRow.get( "MONVON" );
-            // entity.monatVon().set( value.intValue() );
-            // value = (Double)builderRow.get( "MONBIS" );
-            // entity.monatBis().set( value.intValue() );
-            // }
-            // } );
-            //
-            // sub = new SubMonitor( monitor, 10 );
-            // importNHK2010Bewertung( db, sub, parentFolder );
-            //
-            // sub = new SubMonitor( monitor, 10 );
-            // importModernisierungsgrad( db, sub, parentFolder );
+
+            sub = new SubMonitor( monitor, 10 );
+            importEntity( db, monitor, NHK2010Anbauten.class, new EntityCallback<NHK2010Anbauten>() {
+
+                @Override
+                public void fillEntity( NHK2010Anbauten entity, Map<String, Object> builderRow ) {
+                    // bewertung finden
+                    entity.schl().set( String.valueOf( (Integer)builderRow.get( "SCHL" ) ) );
+                }
+            } );
+            sub = new SubMonitor( monitor, 10 );
+            importEntity( db, monitor, NHK2010Baupreisindex.class, new EntityCallback<NHK2010Baupreisindex>() {
+
+                @Override
+                public void fillEntity( NHK2010Baupreisindex entity, Map<String, Object> builderRow ) {
+                    // jahr von bis
+                    Double value = (Double)builderRow.get( "JAHR" );
+                    entity.jahr().set( value.intValue() );
+                    value = (Double)builderRow.get( "MONVON" );
+                    entity.monatVon().set( value.intValue() );
+                    value = (Double)builderRow.get( "MONBIS" );
+                    entity.monatBis().set( value.intValue() );
+                }
+            } );
+
+            sub = new SubMonitor( monitor, 10 );
+            importNHK2010Bewertung( db, sub, parentFolder );
+
+            sub = new SubMonitor( monitor, 10 );
+            importModernisierungsgrad( db, sub, parentFolder );
 
             sub = new SubMonitor( monitor, 10 );
             importEntity( db, monitor, ErtragswertverfahrenComposite.class,
@@ -158,8 +158,17 @@ public class MdbImportBewertungenOperation
                             if (ev != null) {
                                 entity.bereinigterKaufpreis().set( ev.bereinigterVollpreis().get() );
                             }
+
+                            Double bw = entity.bodenwert().get();
+                            Double freilegung = entity.freilegung().get();
+
+                            entity.bodenwertAbzglFreilegung().set(
+                                    bw != null ? (freilegung != null ? bw - freilegung : bw) : null );
                         }
                     } );
+
+            sub = new SubMonitor( monitor, 10 );
+            importBemerkungen( db, monitor, parentFolder );
         }
         finally {
             db.close();
@@ -494,13 +503,13 @@ public class MdbImportBewertungenOperation
                 if ("frm_sachwnhk2010".equals( type )) {
                     NHK2010BewertungComposite nhk2010 = NHK2010BewertungComposite.Mixin.forVertrag( b.vertrag().get() );
                     if (nhk2010 == null) {
-                        wmvaopfW.write( "keine NHK gefunden fuer " + b.vertrag().get().eingangsNr().get() );
+                        wmvaopfW.write( "keine NHK gefunden fuer " + b.vertrag().get().eingangsNr().get() + "\n" );
                     }
                     else {
                         for (NHK2010BewertungGebaeudeComposite gebaeude : NHK2010BewertungGebaeudeComposite.Mixin
                                 .forBewertung( nhk2010 )) {
                             if (b.gebaeudeNummer().get() == gebaeude.laufendeNummer().get()) {
-                                b.nhk2010().set(gebaeude);
+                                b.nhk2010().set( gebaeude );
                                 if (b.bereinigtesBaujahr().get() == null) {
                                     b.bereinigtesBaujahr().set( gebaeude.bereinigtesBaujahr().get() );
                                 }
@@ -519,10 +528,10 @@ public class MdbImportBewertungenOperation
                         wmvaopfW.write( "keine wohnung gefunden fuer " + b.objektNummer().get() + ", "
                                 + b.objektFortfuehrung().get() + ", " + b.gebaeudeNummer().get() + ", "
                                 + b.gebaeudeFortfuehrung().get() + ", " + b.wohnungsNummer().get() + ", "
-                                + b.wohnungsFortfuehrung().get() );
+                                + b.wohnungsFortfuehrung().get() + "\n" );
                     }
                     else {
-                        b.wohnung().set(wohnung);
+                        b.wohnung().set( wohnung );
                         if (b.bereinigtesBaujahr().get() == null) {
                             b.bereinigtesBaujahr().set( wohnung.bereinigtesBaujahr().get() );
                         }
@@ -531,8 +540,23 @@ public class MdbImportBewertungenOperation
                     }
                 }
                 else if ("frm_ertragswertn".equals( type )) {
-                    // TODO ertragswertverfahren ergänzen
-                    // TODO IMPORTb.ertragswertVerfahren().set(ev);
+                    ErtragswertverfahrenComposite ec = ErtragswertverfahrenComposite.Mixin.forVertrag( b.vertrag()
+                            .get() );
+                    if (ec == null) {
+                        wmvaopfW.write( "kein Ertragswertverfahren gefunden fuer "
+                                + +b.vertrag().get().eingangsNr().get() + "\n" );
+                    }
+                    else {
+                        b.ertragswertVerfahren().set( ec );
+                        if (b.bereinigtesBaujahr().get() == null) {
+                            b.bereinigtesBaujahr().set( ec.bereinigtesBaujahr().get() );
+                        }
+                        b.gesamtNutzungsDauer().set( ec.gesamtNutzungsDauer().get() );
+                        b.tatsaechlichesBaujahr().set( ec.tatsaechlichesBaujahr().get() );
+                    }
+                }
+                else {
+                    wmvaopfW.write( "unbekannter Typ " + type + "\n" );
                 }
 
                 if (b.gesamtNutzungsDauer().get() == null) {
@@ -570,4 +594,78 @@ public class MdbImportBewertungenOperation
         wmvaopfW.flush();
         wmvaopfW.close();
     }
+
+
+    private void importBemerkungen( Database db, IProgressMonitor monitor, final File parentFolder )
+            throws Exception {
+        Table table = db.getTable( "K_BEMERKUNG" );
+        monitor.beginTask( "Tabelle: " + table.getName(), table.getRowCount() );
+
+        final BufferedWriter wmvaopfW = new BufferedWriter( new FileWriter( new File( parentFolder,
+                "fehler_import_bemerkung.txt" ) ) );
+
+        Map<String, Object> builderRow = null;
+        int count = 0;
+        while ((builderRow = table.getNextRow()) != null) {
+            // alle Bewertungen importieren
+            String maske = (String)builderRow.get( "MASKE" );
+            Integer eingangsnummer = (Integer)builderRow.get( "EINGANGSNR" );
+            String text = (String)builderRow.get( "BEZ1" );
+            VertragComposite vertragTemplate = QueryExpressions.templateFor( VertragComposite.class );
+            BooleanExpression expr = QueryExpressions.eq( vertragTemplate.eingangsNr(), eingangsnummer.intValue() );
+            VertragComposite vertrag = KapsRepository.instance().findEntities( VertragComposite.class, expr, 0, 1 )
+                    .find();
+            if (vertrag == null) {
+                wmvaopfW.write( "no vertrag found for " + eingangsnummer + "\n" );
+            }
+            else {
+
+                if ("frm_buch".equals( maske )) {
+                    String old = vertrag.bemerkungen().get();
+                    vertrag.bemerkungen().set( old != null ? old + "\n" + text : text );
+                }
+                else if ("frm_gveditbau".equals( maske )) {
+                    boolean found = false;
+                    for (FlurstueckComposite fs : FlurstueckComposite.Mixin.forEntity( vertrag )) {
+                        FlurstuecksdatenBaulandComposite bc = FlurstuecksdatenBaulandComposite.Mixin.forFlurstueck( fs );
+                        if (bc != null) {
+                            bc.bemerkungen().set( text );
+                            found = true;
+                        }
+                    }
+                    if (!found) {
+                        wmvaopfW.write( "no FlurstuecksdatenBaulandComposite found for " + eingangsnummer + "\n" );
+                    }
+                }
+                else if ("frm_gveditagrar".equals( maske )) {
+                    boolean found = false;
+                    for (FlurstueckComposite fs : FlurstueckComposite.Mixin.forEntity( vertrag )) {
+                        FlurstuecksdatenAgrarComposite bc = FlurstuecksdatenAgrarComposite.Mixin.forFlurstueck( fs );
+                        if (bc != null) {
+                            String old = bc.bemerkungen().get();
+                            bc.bemerkungen().set( old != null ? old + "\n" + text : text );
+                            found = true;
+                        }
+                    }
+                    if (!found) {
+                        wmvaopfW.write( "no FlurstuecksdatenBaulandComposite found for " + eingangsnummer + "\n" );
+                    }
+                }
+                else if ("frm_ertragswertn_n".equals( maske )) {
+                    ErtragswertverfahrenComposite ec = ErtragswertverfahrenComposite.Mixin.forVertrag( vertrag );
+                    ec.bemerkungen().set( text );
+                }
+                else {
+                    throw new IllegalStateException( "unbekannte MASKE " + maske );
+                }
+            }
+            count++;
+        }
+        repo.commitChanges();
+        log.info( "Imported and committed: K_BEMERKUNG -> " + count );
+        monitor.done();
+        wmvaopfW.flush();
+        wmvaopfW.close();
+    }
+
 }

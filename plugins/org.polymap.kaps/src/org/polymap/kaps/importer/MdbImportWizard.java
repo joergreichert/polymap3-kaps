@@ -76,12 +76,12 @@ public class MdbImportWizard
                         throws Exception {
                     new MdbImportOperation( importPage.dbFile, importPage.tableNames ).doExecute( monitor, info );
                     new MdbImportWohneigentumOperation( importPage.dbFile, importPage.tableNames ).doExecute( monitor,
-                          info );
+                            info );
                     new MdbImportBewertungenOperation( importPage.dbFile, importPage.tableNames ).doExecute( monitor,
                             info );
                     return Status.OK_STATUS;
                 }
-                
+
                 @Override
                 public void propertyChange( PropertyChangeEvent ev ) {
                     // do nothing

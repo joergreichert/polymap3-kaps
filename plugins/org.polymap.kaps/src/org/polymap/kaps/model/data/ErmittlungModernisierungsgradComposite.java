@@ -378,10 +378,12 @@ public interface ErmittlungModernisierungsgradComposite
 
             ErmittlungModernisierungsgradComposite template = QueryExpressions
                     .templateFor( ErmittlungModernisierungsgradComposite.class );
-            BooleanExpression expr = QueryExpressions.and(
-                    QueryExpressions.eq( template.gebaeudeNummer(), gebaeude.laufendeNummer().get() ),
-                    QueryExpressions.eq( template.vertrag(), gebaeude.bewertung().get().vertrag().get() ) );
-
+            BooleanExpression expr = QueryExpressions.eq( template.nhk2010(), gebaeude );
+            // BooleanExpression expr = QueryExpressions.and(
+            // QueryExpressions.eq( template.gebaeudeNummer(),
+            // gebaeude.laufendeNummer().get() ),
+            // QueryExpressions.eq( template.vertrag(),
+            // gebaeude.bewertung().get().vertrag().get() ) );
             return KapsRepository.instance().findEntities( ErmittlungModernisierungsgradComposite.class, expr, 0, 1 )
                     .find();
         }
@@ -480,21 +482,47 @@ public interface ErmittlungModernisierungsgradComposite
         public static ErmittlungModernisierungsgradComposite forWohnung( WohnungComposite wohnung ) {
             ErmittlungModernisierungsgradComposite template = QueryExpressions
                     .templateFor( ErmittlungModernisierungsgradComposite.class );
-            BooleanExpression expr = QueryExpressions.and(
-                    QueryExpressions.eq( template.objektNummer(), wohnung.objektNummer().get() ),
-                    QueryExpressions.eq( template.objektFortfuehrung(), wohnung.objektFortfuehrung().get() ),
-                    QueryExpressions.eq( template.gebaeudeNummer(), wohnung.gebaeudeNummer().get() ),
-                    QueryExpressions.eq( template.gebaeudeFortfuehrung(), wohnung.gebaeudeFortfuehrung().get() ),
-                    QueryExpressions.eq( template.wohnungsNummer(), wohnung.wohnungsNummer().get() ),
-                    QueryExpressions.eq( template.wohnungsFortfuehrung(), wohnung.wohnungsFortfuehrung().get() ) );
+            BooleanExpression expr = QueryExpressions.eq( template.wohnung(), wohnung );
+            // BooleanExpression expr = QueryExpressions.and(
+            // QueryExpressions.eq( template.objektNummer(),
+            // wohnung.objektNummer().get() ),
+            // QueryExpressions.eq( template.objektFortfuehrung(),
+            // wohnung.objektFortfuehrung().get() ),
+            // QueryExpressions.eq( template.gebaeudeNummer(),
+            // wohnung.gebaeudeNummer().get() ),
+            // QueryExpressions.eq( template.gebaeudeFortfuehrung(),
+            // wohnung.gebaeudeFortfuehrung().get() ),
+            // QueryExpressions.eq( template.wohnungsNummer(),
+            // wohnung.wohnungsNummer().get() ),
+            // QueryExpressions.eq( template.wohnungsFortfuehrung(),
+            // wohnung.wohnungsFortfuehrung().get() ) );
             Query<ErmittlungModernisierungsgradComposite> matches = KapsRepository.instance().findEntities(
                     ErmittlungModernisierungsgradComposite.class, expr, 0, 1 );
             return matches.find();
         }
+
+
+        /**
+         * 
+         * @param vb
+         * @return
+         */
+        public static ErmittlungModernisierungsgradComposite forErtragswertverfahren( ErtragswertverfahrenComposite vb ) {
+            ErmittlungModernisierungsgradComposite template = QueryExpressions
+                    .templateFor( ErmittlungModernisierungsgradComposite.class );
+            BooleanExpression expr = QueryExpressions.eq( template.ertragswertVerfahren(), vb );
+            return KapsRepository.instance().findEntities( ErmittlungModernisierungsgradComposite.class, expr, 0, 1 )
+                    .find();
+        }
     }
+
 
     @Optional
     Association<NHK2010BewertungGebaeudeComposite> nhk2010();
+
+
+    @Optional
+    Association<ErtragswertverfahrenComposite> ertragswertVerfahren();
 
 
     @Optional

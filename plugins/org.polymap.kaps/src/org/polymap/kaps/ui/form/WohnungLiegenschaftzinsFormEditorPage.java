@@ -33,7 +33,6 @@ import org.polymap.rhei.data.entityfeature.PropertyAdapter;
 import org.polymap.rhei.field.CheckboxFormField;
 import org.polymap.rhei.field.DateTimeFormField;
 import org.polymap.rhei.field.IFormFieldLabel;
-import org.polymap.rhei.field.IFormFieldListener;
 import org.polymap.rhei.form.FormEditor;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
@@ -69,7 +68,7 @@ public class WohnungLiegenschaftzinsFormEditorPage
     private FieldCalculation            berPreis;
 
     @SuppressWarnings("unused")
-    private FieldListener         fieldListener;
+    private FieldListener               fieldListener;
 
     @SuppressWarnings("unused")
     private FieldCalculation            jahresRohertrag;
@@ -98,35 +97,27 @@ public class WohnungLiegenschaftzinsFormEditorPage
     @SuppressWarnings("unused")
     private FieldCalculationWithTrigger liegenschaftsZins;
 
-
-    // private IFormFieldListener gemeindeListener;
-
     public WohnungLiegenschaftzinsFormEditorPage( final FormEditor editor, Feature feature, FeatureStore featureStore ) {
         super( WohnungLiegenschaftzinsFormEditorPage.class.getName(), "Liegenschaftszins", feature, featureStore );
         EventManager.instance().subscribe(
-                fieldListener = new FieldListener( wohnung.wohnflaeche(), /*
-                                                                           * wohnung.
-                                                                           * bruchteilNenner
-                                                                           * (),
-                                                                           * wohnung.
-                                                                           * bruchteilZaehler
-                                                                           * (),
-                                                                           */wohnung.bereinigterVollpreis(),
-                        wohnung.kaufpreis(), wohnung.baujahr(), wohnung.gesamtNutzungsDauer() ) {
-
-                            @Override
-                            protected void onChangedValue( IFormEditorPageSite site, String fieldName, Object value ) {
-                                // TODO Auto-generated method stub
-                                throw new RuntimeException( "not yet implemented." );
-                            }
-
-                }, new FieldListener.EventFilter( editor ) );
+                fieldListener = new FieldListener( wohnung.wohnflaeche(), wohnung.bereinigterVollpreis(),
+                        wohnung.kaufpreis(), wohnung.baujahr(), wohnung.gesamtNutzungsDauer() ),
+                new FieldListener.EventFilter( editor ) );
     }
+
 
     @Override
     public void dispose() {
         EventManager.instance().unsubscribe( fieldListener );
     }
+
+
+    @Override
+    public void afterDoLoad( IProgressMonitor monitor )
+            throws Exception {
+        fieldListener.flush( pageSite );
+    }
+
 
     protected SimpleFormData one() {
         return new SimpleFormData( SPACING ).left( ONE ).right( TWO );
@@ -425,43 +416,5 @@ public class WohnungLiegenschaftzinsFormEditorPage
                 return null;
             }
         } );
-    }
-
-
-    @Override
-    public void afterDoLoad( IProgressMonitor monitor )
-            throws Exception {
-        if (fieldListener.get( wohnung.wohnflaeche() ) != null) {
-            pageSite.fireEvent( this, wohnung.wohnflaeche().qualifiedName().name(), IFormFieldListener.VALUE_CHANGE,
-                    fieldListener.get( wohnung.wohnflaeche() ) );
-        }
-        // if (fieldListener.get( wohnung.bruchteilNenner() ) != null) {
-        // pageSite.fireEvent( this,
-        // wohnung.bruchteilNenner().qualifiedName().name(),
-        // IFormFieldListener.VALUE_CHANGE, fieldListener.get(
-        // wohnung.bruchteilNenner() ) );
-        // }
-        // if (fieldListener.get( wohnung.bruchteilZaehler() ) != null) {
-        // pageSite.fireEvent( this,
-        // wohnung.bruchteilZaehler().qualifiedName().name(),
-        // IFormFieldListener.VALUE_CHANGE, fieldListener.get(
-        // wohnung.bruchteilZaehler() ) );
-        // }
-        if (fieldListener.get( wohnung.bereinigterVollpreis() ) != null) {
-            pageSite.fireEvent( this, wohnung.bereinigterVollpreis().qualifiedName().name(),
-                    IFormFieldListener.VALUE_CHANGE, fieldListener.get( wohnung.bereinigterVollpreis() ) );
-        }
-        if (fieldListener.get( wohnung.kaufpreis() ) != null) {
-            pageSite.fireEvent( this, wohnung.kaufpreis().qualifiedName().name(), IFormFieldListener.VALUE_CHANGE,
-                    fieldListener.get( wohnung.kaufpreis() ) );
-        }
-        if (fieldListener.get( wohnung.baujahr() ) != null) {
-            pageSite.fireEvent( this, wohnung.baujahr().qualifiedName().name(), IFormFieldListener.VALUE_CHANGE,
-                    fieldListener.get( wohnung.baujahr() ) );
-        }
-        if (fieldListener.get( wohnung.gesamtNutzungsDauer() ) != null) {
-            pageSite.fireEvent( this, wohnung.gesamtNutzungsDauer().qualifiedName().name(),
-                    IFormFieldListener.VALUE_CHANGE, fieldListener.get( wohnung.gesamtNutzungsDauer() ) );
-        }
     }
 }

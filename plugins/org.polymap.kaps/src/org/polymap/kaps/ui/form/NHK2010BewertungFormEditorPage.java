@@ -15,11 +15,8 @@ package org.polymap.kaps.ui.form;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
-import java.beans.PropertyChangeEvent;
 
 import org.geotools.data.FeatureStore;
 import org.opengis.feature.Feature;
@@ -28,6 +25,7 @@ import org.opengis.feature.type.PropertyDescriptor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.qi4j.api.entity.Entity;
 import org.qi4j.api.property.Property;
 
 import org.eclipse.swt.SWT;
@@ -40,6 +38,8 @@ import org.eclipse.jface.dialogs.MessageDialog;
 
 import org.eclipse.ui.forms.widgets.Section;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+
 import org.polymap.core.data.ui.featuretable.DefaultFeatureTableColumn;
 import org.polymap.core.data.ui.featuretable.FeatureTableViewer;
 import org.polymap.core.model.EntityType;
@@ -47,7 +47,6 @@ import org.polymap.core.project.ui.util.SimpleFormData;
 import org.polymap.core.qi4j.QiModule.EntityCreator;
 import org.polymap.core.runtime.Polymap;
 import org.polymap.core.runtime.event.EventFilter;
-import org.polymap.core.runtime.event.EventHandler;
 import org.polymap.core.runtime.event.EventManager;
 import org.polymap.core.workbench.PolymapWorkbench;
 
@@ -78,6 +77,8 @@ import org.polymap.kaps.model.data.NHK2010Gebaeudeart;
 import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.ui.ActionButton;
 import org.polymap.kaps.ui.FieldSummation;
+import org.polymap.kaps.ui.InterEditorListener;
+import org.polymap.kaps.ui.InterEditorPropertyChangeEvent;
 import org.polymap.kaps.ui.KapsDefaultFormEditorPageWithFeatureTable;
 
 /**
@@ -142,17 +143,47 @@ public class NHK2010BewertungFormEditorPage
 
     protected Double                    gnd;
 
+    private InterEditorListener         fieldListener;
 
-    public NHK2010BewertungFormEditorPage( Feature feature, FeatureStore featureStore ) {
+    private final FormEditor            formEditor;
+
+
+    public NHK2010BewertungFormEditorPage( final FormEditor formEditor, Feature feature, FeatureStore featureStore ) {
         super( NHK2010BewertungGebaeudeComposite.class, NHK2010BewertungFormEditorPage.class.getName(), "NHK 2010",
                 feature, featureStore );
+        this.formEditor = formEditor;
 
         bewertung = repository.findEntity( NHK2010BewertungComposite.class, feature.getIdentifier().getID() );
 
-        EventManager.instance().subscribe( this, new EventFilter<PropertyChangeEvent>() {
+        EventManager.instance().subscribe( fieldListener = new InterEditorListener( ) {
 
-            public boolean apply( PropertyChangeEvent ev ) {
-                Object source = ev.getSource();
+            @Override
+            protected void onChangedValue( IFormEditorPageSite site, Entity entity, String fieldName, Object value ) {
+                NHK2010BewertungGebaeudeComposite gebaeude = (NHK2010BewertungGebaeudeComposite)entity;
+                if (selectedComposite.get() == null || !selectedComposite.get().equals( gebaeude )) {
+                    // neu setzen
+                    selectedComposite.set( gebaeude );
+                    try {
+                        refreshReloadables();
+                    }
+                    catch (Exception e) {
+                        throw new RuntimeException( "Fehler beim Setzen der neuen Parameter" );
+                    }
+                }
+                // GND und Baujahr
+                // check for gnd and baujahr, alle anderen Properties werden beim
+                // Speichern gefeuert
+                if (fieldName.equals( selectedComposite.get().gesamtNutzungsDauer().qualifiedName().name() )
+                        || fieldName.equals( selectedComposite.get().bereinigtesBaujahr().qualifiedName().name() )) {
+                    // System.out.println( ev );
+                    pageSite.setFieldValue( prefix + fieldName, value != null ? getFormatter( 0 ).format( value )
+                            : null );
+                }
+            }
+        }, new EventFilter<InterEditorPropertyChangeEvent>() {
+
+            public boolean apply( InterEditorPropertyChangeEvent ev ) {
+                Object source = ev.getEntity();
                 if (source != null && source instanceof NHK2010BewertungGebaeudeComposite) {
                     NHK2010BewertungGebaeudeComposite gebaeude = (NHK2010BewertungGebaeudeComposite)source;
                     if (gebaeude.bewertung().get().equals( bewertung )) {
@@ -166,31 +197,17 @@ public class NHK2010BewertungFormEditorPage
     }
 
 
-    @EventHandler(display = true, delay = 1)
-    public void handleExternalGebaeudeSelection( List<PropertyChangeEvent> events )
-            throws Exception {
-
-        for (PropertyChangeEvent ev : events) {
-
-            NHK2010BewertungGebaeudeComposite gebaeude = (NHK2010BewertungGebaeudeComposite)ev.getSource();
-            if (selectedComposite.get() == null || !selectedComposite.get().equals( gebaeude )) {
-                // neu setzen
-                selectedComposite.set( gebaeude );
-                refreshReloadables();
-            }
-            // GND und Baujahr
-            // System.out.println( ev );
-            pageSite.setFieldValue( prefix + ev.getPropertyName(),
-                    ev.getNewValue() != null ? getFormatter( 0 ).format( ev.getNewValue() ) : null );
-            System.out.println( ev );
-        }
+    @Override
+    public void dispose() {
+        super.dispose();
+        EventManager.instance().unsubscribe( fieldListener );
     }
 
 
     @Override
-    public void dispose() {
-        super.dispose();
-        EventManager.instance().unsubscribe( this );
+    public void afterDoLoad( IProgressMonitor monitor )
+            throws Exception {
+        fieldListener.flush(pageSite);
     }
 
 
@@ -350,12 +367,13 @@ public class NHK2010BewertungFormEditorPage
                                     erweitert );
                             editor.setActivePage( FlurstuecksdatenBaulandBodenwertFormEditorPage.class.getName() );
                             EventManager.instance().publish(
-                                    new PropertyChangeEvent( erweitert, erweitert.wertDerBaulichenAnlagen()
-                                            .qualifiedName().name(), erweitert.wertDerBaulichenAnlagen().get(),
-                                            newValue ) );
+                                    new InterEditorPropertyChangeEvent( formEditor, editor, erweitert, erweitert
+                                            .wertDerBaulichenAnlagen().qualifiedName().name(), erweitert
+                                            .wertDerBaulichenAnlagen().get(), newValue ) );
                             EventManager.instance().publish(
-                                    new PropertyChangeEvent( erweitert, erweitert.bewertungsMethode().qualifiedName()
-                                            .name(), erweitert.bewertungsMethode().get(), "NHK2010" ) );
+                                    new InterEditorPropertyChangeEvent( formEditor, editor, erweitert, erweitert
+                                            .bewertungsMethode().qualifiedName().name(), erweitert.bewertungsMethode()
+                                            .get(), "NHK2010" ) );
                         }
                     }
                 }
@@ -365,7 +383,7 @@ public class NHK2010BewertungFormEditorPage
                             "Wert übernommen",
                             "Der Gesamtwert der baulichen Anlagen wurde in \"Wert der baulichen Anlagen\" im Reiter \"Boden- und Gebäudewert \" in "
                                     + count
-                                    + " erweiterte Daten für Flurstücke übernommen. Die erweiterten Daten werden entsprechend angezeigt." );
+                                    + " " + FlurstuecksdatenBaulandComposite.NAME + " übernommen. Die Formulare werden entsprechend angezeigt." );
                 }
             }
         } );
@@ -1196,8 +1214,6 @@ public class NHK2010BewertungFormEditorPage
                 .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 4, 0 ) )
                 .setLayoutData( four().top( lastLine ).create() ).create();
 
-
-        
         pageSite.addFieldListener( gndbjListener = new IFormFieldListener() {
 
             @Override
@@ -1205,7 +1221,8 @@ public class NHK2010BewertungFormEditorPage
                 if (ev.getEventCode() == VALUE_CHANGE) {
                     if (ev.getFieldName().equalsIgnoreCase( getPropertyName( nameTemplate.tatsaechlichesBaujahr() ) )) {
                         baujahr = (Double)ev.getNewValue();
-                    } else if (ev.getFieldName().equalsIgnoreCase( getPropertyName( nameTemplate.gesamtNutzungsDauer() ) )) {
+                    }
+                    else if (ev.getFieldName().equalsIgnoreCase( getPropertyName( nameTemplate.gesamtNutzungsDauer() ) )) {
                         gnd = (Double)ev.getNewValue();
                     }
                 }
@@ -1239,16 +1256,18 @@ public class NHK2010BewertungFormEditorPage
                             ermittlung.alterObergrenzeZeile7().set( 15.0d );
                             ermittlung.alterObergrenzeZeile8().set( 30.0d );
                         }
-//                        ermittlung.gesamtNutzungsDauer().set( gnd );
-//                        ermittlung.tatsaechlichesBaujahr().set( baujahr );
-                        KapsPlugin.openEditor( fs, ErmittlungModernisierungsgradComposite.NAME, ermittlung );
+                        // ermittlung.gesamtNutzungsDauer().set( gnd );
+                        // ermittlung.tatsaechlichesBaujahr().set( baujahr );
+                        FormEditor targetEditor = KapsPlugin.openEditor( fs,
+                                ErmittlungModernisierungsgradComposite.NAME, ermittlung );
                         EventManager.instance().publish(
-                                new PropertyChangeEvent( ermittlung, ermittlung.gesamtNutzungsDauer()
-                                        .qualifiedName().name(), ermittlung.gesamtNutzungsDauer().get(),
-                                        gnd ) );
+                                new InterEditorPropertyChangeEvent( formEditor, targetEditor, ermittlung, ermittlung
+                                        .gesamtNutzungsDauer().qualifiedName().name(), ermittlung.gesamtNutzungsDauer()
+                                        .get(), gnd ) );
                         EventManager.instance().publish(
-                                new PropertyChangeEvent( ermittlung, ermittlung.tatsaechlichesBaujahr().qualifiedName()
-                                        .name(), ermittlung.tatsaechlichesBaujahr().get(), baujahr ) );
+                                new InterEditorPropertyChangeEvent( formEditor, targetEditor, ermittlung, ermittlung
+                                        .tatsaechlichesBaujahr().qualifiedName().name(), ermittlung
+                                        .tatsaechlichesBaujahr().get(), baujahr ) );
                     }
                 }
             }

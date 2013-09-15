@@ -12,7 +12,9 @@
  */
 package org.polymap.kaps.ui;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -33,7 +35,7 @@ import org.polymap.rhei.form.IFormEditorPageSite;
  * 
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
-public abstract class FieldListener
+public class FieldListener
         implements IFormFieldListener {
 
     /**
@@ -68,7 +70,11 @@ public abstract class FieldListener
 
 
     public <T> T get( Property<T> term ) {
-        return (T)values.get( term.qualifiedName().name() );
+        T result = (T)values.get( term.qualifiedName().name() );
+        if (result == null) {
+            result = term.get();
+        }
+        return result;
     }
 
     private final Map<String, Property<?>> terms;
@@ -81,10 +87,9 @@ public abstract class FieldListener
         for (Property<?> term : operators) {
             terms.put( term.qualifiedName().name(), term );
         }
-        // for (Property term : operators) {
-        // put( term, term.get() );
-        // }
     }
+
+    private final List<String> currentCalls = new ArrayList<String>();
 
 
     @Override
@@ -92,19 +97,36 @@ public abstract class FieldListener
         if (!blocked && ev.getEventCode() != IFormFieldListener.VALUE_CHANGE) {
             return;
         }
-//        log.info( "field change for " + ev.toString() + " on  " + this );
+        // log.info( "field change for " + ev.toString() + " on  " + this );
         String fieldName = ev.getFieldName();
         if (terms.keySet().contains( fieldName )) {
             put( terms.get( fieldName ), ev.getNewValue() );
         }
+        // if (site != null && !blocked) {
+        // synchronized (currentCalls) {
+        // if (!currentCalls.contains( fieldName.intern() )) {
+        // currentCalls.add( fieldName.intern() );
+        // // avoid endless loops
+        // log.info( "onchange for " + site.toString() + " and field " + fieldName +
+        // " and Value "
+        // + values.get( fieldName ) );
+        // onChangedValue( site, fieldName, values.get( fieldName ) );
+        // currentCalls.remove( fieldName.intern() );
+        // }
+        // }
+        // }
     }
 
-    public void unBlock() {
-        blocked = false;
-    }
-    
+
+    //
+    // public void unBlock() {
+    // blocked = false;
+    // }
+
     public final void flush( IFormEditorPageSite site ) {
         // after flush, no more events would be tracked
+        // initial flush, block after that call
+        // this.site = site;
         blocked = true;
         for (String fieldName : values.keySet()) {
             log.info( "Flush for site " + site.toString() + " and field " + fieldName + " and Value "
@@ -114,5 +136,8 @@ public abstract class FieldListener
     }
 
 
-    protected abstract void onChangedValue( IFormEditorPageSite site, String fieldName, Object value );
+    // default implementation, overwrite if necessary
+    protected void onChangedValue( IFormEditorPageSite site, String fieldName, Object value ) {
+        site.fireEvent( this, fieldName, IFormFieldListener.VALUE_CHANGE, value );
+    }
 }

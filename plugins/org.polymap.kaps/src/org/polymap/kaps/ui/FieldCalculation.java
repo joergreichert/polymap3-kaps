@@ -95,7 +95,7 @@ public abstract class FieldCalculation
 
     public final void refreshResult() {
         Double resultValue = calculate( values );
-        if (resultValue != null) {
+        if (resultValue != null && resultValue != Double.NaN) {
             site.setFieldValue( result.qualifiedName().name(), getFormatter().format( resultValue ) );
         }
     }

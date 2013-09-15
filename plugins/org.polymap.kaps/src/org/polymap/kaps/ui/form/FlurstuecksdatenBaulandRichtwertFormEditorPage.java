@@ -30,7 +30,6 @@ import org.polymap.core.project.ui.util.SimpleFormData;
 import org.polymap.core.runtime.event.EventManager;
 
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
-import org.polymap.rhei.field.FormFieldEvent;
 import org.polymap.rhei.field.IFormFieldLabel;
 import org.polymap.rhei.field.IFormFieldListener;
 import org.polymap.rhei.field.TextFormField;
@@ -39,6 +38,7 @@ import org.polymap.rhei.form.IFormEditorPageSite;
 
 import org.polymap.kaps.ui.FieldCalculation;
 import org.polymap.kaps.ui.FieldListener;
+import org.polymap.kaps.ui.FieldSummation;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -89,40 +89,8 @@ public class FlurstuecksdatenBaulandRichtwertFormEditorPage
 
         EventManager.instance().subscribe(
                 fieldListener = new FieldListener( vb.bodenwertBereinigt1(), vb.bebAbschlag(),
-                        vb.richtwertAbschlagProzent(), vb.richtwertZuschlagProzent(), vb.erschliessungsKosten() ) {
-
-                    @Override
-                    protected void onChangedValue( IFormEditorPageSite site, String fieldName, Object value ) {
-                        // bodenpreis vom 1. tab könnte sich geändert haben, also neu
-                        // berechnen
-                        if (fieldName.equals( vb.bodenwertBereinigt1().qualifiedName().name() ) && value != null
-                                && value != vb.bodenpreisAbgleichAufBaupreisBebaut().get()) {
-                            // vb.bodenpreisAbgleichAufBaupreisBebaut().set(
-                            // bodenpreisBebaut );
-                            site.setFieldValue( vb.bodenpreisAbgleichAufBaupreisBebaut().qualifiedName().name(),
-                                    value != null ? getFormatter( 2 ).format( (Double)value ) : null );
-                        }
-                        else if (fieldName.equals( vb.bebAbschlag().qualifiedName().name() )) {
-                            site.fireEvent( this, vb.bebAbschlag().qualifiedName().name(),
-                                    IFormFieldListener.VALUE_CHANGE, value );
-                        }
-                        if (fieldName.equals( vb.richtwertAbschlagProzent().qualifiedName().name() )) {
-                            site.fireEvent( this, vb.richtwertAbschlagProzent().qualifiedName().name(),
-                                    IFormFieldListener.VALUE_CHANGE, value );
-                        }
-                        if (fieldName.equals( vb.richtwertZuschlagProzent().qualifiedName().name() )) {
-                            site.fireEvent( this, vb.richtwertZuschlagProzent().qualifiedName().name(),
-                                    IFormFieldListener.VALUE_CHANGE, value );
-                        }
-                        if (fieldName.equals( vb.erschliessungsKosten().qualifiedName().name() )) {
-                            // vb.zwischensummeEK().set( fieldListener.get(
-                            // vb.erschliessungsKosten() ) );
-                            site.setFieldValue( vb.zwischensummeEK().qualifiedName().name(),
-                                    value != null ? getFormatter( 2 ).format( (Double)value ) : null );
-                        }
-                    }
-
-                }, new FieldListener.EventFilter( editor ) );
+                        vb.richtwertAbschlagProzent(), vb.richtwertZuschlagProzent(), vb.erschliessungsKosten(),
+                        vb.bodenpreisBebaut() ), new FieldListener.EventFilter( editor ) );
     }
 
 
@@ -188,18 +156,8 @@ public class FlurstuecksdatenBaulandRichtwertFormEditorPage
         createLabel( client, "Bodenpreis bebaut", one().top( lastLine, 12 ), SWT.RIGHT );
         newLine = createPreisField( vb.bodenpreisAbgleichAufBaupreisBebaut(), two().top( lastLine ), client, false );
         // wenn die seite bereits an ist dann per refresher
-        site.addFieldListener( bodenpreis = new IFormFieldListener() {
-
-            @Override
-            public void fieldChange( FormFieldEvent ev ) {
-                if (ev.getEventCode() == IFormFieldListener.VALUE_CHANGE
-                        && ev.getFieldName().equals( vb.bodenwertBereinigt1().qualifiedName().name() )) {
-                    Double preis = (Double)ev.getNewValue();
-                    site.setFieldValue( vb.bodenpreisAbgleichAufBaupreisBebaut().qualifiedName().name(),
-                            preis == null ? "" : getFormatter( 2 ).format( preis ) );
-                }
-            }
-        } );
+        site.addFieldListener( bodenpreis = new FieldSummation( site, 2, vb.bodenpreisAbgleichAufBaupreisBebaut(), vb
+                .bodenwertBereinigt1() ) );
 
         createLabel( client, "Bodenpreis unbebaut", three().top( lastLine, 12 ), SWT.RIGHT );
         createPreisField( vb.bodenpreisAbgleichAufKaufpreisUnbebaut(), four().top( lastLine ), client, false );
@@ -287,18 +245,8 @@ public class FlurstuecksdatenBaulandRichtwertFormEditorPage
         lastLine = newLine;
         createLabel( client, "Erschließungskosten", three().top( lastLine, 12 ), SWT.RIGHT );
         newLine = createPreisField( vb.zwischensummeEK(), four().top( lastLine ), client, true );
-        site.addFieldListener( erschliessungskosten = new IFormFieldListener() {
-
-            @Override
-            public void fieldChange( FormFieldEvent ev ) {
-                if (ev.getEventCode() == IFormFieldListener.VALUE_CHANGE
-                        && ev.getFieldName().equals( vb.erschliessungsKosten().qualifiedName().name() )) {
-                    Double preis = (Double)ev.getNewValue();
-                    site.setFieldValue( vb.zwischensummeEK().qualifiedName().name(),
-                            preis == null ? "" : getFormatter( 2 ).format( preis ) );
-                }
-            }
-        } );
+        site.addFieldListener( erschliessungskosten = new FieldSummation( site, 2, vb.zwischensummeEK(), vb
+                .erschliessungsKosten() ) );
 
         lastLine = newLine;
         createLabel( client, "vorläufiger Bodenpreis", three().top( lastLine, 12 ), SWT.RIGHT );

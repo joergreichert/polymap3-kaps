@@ -248,6 +248,7 @@ public interface ErtragswertverfahrenComposite
 
     @Optional
     // betriebskosten nochmal in Bewirtschaftungskosten
+    @ImportColumn("JB")
     Property<Double> anteiligeBetriebskosten();
 
     // JV - Double
@@ -667,4 +668,11 @@ public interface ErtragswertverfahrenComposite
             return KapsRepository.instance().findEntities( ErtragswertverfahrenComposite.class, expr, 0, 1 ).find();
         }
     }
+
+    @Optional
+    Property<String> bemerkungen();
+
+
+    @Optional
+    Property<Double> bodenwertAbzglFreilegung();
 }

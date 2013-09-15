@@ -144,14 +144,14 @@ public class FlurstuecksdatenAgrarBodenwertFormEditorPage
 
         zonen = searchZonen();
 
-        EventManager.instance().subscribe( fieldListener = new FieldListener( vb.gesamtBauWert() ) {
+        EventManager.instance().subscribe( fieldListener = new FieldListener( vb.gesamtBauWert() ) /*{
 
             @Override
             protected void onChangedValue( IFormEditorPageSite site, String fieldName, Object value ) {
                 site.fireEvent( formEditor, vb.gesamtBauWert().qualifiedName().name(), IFormFieldListener.VALUE_CHANGE,
                         fieldListener.get( vb.gesamtBauWert() ) );
             }
-        }, new FieldListener.EventFilter(formEditor));
+        }*/, new FieldListener.EventFilter(formEditor));
         // InterEditorListener( this, vb.gesamtBauWert() ) {
         //
         // @Override

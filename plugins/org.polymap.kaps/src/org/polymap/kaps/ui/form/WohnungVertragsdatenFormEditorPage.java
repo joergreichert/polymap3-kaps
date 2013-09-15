@@ -12,6 +12,10 @@
  */
 package org.polymap.kaps.ui.form;
 
+import java.util.List;
+
+import java.beans.PropertyChangeEvent;
+
 import org.geotools.data.FeatureStore;
 import org.opengis.feature.Feature;
 
@@ -27,13 +31,14 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.polymap.core.runtime.Polymap;
+import org.polymap.core.runtime.event.EventFilter;
+import org.polymap.core.runtime.event.EventHandler;
 import org.polymap.core.runtime.event.EventManager;
 
 import org.polymap.rhei.data.entityfeature.AssociationAdapter;
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
 import org.polymap.rhei.field.CheckboxFormField;
 import org.polymap.rhei.field.IFormFieldLabel;
-import org.polymap.rhei.field.IFormFieldListener;
 import org.polymap.rhei.field.NumberValidator;
 import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.field.TextFormField;
@@ -71,23 +76,51 @@ public class WohnungVertragsdatenFormEditorPage
 
     public WohnungVertragsdatenFormEditorPage( final FormEditor editor, Feature feature, FeatureStore featureStore ) {
         super( WohnungVertragsdatenFormEditorPage.class.getName(), "Vertragsdaten", feature, featureStore );
-        EventManager.instance().subscribe( fieldListener = new FieldListener( wohnung.wohnflaeche() ) {
+        EventManager.instance().subscribe( fieldListener = new FieldListener( wohnung.wohnflaeche() ),
+                new FieldListener.EventFilter( editor ) );
 
-            @Override
-            protected void onChangedValue( IFormEditorPageSite site, String fieldName, Object value ) {
-                if (fieldName.equals( wohnung.wohnflaeche().qualifiedName().name() )) {
-                    site.fireEvent( this, wohnung.wohnflaeche().qualifiedName().name(),
-                            IFormFieldListener.VALUE_CHANGE, value );
+        EventManager.instance().subscribe( this, new EventFilter<PropertyChangeEvent>() {
+
+            public boolean apply( PropertyChangeEvent ev ) {
+                Object source = ev.getSource();
+                if (source != null && source instanceof WohnungComposite) {
+                    if (source.equals( wohnung )) {
+                        return true;
+                    }
                 }
+                return false;
             }
-        }, new FieldListener.EventFilter( editor ) );
+        } );
+    }
+
+
+    @EventHandler(display = true, delay = 1)
+    public void handleBaujahrberechnung( List<PropertyChangeEvent> events )
+            throws Exception {
+
+        for (PropertyChangeEvent ev : events) {
+
+            // GND und Baujahr
+            // check for gnd and baujahr, alle anderen Properties werden beim
+            // Speichern gefeuert
+            if (ev.getPropertyName().equals( wohnung.gesamtNutzungsDauer().qualifiedName().name() )
+                    || ev.getPropertyName().equals( wohnung.baujahr().qualifiedName().name() )) {
+                // System.out.println( ev );
+                pageSite.setFieldValue( ev.getPropertyName(),
+                        ev.getNewValue() != null ? getFormatter( 0 ).format( ev.getNewValue() ) : null );
+                System.out.println( ev );
+            }
+        }
     }
 
 
     @Override
     public void dispose() {
+        super.dispose();
+        EventManager.instance().unsubscribe( this );
         EventManager.instance().unsubscribe( fieldListener );
     }
+
 
     @SuppressWarnings("unchecked")
     @Override

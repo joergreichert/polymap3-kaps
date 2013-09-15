@@ -328,7 +328,7 @@ public abstract class KapsDefaultFormEditorPage
     }
 
 
-    private Composite createNumberField( String label, String tooltip, Property<Double> property, SimpleFormData data,
+    protected final Composite createNumberField( String label, String tooltip, Property<Double> property, SimpleFormData data,
             Composite parent, boolean editable, int fractionDigits ) {
         return newFormField( label )
                 .setProperty( new PropertyAdapter( property ) )

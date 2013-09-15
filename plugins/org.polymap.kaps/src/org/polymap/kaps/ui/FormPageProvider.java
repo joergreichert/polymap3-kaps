@@ -58,8 +58,8 @@ public class FormPageProvider
         if (name.equalsIgnoreCase( VertragComposite.NAME )) {
             result.add( new Kaufvertrag1FormEditorPage( feature, formEditor.getFeatureStore() ) );
             result.add( new Kaufvertrag2FormEditorPage( feature, formEditor.getFeatureStore() ) );
-            result.add( new KaufvertragFlurstueckeFormEditorPage( feature, formEditor.getFeatureStore() ) );
-            result.add( new KaufvertragErweitertFormEditorPage( feature, formEditor.getFeatureStore() ) );
+            result.add( new KaufvertragFlurstueckeFormEditorPage( formEditor, feature, formEditor.getFeatureStore() ) );
+            result.add( new KaufvertragErweitertFormEditorPage( formEditor, feature, formEditor.getFeatureStore() ) );
         }
         else if (name.equalsIgnoreCase( RichtwertzoneComposite.NAME )) {
             result.add( new RichtwertzoneGrunddatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
@@ -71,24 +71,31 @@ public class FormPageProvider
         }
         else if (name.equalsIgnoreCase( FlurstuecksdatenBaulandComposite.NAME )) {
             result.add( new FlurstuecksdatenBaulandGrunddatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
-            result.add( new FlurstuecksdatenBaulandBodenwertFormEditorPage( feature, formEditor.getFeatureStore() ) );
-            result.add( new FlurstuecksdatenBaulandRichtwertFormEditorPage( formEditor, feature, formEditor.getFeatureStore() ) );
+            result.add( new FlurstuecksdatenBaulandBodenwertFormEditorPage( formEditor, feature, formEditor.getFeatureStore() ) );
+            result.add( new FlurstuecksdatenBaulandRichtwertFormEditorPage( formEditor, feature, formEditor
+                    .getFeatureStore() ) );
             result.add( new FlurstuecksdatenBaulandSonstigesFormEditorPage( feature, formEditor.getFeatureStore() ) );
         }
         else if (name.equalsIgnoreCase( FlurstuecksdatenAgrarComposite.NAME )) {
-            result.add( new FlurstuecksdatenAgrarGrunddatenFormEditorPage( formEditor, feature, formEditor.getFeatureStore() ) );
-            result.add( new FlurstuecksdatenAgrarBodenwertFormEditorPage( formEditor, feature, formEditor.getFeatureStore() ) );
+            result.add( new FlurstuecksdatenAgrarGrunddatenFormEditorPage( formEditor, feature, formEditor
+                    .getFeatureStore() ) );
+            result.add( new FlurstuecksdatenAgrarBodenwertFormEditorPage( formEditor, feature, formEditor
+                    .getFeatureStore() ) );
         }
         else if (name.equalsIgnoreCase( WohnungseigentumComposite.NAME )) {
             result.add( new WohnungseigentumFormEditorPage( feature, formEditor.getFeatureStore() ) );
         }
         else if (name.equalsIgnoreCase( ErmittlungModernisierungsgradComposite.NAME )) {
-            result.add( new ErmittlungModernisierungsgradFormEditorPage( feature, formEditor.getFeatureStore() ) );
+            result.add( new ErmittlungModernisierungsgradFormEditorPage( formEditor, feature, formEditor
+                    .getFeatureStore() ) );
         }
         else if (name.equalsIgnoreCase( ErtragswertverfahrenComposite.NAME )) {
             result.add( new ErtragswertverfahrenBetriebskostenFormEditorPage( feature, formEditor.getFeatureStore() ) );
-            result.add( new ErtragswertverfahrenErtraegeFormEditorPage( feature, formEditor.getFeatureStore() ) );
-            result.add( new ErtragswertverfahrenBewirtschaftungskostenFormEditorPage( feature, formEditor
+            result.add( new ErtragswertverfahrenErtraegeFormEditorPage( formEditor, feature, formEditor
+                    .getFeatureStore() ) );
+            result.add( new ErtragswertverfahrenBewirtschaftungskostenFormEditorPage( formEditor, feature, formEditor
+                    .getFeatureStore() ) );
+            result.add( new ErtragswertverfahrenErtragswertFormEditorPage( formEditor, feature, formEditor
                     .getFeatureStore() ) );
         }
         else if (name.equalsIgnoreCase( GebaeudeComposite.NAME )) {
@@ -96,7 +103,7 @@ public class FormPageProvider
             result.add( new GebaeudeFlurstueckeFormEditorPage( feature, formEditor.getFeatureStore() ) );
         }
         else if (name.equalsIgnoreCase( WohnungComposite.NAME )) {
-            result.add( new WohnungGrunddatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
+            result.add( new WohnungGrunddatenFormEditorPage( formEditor, feature, formEditor.getFeatureStore() ) );
             result.add( new WohnungVertragsdatenFormEditorPage( formEditor, feature, formEditor.getFeatureStore() ) );
             result.add( new WohnungLiegenschaftzinsFormEditorPage( formEditor, feature, formEditor.getFeatureStore() ) );
         }
@@ -241,7 +248,7 @@ public class FormPageProvider
                     KapsRepository.instance(), FlurComposite.NAME ) );
         }
         else if (name.equalsIgnoreCase( NHK2010BewertungComposite.NAME )) {
-            result.add( new NHK2010BewertungFormEditorPage( feature, formEditor.getFeatureStore() ) );
+            result.add( new NHK2010BewertungFormEditorPage( formEditor, feature, formEditor.getFeatureStore() ) );
         }
         return result;
     }
