@@ -18,8 +18,12 @@ import org.apache.commons.logging.LogFactory;
 import org.qi4j.api.common.Optional;
 import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.entity.EntityComposite;
+import org.qi4j.api.entity.association.Association;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.property.Property;
+import org.qi4j.api.query.Query;
+import org.qi4j.api.query.QueryExpressions;
+import org.qi4j.api.query.grammar.BooleanExpression;
 
 import org.polymap.core.qi4j.QiEntity;
 import org.polymap.core.qi4j.event.ModelChangeSupport;
@@ -27,6 +31,7 @@ import org.polymap.core.qi4j.event.PropertyChangeSupport;
 
 import org.polymap.kaps.importer.ImportColumn;
 import org.polymap.kaps.importer.ImportTable;
+import org.polymap.kaps.model.KapsRepository;
 
 /**
  * 
@@ -41,40 +46,42 @@ import org.polymap.kaps.importer.ImportTable;
 public interface AusstattungBewertungComposite
         extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite {
 
+    public final String NAME = "Ausstattungsmerkmale - Bewertung";
+    
     // OBJEKTNR - Long
     @Optional
     @ImportColumn("OBJEKTNR")
-    Property<Long> objektNummer();
+    Property<Integer> objektNummer();
 
 
-    // OBJEKTNRFORTF - Long
+    // OBJEKTNRFORTF - Integer
     @Optional
     @ImportColumn("OBJEKTNRFORTF")
-    Property<Long> objektFortfuehrung();
+    Property<Integer> objektFortfuehrung();
 
 
     // GEBNR - Long
     @Optional
     @ImportColumn("GEBNR")
-    Property<Long> gebaeudeNummer();
+    Property<Integer> gebaeudeNummer();
 
 
     // GEBFORTF - Long
     @Optional
     @ImportColumn("GEBFORTF")
-    Property<Long> gebaeudeFortfuehrung();
+    Property<Integer> gebaeudeFortfuehrung();
 
 
     // WOHNUNGSNR - Long
     @Optional
     @ImportColumn("WOHNUNGSNR")
-    Property<Long> wohnungsNummer();
+    Property<Integer> wohnungsNummer();
 
 
     // FORTF - Long
     @Optional
     @ImportColumn("FORTF")
-    Property<Long> wohnungsFortfuehrung();
+    Property<Integer> wohnungsFortfuehrung();
 
 
     // ME1P - Double
@@ -337,20 +344,20 @@ public interface AusstattungBewertungComposite
 
     // ME6P - Long
     @Optional
-    @ImportColumn("ME6P")
-    Property<Long> ME6P();
+//    @ImportColumn("ME6P")
+    Property<Double> ME6P();
 
 
     // ME7P - Long
     @Optional
-    @ImportColumn("ME7P")
-    Property<Long> ME7P();
-
-
-    // NEU - String
-    @Optional
-    @ImportColumn("NEU")
-    Property<Boolean> NEU();
+//    @ImportColumn("ME7P")
+    Property<Double> ME7P();
+//
+//
+//    // NEU - String
+//    @Optional
+//    @ImportColumn("NEU")
+//    Property<Boolean> NEU();
 
 
     /**
@@ -361,6 +368,18 @@ public interface AusstattungBewertungComposite
 
         private static Log log = LogFactory.getLog( Mixin.class );
 
+        public static AusstattungBewertungComposite forWohnung( WohnungComposite wohnung ) {
+            AusstattungBewertungComposite template = QueryExpressions
+                    .templateFor( AusstattungBewertungComposite.class );
+            BooleanExpression expr = QueryExpressions.eq( template.wohnung(), wohnung );
+            Query<AusstattungBewertungComposite> matches = KapsRepository.instance().findEntities(
+                    AusstattungBewertungComposite.class, expr, 0, 1 );
+            return matches.find();
+        }
     }
+
+
+    @Optional
+    Association<WohnungComposite> wohnung();
 
 }

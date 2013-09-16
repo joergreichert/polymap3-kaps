@@ -22,6 +22,7 @@ import org.polymap.rhei.form.IFormEditorPage;
 import org.polymap.rhei.form.IFormPageProvider;
 
 import org.polymap.kaps.model.KapsRepository;
+import org.polymap.kaps.model.data.AusstattungBewertungComposite;
 import org.polymap.kaps.model.data.BodennutzungComposite;
 import org.polymap.kaps.model.data.ErmittlungModernisierungsgradComposite;
 import org.polymap.kaps.model.data.ErtragswertverfahrenComposite;
@@ -84,6 +85,9 @@ public class FormPageProvider
         }
         else if (name.equalsIgnoreCase( WohnungseigentumComposite.NAME )) {
             result.add( new WohnungseigentumFormEditorPage( feature, formEditor.getFeatureStore() ) );
+        }
+        else if (name.equalsIgnoreCase( AusstattungBewertungComposite.NAME )) {
+            result.add( new BewertungAnhandVonAustattungsmerkmalenFormEditorPage( formEditor, feature, formEditor.getFeatureStore() ) );
         }
         else if (name.equalsIgnoreCase( ErmittlungModernisierungsgradComposite.NAME )) {
             result.add( new ErmittlungModernisierungsgradFormEditorPage( formEditor, feature, formEditor

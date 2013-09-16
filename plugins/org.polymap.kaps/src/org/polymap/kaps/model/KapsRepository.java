@@ -155,7 +155,8 @@ public class KapsRepository
                     new SimpleEntityProvider<FlurstuecksdatenBaulandComposite>( this,
                             FlurstuecksdatenBaulandComposite.class, new NameImpl( KapsRepository.NAMESPACE,
                                     FlurstuecksdatenBaulandComposite.NAME ) ),
-
+                    new SimpleEntityProvider<AusstattungBewertungComposite>( this, AusstattungBewertungComposite.class,
+                            new NameImpl( KapsRepository.NAMESPACE, AusstattungBewertungComposite.NAME ) ),
                     new SimpleEntityProvider<FlurstuecksdatenAgrarComposite>( this,
                             FlurstuecksdatenAgrarComposite.class, new NameImpl( KapsRepository.NAMESPACE,
                                     FlurstuecksdatenAgrarComposite.NAME ) ), new SimpleEntityProvider<FlurComposite>(
@@ -256,14 +257,15 @@ public class KapsRepository
             public void create( VertragComposite prototype )
                     throws Exception {
                 prototype.eingangsDatum().set( new Date() );
-//                prototype.kaufpreis().set( new Double(0.0d)  );
-                prototype.kaufpreisAnteilZaehler().set(new Double(1.0)  );
-                prototype.kaufpreisAnteilNenner().set( new Double(1.0) );
+                // prototype.kaufpreis().set( new Double(0.0d) );
+                prototype.kaufpreisAnteilZaehler().set( new Double( 1.0 ) );
+                prototype.kaufpreisAnteilNenner().set( new Double( 1.0 ) );
                 prototype.fuerGewosGeeignet().set( Boolean.TRUE );
                 prototype.fuerAuswertungGeeignet().set( Boolean.TRUE );
-//                VertragsdatenErweitertComposite  vdec = newEntity( VertragsdatenErweitertComposite.class, null );
-//                prototype.erweiterteVertragsdaten().set( vdec );
-//                    vdec.basispreis().set( prototype.kaufpreis().get() );
+                // VertragsdatenErweitertComposite vdec = newEntity(
+                // VertragsdatenErweitertComposite.class, null );
+                // prototype.erweiterteVertragsdaten().set( vdec );
+                // vdec.basispreis().set( prototype.kaufpreis().get() );
                 // eingangsnummer erst beim Speichern setzen!
 
                 if (creator != null) {

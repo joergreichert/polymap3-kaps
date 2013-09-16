@@ -50,7 +50,7 @@ public class ActionButton
         
         delegate.addPropertyChangeListener( new IPropertyChangeListener() {
             public void propertyChange( PropertyChangeEvent ev ) {
-                log.info( "prop change: " + ev );
+//                log.info( "prop change: " + ev );
                 if (ev.getProperty().equalsIgnoreCase( "enabled" )) {
                     setEnabled( (Boolean)ev.getNewValue() );
                 }

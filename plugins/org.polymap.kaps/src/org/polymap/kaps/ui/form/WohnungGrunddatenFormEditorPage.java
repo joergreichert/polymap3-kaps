@@ -49,6 +49,7 @@ import org.polymap.rhei.form.FormEditor;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
 import org.polymap.kaps.KapsPlugin;
+import org.polymap.kaps.model.data.AusstattungBewertungComposite;
 import org.polymap.kaps.model.data.AusstattungComposite;
 import org.polymap.kaps.model.data.EigentumsartComposite;
 import org.polymap.kaps.model.data.ErmittlungModernisierungsgradComposite;
@@ -94,6 +95,8 @@ public class WohnungGrunddatenFormEditorPage
     private FormEditor                formEditor;
 
     private final InterEditorListener editorListener;
+
+    private ActionButton              bewertungAction;
 
 
     public WohnungGrunddatenFormEditorPage( FormEditor formEditor, Feature feature, FeatureStore featureStore ) {
@@ -331,9 +334,27 @@ public class WohnungGrunddatenFormEditorPage
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 0, 1, 0 ) )
                 .setLayoutData( left().top( lastLine ).bottom( 100 ).create() ).setParent( client ).create();
-        newFormField( "Schlüssel" ).setProperty( new AssociationAdapter<AusstattungComposite>( wohnung.ausstattung() ) )
-                .setField( namedAssocationsPicklist( AusstattungComposite.class ) )
-                .setLayoutData( right().top( lastLine ).create() ).setParent( client ).create();
 
+        Composite schluessel = newFormField( "Schlüssel" ).setProperty( new AssociationAdapter<AusstattungComposite>( wohnung.ausstattung() ) )
+                .setField( namedAssocationsPicklist( AusstattungComposite.class ) )
+                .setLayoutData( right().right( 75 ).top( lastLine ).create() ).setParent( client ).create();
+        
+        // berechnen knopf
+        bewertungAction = new ActionButton( client, new Action( "Ermitteln" ) {
+
+            @Override
+            public void run() {
+                AusstattungBewertungComposite aust = AusstattungBewertungComposite.Mixin.forWohnung( wohnung );
+
+                if (aust == null) {
+                    aust = repository.newEntity( AusstattungBewertungComposite.class, null );
+                    aust.wohnung().set( wohnung );
+                }
+                FormEditor targetEditor = KapsPlugin.openEditor( fs, AusstattungBewertungComposite.NAME, aust );
+            }
+
+        } );
+        bewertungAction.setLayoutData( right().left( schluessel ).top( lastLine ).height( 25 ).create() );
+        bewertungAction.setEnabled( true );
     }
 }

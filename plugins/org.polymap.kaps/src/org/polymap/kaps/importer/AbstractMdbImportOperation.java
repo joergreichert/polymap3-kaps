@@ -203,7 +203,7 @@ public abstract class AbstractMdbImportOperation
             }
             String schlStr = schl.toString();
             if (!schlStr.isEmpty()) {
-                T obj = findSchlNamed( type, schlStr );
+                T obj = findSchlNamed( type, schlStr.trim() );
                 if (obj == null && !nullAllowed) {
                     throw new IllegalStateException( "no " + columnName + " found for schl '" + schl + "'!" );
                 }

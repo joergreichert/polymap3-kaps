@@ -129,8 +129,8 @@ public class FieldListener
         // this.site = site;
         blocked = true;
         for (String fieldName : values.keySet()) {
-            log.info( "Flush for site " + site.toString() + " and field " + fieldName + " and Value "
-                    + values.get( fieldName ) );
+//            log.info( "Flush for site " + site.toString() + " and field " + fieldName + " and Value "
+//                    + values.get( fieldName ) );
             onChangedValue( site, fieldName, values.get( fieldName ) );
         }
     }
