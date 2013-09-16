@@ -1014,10 +1014,10 @@ public interface FlurstuecksdatenBaulandComposite
     @Optional
     Property<Boolean> zurRichtwertermittlungGeeignet();
 
-    // http://polymap.org/kaps/ticket/104#comment:8
-    @Optional
-    Property<Double> differenzGebaeudeZuBodenwert();
-    
+//    // http://polymap.org/kaps/ticket/104#comment:8
+//    @Optional
+//    Property<Double> differenzGebaeudeZuBodenwert();
+//    
 
     @Optional
     Property<String> bemerkungen();

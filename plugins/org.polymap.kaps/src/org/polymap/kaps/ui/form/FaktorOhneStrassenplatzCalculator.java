@@ -117,6 +117,14 @@ public class FaktorOhneStrassenplatzCalculator
                     kaufpreis = bereinigt;
                 }
             }
+            Double differenz = (Double)values.get( vb.wertDerBaulichenAnlagen().qualifiedName().name() );
+            if (differenz == null) {
+                differenz = vb.wertDerBaulichenAnlagen().get();
+            }
+            // faktor = kaufpreis / bodenwert - gebäudewert
+            if (kaufpreis != null && differenz != null) {
+                kaufpreis -= differenz;
+            }
             if (kaufpreis != null && bodenwert != 0.0d) {
                 site.setFieldValue( vb.faktorOhneStrassenplatz().qualifiedName().name(),
                         getFormatter().format( kaufpreis / bodenwert ) );

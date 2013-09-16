@@ -39,6 +39,7 @@ import org.polymap.core.workbench.PolymapWorkbench;
 
 import org.polymap.rhei.data.entityfeature.AssociationAdapter;
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
+import org.polymap.rhei.field.FormFieldEvent;
 import org.polymap.rhei.field.IFormFieldLabel;
 import org.polymap.rhei.field.IFormFieldListener;
 import org.polymap.rhei.field.NumberValidator;
@@ -98,18 +99,27 @@ public class WohnungGrunddatenFormEditorPage
 
     private ActionButton              bewertungAction;
 
+    private IFormFieldListener        ausstattungListener;
+
 
     public WohnungGrunddatenFormEditorPage( FormEditor formEditor, Feature feature, FeatureStore featureStore ) {
         super( WohnungGrunddatenFormEditorPage.class.getName(), "Grunddaten", feature, featureStore );
         this.formEditor = formEditor;
-        EventManager.instance().subscribe( editorListener = new InterEditorListener( wohnung.bereinigtesBaujahr() ) {
+        EventManager.instance().subscribe(
+                editorListener = new InterEditorListener( wohnung.bereinigtesBaujahr(), wohnung.bewertungsPunkte() ) {
 
-            @Override
-            protected void onChangedValue( IFormEditorPageSite site, Entity entity, String fieldName, Object value ) {
-                pageSite.setFieldValue( fieldName, value != null ? getFormatter( 0 ).format( value ) : null );
-            }
+                    @Override
+                    protected void onChangedValue( IFormEditorPageSite site, Entity entity, String fieldName,
+                            Object value ) {
+                        if (fieldName.equals( wohnung.bereinigtesBaujahr().qualifiedName().name() )) {
+                            pageSite.setFieldValue( fieldName, value != null ? getFormatter( 0 ).format( value ) : null );
+                        }
+                        else if (fieldName.equals( wohnung.bewertungsPunkte().qualifiedName().name() )) {
+                            pageSite.setFieldValue( fieldName, value != null ? getFormatter( 0 ).format( value ) : null );
+                        }
+                    }
 
-        }, new InterEditorListener.EventFilter( wohnung ) );
+                }, new InterEditorListener.EventFilter( wohnung ) );
     }
 
 
@@ -333,12 +343,26 @@ public class WohnungGrunddatenFormEditorPage
                 .setProperty( new PropertyAdapter( wohnung.bewertungsPunkte() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 0, 1, 0 ) )
-                .setLayoutData( left().top( lastLine ).bottom( 100 ).create() ).setParent( client ).create();
+                .setLayoutData( left().right( 40 ).top( lastLine ).bottom( 100 ).create() ).setParent( client )
+                .create();
 
-        Composite schluessel = newFormField( "Schlüssel" ).setProperty( new AssociationAdapter<AusstattungComposite>( wohnung.ausstattung() ) )
+        Composite schluessel = newFormField( "Schlüssel" )
+                .setProperty( new AssociationAdapter<AusstattungComposite>( wohnung.ausstattung() ) )
                 .setField( namedAssocationsPicklist( AusstattungComposite.class ) )
-                .setLayoutData( right().right( 75 ).top( lastLine ).create() ).setParent( client ).create();
-        
+                .setLayoutData( right().left( newLine ).right( 75 ).top( lastLine ).create() ).setParent( client )
+                .create();
+        site.addFieldListener( ausstattungListener = new IFormFieldListener() {
+
+            @Override
+            public void fieldChange( FormFieldEvent ev ) {
+                if (ev.getEventCode() == IFormFieldListener.VALUE_CHANGE
+                        && ev.getFieldName().equals( wohnung.bewertungsPunkte().qualifiedName().name() )) {
+                    site.setFieldValue( wohnung.ausstattung().qualifiedName().name(),
+                            AusstattungComposite.Mixin.forWert( (Double)ev.getNewValue() ) );
+                }
+            }
+        } );
+
         // berechnen knopf
         bewertungAction = new ActionButton( client, new Action( "Ermitteln" ) {
 

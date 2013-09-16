@@ -124,20 +124,10 @@ public class MdbImportWohneigentumOperation
                         bem.append( bem2 );
                     }
                     entity.bemerkungen().set( bem.toString() );
-                    // allWohnungseigentum.put( entity.schl().get(), entity );
                 }
             } );
 
-            // final Map<String, GebaeudeArtComposite> allGebaeudeArt = new
-            // HashMap<String, GebaeudeArtComposite>();
-            // for (GebaeudeArtComposite gebaeudeArt : repo.findEntities(
-            // GebaeudeArtComposite.class, null, 0, 10000 )) {
-            // allGebaeudeArt.put( gebaeudeArt.schl().get(), gebaeudeArt );
-            // }
-
             sub = new SubMonitor( monitor, 10 );
-            // final Map<String, GebaeudeComposite> allGebaeude = new HashMap<String,
-            // GebaeudeComposite>();
             importEntity( db, sub, GebaeudeComposite.class, new EntityCallback<GebaeudeComposite>() {
 
                 @Override
@@ -146,7 +136,6 @@ public class MdbImportWohneigentumOperation
                         entity.sanierungswert().set( "U" );
                     }
                     entity.gebaeudeArt().set( findSchlNamed( GebaeudeArtComposite.class, builderRow, "GEBART" ) );
-                    // allGebaeude.put( entity.schl().get(), entity );
                 }
             } );
 
@@ -185,7 +174,9 @@ public class MdbImportWohneigentumOperation
                     entity.zurAuswertungGeeignet().set( getBooleanValue( builderRow, "VERARBKZ" ) );
 
                     Object schl = builderRow.get( "BEWSCHL" );
-                    System.out.println( "BEWSCHL '" + schl + "'" );
+                    if (schl != null) {
+                        System.out.println( "BEWSCHL '" + schl + "'" );
+                    }
                     entity.ausstattung().set( findSchlNamed( AusstattungComposite.class, builderRow, "BEWSCHL" ) );
                     entity.eigentumsArt().set( findSchlNamed( EigentumsartComposite.class, builderRow, "EIGENTART" ) );
                     entity.etage().set( findSchlNamed( EtageComposite.class, builderRow, "GESCHOSS" ) );
@@ -359,6 +350,30 @@ public class MdbImportWohneigentumOperation
                             entity.ME6P().set( asDouble( (Integer)builderRow.get( "ME6P" ) ) );
                             entity.ME7P().set( asDouble( (Integer)builderRow.get( "ME7P" ) ) );
 
+                            Double summe = 0.0d;
+                            if (entity.ME1P().get() != null) {
+                                summe += entity.ME1P().get();
+                            }
+                            if (entity.ME2P().get() != null) {
+                                summe += entity.ME2P().get();
+                            }
+                            if (entity.ME3P().get() != null) {
+                                summe += entity.ME3P().get();
+                            }
+                            if (entity.ME4P().get() != null) {
+                                summe += entity.ME4P().get();
+                            }
+                            if (entity.ME5P().get() != null) {
+                                summe += entity.ME5P().get();
+                            }
+                            if (entity.ME6P().get() != null) {
+                                summe += entity.ME6P().get();
+                            }
+                            if (entity.ME7P().get() != null) {
+                                summe += entity.ME7P().get();
+                            }
+
+                            entity.gesamtSumme().set( summe );
                             WohnungComposite wohnung = WohnungComposite.Mixin.forKeys( entity.objektNummer().get(),
                                     entity.objektFortfuehrung().get(), entity.gebaeudeNummer().get(), entity
                                             .gebaeudeFortfuehrung().get(), entity.wohnungsNummer().get(), entity

@@ -288,7 +288,7 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
         newLine = createLabel( client, "Wert der baul. Anlagen",
                 "Wert der baulichen Anlagen entsprechend Bewertungsmethode", one().top( lastLine, 12 ), SWT.RIGHT );
         newFormField( IFormFieldLabel.NO_LABEL )
-                .setToolTipText( "Wert der baulichen Anlagen entsprechend Bewertungsmethode" ).setEnabled( false )
+                .setToolTipText( "Wert der baulichen Anlagen entsprechend Bewertungsmethode" ).setEnabled( true )
                 .setProperty( new PropertyAdapter( vb.wertDerBaulichenAnlagen() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
@@ -308,25 +308,25 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
         site.addFieldListener( sachwertSummation = new FieldSummation( site, 2, vb.sachwert(), vb.bodenwertGesamt(), vb
                 .wertDerBaulichenAnlagen() ) );
 
-        lastLine = newLine;
-        newLine = createLabel( client, "Differenz Gebäudewert", one().top( lastLine, 12 ), SWT.RIGHT );
-        newFormField( IFormFieldLabel.NO_LABEL )
-                .setToolTipText( "Differenz Gebäude- zu Bodenwert (ehemals Sachwertverfahren 1913)" )
-                .setProperty( new PropertyAdapter( vb.differenzGebaeudeZuBodenwert() ) )
-                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
-                .setLayoutData( two().top( lastLine ).create() ).setParent( client ).create();
+//        lastLine = newLine;
+//        newLine = createLabel( client, "Differenz Gebäudewert", one().top( lastLine, 12 ), SWT.RIGHT );
+//        newFormField( IFormFieldLabel.NO_LABEL )
+//                .setToolTipText( "Differenz Gebäude- zu Bodenwert (ehemals Sachwertverfahren 1913)" )
+//                .setProperty( new PropertyAdapter( vb.differenzGebaeudeZuBodenwert() ) )
+//                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
+//                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+//                .setLayoutData( two().top( lastLine ).create() ).setParent( client ).create();
 
         lastLine = newLine;
         newLine = createLabel( client, "Faktor", one().top( lastLine, 12 ), SWT.RIGHT );
-        newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Faktor bereinigter Kaufpreis/Sachwert" )
+        newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Faktor = (bereinigter Kaufpreis - Wert der bauliche Anlagen)/Bodenwert" )
                 .setProperty( new PropertyAdapter( vb.faktorBereinigterKaufpreis() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 4, 1, 4 ) )
                 .setLayoutData( two().top( lastLine ).create() ).setParent( client ).setEnabled( false ).create();
 
         site.addFieldListener( bereinCalculator = new FieldCalculation( site, 4, vb.faktorBereinigterKaufpreis(), vb
-                .bodenwertGesamt(), vb.differenzGebaeudeZuBodenwert() ) {
+                .bodenwertGesamt(), vb.wertDerBaulichenAnlagen() ) {
 
             @Override
             protected Double calculate( org.polymap.kaps.ui.FieldCalculation.ValueProvider values ) {
@@ -341,7 +341,7 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
                     }
                 }
                 Double bodenwert = values.get( vb.bodenwertGesamt() );
-                Double differenz = values.get( vb.differenzGebaeudeZuBodenwert() );
+                Double differenz = values.get( vb.wertDerBaulichenAnlagen() );
                 // faktor = kaufpreis / bodenwert - gebäudewert
                 if (kaufpreis != null && bodenwert != null && bodenwert != 0.0d) {
                     return (differenz != null ? kaufpreis - differenz : kaufpreis) / bodenwert;

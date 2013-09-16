@@ -27,6 +27,7 @@ import org.polymap.core.qi4j.event.PropertyChangeSupport;
 
 import org.polymap.kaps.importer.ImportColumn;
 import org.polymap.kaps.importer.ImportTable;
+import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.SchlNamed;
 
 /**
@@ -58,6 +59,23 @@ public interface AusstattungComposite
             implements AusstattungComposite {
 
         private static Log log = LogFactory.getLog( Mixin.class );
+
+        public static AusstattungComposite forWert( Double wert ) {
+            if (wert == null) {
+                return null;
+            }
+            String schl = null;
+            if (wert <= 21) {
+                schl = "E";
+            } else if (wert <= 49) {
+                schl = "M";
+            } else if (wert <= 71) {
+                schl = "G";
+            } else {
+                schl = "S";
+            }
+            return KapsRepository.instance().findSchlNamed( AusstattungComposite.class, schl );
+        }
 
     }
 

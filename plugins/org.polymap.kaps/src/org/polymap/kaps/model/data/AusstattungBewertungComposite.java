@@ -382,4 +382,8 @@ public interface AusstattungBewertungComposite
     @Optional
     Association<WohnungComposite> wohnung();
 
+
+    @Optional
+    Property<Double> gesamtSumme();
+
 }

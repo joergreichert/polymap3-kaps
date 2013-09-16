@@ -59,7 +59,7 @@ public abstract class InterEditorListener {
     private IFormEditorPageSite                               site;
 
 
-    public InterEditorListener( Property... operators ) {
+    public InterEditorListener( Property<?>... operators ) {
         terms = new HashMap<String, Property<?>>();
         for (Property<?> term : operators) {
             terms.put( term.qualifiedName().name(), term );
