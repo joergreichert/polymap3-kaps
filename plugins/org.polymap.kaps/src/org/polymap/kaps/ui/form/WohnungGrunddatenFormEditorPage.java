@@ -33,7 +33,6 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import org.polymap.core.runtime.Polymap;
 import org.polymap.core.runtime.event.EventManager;
 import org.polymap.core.workbench.PolymapWorkbench;
 
@@ -42,7 +41,6 @@ import org.polymap.rhei.data.entityfeature.PropertyAdapter;
 import org.polymap.rhei.field.FormFieldEvent;
 import org.polymap.rhei.field.IFormFieldLabel;
 import org.polymap.rhei.field.IFormFieldListener;
-import org.polymap.rhei.field.NumberValidator;
 import org.polymap.rhei.field.PicklistFormField;
 import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.field.TextFormField;
@@ -64,6 +62,8 @@ import org.polymap.kaps.ui.FieldCalculation;
 import org.polymap.kaps.ui.FieldListener;
 import org.polymap.kaps.ui.InterEditorListener;
 import org.polymap.kaps.ui.InterEditorPropertyChangeEvent;
+import org.polymap.kaps.ui.MyNumberValidator;
+import org.polymap.kaps.ui.NotNullMyNumberValidator;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -112,10 +112,12 @@ public class WohnungGrunddatenFormEditorPage
                     protected void onChangedValue( IFormEditorPageSite site, Entity entity, String fieldName,
                             Object value ) {
                         if (fieldName.equals( wohnung.bereinigtesBaujahr().qualifiedName().name() )) {
-                            pageSite.setFieldValue( fieldName, value != null ? getFormatter( 0 ).format( value ) : null );
+                            pageSite.setFieldValue( fieldName, value != null ? getFormatter( 0, false ).format( value )
+                                    : null );
                         }
                         else if (fieldName.equals( wohnung.bewertungsPunkte().qualifiedName().name() )) {
-                            pageSite.setFieldValue( fieldName, value != null ? getFormatter( 0 ).format( value ) : null );
+                            pageSite.setFieldValue( fieldName, value != null ? getFormatter( 0, false ).format( value )
+                                    : null );
                         }
                     }
 
@@ -148,14 +150,14 @@ public class WohnungGrunddatenFormEditorPage
         newLine = newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Objektnummer" )
                 .setProperty( new PropertyAdapter( wohnung.objektNummer() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NotNullNumberValidator( Integer.class, Polymap.getSessionLocale() ) )
+                .setValidator( new NotNullMyNumberValidator( Integer.class ) )
                 .setEnabled( wohnung.objektNummer().get() == null )
                 .setLayoutData( left().left( 0 ).right( 15 ).create() ).create();
 
         newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Fortführung" )
                 .setProperty( new PropertyAdapter( wohnung.objektFortfuehrung() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NotNullNumberValidator( Integer.class, Polymap.getSessionLocale() ) )
+                .setValidator( new NotNullMyNumberValidator( Integer.class ) )
                 .setEnabled( wohnung.objektNummer().get() == null )
                 .setLayoutData( left().left( 16 ).right( 31 ).create() ).create();
 
@@ -163,14 +165,14 @@ public class WohnungGrunddatenFormEditorPage
         newLine = newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Gebäudenummer" )
                 .setProperty( new PropertyAdapter( wohnung.gebaeudeNummer() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NotNullNumberValidator( Integer.class, Polymap.getSessionLocale() ) )
+                .setValidator( new NotNullMyNumberValidator( Integer.class ) )
                 .setEnabled( wohnung.objektNummer().get() == null )
                 .setLayoutData( left().left( 34 ).right( 49 ).create() ).create();
 
         newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Fortführung" )
                 .setProperty( new PropertyAdapter( wohnung.gebaeudeFortfuehrung() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NotNullNumberValidator( Integer.class, Polymap.getSessionLocale() ) )
+                .setValidator( new NotNullMyNumberValidator( Integer.class ) )
                 .setEnabled( wohnung.objektNummer().get() == null )
                 .setLayoutData( left().left( 50 ).right( 65 ).create() ).create();
 
@@ -178,14 +180,14 @@ public class WohnungGrunddatenFormEditorPage
         newLine = newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Wohnungsnummer" )
                 .setProperty( new PropertyAdapter( wohnung.wohnungsNummer() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NotNullNumberValidator( Integer.class, Polymap.getSessionLocale() ) )
+                .setValidator( new NotNullMyNumberValidator( Integer.class ) )
                 .setEnabled( wohnung.wohnungsNummer().get() == null )
                 .setLayoutData( left().left( 69 ).right( 83 ).create() ).create();
 
         newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Fortführung" )
                 .setProperty( new PropertyAdapter( wohnung.wohnungsFortfuehrung() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NotNullNumberValidator( Integer.class, Polymap.getSessionLocale() ) )
+                .setValidator( new NotNullMyNumberValidator( Integer.class ) )
                 .setEnabled( wohnung.wohnungsNummer().get() == null )
                 .setLayoutData( left().left( 84 ).right( 100 ).create() ).create();
 
@@ -221,7 +223,7 @@ public class WohnungGrunddatenFormEditorPage
                 .setLayoutData( left().top( lastLine ).create() ).setParent( parent ).create();
         newFormField( "Anzahl Zimmer" ).setProperty( new PropertyAdapter( wohnung.anzahlZimmer() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 0, 1, 0 ) )
+                .setValidator( new MyNumberValidator( Double.class ) )
                 .setLayoutData( right().right( 75 ).top( lastLine ).create() ).setParent( parent ).create();
 
         lastLine = newLine;
@@ -232,19 +234,19 @@ public class WohnungGrunddatenFormEditorPage
         newLine = newFormField( "Gesamtnutzungsdauer" ).setToolTipText( "Gesamtnutzungsdauer in Jahren" )
                 .setProperty( new PropertyAdapter( wohnung.gesamtNutzungsDauer() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 0, 1, 0 ) )
-                .setLayoutData( left().top( lastLine ).create() ).setParent( parent ).create();
+                .setValidator( new MyNumberValidator( Double.class ) ).setLayoutData( left().top( lastLine ).create() )
+                .setParent( parent ).create();
 
         lastLine = newLine;
         newLine = newFormField( "Baujahr tatsächlich" ).setToolTipText( "Baujahr tatsächlich" )
                 .setProperty( new PropertyAdapter( wohnung.baujahr() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 0, 1, 0 ) )
-                .setLayoutData( left().top( lastLine ).create() ).setParent( parent ).create();
+                .setValidator( new MyNumberValidator( Double.class ) ).setLayoutData( left().top( lastLine ).create() )
+                .setParent( parent ).create();
         Composite baujahrField = newFormField( "Baujahr bereinigt" ).setToolTipText( "Baujahr bereinigt" )
                 .setProperty( new PropertyAdapter( wohnung.bereinigtesBaujahr() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 0, 1, 0 ) )
+                .setValidator( new MyNumberValidator( Double.class ) )
                 .setLayoutData( right().right( 75 ).top( lastLine ).create() ).setParent( parent ).create();
 
         site.addFieldListener( gndbjListener = new NonFiringFieldListener( wohnung.gesamtNutzungsDauer(), wohnung
@@ -318,7 +320,7 @@ public class WohnungGrunddatenFormEditorPage
         newFormField( "Umbau" ).setToolTipText( "Jahr des letzen Umbaus" )
                 .setProperty( new PropertyAdapter( wohnung.umbau() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Integer.class, Polymap.getSessionLocale(), 12, 0, 1, 0 ) )
+                .setValidator( new MyNumberValidator( Integer.class ) )
                 .setLayoutData( right().top( lastLine ).create() ).setParent( parent ).create();
 
         lastLine = newLine;
@@ -342,12 +344,12 @@ public class WohnungGrunddatenFormEditorPage
         newLine = newFormField( "Punkte" ).setToolTipText( "Bewertungspunkte der Ausstattung" )
                 .setProperty( new PropertyAdapter( wohnung.bewertungsPunkte() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 0, 1, 0 ) )
+                .setValidator( new MyNumberValidator( Double.class ) )
                 .setLayoutData( left().right( 40 ).top( lastLine ).bottom( 100 ).create() ).setParent( client )
                 .create();
 
         Composite schluessel = newFormField( "Schlüssel" )
-                .setProperty( new AssociationAdapter<AusstattungComposite>( wohnung.ausstattung() ) )
+                .setProperty( new AssociationAdapter<AusstattungComposite>( wohnung.ausstattungSchluessel() ) )
                 .setField( namedAssocationsPicklist( AusstattungComposite.class ) )
                 .setLayoutData( right().left( newLine ).right( 75 ).top( lastLine ).create() ).setParent( client )
                 .create();
@@ -357,7 +359,7 @@ public class WohnungGrunddatenFormEditorPage
             public void fieldChange( FormFieldEvent ev ) {
                 if (ev.getEventCode() == IFormFieldListener.VALUE_CHANGE
                         && ev.getFieldName().equals( wohnung.bewertungsPunkte().qualifiedName().name() )) {
-                    site.setFieldValue( wohnung.ausstattung().qualifiedName().name(),
+                    site.setFieldValue( wohnung.ausstattungSchluessel().qualifiedName().name(),
                             AusstattungComposite.Mixin.forWert( (Double)ev.getNewValue() ) );
                 }
             }

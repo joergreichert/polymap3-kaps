@@ -20,15 +20,13 @@ import org.apache.commons.logging.LogFactory;
 
 import org.eclipse.swt.widgets.Composite;
 
-import org.polymap.core.runtime.Polymap;
-
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
-import org.polymap.rhei.field.NumberValidator;
 import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
 import org.polymap.kaps.model.data.GemeindeComposite;
 import org.polymap.kaps.ui.KapsDefaultFormEditorPage;
+import org.polymap.kaps.ui.MyNumberValidator;
 import org.polymap.kaps.ui.NotNullValidator;
 
 /**
@@ -69,18 +67,18 @@ public class GemeindeFormEditorPage
 
         lastLine = newLine;
         newLine = newFormField( "Einwohner" ).setProperty( new PropertyAdapter( composite.einwohner() ) )
-                .setValidator( new NumberValidator( Integer.class, Polymap.getSessionLocale() ) )
+                .setValidator( new MyNumberValidator( Integer.class ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setLayoutData( left().top( lastLine ).create() ).create();
 
         newFormField( "tatsächlich" ).setProperty( new PropertyAdapter( composite.einwohnerTatsaechlich() ) )
-                .setValidator( new NumberValidator( Integer.class, Polymap.getSessionLocale() ) )
+                .setValidator( new MyNumberValidator( Integer.class ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setLayoutData( right().top( lastLine ).create() ).create();
 
         lastLine = newLine;
         newLine = newFormField( "Faktor" ).setProperty( new PropertyAdapter( composite.faktor() ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 1, 2 ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setLayoutData( left().top( lastLine ).create() ).create();
     }

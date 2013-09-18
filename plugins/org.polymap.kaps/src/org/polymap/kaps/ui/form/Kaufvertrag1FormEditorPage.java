@@ -12,8 +12,6 @@
  */
 package org.polymap.kaps.ui.form;
 
-import java.util.Locale;
-
 import org.geotools.data.FeatureStore;
 import org.opengis.feature.Feature;
 
@@ -26,7 +24,6 @@ import org.polymap.rhei.data.entityfeature.PropertyAdapter;
 import org.polymap.rhei.field.CheckboxFormField;
 import org.polymap.rhei.field.DateTimeFormField;
 import org.polymap.rhei.field.IFormFieldListener;
-import org.polymap.rhei.field.NumberValidator;
 import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.field.TextFormField;
 import org.polymap.rhei.form.IFormEditorPageSite;
@@ -34,6 +31,8 @@ import org.polymap.rhei.form.IFormEditorPageSite;
 import org.polymap.kaps.model.data.KaeuferKreisComposite;
 import org.polymap.kaps.model.data.VertragsArtComposite;
 import org.polymap.kaps.ui.FieldCalculation;
+import org.polymap.kaps.ui.MyNumberValidator;
+import org.polymap.kaps.ui.NotNullMyNumberValidator;
 import org.polymap.kaps.ui.NotNullValidator;
 
 /**
@@ -102,23 +101,23 @@ public class Kaufvertrag1FormEditorPage
 
         // Kaufpreis Nenner/Zähler
         final Composite line5 = site.newFormField( parent, new PropertyAdapter( kaufvertrag.kaufpreis() ),
-                new StringFormField( StringFormField.Style.ALIGN_RIGHT ), new NotNullNumberValidator( Double.class,
-                        Locale.getDefault(), 12, 2, 1, 2 ), "Kaufpreis (€)" );
+                new StringFormField( StringFormField.Style.ALIGN_RIGHT ), new NotNullMyNumberValidator( Double.class,
+                        2 ), "Kaufpreis (€)" );
         line5.setLayoutData( left().right( 30 ).top( line4 ).create() );
 
         site.newFormField( parent, new PropertyAdapter( kaufvertrag.kaufpreisAnteilZaehler() ),
                 new StringFormField( StringFormField.Style.ALIGN_RIGHT ),
-                new NotNullNumberValidator( Double.class, Locale.getDefault(), 12, 2, 1, 2 ), "Anteil Zähler" )
+                new NotNullMyNumberValidator( Double.class,  2 ), "Anteil Zähler" )
                 .setLayoutData( new SimpleFormData( SPACING ).left( 60 ).right( 80 ).top( line4 ).create() );
 
         site.newFormField( parent, new PropertyAdapter( kaufvertrag.kaufpreisAnteilNenner() ),
                 new StringFormField( StringFormField.Style.ALIGN_RIGHT ),
-                new NotNullNumberValidator( Double.class, Locale.getDefault(), 12, 2, 1, 2 ), "/Nenner" )
+                new NotNullMyNumberValidator( Double.class,  2 ), "/Nenner" )
                 .setLayoutData( new SimpleFormData( SPACING ).left( 80 ).right( RIGHT ).top( line4 ).create() );
 
         final Composite line6 = site.newFormField( parent, new PropertyAdapter( kaufvertrag.vollpreis() ),
                 new StringFormField( StringFormField.Style.ALIGN_RIGHT ),
-                new NumberValidator( Double.class, Locale.getDefault(), 12, 2, 1, 2 ), "Vollpreis (€)" );
+                new MyNumberValidator( Double.class,  2 ), "Vollpreis (€)" );
         line6.setEnabled( false );
         line6.setLayoutData( left().right( 30 ).top( line5 ).create() );
 

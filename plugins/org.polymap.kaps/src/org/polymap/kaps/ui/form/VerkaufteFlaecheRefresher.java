@@ -12,8 +12,6 @@
  */
 package org.polymap.kaps.ui.form;
 
-import java.text.NumberFormat;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -23,6 +21,7 @@ import org.polymap.rhei.field.IFormFieldListener;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
 import org.polymap.kaps.model.data.FlurstueckComposite;
+import org.polymap.kaps.ui.NumberFormatter;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -45,8 +44,8 @@ public class VerkaufteFlaecheRefresher
     private final String                                 prefix;
 
 
-    public VerkaufteFlaecheRefresher( IFormEditorPageSite site,
-            CompositeProvider<FlurstueckComposite> flurstueck, String prefix ) {
+    public VerkaufteFlaecheRefresher( IFormEditorPageSite site, CompositeProvider<FlurstueckComposite> flurstueck,
+            String prefix ) {
         this.site = site;
         this.flurstueckProvider = flurstueck;
         this.prefix = prefix;
@@ -85,30 +84,15 @@ public class VerkaufteFlaecheRefresher
         FlurstueckComposite flurstueck = flurstueckProvider.get();
         if (flurstueck != null) {
             Double kp = flaeche == null ? flurstueck.flaeche().get() : flaeche;
-            Double n = flaechenAnteilNenner == null ? flurstueck.flaechenAnteilNenner().get()
-                    : flaechenAnteilNenner;
-            Double z = flaecheAnteilZaehler == null ? flurstueck.flaechenAnteilZaehler().get()
-                    : flaecheAnteilZaehler;
+            Double n = flaechenAnteilNenner == null ? flurstueck.flaechenAnteilNenner().get() : flaechenAnteilNenner;
+            Double z = flaecheAnteilZaehler == null ? flurstueck.flaechenAnteilZaehler().get() : flaecheAnteilZaehler;
 
             if (kp != null && n != null && z != null && z != 0) {
                 Double verkaufteFlaeche = kp * z / n;
                 site.setFieldValue( prefix + "verkaufteFlaeche",
-                        getFormatter().format( verkaufteFlaeche ) );
+                        NumberFormatter.getFormatter( 2 ).format( verkaufteFlaeche ) );
             }
         }
-    }
-
-
-    /**
-     * 
-     * @return
-     */
-    private NumberFormat getFormatter() {
-        NumberFormat nf = NumberFormat.getInstance();
-        nf.setMaximumFractionDigits( 2 );
-        nf.setMinimumFractionDigits( 2 );
-        nf.setMinimumIntegerDigits( 1 );
-        return nf;
     }
 
     private static Log log = LogFactory.getLog( VerkaufteFlaecheRefresher.class );

@@ -30,7 +30,6 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.polymap.core.project.ui.util.SimpleFormData;
-import org.polymap.core.runtime.Polymap;
 import org.polymap.core.runtime.event.EventManager;
 
 import org.polymap.rhei.data.entityfeature.AssociationAdapter;
@@ -39,7 +38,6 @@ import org.polymap.rhei.field.CheckboxFormField;
 import org.polymap.rhei.field.FormFieldEvent;
 import org.polymap.rhei.field.IFormFieldLabel;
 import org.polymap.rhei.field.IFormFieldListener;
-import org.polymap.rhei.field.NumberValidator;
 import org.polymap.rhei.field.PicklistFormField;
 import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.form.FormEditor;
@@ -56,6 +54,8 @@ import org.polymap.kaps.ui.FieldCalculation;
 import org.polymap.kaps.ui.FieldListener;
 import org.polymap.kaps.ui.FieldMultiplication;
 import org.polymap.kaps.ui.FieldSummation;
+import org.polymap.kaps.ui.MyNumberValidator;
+import org.polymap.kaps.ui.NumberFormatter;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -144,14 +144,65 @@ public class FlurstuecksdatenAgrarBodenwertFormEditorPage
 
         zonen = searchZonen();
 
-        EventManager.instance().subscribe( fieldListener = new FieldListener( vb.gesamtBauWert() ) /*{
-
-            @Override
-            protected void onChangedValue( IFormEditorPageSite site, String fieldName, Object value ) {
-                site.fireEvent( formEditor, vb.gesamtBauWert().qualifiedName().name(), IFormFieldListener.VALUE_CHANGE,
-                        fieldListener.get( vb.gesamtBauWert() ) );
-            }
-        }*/, new FieldListener.EventFilter(formEditor));
+        EventManager.instance().subscribe( fieldListener = new FieldListener( vb.gesamtBauWert() ) /*
+                                                                                                    * {
+                                                                                                    * 
+                                                                                                    * @
+                                                                                                    * Override
+                                                                                                    * protected
+                                                                                                    * void
+                                                                                                    * onChangedValue
+                                                                                                    * (
+                                                                                                    * IFormEditorPageSite
+                                                                                                    * site
+                                                                                                    * ,
+                                                                                                    * String
+                                                                                                    * fieldName
+                                                                                                    * ,
+                                                                                                    * Object
+                                                                                                    * value
+                                                                                                    * )
+                                                                                                    * {
+                                                                                                    * site
+                                                                                                    * .
+                                                                                                    * fireEvent
+                                                                                                    * (
+                                                                                                    * formEditor
+                                                                                                    * ,
+                                                                                                    * vb
+                                                                                                    * .
+                                                                                                    * gesamtBauWert
+                                                                                                    * (
+                                                                                                    * )
+                                                                                                    * .
+                                                                                                    * qualifiedName
+                                                                                                    * (
+                                                                                                    * )
+                                                                                                    * .
+                                                                                                    * name
+                                                                                                    * (
+                                                                                                    * )
+                                                                                                    * ,
+                                                                                                    * IFormFieldListener
+                                                                                                    * .
+                                                                                                    * VALUE_CHANGE
+                                                                                                    * ,
+                                                                                                    * fieldListener
+                                                                                                    * .
+                                                                                                    * get
+                                                                                                    * (
+                                                                                                    * vb
+                                                                                                    * .
+                                                                                                    * gesamtBauWert
+                                                                                                    * (
+                                                                                                    * )
+                                                                                                    * )
+                                                                                                    * )
+                                                                                                    * ;
+                                                                                                    * }
+                                                                                                    * }
+                                                                                                    */,
+                new FieldListener.EventFilter( formEditor ) );
         // InterEditorListener( this, vb.gesamtBauWert() ) {
         //
         // @Override
@@ -255,7 +306,7 @@ public class FlurstuecksdatenAgrarBodenwertFormEditorPage
 
         newFormField( IFormFieldLabel.NO_LABEL ).setProperty( new PropertyAdapter( vb.ackerzahl1() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Long.class, Polymap.getSessionLocale() ) )
+                .setValidator( new MyNumberValidator( Long.class ) )
                 .setLayoutData( three().top( lastLine ).create() ).setParent( client ).create();
 
         createFlaecheField( vb.flaechenAnteil1(), four().top( lastLine ), client, true );
@@ -270,7 +321,7 @@ public class FlurstuecksdatenAgrarBodenwertFormEditorPage
                         && ev.getFieldName().equals( vb.richtwertZone1().qualifiedName().name() )) {
                     RichtwertzoneZeitraumComposite zone = (RichtwertzoneZeitraumComposite)ev.getNewValue();
                     Double wert = zone != null ? zone.euroQm().get() : null;
-                    site.setFieldValue( vb.bodenrichtwert1().qualifiedName().name(), wert != null ? getFormatter( 2 )
+                    site.setFieldValue( vb.bodenrichtwert1().qualifiedName().name(), wert != null ? NumberFormatter.getFormatter( 2 )
                             .format( wert ) : null );
                 }
             }
@@ -291,7 +342,7 @@ public class FlurstuecksdatenAgrarBodenwertFormEditorPage
 
         newFormField( IFormFieldLabel.NO_LABEL ).setProperty( new PropertyAdapter( vb.ackerzahl2() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Long.class, Polymap.getSessionLocale() ) )
+                .setValidator( new MyNumberValidator( Long.class ) )
                 .setLayoutData( three().top( lastLine ).create() ).setParent( client ).create();
 
         createFlaecheField( vb.flaechenAnteil2(), four().top( lastLine ), client, true );
@@ -306,8 +357,8 @@ public class FlurstuecksdatenAgrarBodenwertFormEditorPage
                         && ev.getFieldName().equals( vb.richtwertZone2().qualifiedName().name() )) {
                     RichtwertzoneZeitraumComposite zone = (RichtwertzoneZeitraumComposite)ev.getNewValue();
                     Double wert = zone.euroQm().get();
-                    site.setFieldValue( vb.bodenrichtwert2().qualifiedName().name(), wert != null ? getFormatter( 2 )
-                            .format( wert ) : null );
+                    site.setFieldValue( vb.bodenrichtwert2().qualifiedName().name(), wert != null ? NumberFormatter
+                            .getFormatter( 2 ).format( wert ) : null );
                 }
             }
         } );
@@ -327,7 +378,7 @@ public class FlurstuecksdatenAgrarBodenwertFormEditorPage
 
         newFormField( IFormFieldLabel.NO_LABEL ).setProperty( new PropertyAdapter( vb.ackerzahl3() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Long.class, Polymap.getSessionLocale() ) )
+                .setValidator( new MyNumberValidator( Long.class ) )
                 .setLayoutData( three().top( lastLine ).create() ).setParent( client ).create();
 
         createFlaecheField( vb.flaechenAnteil3(), four().top( lastLine ), client, true );
@@ -342,8 +393,8 @@ public class FlurstuecksdatenAgrarBodenwertFormEditorPage
                         && ev.getFieldName().equals( vb.richtwertZone3().qualifiedName().name() )) {
                     RichtwertzoneZeitraumComposite zone = (RichtwertzoneZeitraumComposite)ev.getNewValue();
                     Double wert = zone.euroQm().get();
-                    site.setFieldValue( vb.bodenrichtwert3().qualifiedName().name(), wert != null ? getFormatter( 2 )
-                            .format( wert ) : null );
+                    site.setFieldValue( vb.bodenrichtwert3().qualifiedName().name(), wert != null ? NumberFormatter
+                            .getFormatter( 2 ).format( wert ) : null );
                 }
             }
         } );
@@ -363,7 +414,7 @@ public class FlurstuecksdatenAgrarBodenwertFormEditorPage
 
         newFormField( IFormFieldLabel.NO_LABEL ).setProperty( new PropertyAdapter( vb.ackerzahl4() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Long.class, Polymap.getSessionLocale() ) )
+                .setValidator( new MyNumberValidator( Long.class ) )
                 .setLayoutData( three().top( lastLine ).create() ).setParent( client ).create();
 
         createFlaecheField( vb.flaechenAnteil4(), four().top( lastLine ), client, true );
@@ -378,8 +429,8 @@ public class FlurstuecksdatenAgrarBodenwertFormEditorPage
                         && ev.getFieldName().equals( vb.richtwertZone4().qualifiedName().name() )) {
                     RichtwertzoneZeitraumComposite zone = (RichtwertzoneZeitraumComposite)ev.getNewValue();
                     Double wert = zone.euroQm().get();
-                    site.setFieldValue( vb.bodenrichtwert4().qualifiedName().name(), wert != null ? getFormatter( 2 )
-                            .format( wert ) : null );
+                    site.setFieldValue( vb.bodenrichtwert4().qualifiedName().name(), wert != null ? NumberFormatter
+                            .getFormatter( 2 ).format( wert ) : null );
                 }
             }
         } );
@@ -397,7 +448,7 @@ public class FlurstuecksdatenAgrarBodenwertFormEditorPage
 
         newFormField( IFormFieldLabel.NO_LABEL ).setProperty( new PropertyAdapter( vb.ackerzahl5() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Long.class, Polymap.getSessionLocale() ) )
+                .setValidator( new MyNumberValidator( Long.class ) )
                 .setLayoutData( three().top( lastLine ).create() ).setParent( client ).create();
 
         createFlaecheField( vb.flaechenAnteil5(), four().top( lastLine ), client, true );
@@ -412,8 +463,8 @@ public class FlurstuecksdatenAgrarBodenwertFormEditorPage
                         && ev.getFieldName().equals( vb.richtwertZone5().qualifiedName().name() )) {
                     RichtwertzoneZeitraumComposite zone = (RichtwertzoneZeitraumComposite)ev.getNewValue();
                     Double wert = zone.euroQm().get();
-                    site.setFieldValue( vb.bodenrichtwert5().qualifiedName().name(), wert != null ? getFormatter( 2 )
-                            .format( wert ) : null );
+                    site.setFieldValue( vb.bodenrichtwert5().qualifiedName().name(), wert != null ? NumberFormatter
+                            .getFormatter( 2 ).format( wert ) : null );
                 }
             }
         } );
@@ -431,7 +482,7 @@ public class FlurstuecksdatenAgrarBodenwertFormEditorPage
 
         newFormField( IFormFieldLabel.NO_LABEL ).setProperty( new PropertyAdapter( vb.ackerzahl6() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Long.class, Polymap.getSessionLocale() ) )
+                .setValidator( new MyNumberValidator( Long.class ) )
                 .setLayoutData( three().top( lastLine ).create() ).setParent( client ).create();
 
         createFlaecheField( vb.flaechenAnteil6(), four().top( lastLine ), client, true );
@@ -446,8 +497,8 @@ public class FlurstuecksdatenAgrarBodenwertFormEditorPage
                         && ev.getFieldName().equals( vb.richtwertZone6().qualifiedName().name() )) {
                     RichtwertzoneZeitraumComposite zone = (RichtwertzoneZeitraumComposite)ev.getNewValue();
                     Double wert = zone.euroQm().get();
-                    site.setFieldValue( vb.bodenrichtwert6().qualifiedName().name(), wert != null ? getFormatter( 2 )
-                            .format( wert ) : null );
+                    site.setFieldValue( vb.bodenrichtwert6().qualifiedName().name(), wert != null ? NumberFormatter
+                            .getFormatter( 2 ).format( wert ) : null );
                 }
             }
         } );
@@ -474,7 +525,7 @@ public class FlurstuecksdatenAgrarBodenwertFormEditorPage
         newLine = createLabel( client, "Verkaufte Fläche", one().top( lastLine ), SWT.RIGHT );
         newFormField( IFormFieldLabel.NO_LABEL ).setEnabled( false )
                 .setProperty( new PropertyAdapter( vb.flurstueck().get().verkaufteFlaeche() ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setField( new StringFormField() ).setLayoutData( two().top( lastLine ).bottom( 100 ).create() )
                 .setParent( client ).create();
         createFlaecheField( vb.flaechenAnteilGesamt(), four().top( lastLine ), client, false );
@@ -507,7 +558,7 @@ public class FlurstuecksdatenAgrarBodenwertFormEditorPage
         newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Faktor = bereinigter Kaufpreis/Sachwert" )
                 .setProperty( new PropertyAdapter( vb.faktorKaufpreisZuSachwert() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 4, 1, 4 ) )
+                .setValidator( new MyNumberValidator( Double.class, 4 ) )
                 .setLayoutData( six().top( lastLine ).create() ).setParent( client ).setEnabled( false ).create();
         site.addFieldListener( bereinCalculator = new FieldCalculation( site, 4, vb.faktorKaufpreisZuSachwert(), vb
                 .sachwertGesamt() ) {

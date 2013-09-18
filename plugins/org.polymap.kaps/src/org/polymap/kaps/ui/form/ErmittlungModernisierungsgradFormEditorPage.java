@@ -136,7 +136,7 @@ public class ErmittlungModernisierungsgradFormEditorPage
                     @Override
                     protected void onChangedValue( IFormEditorPageSite site, Entity entity, String fieldName,
                             Object value ) {
-                        site.setFieldValue( fieldName, value != null ? getFormatter( 0 ).format( value ) : null );
+                        site.setFieldValue( fieldName, value != null ? getFormatter( 0, false ).format( value ) : null );
                     }
                 }, new InterEditorListener.EventFilter( em ) );
 
@@ -441,15 +441,15 @@ public class ErmittlungModernisierungsgradFormEditorPage
 
         lastLine = newLine;
         newLine = createLabel( client, "Tatsächliches Baujahr", one().top( null ), SWT.RIGHT );
-        createFlaecheField( em.tatsaechlichesBaujahr(), two().top( null ), client, false );
+        createGrouplessField( em.tatsaechlichesBaujahr(), two().top( null ), client, false );
 
         lastLine = newLine;
         newLine = createLabel( client, "Gesamtnutzungsdauer", one().top( lastLine ), SWT.RIGHT );
-        createFlaecheField( em.gesamtNutzungsDauer(), two().top( lastLine ), client, false );
+        createGrouplessField( em.gesamtNutzungsDauer(), two().top( lastLine ), client, false );
 
         lastLine = newLine;
         newLine = createLabel( client, "Restnutzungdauer (ohne Modernisierung)", one().top( lastLine ), SWT.RIGHT );
-        createFlaecheField( em.restNutzungsDauer(), two().top( lastLine ), client, false );
+        createGrouplessField( em.restNutzungsDauer(), two().top( lastLine ), client, false );
         site.addFieldListener( restnutzungListener = new FieldCalculation( site, 0, em.restNutzungsDauer(), em
                 .tatsaechlichesBaujahr(), em.gesamtNutzungsDauer() ) {
 
@@ -466,11 +466,11 @@ public class ErmittlungModernisierungsgradFormEditorPage
         lastLine = newLine;
         newLine = createLabel( client, "verlängerte Restnutzungdauer aufgrund Modernisierung", one().top( lastLine ),
                 SWT.RIGHT );
-        createFlaecheField( em.neueRestNutzungsDauer(), two().top( lastLine ), client, false );
+        createGrouplessField( em.neueRestNutzungsDauer(), two().top( lastLine ), client, false );
 
         lastLine = newLine;
         newLine = createLabel( client, "Bereinigtes Baujahr", one().top( lastLine ), SWT.RIGHT );
-        createFlaecheField( em.bereinigtesBaujahr(), two().top( lastLine ).bottom( 100 ), client, false );
+        createGrouplessField( em.bereinigtesBaujahr(), two().top( lastLine ).bottom( 100 ), client, false );
 
         site.addFieldListener( neueRestnutzungListener = new FieldCalculation( site, 0, em.neueRestNutzungsDauer(), em
                 .modernisierungsGrad(), em.tatsaechlichesBaujahr(), em.gesamtNutzungsDauer(), em.restNutzungsDauer() ) {
@@ -561,7 +561,7 @@ public class ErmittlungModernisierungsgradFormEditorPage
             // em.restNutzungsDauer().qualifiedName().name(),
             // IFormFieldListener.VALUE_CHANGE, em
             // .auswirkungZeile1().get() );
-            pageSite.setFieldValue( em.restNutzungsDauer().qualifiedName().name(), getFormatter( 0 ).format( rnd ) );
+            pageSite.setFieldValue( em.restNutzungsDauer().qualifiedName().name(), getFormatter( 0, false ).format( rnd ) );
         }
         fieldListener.flush( pageSite );
     }

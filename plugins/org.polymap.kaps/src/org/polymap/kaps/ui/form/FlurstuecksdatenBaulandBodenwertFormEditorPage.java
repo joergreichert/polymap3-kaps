@@ -28,7 +28,6 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import org.polymap.core.runtime.Polymap;
 import org.polymap.core.runtime.event.EventManager;
 
 import org.polymap.rhei.data.entityfeature.AssociationAdapter;
@@ -36,7 +35,6 @@ import org.polymap.rhei.data.entityfeature.PropertyAdapter;
 import org.polymap.rhei.field.CheckboxFormField;
 import org.polymap.rhei.field.IFormFieldLabel;
 import org.polymap.rhei.field.IFormFieldListener;
-import org.polymap.rhei.field.NumberValidator;
 import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.form.FormEditor;
 import org.polymap.rhei.form.IFormEditorPageSite;
@@ -49,6 +47,8 @@ import org.polymap.kaps.ui.FieldListener;
 import org.polymap.kaps.ui.FieldMultiplication;
 import org.polymap.kaps.ui.FieldSummation;
 import org.polymap.kaps.ui.InterEditorListener;
+import org.polymap.kaps.ui.MyNumberValidator;
+import org.polymap.kaps.ui.NumberFormatter;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -92,7 +92,7 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
     @SuppressWarnings("unused")
     private IFormFieldListener                anteilBodenwert;
 
-    private FaktorOhneStrassenplatzCalculator faktorStrassenplatz;
+//    private FaktorOhneStrassenplatzCalculator faktorStrassenplatz;
 
     private FieldMultiplication               line1multiplicator2;
 
@@ -114,31 +114,35 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
 
     private FieldListener                     fieldListener;
 
-    private InterEditorListener editorListener;
+    private InterEditorListener               editorListener;
 
 
     // private IFormFieldListener gemeindeListener;
 
-    public FlurstuecksdatenBaulandBodenwertFormEditorPage( FormEditor formEditor, Feature feature, FeatureStore featureStore ) {
+    public FlurstuecksdatenBaulandBodenwertFormEditorPage( FormEditor formEditor, Feature feature,
+            FeatureStore featureStore ) {
         super( FlurstuecksdatenBaulandBodenwertFormEditorPage.class.getName(), "Boden- und Gebäudewert", feature,
                 featureStore );
 
         EventManager.instance().subscribe( fieldListener = new FieldListener( vb.bodenpreisBebaut() ),
                 new FieldListener.EventFilter( formEditor ) );
-        
-        EventManager.instance().subscribe( editorListener = new InterEditorListener( vb.bewertungsMethode(), vb.wertDerBaulichenAnlagen() ) {
 
-            @Override
-            protected void onChangedValue( IFormEditorPageSite site, Entity entity, String fieldName, Object newValue ) {
-                if (fieldName.equals( vb.wertDerBaulichenAnlagen().qualifiedName().name() )) {
-                    site.setFieldValue( fieldName, newValue != null ? getFormatter( 2 ).format( newValue ) : null );
-                }
-                else if (fieldName.equals( vb.bewertungsMethode().qualifiedName().name() )) {
-                    pageSite.setFieldValue( fieldName, newValue );
-                }
-            }
+        EventManager.instance().subscribe(
+                editorListener = new InterEditorListener( vb.bewertungsMethode(), vb.wertDerBaulichenAnlagen() ) {
 
-        }, new InterEditorListener.EventFilter( vb ) );
+                    @Override
+                    protected void onChangedValue( IFormEditorPageSite site, Entity entity, String fieldName,
+                            Object newValue ) {
+                        if (fieldName.equals( vb.wertDerBaulichenAnlagen().qualifiedName().name() )) {
+                            site.setFieldValue( fieldName, newValue != null ? NumberFormatter.getFormatter( 2 ).format( newValue )
+                                    : null );
+                        }
+                        else if (fieldName.equals( vb.bewertungsMethode().qualifiedName().name() )) {
+                            pageSite.setFieldValue( fieldName, newValue );
+                        }
+                    }
+
+                }, new InterEditorListener.EventFilter( vb ) );
     }
 
 
@@ -148,6 +152,7 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
         EventManager.instance().unsubscribe( fieldListener );
         EventManager.instance().unsubscribe( editorListener );
     }
+
 
     @Override
     public void afterDoLoad( IProgressMonitor monitor )
@@ -260,7 +265,7 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
         newLine = createLabel( client, "Fläche Flurstück", one().top( lastLine ), SWT.RIGHT );
         newFormField( IFormFieldLabel.NO_LABEL ).setEnabled( false )
                 .setProperty( new PropertyAdapter( vb.flurstueck().get().verkaufteFlaeche() ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setLayoutData( two().top( lastLine ).bottom( 100 ).create() ).setParent( client ).create();
 
@@ -279,7 +284,7 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
         newLine = createLabel( client, "Bodenwert", one().top( lastLine, 12 ), SWT.RIGHT );
         newFormField( IFormFieldLabel.NO_LABEL ).setProperty( new PropertyAdapter( vb.bodenwertGesamt() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( two().top( lastLine ).create() ).setParent( client ).setEnabled( false ).create();
         site.addFieldListener( bodenwertSummation = new FieldSummation( site, 2, vb.bodenwertGesamt(), vb.bodenwert1(),
                 vb.bodenwert2(), vb.bodenwert3(), vb.bodenwert4(), vb.bodenwert5(), vb.bodenwert6() ) );
@@ -291,7 +296,7 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
                 .setToolTipText( "Wert der baulichen Anlagen entsprechend Bewertungsmethode" ).setEnabled( true )
                 .setProperty( new PropertyAdapter( vb.wertDerBaulichenAnlagen() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( two().top( lastLine ).create() ).setParent( client ).create();
 
         createLabel( client, "Bewertungsmethode", three().top( lastLine, 12 ), SWT.RIGHT );
@@ -303,30 +308,34 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
         newLine = createLabel( client, "Sachwert", one().top( lastLine, 12 ), SWT.RIGHT );
         newFormField( IFormFieldLabel.NO_LABEL ).setProperty( new PropertyAdapter( vb.sachwert() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( two().top( lastLine ).create() ).setParent( client ).setEnabled( false ).create();
         site.addFieldListener( sachwertSummation = new FieldSummation( site, 2, vb.sachwert(), vb.bodenwertGesamt(), vb
                 .wertDerBaulichenAnlagen() ) );
 
-//        lastLine = newLine;
-//        newLine = createLabel( client, "Differenz Gebäudewert", one().top( lastLine, 12 ), SWT.RIGHT );
-//        newFormField( IFormFieldLabel.NO_LABEL )
-//                .setToolTipText( "Differenz Gebäude- zu Bodenwert (ehemals Sachwertverfahren 1913)" )
-//                .setProperty( new PropertyAdapter( vb.differenzGebaeudeZuBodenwert() ) )
-//                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-//                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
-//                .setLayoutData( two().top( lastLine ).create() ).setParent( client ).create();
+        // lastLine = newLine;
+        // newLine = createLabel( client, "Differenz Gebäudewert", one().top(
+        // lastLine, 12 ), SWT.RIGHT );
+        // newFormField( IFormFieldLabel.NO_LABEL )
+        // .setToolTipText(
+        // "Differenz Gebäude- zu Bodenwert (ehemals Sachwertverfahren 1913)" )
+        // .setProperty( new PropertyAdapter( vb.differenzGebaeudeZuBodenwert() ) )
+        // .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
+        // .setValidator( new MyNumberValidator( Double.class,
+        // Polymap.getSessionLocale(), 2 ) )
+        // .setLayoutData( two().top( lastLine ).create() ).setParent( client
+        // ).create();
 
         lastLine = newLine;
         newLine = createLabel( client, "Faktor", one().top( lastLine, 12 ), SWT.RIGHT );
-        newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Faktor = (bereinigter Kaufpreis - Wert der bauliche Anlagen)/Bodenwert" )
+        newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Faktor = bereinigter Kaufpreis/Sachwert" )
                 .setProperty( new PropertyAdapter( vb.faktorBereinigterKaufpreis() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 4, 1, 4 ) )
+                .setValidator( new MyNumberValidator( Double.class, 4 ) )
                 .setLayoutData( two().top( lastLine ).create() ).setParent( client ).setEnabled( false ).create();
 
         site.addFieldListener( bereinCalculator = new FieldCalculation( site, 4, vb.faktorBereinigterKaufpreis(), vb
-                .bodenwertGesamt(), vb.wertDerBaulichenAnlagen() ) {
+                .sachwert() ) {
 
             @Override
             protected Double calculate( org.polymap.kaps.ui.FieldCalculation.ValueProvider values ) {
@@ -340,32 +349,32 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
                         kaufpreis = bereinigt;
                     }
                 }
-                Double bodenwert = values.get( vb.bodenwertGesamt() );
-                Double differenz = values.get( vb.wertDerBaulichenAnlagen() );
+                Double sachwert = values.get( vb.sachwert() );
+                // Double differenz = values.get( vb.wertDerBaulichenAnlagen() );
                 // faktor = kaufpreis / bodenwert - gebäudewert
-                if (kaufpreis != null && bodenwert != null && bodenwert != 0.0d) {
-                    return (differenz != null ? kaufpreis - differenz : kaufpreis) / bodenwert;
+                if (kaufpreis != null && sachwert != null && sachwert != 0.0d) {
+                    return kaufpreis / sachwert;
                 }
                 return null;
             }
         } );
 
-        // kaufpreis / (bodenwert - Wert aller strflaechen)
-        createLabel( client, "ohne Straßenplatz", three().top( lastLine, 12 ), SWT.RIGHT );
-        newFormField( IFormFieldLabel.NO_LABEL )
-                .setToolTipText( "Faktor bereinigter Kaufpreis/Sachwert ohne Straßenplatz" )
-                .setProperty( new PropertyAdapter( vb.faktorOhneStrassenplatz() ) )
-                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 4, 1, 4 ) )
-                .setLayoutData( four().top( lastLine ).create() ).setParent( client ).setEnabled( false ).create();
-        site.addFieldListener( faktorStrassenplatz = new FaktorOhneStrassenplatzCalculator( site, vb ) );
+//        // kaufpreis / (bodenwert - Wert aller strflaechen)
+//        createLabel( client, "ohne Straßenplatz", three().top( lastLine, 12 ), SWT.RIGHT );
+//        newFormField( IFormFieldLabel.NO_LABEL )
+//                .setToolTipText( "Faktor bereinigter Kaufpreis/Sachwert ohne Straßenplatz" )
+//                .setProperty( new PropertyAdapter( vb.faktorOhneStrassenplatz() ) )
+//                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
+//                .setValidator( new MyNumberValidator( Double.class, 12, 4, 1, 4 ) )
+//                .setLayoutData( four().top( lastLine ).create() ).setParent( client ).setEnabled( false ).create();
+//        site.addFieldListener( faktorStrassenplatz = new FaktorOhneStrassenplatzCalculator( site, vb ) );
 
         lastLine = newLine;
         newLine = createLabel( client, "Kaufpreisanteil", one().top( lastLine, 12 ), SWT.RIGHT );
         newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Kaufpreisanteil Bodenwert" )
                 .setProperty( new PropertyAdapter( vb.kaufpreisAnteilBodenwert() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( two().top( lastLine ).create() ).setParent( client ).setEnabled( false ).create();
         site.addFieldListener( anteilBodenwert = new FieldMultiplication( site, 2, vb.faktorBereinigterKaufpreis(), vb
                 .bodenwertGesamt(), vb.kaufpreisAnteilBodenwert() ) );

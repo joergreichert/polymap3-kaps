@@ -42,7 +42,6 @@ import org.polymap.rhei.data.entityfeature.PropertyAdapter;
 import org.polymap.rhei.field.CheckboxFormField;
 import org.polymap.rhei.field.IFormFieldLabel;
 import org.polymap.rhei.field.IFormFieldListener;
-import org.polymap.rhei.field.NumberValidator;
 import org.polymap.rhei.field.PicklistFormField;
 import org.polymap.rhei.field.SelectlistFormField;
 import org.polymap.rhei.field.StringFormField;
@@ -283,12 +282,8 @@ public abstract class KapsDefaultFormEditorPage
     }
 
 
-    protected NumberFormat getFormatter( int fractionDigits ) {
-        NumberFormat nf = NumberFormat.getInstance();
-        nf.setMaximumFractionDigits( fractionDigits );
-        nf.setMinimumFractionDigits( fractionDigits );
-        nf.setMinimumIntegerDigits( 1 );
-        return nf;
+    protected NumberFormat getFormatter( int fractionDigits, boolean useGrouping ) {
+        return NumberFormatter.getFormatter( fractionDigits, useGrouping );
     }
 
 
@@ -324,20 +319,34 @@ public abstract class KapsDefaultFormEditorPage
 
     protected Composite createFlaecheField( String label, String tooltip, Property<Double> property,
             SimpleFormData data, Composite parent, boolean editable ) {
-        return createNumberField( label, tooltip, property, data, parent, editable, 0 );
+        return createNumberField( label, tooltip, property, data, parent, editable, 0, true );
     }
 
 
-    protected final Composite createNumberField( String label, String tooltip, Property<Double> property, SimpleFormData data,
-            Composite parent, boolean editable, int fractionDigits ) {
-        return newFormField( label )
-                .setProperty( new PropertyAdapter( property ) )
-                .setToolTipText( tooltip )
+    protected final Composite createNumberField( String label, String tooltip, Property<Double> property,
+            SimpleFormData data, Composite parent, boolean editable, int fractionDigits ) {
+        return createNumberField( label, tooltip, property, data, parent, editable, fractionDigits, true );
+    }
+
+
+    protected Composite createGrouplessField( Property<Double> property, SimpleFormData data, Composite parent,
+            boolean editable ) {
+        return createGrouplessField( IFormFieldLabel.NO_LABEL, null, property, data, parent, editable );
+    }
+
+
+    protected final Composite createGrouplessField( String label, String tooltip, Property<Double> property,
+            SimpleFormData data, Composite parent, boolean editable ) {
+        return createNumberField( label, tooltip, property, data, parent, editable, 0, false );
+    }
+
+
+    protected final Composite createNumberField( String label, String tooltip, Property<Double> property,
+            SimpleFormData data, Composite parent, boolean editable, int fractionDigits, boolean useGrouping ) {
+        return newFormField( label ).setProperty( new PropertyAdapter( property ) ).setToolTipText( tooltip )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator(
-                        new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, fractionDigits, 1,
-                                fractionDigits ) ).setLayoutData( data.create() ).setParent( parent )
-                .setEnabled( editable ).create();
+                .setValidator( new MyNumberValidator( Double.class, fractionDigits, fractionDigits, useGrouping ) )
+                .setLayoutData( data.create() ).setParent( parent ).setEnabled( editable ).create();
     }
 
 
@@ -372,7 +381,8 @@ public abstract class KapsDefaultFormEditorPage
                 .setProperty( new PropertyAdapter( property ) ).setField( new CheckboxFormField() )
                 .setLayoutData( data.create() ).setParent( client ).create();
     }
-    
+
+
     public final IFormEditorPageSite getPageSite() {
         return pageSite;
     }

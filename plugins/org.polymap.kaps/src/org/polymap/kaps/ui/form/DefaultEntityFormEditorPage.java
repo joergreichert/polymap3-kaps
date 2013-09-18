@@ -32,13 +32,11 @@ import org.polymap.core.model.Entity;
 import org.polymap.core.model.EntityType;
 import org.polymap.core.model.EntityType.Property;
 import org.polymap.core.qi4j.QiModule;
-import org.polymap.core.runtime.Polymap;
 
 import org.polymap.rhei.data.entityfeature.AssociationAdapter;
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
 import org.polymap.rhei.field.CheckboxFormField;
 import org.polymap.rhei.field.DateTimeFormField;
-import org.polymap.rhei.field.NumberValidator;
 import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
@@ -46,6 +44,7 @@ import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.Named;
 import org.polymap.kaps.model.SchlNamed;
 import org.polymap.kaps.ui.KapsDefaultFormEditorPage;
+import org.polymap.kaps.ui.MyNumberValidator;
 import org.polymap.kaps.ui.NotNullValidator;
 
 /**
@@ -156,32 +155,32 @@ public class DefaultEntityFormEditorPage
             // .setField( namedAssocationsPicklist( GebaeudeArtStaBuComposite.class )
             // )
             // .setLayoutData( left().top( lastLine ).create() ).create();
-            FormFieldBuilder fieldBuilder = newFormField( label ).setToolTipText( tooltipFor( propertyName ) ).setLayoutData( left().top( lastLine ).create() );
+            FormFieldBuilder fieldBuilder = newFormField( label ).setToolTipText( tooltipFor( propertyName ) )
+                    .setLayoutData( left().top( lastLine ).create() );
             if (String.class.isAssignableFrom( propertyType )) {
-                fieldBuilder.setProperty( new PropertyAdapter( (org.qi4j.api.property.Property)delegate ) )
-                        .setField( new StringFormField() );
+                fieldBuilder.setProperty( new PropertyAdapter( (org.qi4j.api.property.Property)delegate ) ).setField(
+                        new StringFormField() );
             }
             else if (Integer.class.isAssignableFrom( propertyType )) {
                 fieldBuilder.setProperty( new PropertyAdapter( (org.qi4j.api.property.Property)delegate ) )
-                        .setField( new StringFormField() )
-                        .setValidator( new NumberValidator( Integer.class, Polymap.getSessionLocale() ) );
+                        .setField( new StringFormField() ).setValidator( new MyNumberValidator( Integer.class ) );
             }
             else if (Double.class.isAssignableFrom( propertyType )) {
                 fieldBuilder.setProperty( new PropertyAdapter( (org.qi4j.api.property.Property)delegate ) )
-                        .setField( new StringFormField() )
-                        .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) );
+                        .setField( new StringFormField() ).setValidator( new MyNumberValidator( Double.class, 2 ) );
             }
             else if (Date.class.isAssignableFrom( propertyType )) {
-                fieldBuilder.setProperty( new PropertyAdapter( (org.qi4j.api.property.Property)delegate ) )
-                        .setField( new DateTimeFormField() );
+                fieldBuilder.setProperty( new PropertyAdapter( (org.qi4j.api.property.Property)delegate ) ).setField(
+                        new DateTimeFormField() );
             }
             else if (Boolean.class.isAssignableFrom( propertyType )) {
-                fieldBuilder.setProperty( new PropertyAdapter( (org.qi4j.api.property.Property)delegate ) )
-                        .setField( new CheckboxFormField() );
+                fieldBuilder.setProperty( new PropertyAdapter( (org.qi4j.api.property.Property)delegate ) ).setField(
+                        new CheckboxFormField() );
             }
             else if (Named.class.isAssignableFrom( propertyType )) {
-                fieldBuilder.setProperty( new AssociationAdapter( (org.qi4j.api.entity.association.Association)delegate ) )
-                        .setField( namedAssocationsPicklist( propertyType ) );
+                fieldBuilder.setProperty(
+                        new AssociationAdapter( (org.qi4j.api.entity.association.Association)delegate ) ).setField(
+                        namedAssocationsPicklist( propertyType ) );
             }
             lastLine = fieldBuilder.create();
         }
@@ -210,6 +209,6 @@ public class DefaultEntityFormEditorPage
 
 
     protected String tooltipFor( String name ) {
-        return labelFor(name);
+        return labelFor( name );
     }
 }

@@ -22,7 +22,6 @@ import org.eclipse.swt.widgets.Composite;
 
 import org.polymap.rhei.data.entityfeature.AssociationAdapter;
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
-import org.polymap.rhei.field.NumberValidator;
 import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.form.IFormEditorPage;
 import org.polymap.rhei.form.IFormEditorPageSite;
@@ -32,6 +31,7 @@ import org.polymap.kaps.model.data.BodenRichtwertKennungComposite;
 import org.polymap.kaps.model.data.EntwicklungsZusatzComposite;
 import org.polymap.kaps.model.data.RichtwertzoneComposite;
 import org.polymap.kaps.ui.KapsDefaultFormEditorPage;
+import org.polymap.kaps.ui.MyNumberValidator;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -79,20 +79,20 @@ public class RichtwertzoneWeitereDatenFormEditorPage
         // newFormField( "Maßstab     1:" )
         // .setProperty( new PropertyAdapter( richtwertzone.massstab() ) )
         // .setField( new StringFormField() )
-        // .setValidator( new NumberValidator( Integer.class, locale ) )
+        // .setValidator( new MyNumberValidator( Integer.class ) )
         // .setLayoutData( right().top( lastLine ).create() ).create();
         //
         // lastLine = newLine;
         // newLine = newFormField( "Rechtswert" )
         // .setProperty( new PropertyAdapter( richtwertzone.rechtsWert() ) )
         // .setField( new StringFormField() )
-        // .setValidator( new NumberValidator( Double.class, locale ) )
+        // .setValidator( new MyNumberValidator( Double.class ) )
         // .setLayoutData( left().top( lastLine ).create() ).create();
         //
         // newFormField( "Hochwert" ).setProperty( new PropertyAdapter(
         // richtwertzone.hochWert() ) )
         // .setField( new StringFormField() )
-        // .setValidator( new NumberValidator( Double.class, locale ) )
+        // .setValidator( new MyNumberValidator( Double.class ) )
         // .setLayoutData( right().top( lastLine ).create() ).create();
 
         lastLine = newLine;
@@ -111,30 +111,30 @@ public class RichtwertzoneWeitereDatenFormEditorPage
         newLine = newFormField( "Grundstücksgröße in qm" )
                 .setProperty( new PropertyAdapter( richtwertzone.grundstuecksGroesse() ) )
                 .setField( new StringFormField() )
-                .setValidator( new NumberValidator( Double.class, locale, 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( left().top( lastLine ).create() ).create();
 
         newFormField( "Grundstückstiefe in m" ).setProperty( new PropertyAdapter( richtwertzone.grundstuecksTiefe() ) )
                 .setField( new StringFormField() )
-                .setValidator( new NumberValidator( Double.class, locale, 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( right().top( lastLine ).create() ).create();
 
         lastLine = newLine;
         newLine = newFormField( "Grundstücksbreite in m" )
                 .setProperty( new PropertyAdapter( richtwertzone.grundstuecksBreite() ) )
                 .setField( new StringFormField() )
-                .setValidator( new NumberValidator( Double.class, locale, 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( left().top( lastLine ).create() ).create();
 
         newFormField( "Grundflächenzahl" ).setProperty( new PropertyAdapter( richtwertzone.grundflaechenZahl() ) )
                 .setField( new StringFormField() )
-                .setValidator( new NumberValidator( Double.class, locale, 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( right().top( lastLine ).create() ).create();
 
         lastLine = newLine;
         newLine = newFormField( "Geschoßzahl" ).setProperty( new PropertyAdapter( richtwertzone.geschossZahl() ) )
                 .setField( new StringFormField() )
-                .setValidator( new NumberValidator( Double.class, locale, 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( left().top( lastLine ).create() ).create();
 
         newFormField( "Geschoßflächenzahl" ).setProperty( new PropertyAdapter( richtwertzone.geschossFlaechenZahl() ) )
@@ -143,16 +143,16 @@ public class RichtwertzoneWeitereDatenFormEditorPage
         lastLine = newLine;
         newLine = newFormField( "Baumassenzahl" ).setProperty( new PropertyAdapter( richtwertzone.baumassenZahl() ) )
                 .setField( new StringFormField() )
-                .setValidator( new NumberValidator( Double.class, locale, 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( left().top( lastLine ).create() ).create();
 
         lastLine = newLine;
         newLine = newFormField( "Ackerzahl" ).setProperty( new PropertyAdapter( richtwertzone.ackerZahl() ) )
-                .setField( new StringFormField() ).setValidator( new NumberValidator( Integer.class, locale ) )
+                .setField( new StringFormField() ).setValidator( new MyNumberValidator( Integer.class ) )
                 .setLayoutData( left().top( lastLine ).create() ).create();
 
         newFormField( "Grünlandzahl" ).setProperty( new PropertyAdapter( richtwertzone.gruenLandZahl() ) )
-                .setField( new StringFormField() ).setValidator( new NumberValidator( Integer.class, locale ) )
+                .setField( new StringFormField() ).setValidator( new MyNumberValidator( Integer.class ) )
                 .setLayoutData( right().top( lastLine ).create() ).create();
 
     }

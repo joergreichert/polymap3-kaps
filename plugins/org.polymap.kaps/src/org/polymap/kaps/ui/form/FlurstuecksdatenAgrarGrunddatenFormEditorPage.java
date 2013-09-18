@@ -22,20 +22,18 @@ import org.eclipse.swt.widgets.Composite;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import org.polymap.core.runtime.Polymap;
-
 import org.polymap.rhei.data.entityfeature.AssociationAdapter;
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
 import org.polymap.rhei.field.CheckboxFormField;
 import org.polymap.rhei.field.FormFieldEvent;
 import org.polymap.rhei.field.IFormFieldListener;
-import org.polymap.rhei.field.NumberValidator;
 import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.field.TextFormField;
 import org.polymap.rhei.form.FormEditor;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
 import org.polymap.kaps.model.data.GebaeudeArtComposite;
+import org.polymap.kaps.ui.MyNumberValidator;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -69,7 +67,7 @@ public class FlurstuecksdatenAgrarGrunddatenFormEditorPage
 
         newLine = newFormField( "Lageklasse" ).setProperty( new PropertyAdapter( vb.lageklasse() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( left().right( 33 ).top( lastLine ).create() ).setParent( client ).create();
 
         lastLine = newLine;
@@ -96,17 +94,17 @@ public class FlurstuecksdatenAgrarGrunddatenFormEditorPage
         lastLine = newLine;
         newLine = newFormField( "Baujahr tatsächlich" ).setProperty( new PropertyAdapter( vb.baujahr() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Integer.class, Polymap.getSessionLocale() ) )
+                .setValidator( new MyNumberValidator( Integer.class ) )
                 .setLayoutData( left().top( lastLine ).create() ).setParent( client ).create();
         newFormField( "Baujahr bereinigt" ).setProperty( new PropertyAdapter( vb.bereinigtesBaujahr() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Integer.class, Polymap.getSessionLocale() ) )
+                .setValidator( new MyNumberValidator( Integer.class ) )
                 .setLayoutData( right().top( lastLine ).create() ).setParent( client ).create();
 
         lastLine = newLine;
         newLine = newFormField( "Gesamtbauwert" ).setProperty( new PropertyAdapter( vb.gesamtBauWert() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( left().top( lastLine ).create() ).setParent( client ).create();
         newFormField( "nach" ).setToolTipText( "Gesamtbauwert nach" )
                 .setProperty( new PropertyAdapter( vb.gesamtBauWertNach() ) ).setEnabled( false )

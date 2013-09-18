@@ -39,7 +39,6 @@ import org.polymap.core.data.ui.featuretable.DefaultFeatureTableColumn;
 import org.polymap.core.data.ui.featuretable.FeatureTableViewer;
 import org.polymap.core.model.EntityType;
 import org.polymap.core.qi4j.QiModule.EntityCreator;
-import org.polymap.core.runtime.Polymap;
 import org.polymap.core.runtime.event.EventManager;
 import org.polymap.core.workbench.PolymapWorkbench;
 
@@ -49,7 +48,6 @@ import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter.Association
 import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter.PropertyCallback;
 import org.polymap.rhei.field.FormFieldEvent;
 import org.polymap.rhei.field.IFormFieldListener;
-import org.polymap.rhei.field.NumberValidator;
 import org.polymap.rhei.field.PicklistFormField;
 import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.form.FormEditor;
@@ -80,6 +78,8 @@ import org.polymap.kaps.ui.BooleanFormField;
 import org.polymap.kaps.ui.FieldListener;
 import org.polymap.kaps.ui.InterEditorPropertyChangeEvent;
 import org.polymap.kaps.ui.KapsDefaultFormEditorPageWithFeatureTable;
+import org.polymap.kaps.ui.MyNumberValidator;
+import org.polymap.kaps.ui.NotNullMyNumberValidator;
 import org.polymap.kaps.ui.NotNullValidator;
 import org.polymap.kaps.ui.SimplePickList;
 
@@ -229,7 +229,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                                     }
                                 } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
                 .setLayoutData( left().right( 30 ).top( line0 ).create() )
-                .setValidator( new NotNullNumberValidator( Integer.class, locale ) ).create();
+                .setValidator( new NotNullMyNumberValidator( Integer.class ) ).create();
 
         newFormField( "/" )
                 .setParent( parent )
@@ -513,7 +513,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                                         return entity.flaeche();
                                     }
                                 } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( left().right( 25 ).top( line5 ).create() ).create();
 
         newFormField( "Anteil" )
@@ -526,7 +526,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                                 return entity.flaechenAnteilZaehler();
                             }
                         } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( left().left( 25 ).right( 50 ).top( line5 ).create() ).create();
 
         newFormField( "/" )
@@ -539,7 +539,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                                 return entity.flaechenAnteilNenner();
                             }
                         } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( left().left( 50 ).right( 75 ).top( line5 ).create() ).create();
 
         newFormField( "verkaufte Fläche in m²" )
@@ -553,7 +553,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                                 return entity.verkaufteFlaeche();
                             }
                         } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( left().left( 75 ).right( 100 ).top( line5 ).create() ).create();
 
         pageSite.addFieldListener( verkaufteFlaecheRefresher = new VerkaufteFlaecheRefresher( pageSite,

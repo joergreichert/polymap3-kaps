@@ -24,8 +24,6 @@ import org.eclipse.jface.action.Action;
 
 import org.eclipse.ui.forms.widgets.Section;
 
-import org.polymap.core.runtime.Polymap;
-
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
 import org.polymap.rhei.field.IFormFieldLabel;
 import org.polymap.rhei.field.StringFormField;
@@ -37,6 +35,7 @@ import org.polymap.kaps.model.data.GebaeudeComposite;
 import org.polymap.kaps.model.data.WohnungseigentumComposite;
 import org.polymap.kaps.ui.ActionButton;
 import org.polymap.kaps.ui.KapsDefaultFormEditorPage;
+import org.polymap.kaps.ui.NotNullMyNumberValidator;
 import org.polymap.kaps.ui.SimplePickList;
 
 /**
@@ -82,14 +81,14 @@ public class WohnungseigentumFormEditorPage
         newLine = newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Objektnummer" )
                 .setProperty( new PropertyAdapter( eigentum.objektNummer() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NotNullNumberValidator( Integer.class, Polymap.getSessionLocale() ) )
+                .setValidator( new NotNullMyNumberValidator( Integer.class ) )
                 .setEnabled( eigentum.objektNummer().get() == null )
                 .setLayoutData( left().left( 0 ).right( 15 ).create() ).create();
 
         newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Fortführung" )
                 .setProperty( new PropertyAdapter( eigentum.objektFortfuehrung() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NotNullNumberValidator( Integer.class, Polymap.getSessionLocale() ) )
+                .setValidator( new NotNullMyNumberValidator( Integer.class ) )
                 .setEnabled( eigentum.objektNummer().get() == null )
                 .setLayoutData( left().left( 16 ).right( 31 ).create() ).create();
 

@@ -59,7 +59,6 @@ import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter.PropertyCal
 import org.polymap.rhei.field.DateTimeFormField;
 import org.polymap.rhei.field.FormFieldEvent;
 import org.polymap.rhei.field.IFormFieldListener;
-import org.polymap.rhei.field.NumberValidator;
 import org.polymap.rhei.field.PicklistFormField;
 import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.form.IFormEditorPageSite;
@@ -77,6 +76,7 @@ import org.polymap.kaps.model.data.RichtwertZoneLageComposite;
 import org.polymap.kaps.model.data.RichtwertzoneComposite;
 import org.polymap.kaps.model.data.RichtwertzoneZeitraumComposite;
 import org.polymap.kaps.ui.KapsDefaultFormEditorPageWithFeatureTable;
+import org.polymap.kaps.ui.MyNumberValidator;
 import org.polymap.kaps.ui.NotNullValidator;
 
 /**
@@ -398,7 +398,7 @@ public class RichtwertzoneGrunddatenFormEditorPage
                             }
 
                         } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setValidator( new NumberValidator( Double.class, locale, 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( left().top( lastLine ).create() ).create();
 
         lastLine = newLine;

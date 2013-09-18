@@ -45,7 +45,6 @@ import org.polymap.core.data.ui.featuretable.FeatureTableViewer;
 import org.polymap.core.model.EntityType;
 import org.polymap.core.project.ui.util.SimpleFormData;
 import org.polymap.core.qi4j.QiModule.EntityCreator;
-import org.polymap.core.runtime.Polymap;
 import org.polymap.core.runtime.event.EventFilter;
 import org.polymap.core.runtime.event.EventManager;
 import org.polymap.core.workbench.PolymapWorkbench;
@@ -57,7 +56,6 @@ import org.polymap.rhei.field.CheckboxFormField;
 import org.polymap.rhei.field.FormFieldEvent;
 import org.polymap.rhei.field.IFormFieldLabel;
 import org.polymap.rhei.field.IFormFieldListener;
-import org.polymap.rhei.field.NumberValidator;
 import org.polymap.rhei.field.PicklistFormField;
 import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.form.FormEditor;
@@ -80,6 +78,8 @@ import org.polymap.kaps.ui.FieldSummation;
 import org.polymap.kaps.ui.InterEditorListener;
 import org.polymap.kaps.ui.InterEditorPropertyChangeEvent;
 import org.polymap.kaps.ui.KapsDefaultFormEditorPageWithFeatureTable;
+import org.polymap.kaps.ui.MyNumberValidator;
+import org.polymap.kaps.ui.NumberFormatter;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -155,7 +155,7 @@ public class NHK2010BewertungFormEditorPage
 
         bewertung = repository.findEntity( NHK2010BewertungComposite.class, feature.getIdentifier().getID() );
 
-        EventManager.instance().subscribe( fieldListener = new InterEditorListener( ) {
+        EventManager.instance().subscribe( fieldListener = new InterEditorListener() {
 
             @Override
             protected void onChangedValue( IFormEditorPageSite site, Entity entity, String fieldName, Object value ) {
@@ -176,7 +176,7 @@ public class NHK2010BewertungFormEditorPage
                 if (fieldName.equals( selectedComposite.get().gesamtNutzungsDauer().qualifiedName().name() )
                         || fieldName.equals( selectedComposite.get().bereinigtesBaujahr().qualifiedName().name() )) {
                     // System.out.println( ev );
-                    pageSite.setFieldValue( prefix + fieldName, value != null ? getFormatter( 0 ).format( value )
+                    pageSite.setFieldValue( prefix + fieldName, value != null ? getFormatter( 0, false ).format( value )
                             : null );
                 }
             }
@@ -207,7 +207,7 @@ public class NHK2010BewertungFormEditorPage
     @Override
     public void afterDoLoad( IProgressMonitor monitor )
             throws Exception {
-        fieldListener.flush(pageSite);
+        fieldListener.flush( pageSite );
     }
 
 
@@ -325,7 +325,7 @@ public class NHK2010BewertungFormEditorPage
                             }
                         }
                         pageSite.setFieldValue( bewertung.summeZeitwerte().qualifiedName().name(),
-                                result != null ? getFormatter( 2 ).format( result ) : null );
+                                result != null ? NumberFormatter.getFormatter( 2 ).format( result ) : null );
                     }
                 }
             }
@@ -383,7 +383,9 @@ public class NHK2010BewertungFormEditorPage
                             "Wert übernommen",
                             "Der Gesamtwert der baulichen Anlagen wurde in \"Wert der baulichen Anlagen\" im Reiter \"Boden- und Gebäudewert \" in "
                                     + count
-                                    + " " + FlurstuecksdatenBaulandComposite.NAME + " übernommen. Die Formulare werden entsprechend angezeigt." );
+                                    + " "
+                                    + FlurstuecksdatenBaulandComposite.NAME
+                                    + " übernommen. Die Formulare werden entsprechend angezeigt." );
                 }
             }
         } );
@@ -412,8 +414,8 @@ public class NHK2010BewertungFormEditorPage
                                 return entity.laufendeNummer();
                             }
                         } ) ).setField( reloadable( new StringFormField() ) )
-                .setValidator( new NumberValidator( Integer.class, Polymap.getSessionLocale(), 2, 0 ) )
-                .setEnabled( false ).setLayoutData( two().top( lastLine ).create() ).create();
+                .setValidator( new MyNumberValidator( Integer.class, 2, 0 ) ).setEnabled( false )
+                .setLayoutData( two().top( lastLine ).create() ).create();
 
         // gebäudeart mit selektor
         lastLine = newLine;
@@ -548,8 +550,8 @@ public class NHK2010BewertungFormEditorPage
                                 return entity.anzahlWohnungen();
                             }
                         } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 10, 0 ) )
-                .setEnabled( false ).setLayoutData( three().top( lastLine ).create() ).create();
+                .setValidator( new MyNumberValidator( Double.class, 10, 0 ) ).setEnabled( false )
+                .setLayoutData( three().top( lastLine ).create() ).create();
 
         newFormField( "Zweifamilienhaus" )
                 .setToolTipText( "Zweifamilienhaus (nur bei Auswahl von Einfamilienhäusern)" )
@@ -630,8 +632,8 @@ public class NHK2010BewertungFormEditorPage
                                 return entity.faktorGrundrissart();
                             }
                         } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2 ) )
-                .setEnabled( false ).setLayoutData( two().top( lastLine ).create() ).create();
+                .setValidator( new MyNumberValidator( Double.class, 12, 2 ) ).setEnabled( false )
+                .setLayoutData( two().top( lastLine ).create() ).create();
 
         pageSite.addFieldListener( grundrissartListener = new IFormFieldListener() {
 
@@ -669,8 +671,8 @@ public class NHK2010BewertungFormEditorPage
                                 return entity.faktorWohnungsgroesse();
                             }
                         } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2 ) )
-                .setEnabled( false ).setLayoutData( three().top( lastLine ).create() ).create();
+                .setValidator( new MyNumberValidator( Double.class, 12, 2 ) ).setEnabled( false )
+                .setLayoutData( three().top( lastLine ).create() ).create();
 
         pageSite.addFieldListener( wohnungsgroesseListener = new IFormFieldListener() {
 
@@ -714,8 +716,8 @@ public class NHK2010BewertungFormEditorPage
                         faktor = 1.0d - (wohnungsflaeche - 50.0d) * (1.0d - 0.85d) / (135.0d - 50.0d);
                     }
                 }
-                pageSite.setFieldValue( prefix + "faktorWohnungsgroesse",
-                        faktor != null ? getFormatter( 2 ).format( faktor ) : null );
+                pageSite.setFieldValue( prefix + "faktorWohnungsgroesse", faktor != null ? NumberFormatter
+                        .getFormatter( 2 ).format( faktor ) : null );
             }
         } );
 
@@ -731,8 +733,8 @@ public class NHK2010BewertungFormEditorPage
                                 return entity.faktorZweifamilienhaus();
                             }
                         } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2 ) )
-                .setEnabled( false ).setLayoutData( four().top( lastLine ).create() ).create();
+                .setValidator( new MyNumberValidator( Double.class, 12, 2 ) ).setEnabled( false )
+                .setLayoutData( four().top( lastLine ).create() ).create();
 
         pageSite.addFieldListener( zfhListener = new IFormFieldListener() {
 
@@ -768,8 +770,8 @@ public class NHK2010BewertungFormEditorPage
                                 return entity.nhk();
                             }
                         } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
-                .setEnabled( false ).setLayoutData( two().top( lastLine, 30 ).create() ).create();
+                .setValidator( new MyNumberValidator( Double.class, 2 ) ).setEnabled( false )
+                .setLayoutData( two().top( lastLine, 30 ).create() ).create();
 
         pageSite.addFieldListener( gebaeudeStandardListener = new IFormFieldListener() {
 
@@ -783,7 +785,7 @@ public class NHK2010BewertungFormEditorPage
                             if (selectedGebaeudeStandard != null) {
                                 pageSite.setFieldValue(
                                         prefix + "nhk",
-                                        getFormatter( 2 ).format(
+                                        NumberFormatter.getFormatter( 2 ).format(
                                                 selectedGebaeudeArt.calculateNHKFor( selectedGebaeudeStandard ) ) );
                             }
                             else {
@@ -808,8 +810,8 @@ public class NHK2010BewertungFormEditorPage
                                 return entity.bruttoGrundFlaeche();
                             }
                         } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 10, 0 ) )
-                .setEnabled( true ).setLayoutData( three().top( lastLine, 30 ).create() ).create();
+                .setValidator( new MyNumberValidator( Double.class ) ).setEnabled( true )
+                .setLayoutData( three().top( lastLine, 30 ).create() ).create();
 
         lastLine = newLine;
         newLine = newFormField( "NHK 2010 korrigiert" )
@@ -825,8 +827,8 @@ public class NHK2010BewertungFormEditorPage
                                 return entity.nhkKorrigiert();
                             }
                         } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
-                .setEnabled( false ).setLayoutData( two().top( lastLine ).create() ).create();
+                .setValidator( new MyNumberValidator( Double.class, 2 ) ).setEnabled( false )
+                .setLayoutData( two().top( lastLine ).create() ).create();
 
         pageSite.addFieldListener( korrekturfaktorListener = new IFormFieldListener() {
 
@@ -874,7 +876,7 @@ public class NHK2010BewertungFormEditorPage
                     nhkKorrigiert *= faktorZweifamilienhaus;
                 }
                 pageSite.setFieldValue( getPropertyName( nameTemplate.nhkKorrigiert() ),
-                        nhkKorrigiert != null ? getFormatter( 2 ).format( nhkKorrigiert ) : null );
+                        nhkKorrigiert != null ? NumberFormatter.getFormatter( 2 ).format( nhkKorrigiert ) : null );
             }
         } );
 
@@ -925,8 +927,8 @@ public class NHK2010BewertungFormEditorPage
                                         return entity.abschlagBaumaengelBetrag();
                                     }
                                 } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
-                .setEnabled( false ).setLayoutData( three().top( lastLine ).create() ).create();
+                .setValidator( new MyNumberValidator( Double.class, 2 ) ).setEnabled( false )
+                .setLayoutData( three().top( lastLine ).create() ).create();
         lastLine = newLine;
         newLine = createLabel( parent, "Unterhaltungsrückstau", two().top( lastLine ) );
         newFormField( IFormFieldLabel.NO_LABEL )
@@ -942,7 +944,7 @@ public class NHK2010BewertungFormEditorPage
                                         return entity.abschlagRueckstauBetrag();
                                     }
                                 } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( three().top( lastLine ).create() ).create();
         lastLine = newLine;
         newLine = newFormField( IFormFieldLabel.NO_LABEL )
@@ -972,7 +974,7 @@ public class NHK2010BewertungFormEditorPage
                                         return entity.zuschlagZeile3Betrag();
                                     }
                                 } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( three().top( lastLine ).create() ).create();
         lastLine = newLine;
         newLine = newFormField( IFormFieldLabel.NO_LABEL )
@@ -1002,7 +1004,7 @@ public class NHK2010BewertungFormEditorPage
                                         return entity.zuschlagZeile4Betrag();
                                     }
                                 } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( three().top( lastLine ).create() ).create();
 
         return newLine;
@@ -1055,8 +1057,8 @@ public class NHK2010BewertungFormEditorPage
                                         return entity.baukostenIndexWert();
                                     }
                                 } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
-                .setEnabled( false ).setLayoutData( three().top( lastLine ).create() ).create();
+                .setValidator( new MyNumberValidator( Double.class, 2 ) ).setEnabled( false )
+                .setLayoutData( three().top( lastLine ).create() ).create();
 
         pageSite.addFieldListener( baukostenIndexWertListener = new IFormFieldListener() {
 
@@ -1075,14 +1077,15 @@ public class NHK2010BewertungFormEditorPage
                             // TODO Wertermittlungsstichtag festhalten?
                             result = NHK2010Baupreisindex.Mixin.indexFor( indexType, new Date() );
 
-                            pageSite.setFieldValue( getPropertyName( nameTemplate.baukostenIndexWert() ),
-                                    result != null && result.result != null ? getFormatter( 2 ).format( result.result )
-                                            : null );
-                            indexField
-                                    .setToolTipText( result != null && result.result != null ? "Index: "
-                                            + getFormatter( 2 ).format( result.index ) + " / Durchschnitt 2010: "
-                                            + getFormatter( 2 ).format( result.durchschnitt )
-                                            : "Baukostenindex auf Basis 2010" );
+                            pageSite.setFieldValue(
+                                    getPropertyName( nameTemplate.baukostenIndexWert() ),
+                                    result != null && result.result != null ? NumberFormatter.getFormatter( 2 ).format(
+                                            result.result ) : null );
+                            indexField.setToolTipText( result != null && result.result != null ? "Index: "
+                                    + NumberFormatter.getFormatter( 2 ).format( result.index )
+                                    + " / Durchschnitt 2010: "
+                                    + NumberFormatter.getFormatter( 2 ).format( result.durchschnitt )
+                                    : "Baukostenindex auf Basis 2010" );
                         }
                     }
                 }
@@ -1102,8 +1105,8 @@ public class NHK2010BewertungFormEditorPage
                                         return entity.neuWert();
                                     }
                                 } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
-                .setEnabled( false ).setLayoutData( four().top( lastLine ).create() ).create();
+                .setValidator( new MyNumberValidator( Double.class, 2 ) ).setEnabled( false )
+                .setLayoutData( four().top( lastLine ).create() ).create();
         pageSite.addFieldListener( neuWertListener = new IFormFieldListener() {
 
             private Double normalHerstellungsWert;
@@ -1131,8 +1134,10 @@ public class NHK2010BewertungFormEditorPage
                 if (neuwert != null && baukostenIndexWert != null) {
                     neuwert *= baukostenIndexWert;
                 }
-                pageSite.setFieldValue( getPropertyName( nameTemplate.neuWert() ), neuwert != null ? getFormatter( 2 )
-                        .format( neuwert ) : null );
+                if (neuwert != null) {
+                    pageSite.setFieldValue( getPropertyName( nameTemplate.neuWert() ),
+                            neuwert != null ? NumberFormatter.getFormatter( 2 ).format( neuwert ) : null );
+                }
             }
 
         } );
@@ -1155,8 +1160,8 @@ public class NHK2010BewertungFormEditorPage
                                         return entity.gesamtNutzungsDauer();
                                     }
                                 } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 3, 0 ) )
-                .setLayoutData( two().top( lastLine ).create() ).create();
+                .setValidator( new MyNumberValidator( Double.class ) ).setLayoutData( two().top( lastLine ).create() )
+                .create();
 
         pageSite.addFieldListener( gndListener = new IFormFieldListener() {
 
@@ -1165,17 +1170,24 @@ public class NHK2010BewertungFormEditorPage
                 if (ev.getEventCode() == VALUE_CHANGE) {
                     if (ev.getFieldName().equalsIgnoreCase( getPropertyName( nameTemplate.gebaeudeArtId() ) )) {
                         String id = (String)ev.getNewValue();
-                        StringBuffer text = new StringBuffer( "Gesamtnutzungsdauer" );
+                        StringBuffer tooltip = new StringBuffer( "Gesamtnutzungsdauer" );
                         if (id != null) {
                             NHK2010Gebaeudeart art = NHK2010GebaeudeartenProvider.instance().gebaeudeForId( id );
                             Integer bis = art.getGndBis();
                             Integer von = art.getGndVon();
                             if (von != null && bis != null) {
-                                text.append( ": " ).append( von ).append( " - " ).append( bis ).append( " Jahre" );
+                                tooltip.append( ": " ).append( von ).append( " - " ).append( bis ).append( " Jahre" );
                             }
 
+                            if (selectedComposite.get().gesamtNutzungsDauer().get() == null) {
+                                Integer gnd = 80;
+                                if (bis != null) {
+                                    gnd = bis;
+                                }
+                                pageSite.setFieldValue( getPropertyName( nameTemplate.gesamtNutzungsDauer() ), "" + gnd );
+                            }
                         }
-                        field.setToolTipText( text.toString() );
+                        field.setToolTipText( tooltip.toString() );
                     }
                 }
             }
@@ -1195,8 +1207,8 @@ public class NHK2010BewertungFormEditorPage
                                         return entity.tatsaechlichesBaujahr();
                                     }
                                 } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 4, 0 ) )
-                .setLayoutData( three().top( lastLine ).create() ).create();
+                .setValidator( new MyNumberValidator( Double.class ) ).setLayoutData( three().top( lastLine ).create() )
+                .create();
 
         Control bb = newFormField( "Baujahr bereinigt" )
                 .setToolTipText( "Bereinigtes Baujahr" )
@@ -1211,8 +1223,8 @@ public class NHK2010BewertungFormEditorPage
                                         return entity.bereinigtesBaujahr();
                                     }
                                 } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 4, 0 ) )
-                .setLayoutData( four().top( lastLine ).create() ).create();
+                .setValidator( new MyNumberValidator( Double.class ) ).setLayoutData( four().top( lastLine ).create() )
+                .create();
 
         pageSite.addFieldListener( gndbjListener = new IFormFieldListener() {
 
@@ -1293,8 +1305,8 @@ public class NHK2010BewertungFormEditorPage
                                         return entity.restNutzungsDauer();
                                     }
                                 } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 3, 0 ) )
-                .setEnabled( false ).setLayoutData( two().top( lastLine ).create() ).create();
+                .setValidator( new MyNumberValidator( Double.class ) ).setEnabled( false )
+                .setLayoutData( two().top( lastLine ).create() ).create();
 
         pageSite.addFieldListener( rndListener = new IFormFieldListener() {
 
@@ -1338,7 +1350,7 @@ public class NHK2010BewertungFormEditorPage
                     result = Math.max( gesamtNutzungsDauer - alter, 0 );
 
                     pageSite.setFieldValue( getPropertyName( nameTemplate.restNutzungsDauer() ),
-                            result != null ? getFormatter( 0 ).format( result ) : null );
+                            result != null ? getFormatter( 0, false ).format( result ) : null );
                 }
                 else {
                     // nicht das Jahr als RND setzen
@@ -1361,7 +1373,7 @@ public class NHK2010BewertungFormEditorPage
                                         return entity.altersWertMinderung();
                                     }
                                 } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( three().top( lastLine ).create() ).create();
 
         pageSite.addFieldListener( altersWertMinderungListener = new IFormFieldListener() {
@@ -1395,7 +1407,7 @@ public class NHK2010BewertungFormEditorPage
                             .doubleValue()) * 100;
                 }
                 pageSite.setFieldValue( getPropertyName( nameTemplate.altersWertMinderung() ),
-                        result != null ? getFormatter( 2 ).format( result ) : null );
+                        result != null ? NumberFormatter.getFormatter( 2 ).format( result ) : null );
             }
 
         } );
@@ -1413,7 +1425,7 @@ public class NHK2010BewertungFormEditorPage
                                         return entity.zeitwertRnd();
                                     }
                                 } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( four().top( lastLine ).create() ).create();
 
         pageSite.addFieldListener( zeitwertRndListener = new IFormFieldListener() {
@@ -1444,8 +1456,8 @@ public class NHK2010BewertungFormEditorPage
                 if (neuWert != null && altersWertMinderung != null) {
                     result = neuWert / 100 * (100 - altersWertMinderung);
                 }
-                pageSite.setFieldValue( getPropertyName( nameTemplate.zeitwertRnd() ),
-                        result != null ? getFormatter( 2 ).format( result ) : null );
+                pageSite.setFieldValue( getPropertyName( nameTemplate.zeitwertRnd() ), result != null ? NumberFormatter
+                        .getFormatter( 2 ).format( result ) : null );
             }
 
         } );
@@ -1467,8 +1479,8 @@ public class NHK2010BewertungFormEditorPage
                                 return entity.normalHerstellungsWert();
                             }
                         } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
-                .setEnabled( false ).setLayoutData( four().top( lastLine ).create() ).create();
+                .setValidator( new MyNumberValidator( Double.class, 2 ) ).setEnabled( false )
+                .setLayoutData( four().top( lastLine ).create() ).create();
 
         pageSite.addFieldListener( normalHerstellungsWertListener = new IFormFieldListener() {
 
@@ -1497,8 +1509,10 @@ public class NHK2010BewertungFormEditorPage
                 if (nhkKorrigiert != null && bruttoGrundFlaeche != null) {
                     result = nhkKorrigiert * bruttoGrundFlaeche;
                 }
-                pageSite.setFieldValue( getPropertyName( nameTemplate.normalHerstellungsWert() ),
-                        result != null ? getFormatter( 2 ).format( result ) : null );
+                if (result != null) {
+                    pageSite.setFieldValue( getPropertyName( nameTemplate.normalHerstellungsWert() ),
+                            result != null ? NumberFormatter.getFormatter( 2 ).format( result ) : null );
+                }
             }
 
         } );
@@ -1520,8 +1534,8 @@ public class NHK2010BewertungFormEditorPage
                                         return entity.gebaeudeZeitWert();
                                     }
                                 } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
-                .setEnabled( false ).setLayoutData( four().top( lastLine ).bottom( 100 ).create() ).create();
+                .setValidator( new MyNumberValidator( Double.class, 2 ) ).setEnabled( false )
+                .setLayoutData( four().top( lastLine ).bottom( 100 ).create() ).create();
 
         pageSite.addFieldListener( gebaeudeZeitWertListener = new IFormFieldListener() {
 
@@ -1582,8 +1596,10 @@ public class NHK2010BewertungFormEditorPage
                 if (result != null && zuschlagZeile4Betrag != null) {
                     result += zuschlagZeile4Betrag;
                 }
-                pageSite.setFieldValue( getPropertyName( nameTemplate.gebaeudeZeitWert() ),
-                        result != null ? getFormatter( 2 ).format( result ) : null );
+                if (result != null) {
+                    pageSite.setFieldValue( getPropertyName( nameTemplate.gebaeudeZeitWert() ),
+                            result != null ? NumberFormatter.getFormatter( 2 ).format( result ) : null );
+                }
             }
 
         } );

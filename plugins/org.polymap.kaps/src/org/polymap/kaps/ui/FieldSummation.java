@@ -15,8 +15,6 @@ package org.polymap.kaps.ui;
 import java.util.HashMap;
 import java.util.Map;
 
-import java.text.NumberFormat;
-
 import org.qi4j.api.property.Property;
 
 import org.polymap.rhei.field.FormFieldEvent;
@@ -100,19 +98,8 @@ public class FieldSummation
                 resultValue += termValue;
             }
         }
-        site.setFieldValue( result.qualifiedName().name(), getFormatter().format( resultValue ) );
+        site.setFieldValue( result.qualifiedName().name(), NumberFormatter.getFormatter( fractionDigits ).format( resultValue ) );
     }
 
 
-    /**
-     * 
-     * @return
-     */
-    private NumberFormat getFormatter() {
-        NumberFormat nf = NumberFormat.getInstance();
-        nf.setMaximumFractionDigits( fractionDigits );
-        nf.setMinimumFractionDigits( fractionDigits );
-        nf.setMinimumIntegerDigits( 1 );
-        return nf;
-    }
 }

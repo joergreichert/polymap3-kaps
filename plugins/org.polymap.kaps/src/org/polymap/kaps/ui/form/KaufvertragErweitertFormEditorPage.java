@@ -21,11 +21,9 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import org.polymap.core.runtime.Polymap;
 import org.polymap.core.runtime.event.EventManager;
 
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
-import org.polymap.rhei.field.NumberValidator;
 import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.form.FormEditor;
 import org.polymap.rhei.form.IFormEditorPageSite;
@@ -35,6 +33,7 @@ import org.polymap.kaps.model.data.VertragsdatenErweitertComposite;
 import org.polymap.kaps.ui.FieldCalculation;
 import org.polymap.kaps.ui.FieldListener;
 import org.polymap.kaps.ui.FieldSummation;
+import org.polymap.kaps.ui.MyNumberValidator;
 
 /**
  * Erweiterte Vertragsdaten, Vertragsanteil Kaufpreis mit Zu- Abschlag
@@ -87,7 +86,7 @@ public class KaufvertragErweitertFormEditorPage
         newLine = newFormField( "Vollpreis" ).setEnabled( false )
                 .setProperty( new PropertyAdapter( erweiterteVertragsdaten.basispreis() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( left().top( lastLine ).create() ).setParent( client ).create();
         site.addFieldListener( vollpreis = new FieldSummation( site, 2, erweiterteVertragsdaten.basispreis(),
                 kaufvertrag.vollpreis() ) );
@@ -95,7 +94,7 @@ public class KaufvertragErweitertFormEditorPage
         lastLine = newLine;
         newLine = newFormField( "Zuschlag" ).setProperty( new PropertyAdapter( erweiterteVertragsdaten.zuschlag() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( left().top( lastLine ).create() ).setParent( client ).create();
 
         newFormField( "Bemerkung Zuschlag" )
@@ -106,7 +105,7 @@ public class KaufvertragErweitertFormEditorPage
         lastLine = newLine;
         newLine = newFormField( "Abschlag" ).setProperty( new PropertyAdapter( erweiterteVertragsdaten.abschlag() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( left().top( lastLine ).create() ).setParent( client ).create();
 
         newFormField( "Bemerkung Abschlag" )
@@ -115,11 +114,10 @@ public class KaufvertragErweitertFormEditorPage
                 .create();
 
         lastLine = newLine;
-        // TODO Refresher
         newLine = newFormField( "bereinigter Vollpreis" )
                 .setProperty( new PropertyAdapter( erweiterteVertragsdaten.bereinigterVollpreis() ) )
                 .setEnabled( false ).setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( left().top( lastLine ).bottom( 100 ).create() ).setParent( client ).create();
 
         site.addFieldListener( refresher = new FieldCalculation( site, 2, erweiterteVertragsdaten

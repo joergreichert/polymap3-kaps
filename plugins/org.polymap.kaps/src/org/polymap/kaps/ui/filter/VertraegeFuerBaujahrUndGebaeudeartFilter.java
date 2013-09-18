@@ -25,12 +25,10 @@ import org.eclipse.swt.widgets.Composite;
 
 import org.polymap.core.model.Entity;
 import org.polymap.core.project.ILayer;
-import org.polymap.core.runtime.Polymap;
 
 import org.polymap.rhei.data.entityfeature.AbstractEntityFilter;
 import org.polymap.rhei.field.BetweenFormField;
 import org.polymap.rhei.field.BetweenValidator;
-import org.polymap.rhei.field.NumberValidator;
 import org.polymap.rhei.field.PicklistFormField;
 import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.filter.IFilterEditorSite;
@@ -40,6 +38,7 @@ import org.polymap.kaps.model.data.FlurstueckComposite;
 import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
 import org.polymap.kaps.model.data.GebaeudeArtComposite;
 import org.polymap.kaps.model.data.VertragComposite;
+import org.polymap.kaps.ui.MyNumberValidator;
 
 /**
  * 
@@ -71,8 +70,8 @@ public class VertraegeFuerBaujahrUndGebaeudeartFilter
                 typen ), null, "Gebäudeart" ) );
 
         site.addStandardLayout( site.newFormField( result, "date", Integer.class, new BetweenFormField(
-                new StringFormField(), new StringFormField() ), new BetweenValidator( new NumberValidator(
-                Integer.class, Polymap.getSessionLocale() ) ), "Baujahr" ) );
+                new StringFormField(), new StringFormField() ), new BetweenValidator( new MyNumberValidator(
+                Integer.class ) ), "Baujahr" ) );
 
         return result;
     }

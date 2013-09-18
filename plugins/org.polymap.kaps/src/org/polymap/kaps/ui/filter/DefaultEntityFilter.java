@@ -38,19 +38,18 @@ import org.polymap.core.model.EntityType;
 import org.polymap.core.model.EntityType.Property;
 import org.polymap.core.project.ILayer;
 import org.polymap.core.qi4j.QiModule;
-import org.polymap.core.runtime.Polymap;
 
 import org.polymap.rhei.data.entityfeature.AbstractEntityFilter;
 import org.polymap.rhei.field.BetweenFormField;
 import org.polymap.rhei.field.BetweenValidator;
 import org.polymap.rhei.field.DateTimeFormField;
-import org.polymap.rhei.field.NumberValidator;
 import org.polymap.rhei.field.SelectlistFormField;
 import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.filter.IFilterEditorSite;
 
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.Named;
+import org.polymap.kaps.ui.MyNumberValidator;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -125,12 +124,12 @@ public class DefaultEntityFilter
             else if (Integer.class.isAssignableFrom( propertyType )) {
                 site.addStandardLayout( site.newFormField( result, property.getName(), Integer.class,
                         new BetweenFormField( new StringFormField(), new StringFormField() ), new BetweenValidator(
-                                new NumberValidator( Integer.class, Polymap.getSessionLocale() ) ), label ) );
+                                new MyNumberValidator( Integer.class ) ), label ) );
             }
             else if (Double.class.isAssignableFrom( propertyType )) {
                 site.addStandardLayout( site.newFormField( result, property.getName(), Double.class,
                         new BetweenFormField( new StringFormField(), new StringFormField() ), new BetweenValidator(
-                                new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) ), label ) );
+                                new MyNumberValidator( Double.class, 2 ) ), label ) );
             }
             else if (Date.class.isAssignableFrom( propertyType )) {
                 site.addStandardLayout( site.newFormField( result, property.getName(), Date.class,

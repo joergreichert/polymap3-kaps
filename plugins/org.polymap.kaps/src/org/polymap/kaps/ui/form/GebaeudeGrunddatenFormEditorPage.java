@@ -29,12 +29,9 @@ import org.eclipse.jface.action.Action;
 
 import org.eclipse.ui.forms.widgets.Section;
 
-import org.polymap.core.runtime.Polymap;
-
 import org.polymap.rhei.data.entityfeature.AssociationAdapter;
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
 import org.polymap.rhei.field.IFormFieldLabel;
-import org.polymap.rhei.field.NumberValidator;
 import org.polymap.rhei.field.PicklistFormField;
 import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.field.TextFormField;
@@ -47,6 +44,8 @@ import org.polymap.kaps.model.data.WohnungComposite;
 import org.polymap.kaps.ui.ActionButton;
 import org.polymap.kaps.ui.BooleanFormField;
 import org.polymap.kaps.ui.KapsDefaultFormEditorPage;
+import org.polymap.kaps.ui.MyNumberValidator;
+import org.polymap.kaps.ui.NotNullMyNumberValidator;
 import org.polymap.kaps.ui.SimplePickList;
 
 /**
@@ -105,14 +104,14 @@ public class GebaeudeGrunddatenFormEditorPage
         newLine = newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Objektnummer" )
                 .setProperty( new PropertyAdapter( gebaeude.objektNummer() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NotNullNumberValidator( Integer.class, Polymap.getSessionLocale() ) )
+                .setValidator( new NotNullMyNumberValidator( Integer.class ) )
                 .setEnabled( gebaeude.objektNummer().get() == null )
                 .setLayoutData( left().left( 0 ).right( 15 ).create() ).create();
 
         newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Fortführung" )
                 .setProperty( new PropertyAdapter( gebaeude.objektFortfuehrung() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NotNullNumberValidator( Integer.class, Polymap.getSessionLocale() ) )
+                .setValidator( new NotNullMyNumberValidator( Integer.class ) )
                 .setEnabled( gebaeude.objektFortfuehrung().get() == null )
                 .setLayoutData( left().left( 16 ).right( 31 ).create() ).create();
 
@@ -120,14 +119,14 @@ public class GebaeudeGrunddatenFormEditorPage
         newLine = newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Gebäudenummer" )
                 .setProperty( new PropertyAdapter( gebaeude.gebaeudeNummer() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NotNullNumberValidator( Integer.class, Polymap.getSessionLocale() ) )
+                .setValidator( new NotNullMyNumberValidator( Integer.class ) )
                 .setEnabled( gebaeude.gebaeudeNummer().get() == null )
                 .setLayoutData( left().left( 34 ).right( 49 ).create() ).create();
 
         newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Fortführung" )
                 .setProperty( new PropertyAdapter( gebaeude.gebaeudeFortfuehrung() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NotNullNumberValidator( Integer.class, Polymap.getSessionLocale() ) )
+                .setValidator( new NotNullMyNumberValidator( Integer.class ) )
                 .setEnabled( gebaeude.gebaeudeFortfuehrung().get() == null )
                 .setLayoutData( left().left( 50 ).right( 65 ).create() ).create();
 
@@ -142,25 +141,25 @@ public class GebaeudeGrunddatenFormEditorPage
                 .setProperty( new PropertyAdapter( gebaeude.baujahrTatsaechlich() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setLayoutData( left().top( lastLine ).create() )
-                .setValidator( new NumberValidator( Integer.class, locale ) ).create();
+                .setValidator( new MyNumberValidator( Integer.class ) ).create();
 
         newFormField( "Baujahr bereinigt" ).setToolTipText( "bereinigtes Baujahr" ).setParent( parent )
                 .setProperty( new PropertyAdapter( gebaeude.baujahr() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setLayoutData( right().top( lastLine ).create() )
-                .setValidator( new NumberValidator( Integer.class, locale ) ).create();
+                .setValidator( new MyNumberValidator( Integer.class ) ).create();
 
         lastLine = newLine;
         newLine = newFormField( "Lageklasse" ).setParent( parent )
                 .setProperty( new PropertyAdapter( gebaeude.lageklasse() ) ).setField( new StringFormField() )
                 .setLayoutData( left().top( lastLine ).create() )
-                .setValidator( new NumberValidator( Double.class, locale, 12, 0, 0, 0 ) ).create();
+                .setValidator( new MyNumberValidator( Double.class ) ).create();
 
         newFormField( "Wohn-/Gewerbeeinheiten" ).setParent( parent )
                 .setProperty( new PropertyAdapter( gebaeude.wohnEinheiten() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setLayoutData( right().top( lastLine ).create() )
-                .setValidator( new NumberValidator( Integer.class, locale ) ).create();
+                .setValidator( new MyNumberValidator( Integer.class ) ).create();
 
         lastLine = newLine;
         newLine = newFormField( "Aufzug" )

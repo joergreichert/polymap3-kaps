@@ -31,7 +31,6 @@ import org.eclipse.swt.widgets.Control;
 import org.polymap.core.data.ui.featuretable.DefaultFeatureTableColumn;
 import org.polymap.core.data.ui.featuretable.FeatureTableViewer;
 import org.polymap.core.model.EntityType;
-import org.polymap.core.runtime.Polymap;
 
 import org.polymap.rhei.data.entityfeature.PropertyDescriptorAdapter;
 import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter;
@@ -39,7 +38,6 @@ import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter.Association
 import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter.PropertyCallback;
 import org.polymap.rhei.field.FormFieldEvent;
 import org.polymap.rhei.field.IFormFieldListener;
-import org.polymap.rhei.field.NumberValidator;
 import org.polymap.rhei.field.PicklistFormField;
 import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.form.IFormEditorPageSite;
@@ -57,6 +55,7 @@ import org.polymap.kaps.model.data.StrasseComposite;
 import org.polymap.kaps.ui.ActionButton;
 import org.polymap.kaps.ui.BooleanFormField;
 import org.polymap.kaps.ui.KapsDefaultFormEditorPageWithFeatureTable;
+import org.polymap.kaps.ui.MyNumberValidator;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -152,7 +151,7 @@ public class GebaeudeFlurstueckeFormEditorPage
 //                                return entity.gebaeudeNummer();
 //                            }
 //                        } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-//                .setValidator( new NumberValidator( Integer.class, Polymap.getSessionLocale() ) )
+//                .setValidator( new MyNumberValidator( Integer.class ) )
 //                .setLayoutData( left().top( lastLine ).create() ).create();
 //
 //        newFormField( "Fortführung" )
@@ -164,7 +163,7 @@ public class GebaeudeFlurstueckeFormEditorPage
 //                                return entity.gebaeudeFortfuehrung();
 //                            }
 //                        } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-//                .setValidator( new NumberValidator( Integer.class, Polymap.getSessionLocale() ) )
+//                .setValidator( new MyNumberValidator( Integer.class ) )
 //                .setLayoutData( right().top( lastLine ).create() ).create();
 
         lastLine = newLine;
@@ -204,7 +203,7 @@ public class GebaeudeFlurstueckeFormEditorPage
                             }
                         } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
                 .setLayoutData( left().right( 30 ).top( lastLine ).create() )
-                .setValidator( new NumberValidator( Integer.class, locale ) ).create();
+                .setValidator( new MyNumberValidator( Integer.class ) ).create();
 
         newFormField( "/" )
                 .setParent( parent )
@@ -409,7 +408,7 @@ public class GebaeudeFlurstueckeFormEditorPage
                                 return entity.flaeche();
                             }
                         } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( left().top( lastLine ).create() ).create();
 
         newFormField( "Erbbaurecht" )

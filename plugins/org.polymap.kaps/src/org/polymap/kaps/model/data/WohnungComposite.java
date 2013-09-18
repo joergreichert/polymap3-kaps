@@ -209,7 +209,7 @@ public interface WohnungComposite
 
     // BEWSCHL - String
     @Optional
-    Association<AusstattungComposite> ausstattung();
+    Association<AusstattungComposite> ausstattungSchluessel();
 
 
     // BEWPUNKTE - Double

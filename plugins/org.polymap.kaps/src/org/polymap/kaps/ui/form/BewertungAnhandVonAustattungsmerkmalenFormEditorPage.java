@@ -15,8 +15,6 @@ package org.polymap.kaps.ui.form;
 import java.util.HashMap;
 import java.util.Map;
 
-import java.text.NumberFormat;
-
 import org.geotools.data.FeatureStore;
 import org.opengis.feature.Feature;
 
@@ -51,6 +49,7 @@ import org.polymap.kaps.ui.ActionButton;
 import org.polymap.kaps.ui.FieldSummation;
 import org.polymap.kaps.ui.InterEditorPropertyChangeEvent;
 import org.polymap.kaps.ui.KapsDefaultFormEditorPage;
+import org.polymap.kaps.ui.NumberFormatter;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -116,17 +115,8 @@ public class BewertungAnhandVonAustattungsmerkmalenFormEditorPage
                     result += terms.get( fieldName );
                 }
             }
-            site.setFieldValue( this.result.qualifiedName().name(), getFormatter()
+            site.setFieldValue( this.result.qualifiedName().name(), NumberFormatter.getFormatter(0)
                     .format( Math.min( maxValue, result ) ) );
-        }
-
-
-        private NumberFormat getFormatter() {
-            NumberFormat nf = NumberFormat.getInstance();
-            nf.setMaximumFractionDigits( 0 );
-            nf.setMinimumFractionDigits( 0 );
-            nf.setMinimumIntegerDigits( 1 );
-            return nf;
         }
     }
 

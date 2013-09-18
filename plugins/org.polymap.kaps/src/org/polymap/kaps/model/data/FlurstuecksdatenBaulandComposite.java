@@ -334,12 +334,12 @@ public interface FlurstuecksdatenBaulandComposite
     @ImportColumn("FAKTOR")
     Property<Double> faktorBereinigterKaufpreis();
 
-
-    // FAKTOR2 DOUBLE,
-    // TODO default 1
-    @Optional
-    @ImportColumn("FAKTOR2")
-    Property<Double> faktorOhneStrassenplatz();
+//
+//    // FAKTOR2 DOUBLE,
+//    // TODO default 1
+//    @Optional
+//    @ImportColumn("FAKTOR2")
+//    Property<Double> faktorOhneStrassenplatz();
 
 
     // KPANTGEB DOUBLE,

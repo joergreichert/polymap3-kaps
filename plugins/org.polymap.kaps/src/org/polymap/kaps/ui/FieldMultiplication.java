@@ -12,8 +12,6 @@
  */
 package org.polymap.kaps.ui;
 
-import java.text.NumberFormat;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -63,7 +61,8 @@ public class FieldMultiplication
         }
         String fieldName = ev.getFieldName();
         if (fieldName.equals( factor1.qualifiedName().name() )) {
-            Double newValue = (Double)ev.getNewValue(); //explizitely deleting this value
+            Double newValue = (Double)ev.getNewValue(); // explizitely deleting this
+                                                        // value
             if (newValue == null) {
                 newValue = Double.valueOf( 0.0d );
             }
@@ -71,7 +70,8 @@ public class FieldMultiplication
             refreshResult();
         }
         else if (fieldName.equals( factor2.qualifiedName().name() )) {
-            Double newValue = (Double)ev.getNewValue(); //explizitely deleting this value
+            Double newValue = (Double)ev.getNewValue(); // explizitely deleting this
+                                                        // value
             if (newValue == null) {
                 newValue = Double.valueOf( 0.0d );
             }
@@ -86,19 +86,7 @@ public class FieldMultiplication
         Double f2 = factor2Value == null ? factor2.get() : factor2Value;
 
         Double resultValue = (f1 == null ? 0 : f1) * (f2 == null ? 0 : f2);
-        site.setFieldValue( result.qualifiedName().name(), getFormatter().format( resultValue ) );
-    }
-
-
-    /**
-     * 
-     * @return
-     */
-    private NumberFormat getFormatter() {
-        NumberFormat nf = NumberFormat.getInstance();
-        nf.setMaximumFractionDigits( fractionDigits );
-        nf.setMinimumFractionDigits( fractionDigits );
-        nf.setMinimumIntegerDigits( 1 );
-        return nf;
+        site.setFieldValue( result.qualifiedName().name(),
+                NumberFormatter.getFormatter( fractionDigits ).format( resultValue ) );
     }
 }

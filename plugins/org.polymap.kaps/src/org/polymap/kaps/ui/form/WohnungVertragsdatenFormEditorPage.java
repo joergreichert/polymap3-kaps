@@ -30,7 +30,6 @@ import org.eclipse.jface.action.Action;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import org.polymap.core.runtime.Polymap;
 import org.polymap.core.runtime.event.EventFilter;
 import org.polymap.core.runtime.event.EventHandler;
 import org.polymap.core.runtime.event.EventManager;
@@ -39,7 +38,6 @@ import org.polymap.rhei.data.entityfeature.AssociationAdapter;
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
 import org.polymap.rhei.field.CheckboxFormField;
 import org.polymap.rhei.field.IFormFieldLabel;
-import org.polymap.rhei.field.NumberValidator;
 import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.field.TextFormField;
 import org.polymap.rhei.form.FormEditor;
@@ -54,6 +52,8 @@ import org.polymap.kaps.ui.ActionButton;
 import org.polymap.kaps.ui.BooleanFormField;
 import org.polymap.kaps.ui.FieldCalculation;
 import org.polymap.kaps.ui.FieldListener;
+import org.polymap.kaps.ui.MyNumberValidator;
+import org.polymap.kaps.ui.NumberFormatter;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -107,7 +107,7 @@ public class WohnungVertragsdatenFormEditorPage
                     || ev.getPropertyName().equals( wohnung.baujahr().qualifiedName().name() )) {
                 // System.out.println( ev );
                 pageSite.setFieldValue( ev.getPropertyName(),
-                        ev.getNewValue() != null ? getFormatter( 0 ).format( ev.getNewValue() ) : null );
+                        ev.getNewValue() != null ? getFormatter( 0, false ).format( ev.getNewValue() ) : null );
                 System.out.println( ev );
             }
         }
@@ -172,7 +172,7 @@ public class WohnungVertragsdatenFormEditorPage
                 .setLayoutData( left().left( THREE ).right( FOUR ).top( lastLine ).create() ).create();
         newFormField( IFormFieldLabel.NO_LABEL ).setProperty( new PropertyAdapter( wohnung.anzahlGaragen() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Integer.class, Polymap.getSessionLocale() ) )
+                .setValidator( new MyNumberValidator( Integer.class ) )
                 .setLayoutData( left().left( FOUR ).right( 100 ).top( lastLine ).create() ).create();
 
         lastLine = newLine;
@@ -187,7 +187,7 @@ public class WohnungVertragsdatenFormEditorPage
                 .setLayoutData( left().left( THREE ).right( FOUR ).top( lastLine ).create() ).create();
         newFormField( IFormFieldLabel.NO_LABEL ).setProperty( new PropertyAdapter( wohnung.anzahlStellplatz() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Integer.class, Polymap.getSessionLocale() ) )
+                .setValidator( new MyNumberValidator( Integer.class ) )
                 .setLayoutData( left().left( FOUR ).right( 100 ).top( lastLine ).create() ).create();
 
         lastLine = newLine;
@@ -202,7 +202,7 @@ public class WohnungVertragsdatenFormEditorPage
                 .setLayoutData( left().left( THREE ).right( FOUR ).top( lastLine ).create() ).create();
         newFormField( IFormFieldLabel.NO_LABEL ).setProperty( new PropertyAdapter( wohnung.anzahlAnderes() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Integer.class, Polymap.getSessionLocale() ) )
+                .setValidator( new MyNumberValidator( Integer.class ) )
                 .setLayoutData( left().left( FOUR ).right( 100 ).top( lastLine ).create() ).create();
 
         lastLine = newLine;
@@ -295,7 +295,7 @@ public class WohnungVertragsdatenFormEditorPage
             }
         }
         if (kaufpreis != null && !kaufpreis.equals( wohnung.kaufpreis().get() )) {
-            pageSite.setFieldValue( wohnung.kaufpreis().qualifiedName().name(), getFormatter( 2 ).format( kaufpreis ) );
+            pageSite.setFieldValue( wohnung.kaufpreis().qualifiedName().name(), NumberFormatter.getFormatter( 2 ).format( kaufpreis ) );
         }
 
         fieldListener.flush( pageSite );

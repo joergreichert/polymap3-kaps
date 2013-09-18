@@ -28,7 +28,7 @@
 //import org.polymap.rhei.data.entityfeature.PropertyAdapter;
 //import org.polymap.rhei.field.CheckboxFormField;
 //import org.polymap.rhei.field.DateTimeFormField;
-//import org.polymap.rhei.field.NumberValidator;
+//import org.polymap.rhei.field.MyNumberValidator;
 //import org.polymap.rhei.field.PicklistFormField;
 //import org.polymap.rhei.field.StringFormField;
 //import org.polymap.rhei.form.IFormEditorPageSite;
@@ -68,14 +68,14 @@
 //        newLine = newFormField( "Vollpreis" ).setEnabled( false )
 //                .setProperty( new PropertyAdapter( vb.vollpreis() ) )
 //                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-//                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale() ) )
+//                .setValidator( new MyNumberValidator( Double.class ) )
 //                .setLayoutData( left().left( 25 ).top( lastLine ).create() ).setParent( parent )
 //                .create();
 //
 //        lastLine = newLine;
 //        newLine = newFormField( "Zuschlag" ).setProperty( new PropertyAdapter( vb.zuschlag() ) )
 //                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-//                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale() ) )
+//                .setValidator( new MyNumberValidator( Double.class ) )
 //                .setLayoutData( left().left( 25 ).top( lastLine ).create() ).setParent( parent )
 //                .create();
 //
@@ -87,7 +87,7 @@
 //        lastLine = newLine;
 //        newLine = newFormField( "Abschlag" ).setProperty( new PropertyAdapter( vb.abschlag() ) )
 //                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-//                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale() ) )
+//                .setValidator( new MyNumberValidator( Double.class ) )
 //                .setLayoutData( left().left( 25 ).top( lastLine ).create() ).setParent( parent )
 //                .create();
 //
@@ -101,7 +101,7 @@
 //        newLine = newFormField( "bereinigter Vollpreis" )
 //                .setProperty( new PropertyAdapter( vb.bereinigterVollpreis() ) ).setEnabled( false )
 //                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-//                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale() ) )
+//                .setValidator( new MyNumberValidator( Double.class ) )
 //                .setLayoutData( left().left( 25 ).top( lastLine ).create() ).setParent( parent )
 //                .create();
 //
@@ -109,12 +109,12 @@
 //        lastLine = newLine;
 //        newLine = newFormField( "Lageklasse" ).setProperty( new PropertyAdapter( vb.lageklasse() ) )
 //                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-//                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale() ) )
+//                .setValidator( new MyNumberValidator( Double.class ) )
 //                .setLayoutData( left().right( 33 ).top( lastLine ).create() ).setParent( parent )
 //                .create();
 //        newFormField( "zul. GFZ" ).setProperty( new PropertyAdapter( vb.gfz() ) )
 //                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-//                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale() ) )
+//                .setValidator( new MyNumberValidator( Double.class ) )
 //                .setLayoutData( left().left( 33 ).right( 66 ).top( lastLine ).create() )
 //                .setParent( parent ).create();
 //        newFormField( "zul. Vollgeschosse" )
@@ -151,12 +151,12 @@
 //        newLine = newFormField( "Baujahr tatsächlich" )
 //                .setProperty( new PropertyAdapter( vb.baujahr() ) )
 //                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-//                .setValidator( new NumberValidator( Integer.class, Polymap.getSessionLocale() ) )
+//                .setValidator( new MyNumberValidator( Integer.class ) )
 //                .setLayoutData( left().top( lastLine ).create() ).setParent( parent ).create();
 //        newFormField( "Baujahr bereinigt" )
 //                .setProperty( new PropertyAdapter( vb.baujahrBereinigt() ) )
 //                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-//                .setValidator( new NumberValidator( Integer.class, Polymap.getSessionLocale() ) )
+//                .setValidator( new MyNumberValidator( Integer.class ) )
 //                .setLayoutData( right().top( lastLine ).create() ).setParent( parent ).create();
 //
 //        lastLine = newLine;
@@ -191,7 +191,7 @@
 //        newLine = newFormField( "Richtwert" ).setEnabled( false )
 //                .setProperty( new PropertyAdapter( vb.richtwert() ) )
 //                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-//                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale() ) )
+//                .setValidator( new MyNumberValidator( Double.class ) )
 //                .setLayoutData( left().left( 25 ).top( lastLine ).create() ).setParent( parent )
 //                .create();
 //
@@ -199,7 +199,7 @@
 //        newLine = newFormField( "GFZ-berein. Bodenpreis" ).setLabel( "GFZ bereinigter Bodenpreis" )
 //                .setEnabled( false )
 //                .setProperty( new PropertyAdapter( vb.gfzBereinigterBodenpreis() ) )
-//                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale() ) )
+//                .setValidator( new MyNumberValidator( Double.class ) )
 //                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
 //                .setLayoutData( left().left( 25 ).top( lastLine ).create() ).setParent( parent )
 //                .create();
@@ -219,7 +219,7 @@
 //                .setLabel( "Richtwertbereinigung in €/m² (+/-)" )
 //                .setProperty( new PropertyAdapter( vb.richtwertBereinigung() ) )
 //                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-//                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale() ) )
+//                .setValidator( new MyNumberValidator( Double.class ) )
 //                .setLayoutData( left().left( 25 ).top( lastLine ).create() ).setParent( parent )
 //                .create();
 //        newFormField( "Bemerkung" ).setLabel( "Bemerkung zur Richwertbereinigung" )
@@ -231,14 +231,14 @@
 //        newLine = newFormField( "Richtwertzuschlag in %" )
 //                .setProperty( new PropertyAdapter( vb.richtwertZuschlagProzent() ) )
 //                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-//                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale() ) )
+//                .setValidator( new MyNumberValidator( Double.class ) )
 //                .setLayoutData( left().right( 25 ).top( lastLine ).create() ).setParent( parent )
 //                .create();
 //        // TODO refresher
 //        newLine = newFormField( "in €/m²" ).setEnabled( false )
 //                .setProperty( new PropertyAdapter( vb.richtwertZuschlagBerechnet() ) )
 //                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-//                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale() ) )
+//                .setValidator( new MyNumberValidator( Double.class ) )
 //                .setLayoutData( left().left( 25 ).top( lastLine ).create() ).setParent( parent )
 //                .create();
 //        newFormField( "Bemerkung" ).setLabel( "Bemerkung zum Richtwertzuschlag" )
@@ -250,14 +250,14 @@
 //        newLine = newFormField( "Richtwertabschlag in %" )
 //                .setProperty( new PropertyAdapter( vb.richtwertAbschlagProzent() ) )
 //                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-//                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale() ) )
+//                .setValidator( new MyNumberValidator( Double.class ) )
 //                .setLayoutData( left().right( 25 ).top( lastLine ).create() ).setParent( parent )
 //                .create();
 //        // TODO refresher
 //        newLine = newFormField( "in €/m²" ).setEnabled( false )
 //                .setProperty( new PropertyAdapter( vb.richtwertAbschlagBerechnet() ) )
 //                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-//                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale() ) )
+//                .setValidator( new MyNumberValidator( Double.class ) )
 //                .setLayoutData( left().left( 25 ).top( lastLine ).create() ).setParent( parent )
 //                .create();
 //        newFormField( "Bemerkung" ).setLabel( "Bemerkung zum Richtwertabschlag" )
@@ -270,7 +270,7 @@
 //                .setLabel( "Erschließungskosten in €/m² anrechenbarer Grundstücksgröße" )
 //                .setProperty( new PropertyAdapter( vb.erschliessungsKosten() ) )
 //                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-//                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale() ) )
+//                .setValidator( new MyNumberValidator( Double.class ) )
 //                .setLayoutData( left().left( 25 ).top( lastLine ).create() ).setParent( parent )
 //                .create();
 //
@@ -279,7 +279,7 @@
 //        newLine = newFormField( "Bodenpreis unbebaut in €/m²" ).setEnabled( false )
 //                .setProperty( new PropertyAdapter( vb.bodenpreisUnbebaut() ) )
 //                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-//                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale() ) )
+//                .setValidator( new MyNumberValidator( Double.class ) )
 //                .setLayoutData( left().left( 25 ).top( lastLine ).create() ).setParent( parent )
 //                .create();
 //
@@ -287,14 +287,14 @@
 //        newLine = newFormField( "Beb.-abschlag in %" )
 //                .setProperty( new PropertyAdapter( vb.bebAbschlag() ) )
 //                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-//                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale() ) )
+//                .setValidator( new MyNumberValidator( Double.class ) )
 //                .setLayoutData( left().right( 25 ).top( lastLine ).create() ).setParent( parent )
 //                .create();
 //        // TODO refresher
 //        newLine = newFormField( "in €/m²" ).setEnabled( false )
 //                .setProperty( new PropertyAdapter( vb.bebAbschlagBerechnet() ) )
 //                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-//                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale() ) )
+//                .setValidator( new MyNumberValidator( Double.class ) )
 //                .setLayoutData( left().left( 25 ).top( lastLine ).create() ).setParent( parent )
 //                .create();
 //
@@ -303,7 +303,7 @@
 //        newLine = newFormField( "Bodenpreis in €/m²" ).setEnabled( false )
 //                .setProperty( new PropertyAdapter( vb.bodenpreisBebaut() ) )
 //                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-//                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale() ) )
+//                .setValidator( new MyNumberValidator( Double.class ) )
 //                .setLayoutData( left().left( 25 ).top( lastLine ).create() ).setParent( parent )
 //                .create();
 //

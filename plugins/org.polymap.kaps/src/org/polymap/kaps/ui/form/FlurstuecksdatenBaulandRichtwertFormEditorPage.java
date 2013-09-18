@@ -30,6 +30,7 @@ import org.polymap.core.project.ui.util.SimpleFormData;
 import org.polymap.core.runtime.event.EventManager;
 
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
+import org.polymap.rhei.field.CheckboxFormField;
 import org.polymap.rhei.field.IFormFieldLabel;
 import org.polymap.rhei.field.IFormFieldListener;
 import org.polymap.rhei.field.TextFormField;
@@ -292,7 +293,7 @@ public class FlurstuecksdatenBaulandRichtwertFormEditorPage
 
         lastLine = newLine;
         createLabel( client, "zur Richtwertermittlung geeignet?", one().right( FOUR ).top( lastLine, 12 ), SWT.RIGHT );
-        newLine = newFormField( IFormFieldLabel.NO_LABEL ).setEnabled( true )
+        newLine = newFormField( IFormFieldLabel.NO_LABEL ).setEnabled( true ).setField( new CheckboxFormField() )
                 .setToolTipText( "zur Richtwertermittlung geeignet?" )
                 .setProperty( new PropertyAdapter( vb.zurRichtwertermittlungGeeignet() ) )
                 .setLayoutData( four().top( lastLine ).create() ).setParent( client ).create();
@@ -300,7 +301,7 @@ public class FlurstuecksdatenBaulandRichtwertFormEditorPage
         lastLine = newLine;
         createLabel( client, "für Statistik Bodenwertaufteilung nicht geeignet?", one().right( FOUR )
                 .top( lastLine, 12 ), SWT.RIGHT );
-        newLine = newFormField( IFormFieldLabel.NO_LABEL ).setEnabled( true )
+        newLine = newFormField( IFormFieldLabel.NO_LABEL ).setEnabled( true ).setField( new CheckboxFormField() )
                 .setToolTipText( "für Statistik Bodenwertaufteilung nicht geeignet?" )
                 .setProperty( new PropertyAdapter( vb.fuerBodenwertaufteilungNichtGeeignet() ) )
                 .setLayoutData( four().top( lastLine ).create() ).setParent( client ).create();

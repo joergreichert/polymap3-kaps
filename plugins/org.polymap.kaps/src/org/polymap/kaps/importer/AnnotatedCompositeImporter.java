@@ -12,14 +12,15 @@
  */
 package org.polymap.kaps.importer;
 
-import java.lang.reflect.Method;
-import java.sql.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import java.lang.reflect.Method;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.qi4j.api.composite.Composite;
 import org.qi4j.api.property.Property;
 

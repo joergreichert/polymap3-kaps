@@ -31,14 +31,12 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.polymap.core.project.ui.util.SimpleFormData;
-import org.polymap.core.runtime.Polymap;
 
 import org.polymap.rhei.data.entityfeature.AssociationAdapter;
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
 import org.polymap.rhei.field.CheckboxFormField;
 import org.polymap.rhei.field.FormFieldEvent;
 import org.polymap.rhei.field.IFormFieldListener;
-import org.polymap.rhei.field.NumberValidator;
 import org.polymap.rhei.field.PicklistFormField;
 import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.field.TextFormField;
@@ -56,6 +54,8 @@ import org.polymap.kaps.model.data.RichtwertzoneZeitraumComposite;
 import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.ui.ActionButton;
 import org.polymap.kaps.ui.FieldCalculation;
+import org.polymap.kaps.ui.MyNumberValidator;
+import org.polymap.kaps.ui.NumberFormatter;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -116,11 +116,11 @@ public class FlurstuecksdatenBaulandGrunddatenFormEditorPage
 
         newLine = newFormField( "Lageklasse" ).setProperty( new PropertyAdapter( vb.lageklasse() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class,  2 ) )
                 .setLayoutData( left().right( 33 ).top( lastLine ).create() ).setParent( client ).create();
         newFormField( "zul. GFZ" ).setProperty( new PropertyAdapter( vb.gfz() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class,  2 ) )
                 .setLayoutData( left().left( 33 ).right( 66 ).top( lastLine ).create() ).setParent( client ).create();
         newFormField( "zul. Vollgeschosse" ).setProperty( new PropertyAdapter( vb.zulaessigeVollgeschosse() ) )
                 .setField( new StringFormField() ).setLayoutData( right().left( 66 ).top( lastLine ).create() )
@@ -146,11 +146,11 @@ public class FlurstuecksdatenBaulandGrunddatenFormEditorPage
         lastLine = newLine;
         newLine = newFormField( "Baujahr tatsächlich" ).setProperty( new PropertyAdapter( vb.baujahr() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Integer.class, Polymap.getSessionLocale() ) )
+                .setValidator( new MyNumberValidator( Integer.class ) )
                 .setLayoutData( left().top( lastLine ).create() ).setParent( client ).create();
         newFormField( "Baujahr bereinigt" ).setProperty( new PropertyAdapter( vb.baujahrBereinigt() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Integer.class, Polymap.getSessionLocale() ) )
+                .setValidator( new MyNumberValidator( Integer.class ) )
                 .setLayoutData( right().top( lastLine ).create() ).setParent( client ).create();
 
         lastLine = newLine;
@@ -195,7 +195,7 @@ public class FlurstuecksdatenBaulandGrunddatenFormEditorPage
                         && ev.getFieldName().equals( vb.richtwertZoneG().qualifiedName().name() )) {
                     RichtwertzoneZeitraumComposite rzc = (RichtwertzoneZeitraumComposite)ev.getNewValue();
                     pageSite.setFieldValue( vb.richtwert().qualifiedName().name(), rzc != null
-                            && rzc.euroQm().get() != null ? getFormatter( 2 ).format( rzc.euroQm().get() ) : "0" );
+                            && rzc.euroQm().get() != null ? NumberFormatter.getFormatter( 2 ).format( rzc.euroQm().get() ) : "0" );
                     pageSite.setFieldValue( vb.erschliessungsBeitrag().qualifiedName().name(), rzc != null ? rzc
                             .erschliessungsBeitrag().get() : null );
                 }
@@ -208,13 +208,13 @@ public class FlurstuecksdatenBaulandGrunddatenFormEditorPage
         lastLine = newLine;
         newLine = newFormField( "Richtwert" ).setEnabled( false ).setProperty( new PropertyAdapter( vb.richtwert() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class,  2 ) )
                 .setLayoutData( left().left( 25 ).top( lastLine ).create() ).setParent( client ).create();
 
         lastLine = newLine;
         newLine = newFormField( "GFZ-bereinigt" ).setToolTipText( "GFZ bereinigter Bodenpreis" ).setEnabled( false )
                 .setProperty( new PropertyAdapter( vb.gfzBereinigterBodenpreis() ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class,  2 ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setLayoutData( left().left( 25 ).top( lastLine ).create() ).setParent( client ).create();
         newFormField( "verwenden?" ).setToolTipText( "GFZ bereinigten Bodenpreis verwenden?" )
@@ -229,7 +229,7 @@ public class FlurstuecksdatenBaulandGrunddatenFormEditorPage
         newLine = newFormField( "Bereinigung in €/m²" ).setToolTipText( "Richtwertbereinigung in €/m² (+/-)" )
                 .setProperty( new PropertyAdapter( vb.richtwertBereinigung() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class,  2 ) )
                 .setLayoutData( left().left( 25 ).top( lastLine ).create() ).setParent( client ).create();
         newFormField( "Bemerkung" ).setToolTipText( "Bemerkung zur Richwertbereinigung" )
                 .setProperty( new PropertyAdapter( vb.richtwertBereinigungBemerkung() ) )
@@ -240,12 +240,12 @@ public class FlurstuecksdatenBaulandGrunddatenFormEditorPage
         newLine = newFormField( "Zuschlag in %" ).setToolTipText( "Richtwertzuschlag in %" )
                 .setProperty( new PropertyAdapter( vb.richtwertZuschlagProzent() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class,  2 ) )
                 .setLayoutData( left().right( 25 ).top( lastLine ).create() ).setParent( client ).create();
         newLine = newFormField( "in €/m²" ).setEnabled( false )
                 .setProperty( new PropertyAdapter( vb.richtwertZuschlagBerechnet() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class,  2 ) )
                 .setLayoutData( left().left( 25 ).top( lastLine ).create() ).setParent( client ).create();
         site.addFieldListener( riwezuschlag = new FieldCalculation( site, 2, vb.richtwertZuschlagBerechnet(), vb
                 .richtwert(), vb.richtwertBereinigung(), vb.richtwertZuschlagProzent() ) {
@@ -275,12 +275,12 @@ public class FlurstuecksdatenBaulandGrunddatenFormEditorPage
         newLine = newFormField( "Abschlag in %" ).setToolTipText( "Richtwertabschlag in %" )
                 .setProperty( new PropertyAdapter( vb.richtwertAbschlagProzent() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class,  2 ) )
                 .setLayoutData( left().right( 25 ).top( lastLine ).create() ).setParent( client ).create();
         newLine = newFormField( "in €/m²" ).setEnabled( false )
                 .setProperty( new PropertyAdapter( vb.richtwertAbschlagBerechnet() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class,  2 ) )
                 .setLayoutData( left().left( 25 ).top( lastLine ).create() ).setParent( client ).create();
         pageSite.addFieldListener( riweabschlag = new FieldCalculation( site, 2, vb.richtwertAbschlagBerechnet(), vb
                 .richtwert(), vb.richtwertBereinigung(), vb.richtwertAbschlagProzent() ) {
@@ -311,14 +311,14 @@ public class FlurstuecksdatenBaulandGrunddatenFormEditorPage
                 .setToolTipText( "Erschließungskosten in €/m² anrechenbarer Grundstücksgröße" )
                 .setProperty( new PropertyAdapter( vb.erschliessungsKosten() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class,  2 ) )
                 .setLayoutData( left().left( 25 ).top( lastLine ).create() ).setParent( client ).create();
 
         lastLine = newLine;
         newLine = newFormField( "Preis unbebaut in €/m²" ).setToolTipText( "Bodenpreis unbebaut in €/m²" )
                 .setEnabled( false ).setProperty( new PropertyAdapter( vb.bodenpreisUnbebaut() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class,  2 ) )
                 .setLayoutData( left().left( 25 ).top( lastLine ).create() ).setParent( client ).create();
         pageSite.addFieldListener( preisunbebaut = new FieldCalculation( pageSite, 2, vb.bodenpreisUnbebaut(), vb
                 .richtwert(), vb.richtwertBereinigung(), vb.richtwertZuschlagBerechnet(), vb
@@ -357,12 +357,12 @@ public class FlurstuecksdatenBaulandGrunddatenFormEditorPage
         lastLine = newLine;
         newLine = newFormField( "Beb.-abschlag in %" ).setProperty( new PropertyAdapter( vb.bebAbschlag() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class,  2 ) )
                 .setLayoutData( left().right( 25 ).top( lastLine ).create() ).setParent( client ).create();
         newLine = newFormField( "in €/m²" ).setEnabled( false )
                 .setProperty( new PropertyAdapter( vb.bebAbschlagBerechnet() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class,  2 ) )
                 .setLayoutData( left().left( 25 ).top( lastLine ).create() ).setParent( client ).create();
         pageSite.addFieldListener( bebabschlag = new FieldCalculation( pageSite, 2, vb.bebAbschlagBerechnet(), vb
                 .bodenpreisUnbebaut(), vb.bebAbschlag() ) {
@@ -384,7 +384,7 @@ public class FlurstuecksdatenBaulandGrunddatenFormEditorPage
         newLine = newFormField( "Bodenpreis in €/m²" ).setEnabled( false )
                 .setProperty( new PropertyAdapter( vb.bodenpreisBebaut() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NumberValidator( Double.class, Polymap.getSessionLocale(), 12, 2, 1, 2 ) )
+                .setValidator( new MyNumberValidator( Double.class,  2 ) )
                 .setLayoutData( left().left( 25 ).top( lastLine ).bottom( 100 ).create() ).setParent( client ).create();
         pageSite.addFieldListener( bodenpreisbebaut = new FieldCalculation( pageSite, 2, vb.bodenpreisBebaut(), vb
                 .bebAbschlagBerechnet(), vb.bodenpreisUnbebaut() ) {

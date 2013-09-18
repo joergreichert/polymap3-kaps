@@ -53,6 +53,7 @@ import org.polymap.kaps.ui.FieldMultiplication;
 import org.polymap.kaps.ui.FieldSummation;
 import org.polymap.kaps.ui.InterEditorListener;
 import org.polymap.kaps.ui.InterEditorPropertyChangeEvent;
+import org.polymap.kaps.ui.NumberFormatter;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -113,13 +114,13 @@ public class ErtragswertverfahrenErtragswertFormEditorPage
                     protected void onChangedValue( IFormEditorPageSite site, Entity entity, String fieldName,
                             Object value ) {
                         if (fieldName.equals( vb.bereinigtesBaujahr().qualifiedName().name() )) {
-                            site.setFieldValue( fieldName, value != null ? getFormatter( 0 ).format( value ) : null );
+                            site.setFieldValue( fieldName, value != null ? NumberFormatter.getFormatter( 0, false ).format( value ) : null );
                         }
                         else if (fieldName.equals( vb.bodenwertAnteil().qualifiedName().name() )) {
-                            site.setFieldValue( fieldName, value != null ? getFormatter( 2 ).format( value ) : null );
+                            site.setFieldValue( fieldName, value != null ? NumberFormatter.getFormatter( 2 ).format( value ) : null );
                         }
                         else if (fieldName.equals( vb.bereinigterKaufpreis().qualifiedName().name() )) {
-                            site.setFieldValue( fieldName, value != null ? getFormatter( 2 ).format( value ) : null );
+                            site.setFieldValue( fieldName, value != null ? NumberFormatter.getFormatter( 2 ).format( value ) : null );
                         }
                     }
                 }, new InterEditorListener.EventFilter( vb ) );
@@ -142,7 +143,7 @@ public class ErtragswertverfahrenErtragswertFormEditorPage
         VertragsdatenErweitertComposite ev = vertrag.erweiterteVertragsdaten().get();
         if (ev != null) {
             Double preis = ev.bereinigterVollpreis().get();
-            pageSite.setFieldValue( vb.bereinigterKaufpreis().qualifiedName().name(), preis != null ? getFormatter( 2 )
+            pageSite.setFieldValue( vb.bereinigterKaufpreis().qualifiedName().name(), preis != null ? NumberFormatter.getFormatter( 2 )
                     .format( preis ) : null );
         }
         fieldListener.flush( pageSite );

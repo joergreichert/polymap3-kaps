@@ -173,11 +173,13 @@ public class MdbImportWohneigentumOperation
                             getBooleanValue( builderRow, "LIZI_GARAGE" ) );
                     entity.zurAuswertungGeeignet().set( getBooleanValue( builderRow, "VERARBKZ" ) );
 
-                    Object schl = builderRow.get( "BEWSCHL" );
-                    if (schl != null) {
-                        System.out.println( "BEWSCHL '" + schl + "'" );
+                    Object bewschl = builderRow.get( "BEWSCHL" );
+                    if (bewschl != null) {
+//                        System.out.println( "BEWSCHL '" + schl + "'" );
+                        AusstattungComposite findSchlNamed = findSchlNamed( AusstattungComposite.class, builderRow, "BEWSCHL" );
+                        entity.ausstattungSchluessel().set( findSchlNamed );
                     }
-                    entity.ausstattung().set( findSchlNamed( AusstattungComposite.class, builderRow, "BEWSCHL" ) );
+                    
                     entity.eigentumsArt().set( findSchlNamed( EigentumsartComposite.class, builderRow, "EIGENTART" ) );
                     entity.etage().set( findSchlNamed( EtageComposite.class, builderRow, "GESCHOSS" ) );
                     entity.himmelsrichtung().set(
@@ -201,6 +203,9 @@ public class MdbImportWohneigentumOperation
                     }
                     if (bem2 != null) {
                         bem.append( bem2 );
+                    }
+                    if (bewschl != null) {
+                        bem.append( "\nAusstattung: " + bewschl );
                     }
                     entity.bemerkung().set( bem.toString() );
 

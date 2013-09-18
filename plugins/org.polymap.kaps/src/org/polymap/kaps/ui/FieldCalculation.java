@@ -15,8 +15,6 @@ package org.polymap.kaps.ui;
 import java.util.HashMap;
 import java.util.Map;
 
-import java.text.NumberFormat;
-
 import org.qi4j.api.property.Property;
 
 import org.polymap.rhei.field.FormFieldEvent;
@@ -47,18 +45,19 @@ public abstract class FieldCalculation
         }
     }
 
-    private final IFormEditorPageSite      site;
+    private final IFormEditorPageSite           site;
 
     private final Property<Double>              result;
 
-    private final int                      fractionDigits;
+    private final int                           fractionDigits;
 
     private final Map<String, Property<Double>> terms;
 
-    private final ValueProvider         values;
+    private final ValueProvider                 values;
 
 
-    public FieldCalculation( IFormEditorPageSite site, int fractionDigits, Property<Double> result, Property<Double>... operators ) {
+    public FieldCalculation( IFormEditorPageSite site, int fractionDigits, Property<Double> result,
+            Property<Double>... operators ) {
         this.site = site;
         this.fractionDigits = fractionDigits;
         this.result = result;
@@ -80,7 +79,8 @@ public abstract class FieldCalculation
         }
         String fieldName = ev.getFieldName();
         if (terms.keySet().contains( fieldName )) {
-            Double newValue = (Double)ev.getNewValue(); //explizitely deleting this value
+            Double newValue = (Double)ev.getNewValue(); // explizitely deleting this
+                                                        // value
             if (newValue == null) {
                 newValue = Double.valueOf( 0.0d );
             }
@@ -96,20 +96,8 @@ public abstract class FieldCalculation
     public final void refreshResult() {
         Double resultValue = calculate( values );
         if (resultValue != null && resultValue != Double.NaN) {
-            site.setFieldValue( result.qualifiedName().name(), getFormatter().format( resultValue ) );
+            site.setFieldValue( result.qualifiedName().name(),
+                    NumberFormatter.getFormatter( fractionDigits ).format( resultValue ) );
         }
-    }
-
-
-    /**
-     * 
-     * @return
-     */
-    private NumberFormat getFormatter() {
-        NumberFormat nf = NumberFormat.getInstance();
-        nf.setMaximumFractionDigits( fractionDigits );
-        nf.setMinimumFractionDigits( fractionDigits );
-        nf.setMinimumIntegerDigits( 1 );
-        return nf;
     }
 }
