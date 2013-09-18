@@ -72,7 +72,7 @@ public class VerkaufteFlaecheRefresher
                 flaechenAnteilNenner = ev.getNewValue();
                 refreshVerkaufteFlaeche();
             }
-            else if (fieldName.equalsIgnoreCase( prefix + "flaecheAnteilZaehler" )) {
+            else if (fieldName.equalsIgnoreCase( prefix + "flaechenAnteilZaehler" )) {
                 flaecheAnteilZaehler = ev.getNewValue();
                 refreshVerkaufteFlaeche();
             }

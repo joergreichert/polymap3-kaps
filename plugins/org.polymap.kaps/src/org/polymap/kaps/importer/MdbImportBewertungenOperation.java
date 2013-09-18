@@ -95,9 +95,6 @@ public class MdbImportBewertungenOperation
             importNHK2010Bewertung( db, sub, parentFolder );
 
             sub = new SubMonitor( monitor, 10 );
-            importModernisierungsgrad( db, sub, parentFolder );
-
-            sub = new SubMonitor( monitor, 10 );
             importEntity( db, monitor, ErtragswertverfahrenComposite.class,
                     new EntityCallback<ErtragswertverfahrenComposite>() {
 
@@ -169,6 +166,9 @@ public class MdbImportBewertungenOperation
 
             sub = new SubMonitor( monitor, 10 );
             importBemerkungen( db, monitor, parentFolder );
+            
+            sub = new SubMonitor( monitor, 10 );
+            importModernisierungsgrad( db, sub, parentFolder );
         }
         finally {
             db.close();

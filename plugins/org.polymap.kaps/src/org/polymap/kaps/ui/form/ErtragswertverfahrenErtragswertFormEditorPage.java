@@ -221,13 +221,13 @@ public class ErtragswertverfahrenErtragswertFormEditorPage
 
         lastLine = newLine;
         newLine = createLabel( client, "Gesamtnutzungsdauer", one().top( lastLine, 30 ), SWT.RIGHT );
-        createFlaecheField( vb.gesamtNutzungsDauer(), three().top( lastLine, 30 ), client, true );
+        createGrouplessField( vb.gesamtNutzungsDauer(), three().top( lastLine, 30 ), client, true );
 
         lastLine = newLine;
         newLine = createLabel( client, "Baujahr tatsächlich/bereinigt", one().top( lastLine ), SWT.RIGHT );
-        createFlaecheField( IFormFieldLabel.NO_LABEL, "tatsächliches Baujahr", vb.tatsaechlichesBaujahr(),
+        createGrouplessField( IFormFieldLabel.NO_LABEL, "tatsächliches Baujahr", vb.tatsaechlichesBaujahr(),
                 two().top( lastLine ), client, true );
-        createFlaecheField( IFormFieldLabel.NO_LABEL, "bereinigtes Baujahr", vb.bereinigtesBaujahr(),
+        createGrouplessField( IFormFieldLabel.NO_LABEL, "bereinigtes Baujahr", vb.bereinigtesBaujahr(),
                 three().top( lastLine ), client, true );
 
         site.addFieldListener( gndbjListener = new NonFiringFieldListener( vb.gesamtNutzungsDauer(), vb
@@ -278,7 +278,7 @@ public class ErtragswertverfahrenErtragswertFormEditorPage
 
         lastLine = newLine;
         newLine = createLabel( client, "Restnutzungsdauer", one().top( lastLine ), SWT.RIGHT );
-        createFlaecheField( vb.restnutzungsDauer(), three().top( lastLine ), client, false );
+        createGrouplessField( vb.restnutzungsDauer(), three().top( lastLine ), client, false );
         site.addFieldListener( rndListener = new FieldCalculation( site, 0, vb.restnutzungsDauer(), vb
                 .bereinigtesBaujahr(), vb.gesamtNutzungsDauer() ) {
 

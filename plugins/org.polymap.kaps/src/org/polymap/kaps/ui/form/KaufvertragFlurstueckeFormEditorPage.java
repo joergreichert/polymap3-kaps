@@ -81,6 +81,7 @@ import org.polymap.kaps.ui.KapsDefaultFormEditorPageWithFeatureTable;
 import org.polymap.kaps.ui.MyNumberValidator;
 import org.polymap.kaps.ui.NotNullMyNumberValidator;
 import org.polymap.kaps.ui.NotNullValidator;
+import org.polymap.kaps.ui.NumberFormatter;
 import org.polymap.kaps.ui.SimplePickList;
 
 /**
@@ -286,12 +287,20 @@ public class KaufvertragFlurstueckeFormEditorPage
                 pageSite.setFieldValue( prefix + "nutzung", toAdopt.nutzung().get() );
                 pageSite.setFieldValue( prefix + "gebaeudeArt", toAdopt.gebaeudeArt().get() );
                 pageSite.setFieldValue( prefix + "artDesBaugebiets", toAdopt.artDesBaugebiets().get() );
-                pageSite.setFieldValue( prefix + "flaeche", String.valueOf( toAdopt.flaeche().get() ) );
-                pageSite.setFieldValue( prefix + "flaechenAnteilZaehler",
-                        String.valueOf( toAdopt.flaechenAnteilZaehler().get() ) );
-                pageSite.setFieldValue( prefix + "flaechenAnteilNenner",
-                        String.valueOf( toAdopt.flaechenAnteilNenner().get() ) );
-                pageSite.setFieldValue( prefix + "verkaufteFlaeche", String.valueOf( toAdopt.verkaufteFlaeche().get() ) );
+                pageSite.setFieldValue( prefix + "flaeche", toAdopt.flaeche().get() != null ? NumberFormatter
+                        .getFormatter( 2 ).format( toAdopt.flaeche().get() ) : null );
+                pageSite.setFieldValue(
+                        prefix + "flaechenAnteilZaehler",
+                        toAdopt.flaechenAnteilZaehler().get() != null ? NumberFormatter.getFormatter( 1 ).format(
+                                toAdopt.flaechenAnteilZaehler().get() ) : null );
+                pageSite.setFieldValue(
+                        prefix + "flaechenAnteilNenner",
+                        toAdopt.flaechenAnteilNenner().get() != null ? NumberFormatter.getFormatter( 1 ).format(
+                                toAdopt.flaechenAnteilNenner().get() ) : null );
+                pageSite.setFieldValue(
+                        prefix + "verkaufteFlaeche",
+                        toAdopt.verkaufteFlaeche().get() != null ? NumberFormatter.getFormatter( 2 ).format(
+                                toAdopt.verkaufteFlaeche().get() ) : null );
                 pageSite.setFieldValue( prefix + "erbbaurecht", toAdopt.erbbaurecht().get() );
                 pageSite.setFieldValue( prefix + "belastung", toAdopt.belastung().get() );
 
