@@ -418,8 +418,8 @@ public class MdbImportOperation
                     entity.richtwertZone().set( found.zone().get() );
                     entity.nutzung().set( findSchlNamed( NutzungComposite.class, builderRow, "NUTZUNG" ) );
                     String strasse = (String)builderRow.get( "STRNR" );
-                    if (strasse != null) {
-                        entity.strasse().set( findSchlNamed( StrasseComposite.class, strasse ) );
+                    if (strasse != null && gemeinde != null) {
+                        entity.strasse().set( StrasseComposite.Mixin.findStrasse( findSchlNamed( GemeindeComposite.class, gemeinde ), strasse ) );
                     }
                     entity.gebaeudeArt().set( findSchlNamed( GebaeudeArtComposite.class, builderRow, "GEBART" ) );
                     entity.artDesBaugebiets().set(

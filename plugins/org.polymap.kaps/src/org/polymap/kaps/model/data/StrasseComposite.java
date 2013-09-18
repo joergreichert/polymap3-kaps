@@ -39,8 +39,8 @@ import org.polymap.kaps.model.SchlNamed;
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 @Concerns({ PropertyChangeSupport.Concern.class })
-@Mixins({ StrasseComposite.Mixin.class, PropertyChangeSupport.Mixin.class,
-        ModelChangeSupport.Mixin.class, QiEntity.Mixin.class
+@Mixins({ StrasseComposite.Mixin.class, PropertyChangeSupport.Mixin.class, ModelChangeSupport.Mixin.class,
+        QiEntity.Mixin.class
 // JsonState.Mixin.class
 })
 @ImportTable("K_STRASS")
@@ -49,9 +49,11 @@ public interface StrasseComposite
 
     static final String NAME = "Straße";
 
+
     @Optional
     @ImportColumn("NUMMER")
     Property<String> schl();
+
 
     @Optional
     @ImportColumn("BEZ")
@@ -62,6 +64,7 @@ public interface StrasseComposite
     // GEMEINDE
     Association<GemeindeComposite> gemeinde();
 
+
     /**
      * Methods and transient fields.
      */
@@ -70,12 +73,21 @@ public interface StrasseComposite
 
         private static Log log = LogFactory.getLog( Mixin.class );
 
+
         public static Iterable<StrasseComposite> findStrasseIn( GemeindeComposite gemeinde ) {
             StrasseComposite template = QueryExpressions.templateFor( StrasseComposite.class );
             BooleanExpression expr = QueryExpressions.eq( template.gemeinde(), gemeinde );
-            Query<StrasseComposite> matches = KapsRepository.instance().findEntities(
-                    StrasseComposite.class, expr, 0, -1 );
+            Query<StrasseComposite> matches = KapsRepository.instance().findEntities( StrasseComposite.class, expr, 0,
+                    -1 );
             return matches;
+        }
+
+
+        public static StrasseComposite findStrasse( GemeindeComposite gemeinde, String schl ) {
+            StrasseComposite template = QueryExpressions.templateFor( StrasseComposite.class );
+            BooleanExpression expr = QueryExpressions.and( QueryExpressions.eq( template.gemeinde(), gemeinde ),
+                    QueryExpressions.eq( template.schl(), schl ) );
+            return KapsRepository.instance().findEntities( StrasseComposite.class, expr, 0, 1 ).find();
         }
     }
 

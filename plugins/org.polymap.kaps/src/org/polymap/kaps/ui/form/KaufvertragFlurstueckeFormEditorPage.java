@@ -338,7 +338,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                         new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix + "strasse",
                                 new AssociationCallback<FlurstueckComposite>() {
 
-                                    public Association get( FlurstueckComposite entity ) {
+                                    public Association<StrasseComposite> get( FlurstueckComposite entity ) {
                                         return entity.strasse();
                                     }
                                 } ) ).setField( reloadable( strassePickList ) )
