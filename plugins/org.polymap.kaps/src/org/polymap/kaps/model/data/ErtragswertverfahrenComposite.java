@@ -585,11 +585,10 @@ public interface ErtragswertverfahrenComposite
     Property<Boolean> bewirtschaftskostenInProzent();
 
 
-    //
-    // // TODO GEWICHT - Long
-    // @Optional
+    // GEWICHT - Long
+    @Optional
     // @ImportColumn("GEWICHT")
-    // Property<Long> GEWICHT();
+    Property<Double> gewichtungLiegenschaftszins();
 
     // BAUJAHR - Long
     @Optional

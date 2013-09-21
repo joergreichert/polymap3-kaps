@@ -114,6 +114,7 @@ public class MdbImportBewertungenOperation
                             if (berbauj != null) {
                                 entity.bereinigtesBaujahr().set( asDouble( berbauj.intValue() ) );
                             }
+                            entity.gewichtungLiegenschaftszins().set( asDouble( (Integer)builderRow.get( "GEWICHT" ) ) );
                             entity.tatsaechlichesBaujahr().set( asDouble( (Integer)builderRow.get( "BAUJAHR" ) ) );
 
                             Double eingangsnummer = (Double)builderRow.get( "EINGANGSNR" );

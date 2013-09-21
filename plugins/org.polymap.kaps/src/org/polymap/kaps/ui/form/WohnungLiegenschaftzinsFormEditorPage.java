@@ -403,15 +403,16 @@ public class WohnungLiegenschaftzinsFormEditorPage
                 int currentYear = new Date().getYear() + 1900;
                 Double RND = (GND != null && baujahr != null) ? baujahr + GND - currentYear : null;
                 if (RND != null && faktor1 != null && faktor2 != null) {
-                    Double lizi = faktor1 - ((1 + faktor1 - 1) / (Math.pow( 1 + faktor1, RND ) - 1) * faktor2);
+                    Double liziV = faktor1;
+                    Double liziN = faktor1 - ((1 + liziV - 1) / (Math.pow( 1 + liziV, RND ) - 1) * faktor2);
                     int iteration = 1;
-                    while (Math.abs( lizi - faktor1 ) > 0.5d) {
-                        faktor1 = lizi;
-                        lizi = faktor1 - ((1 + faktor1 - 1) / (Math.pow( 1 + faktor1, RND ) - 1) * faktor2);
+                    while (Math.abs( liziN - liziV ) > 0.005d) {
+                        liziV = liziN;
+                        liziN = faktor1 - ((1 + liziV - 1) / (Math.pow( 1 + liziV, RND ) - 1) * faktor2);
                         iteration++;
                     }
                     // in % umrechnen
-                    return lizi * 100;
+                    return liziN * 100;
                 }
                 return null;
             }

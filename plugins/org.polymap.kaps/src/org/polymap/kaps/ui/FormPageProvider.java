@@ -101,6 +101,8 @@ public class FormPageProvider
                     .getFeatureStore() ) );
             result.add( new ErtragswertverfahrenErtragswertFormEditorPage( formEditor, feature, formEditor
                     .getFeatureStore() ) );
+            result.add( new ErtragswertverfahrenLiegenschaftszinsFormEditorPage( formEditor, feature, formEditor
+                    .getFeatureStore() ) );
         }
         else if (name.equalsIgnoreCase( GebaeudeComposite.NAME )) {
             result.add( new GebaeudeGrunddatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
