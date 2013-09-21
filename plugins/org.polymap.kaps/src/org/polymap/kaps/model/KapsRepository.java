@@ -250,85 +250,33 @@ public class KapsRepository
     // }
     // }
 
-    public VertragComposite newKaufvertrag( final EntityCreator<VertragComposite> creator )
-            throws Exception {
-        return newEntity( VertragComposite.class, null, new EntityCreator<VertragComposite>() {
-
-            public void create( VertragComposite prototype )
-                    throws Exception {
-                prototype.eingangsDatum().set( new Date() );
-                // prototype.kaufpreis().set( new Double(0.0d) );
-                prototype.kaufpreisAnteilZaehler().set( new Double( 1.0 ) );
-                prototype.kaufpreisAnteilNenner().set( new Double( 1.0 ) );
-                prototype.fuerGewosGeeignet().set( Boolean.TRUE );
-                prototype.fuerAuswertungGeeignet().set( Boolean.TRUE );
-                // VertragsdatenErweitertComposite vdec = newEntity(
-                // VertragsdatenErweitertComposite.class, null );
-                // prototype.erweiterteVertragsdaten().set( vdec );
-                // vdec.basispreis().set( prototype.kaufpreis().get() );
-                // eingangsnummer erst beim Speichern setzen!
-
-                if (creator != null) {
-                    creator.create( prototype );
-                }
-            }
-        } );
-    }
-
-
     public int highestEingangsNummer( Date vertragsdatum ) {
-        // TODO umstellen auf sequenzgenerator
+        Calendar cal = new GregorianCalendar();
+        cal.setTime( vertragsdatum );
+        cal.set( Calendar.DAY_OF_YEAR, 1 );
+        cal.set( Calendar.HOUR_OF_DAY, 0 );
+        cal.set( Calendar.MINUTE, 0 );
+        cal.set( Calendar.SECOND, 0 );
+        cal.set( Calendar.MILLISECOND, 0 );
 
-        // nur zum Test noch die Suche über Verkäuferkreis mit rein
-        // Query<KaeuferKreisComposite> kreise = findEntities(
-        // KaeuferKreisComposite.class, null, 0, 1 );
-        // KaeuferKreisComposite kreis1 = kreise.iterator().next();
-        // KaeuferKreisComposite kreis2 = kreise.iterator().next();
-        //
+        Date lowerDate = cal.getTime();
+
+        // minimum aktuelles Jahr * 100000 + 1
+        int currentYear = cal.get( Calendar.YEAR );
+        int currentMinimumNumber = currentYear * 100000;
+
+        cal.roll( Calendar.YEAR, true );
+        Date upperDate = cal.getTime();
+
         VertragComposite template = templateFor( VertragComposite.class );
+        BooleanExpression exp = //QueryExpressions.and( QueryExpressions.ge( template.vertragsDatum(), lowerDate ),
+                QueryExpressions.lt( template.vertragsDatum(), upperDate );
 
-        // QueryBuilder<VertragComposite> builder =
-        // assembler.getModule().queryBuilderFactory()
-        // .newQueryBuilder( VertragComposite.class );
-        // builder = builder.where( eq( template.kaeuferKreis(), kreis1 ) );
-        // Query<VertragComposite> bentities = builder.newQuery( uow );
-        // bentities.orderBy( orderBy( template.eingangsNr(),
-        // OrderBy.Order.DESCENDING ) );
-        // bentities.maxResults( 1 );
-        // VertragComposite next = bentities.iterator().next();
-        //
-        Query<VertragComposite> entities = findEntities( VertragComposite.class,
-        // eq( template.kaeuferKreis(), kreis1 ), 0, 1 );
-                null, 0, 1 );
+        Query<VertragComposite> entities = findEntities( VertragComposite.class, exp, 0, -1 );
         entities.orderBy( orderBy( template.eingangsNr(), OrderBy.Order.DESCENDING ) );
-        //
-        // entities = findEntities( VertragComposite.class, eq(
-        // template.kaeuferKreis(), kreis2 ),
-        // 0, 1 );
-        // VertragComposite next2 = entities
-        // .orderBy( orderBy( template.eingangsNr(), OrderBy.Order.DESCENDING )
-        // ).iterator()
-        // .next();
-        //
-        // entities = findEntities( VertragComposite.class, eq(
-        // template.kaeuferKreis(), kreis1 ),
-        // 0, 1 );
-        // VertragComposite next3 = entities
-        // .orderBy( orderBy( template.eingangsNr(), OrderBy.Order.DESCENDING )
-        // ).iterator()
-        // .next();
-        //
-        // assert (next1.equals( next3 ));
-        // assert (!next1.equals( next2 ));
-        //
-        // return 1;
 
         VertragComposite highest = entities.iterator().next();
         int highestEingangsNr = highest != null ? highest.eingangsNr().get() : 0;
-
-        // minimum aktuelles Jahr * 100000 + 1
-        int currentYear = new GregorianCalendar().get( Calendar.YEAR );
-        int currentMinimumNumber = currentYear * 100000;
 
         return Math.max( highestEingangsNr, currentMinimumNumber ) + 1;
     }

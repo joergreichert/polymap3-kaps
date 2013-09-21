@@ -55,7 +55,27 @@ public class KaufvertragEntityProvider
 
     public VertragComposite newEntity( final EntityCreator<VertragComposite> creator )
             throws Exception {
-        return ((KapsRepository)repo).newKaufvertrag( creator );
+        return ((KapsRepository)repo).newEntity( VertragComposite.class, null, new EntityCreator<VertragComposite>() {
+
+            public void create( VertragComposite prototype )
+                    throws Exception {
+                prototype.eingangsDatum().set( new Date() );
+                // prototype.kaufpreis().set( new Double(0.0d) );
+                prototype.kaufpreisAnteilZaehler().set( new Double( 1.0 ) );
+                prototype.kaufpreisAnteilNenner().set( new Double( 1.0 ) );
+                prototype.fuerGewosGeeignet().set( Boolean.TRUE );
+                prototype.fuerAuswertungGeeignet().set( Boolean.TRUE );
+                // VertragsdatenErweitertComposite vdec = newEntity(
+                // VertragsdatenErweitertComposite.class, null );
+                // prototype.erweiterteVertragsdaten().set( vdec );
+                // vdec.basispreis().set( prototype.kaufpreis().get() );
+                // eingangsnummer erst beim Speichern setzen!
+
+                if (creator != null) {
+                    creator.create( prototype );
+                }
+            }
+        } );
     }
 
 
