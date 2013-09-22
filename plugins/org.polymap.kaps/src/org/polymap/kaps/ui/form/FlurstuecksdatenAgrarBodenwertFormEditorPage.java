@@ -550,7 +550,7 @@ public class FlurstuecksdatenAgrarBodenwertFormEditorPage
                 SWT.RIGHT );
         createPreisField( IFormFieldLabel.NO_LABEL, "Sachwert = Bodenwert + Bauwert", vb.sachwertGesamt(),
                 six().top( lastLine ), client, false );
-        site.addFieldListener( sachwertSummation = new FieldSummation( site, 0, vb.sachwertGesamt(),
+        site.addFieldListener( sachwertSummation = new FieldSummation( site, 2, vb.sachwertGesamt(),
                 vb.gesamtBauWert(), vb.bodenwertGesamt() ) );
 
         lastLine = newLine;
