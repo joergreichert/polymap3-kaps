@@ -41,6 +41,13 @@
             label="Exportieren als BORIS"
             tooltip="Richtwertzone als CSV im Format BORIS exportieren.">
       </featureOperation>
+      <featureOperation
+            class="org.polymap.kaps.exporter.FlurstueckStaBuExporter"
+            icon="icons/exportas.gif"
+            id="org.polymap.kaps.exporter.FlurstueckStaBuExporter"
+            label="Exportieren für StaBu"
+            tooltip="Flurstücke für StaBu exportieren">
+      </featureOperation>
    </extension>
    <extension
          point="org.polymap.core.data.featureOperations">

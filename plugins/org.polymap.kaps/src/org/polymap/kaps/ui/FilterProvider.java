@@ -29,6 +29,7 @@ import org.polymap.rhei.filter.IFilterProvider;
 
 import org.polymap.kaps.model.KapsEntityProvider;
 import org.polymap.kaps.model.KapsRepository;
+import org.polymap.kaps.model.data.FlurstueckComposite;
 import org.polymap.kaps.model.data.FlurstuecksdatenAgrarComposite;
 import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
 import org.polymap.kaps.model.data.GebaeudeComposite;
@@ -41,6 +42,7 @@ import org.polymap.kaps.ui.filter.DefaultEntityFilter;
 import org.polymap.kaps.ui.filter.EinzelneVertragsdatenAgrarFilter;
 import org.polymap.kaps.ui.filter.EinzelneVertragsdatenBaulandFilter;
 import org.polymap.kaps.ui.filter.EinzelnerVertragFilter;
+import org.polymap.kaps.ui.filter.FlurstueckeStabuFilter;
 import org.polymap.kaps.ui.filter.RichtwertZoneFilter;
 import org.polymap.kaps.ui.filter.RichtwertZoneZeitraumFilter;
 import org.polymap.kaps.ui.filter.VertraegeFuerBaujahrUndGebaeudeartFilter;
@@ -75,6 +77,9 @@ public class FilterProvider
                     result.add( new RichtwertZoneFilter( layer ) );
                     result.add( new RichtwertZoneZeitraumFilter( layer ) );
                     result.add( new DefaultEntityFilter( layer, type, repo ) );
+                }
+                else if (type.isAssignableFrom( FlurstueckComposite.class )) {
+                    result.add( new FlurstueckeStabuFilter( layer )); 
                 }
                 else if (type.isAssignableFrom( RichtwertzoneZeitraumComposite.class )) {
                     result.add( new DefaultEntityFilter( layer, type, repo ).exclude( "zone" ) );

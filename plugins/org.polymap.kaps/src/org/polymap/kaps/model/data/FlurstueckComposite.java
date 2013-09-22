@@ -52,6 +52,9 @@ import org.polymap.kaps.ui.form.EingangsNummerFormatter;
 public interface FlurstueckComposite
         extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite, Named {
 
+    static final String NAME = "Flurstück";
+
+
     // CREATE TABLE FLURZWI (
     // EINGANGSNR DOUBLE,
     @Optional

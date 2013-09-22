@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- https://erhebungsdatenbank.estatistik.de/eid/erhebungsIDForFixedEVAS.jsp;jsessionid=D39C7876AF95E4BDA17532AFB774ADAB -->
+<DatML-RAW-D version="2.0" xmlns="http://www.destatis.de/schema/datml-raw/2.0/de">
+
+   <optionen>
+      <test kennung="100"/>
+   </optionen>
+
+   <protokoll>
+      <dokumentinstanz>
+         <datum>20120402</datum>
+         <uhrzeit>141410</uhrzeit>
+         <anwendung>
+            <anwendungsname>CORE.reporter</anwendungsname>
+            <version>2.1.0</version>
+            <hersteller>Statistisches Bundesamt</hersteller>
+         </anwendung>
+      </dokumentinstanz>
+   </protokoll>
+
+   <absender>
+      <kennung klasse="MELDID">9900016644</kennung>
+      <identifikation>
+         <identitaet>
+            <organisation>
+               <name>Statistisches Bundesamt</name>
+            </organisation>
+         </identitaet>
+         <adresse>
+            <strasse>Gustav-Stresemann-Ring</strasse>
+            <hausnummer>11</hausnummer>
+            <postleitzahl>65189</postleitzahl>
+            <ort>Wiesbaden</ort>
+         </adresse>
+         <telefon>0611 75-2171</telefon>
+         <email>stefan.ritzheim@destatis.de</email>
+      </identifikation>
+      <kontakt>
+         <identitaet>
+            <person>
+               <vorname>Ritzheim</vorname>
+               <nachname>Stefan</nachname>
+            </person>
+         </identitaet>
+         <adresse>
+            <strasse>Viktoriastraße</strasse>
+            <hausnummer>7</hausnummer>
+            <postleitzahl>65189</postleitzahl>
+            <ort>Wiesbaden</ort>
+         </adresse>
+      </kontakt>
+   </absender>
+
+   <empfaenger>
+      <kennung klasse="STAID">99</kennung>
+   </empfaenger>
+
+   <nachricht>
+      <nachrichtenID>1</nachrichtenID>
+
+      <erhebung>
+         <kennung klasse="ERHID">0296</kennung>
+      </erhebung>
+
+      <berichtszeitraum>
+         <jahr>2012</jahr>
+         <quartal>2</quartal>
+      </berichtszeitraum>
+
+      <berichtspflichtiger>
+         <kennung klasse="MELDID">9900016644</kennung>
+         <identifikation>
+            <identitaet>
+               <organisation>
+                  <name>Statistisches Bundesamt</name>
+               </organisation>
+            </identitaet>
+            <adresse>
+               <strasse>Gustav-Stresemann-Ring</strasse>
+               <hausnummer>11</hausnummer>
+               <postleitzahl>65189</postleitzahl>
+               <ort>Wiesbaden</ort>
+            </adresse>
+            <telefon>0611 75-2171</telefon>
+            <email>stefan.ritzheim@destatis.de</email>
+         </identifikation>
+         <kontakt>
+            <identitaet>
+               <person>
+                  <vorname>Ritzheim</vorname>
+                  <nachname>Stefan</nachname>
+               </person>
+            </identitaet>
+            <adresse>
+               <strasse>Kreustraße</strasse>
+               <hausnummer>82</hausnummer>
+               <postleitzahl>55120</postleitzahl>
+               <ort>Mainz</ort>
+            </adresse>
+         </kontakt>
+      </berichtspflichtiger>
+
+      <berichtsempfaenger>
+         <kennung klasse="STAID">00</kennung>
+         <identifikation>
+            <identitaet>
+               <organisation>
+                  <name>Statistisches Bundesamt</name>
+               </organisation>
+            </identitaet>
+         </identifikation>
+      </berichtsempfaenger>
+
+      <segment>
+         <hmm name="BerichtseinheitID">
+            <wert>1</wert>
+         </hmm>
+
+         <datensegment>
+            <meldungsID>1</meldungsID>
+
+            <satz kennung="SA-Bebaute-Grundstücke">
+               <mm name="Satzart">
+                  <wert>1</wert>
+               </mm>
+               <mmgr name="Bebaute_Grundstuecke">
+                  <mmgr name="PWI">
+                     <mm name="Kennummer_Kauffall">
+                        <wert>02-2989-AB_11231344</wert>
+                     </mm>
+                     <mm name="Kaufdatum_TT">
+                        <wert>01</wert>
+                     </mm>
+                     <mm name="Kaufdatum_MM">
+                        <wert>01</wert>
+                     </mm>
+                     <mm name="Kaufdatum_JJJJ">
+                        <wert>2012</wert>
+                     </mm>
+                     <mm name="Gemeindeschluessel">
+                        <wert>01001000</wert>
+                     </mm>
+                     <mm name="Gemarkungsschluessel">
+                        <wert>1241</wert>
+                     </mm>
+                     <mm name="Veraeusserer">
+                        <wert>1</wert>
+                     </mm>
+                     <mm name="Erwerber">
+                        <wert>1</wert>
+                     </mm>
+                     <mm name="Kaufpreis">
+                        <wert>200000</wert>
+                     </mm>
+                     <mm name="Bodenrichtwert">
+                        <wert>1000</wert>
+                     </mm>
+                     <mm name="Flaechenart">
+                        <wert>10</wert>
+                     </mm>
+                     <mm name="Baujahr">
+                        <wert>1910</wert>
+                     </mm>
+                     <mm name="Wohnflaeche">
+                        <wert>50</wert>
+                     </mm>
+                     <mm name="Stellplatz">
+                        <wert>1</wert>
+                     </mm>
+                     <mm name="Lagequalitaet">
+                        <wert>1</wert>
+                     </mm>
+                  </mmgr>
+                  <mmgr name="Grundstuecke">
+                     <mm name="Grundstuecksflaeche">
+                        <wert>500</wert>
+                     </mm>
+                     <mm name="Gebaeudeart">
+                        <wert>2</wert>
+                     </mm>
+                     <mm name="Gebaeudetyp">
+                        <wert>1</wert>
+                     </mm>
+                     <mm name="Unterkellerung">
+                        <wert>1</wert>
+                     </mm>
+                  </mmgr>
+               </mmgr>
+            </satz>
+
+            <satz kennung="SA-Bebaute-Grundstücke">
+               <mm name="Satzart">
+                  <wert>1</wert>
+               </mm>
+               <mmgr name="Bebaute_Grundstuecke">
+                  <mmgr name="PWI">
+                     <mm name="Kennummer_Kauffall">
+                        <wert>03-2989-AB_11231344</wert>
+                     </mm>
+                     <mm name="Kaufdatum_TT">
+                        <wert>01</wert>
+                     </mm>
+                     <mm name="Kaufdatum_MM">
+                        <wert>01</wert>
+                     </mm>
+                     <mm name="Kaufdatum_JJJJ">
+                        <wert>2012</wert>
+                     </mm>
+                     <mm name="Gemeindeschluessel">
+                        <wert>01001000</wert>
+                     </mm>
+                     <mm name="Gemarkungsschluessel">
+                        <wert>1241</wert>
+                     </mm>
+                     <mm name="Veraeusserer">
+                        <wert>1</wert>
+                     </mm>
+                     <mm name="Erwerber">
+                        <wert>1</wert>
+                     </mm>
+                     <mm name="Kaufpreis">
+                        <wert>200000</wert>
+                     </mm>
+                     <mm name="Bodenrichtwert">
+                        <wert>1000</wert>
+                     </mm>
+                     <mm name="Flaechenart">
+                        <wert>10</wert>
+                     </mm>
+                     <mm name="Baujahr">
+                        <wert>1910</wert>
+                     </mm>
+                     <mm name="Wohnflaeche">
+                        <wert>50</wert>
+                     </mm>
+                     <mm name="Stellplatz">
+                        <wert>1</wert>
+                     </mm>
+                     <mm name="Lagequalitaet">
+                        <wert>1</wert>
+                     </mm>
+                  </mmgr>
+                  <mmgr name="Grundstuecke">
+                     <mm name="Grundstuecksflaeche">
+                        <wert>500</wert>
+                     </mm>
+                     <mm name="Gebaeudeart">
+                        <wert>2</wert>
+                     </mm>
+                     <mm name="Gebaeudetyp">
+                        <wert>1</wert>
+                     </mm>
+                     <mm name="Unterkellerung">
+                        <wert>1</wert>
+                     </mm>
+                  </mmgr>
+               </mmgr>
+            </satz>
+
+         </datensegment>
+      </segment>
+
+   </nachricht>
+
+</DatML-RAW-D>

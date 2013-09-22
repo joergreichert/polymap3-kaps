@@ -1,0 +1,2611 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DatML-RAW-D version="2.0"
+	xmlns="http://www.destatis.de/schema/datml-raw/2.0/de">
+	<protokoll>
+		<dokumentinstanz>
+			<datum>20130703</datum>
+			<uhrzeit>064733</uhrzeit>
+			<anwendung>
+				<anwendungsname>WinAKPS</anwendungsname>
+				<version>3.0</version>
+				<hersteller>Zweckverband Kommunale Datenverarbeitung Region
+					Stuttgart</hersteller>
+			</anwendung>
+		</dokumentinstanz>
+	</protokoll>
+	<absender>
+		<kennung klasse="MELDID">9900019233</kennung>
+		<identifikation>
+			<identitaet>
+				<organisation>
+					<name>Landratsamt Mittelsachsen</name>
+				</organisation>
+			</identitaet>
+			<adresse>
+				<strasse>Frauensteiner Straße</strasse>
+				<hausnummer>43</hausnummer>
+				<postleitzahl>09599</postleitzahl>
+				<ort>Freiberg</ort>
+			</adresse>
+		</identifikation>
+    	<kontakt>
+			<identitaet>
+				<person>
+					<vorname>Birgit</vorname>
+					<nachname>Schellenberg</nachname>
+				</person>
+			</identitaet>
+		</kontakt>
+	</absender>
+	<empfaenger>
+		<kennung klasse="STAID">99</kennung>
+	</empfaenger>
+	<nachricht>
+		<nachrichtenID>1</nachrichtenID>
+		<erhebung>
+			<kennung klasse="ERHID">0296</kennung>
+		</erhebung>
+		<berichtszeitraum>
+			<jahr>2012</jahr>
+			<quartal>2</quartal>
+		</berichtszeitraum>
+		<berichtsempfaenger>
+			<kennung klasse="STAID">00</kennung>
+			<identifikation>
+				<identitaet>
+					<organisation>
+						<name>Statistisches Bundesamt</name>
+					</organisation>
+				</identitaet>
+			</identifikation>
+		</berichtsempfaenger>
+		<segment>
+			<hmm name="BerichtseinheitID">
+				<wert>eq9xayW3uqFU</wert>
+			</hmm>
+			<datensegment>
+				<meldungsID>1</meldungsID>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201200658</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>03</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>04</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522180</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>3608</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>2</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>16826</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>76</wert>
+							</mm>
+							<mm name="Baujahr">
+								<wert>1900</wert>
+							</mm>
+							<mm name="Wohnflaeche">
+								<wert>72</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>605</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201200659</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>03</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>04</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522180</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>3608</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>2</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>18241</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>76</wert>
+							</mm>
+							<mm name="Baujahr">
+								<wert>1900</wert>
+							</mm>
+							<mm name="Wohnflaeche">
+								<wert>72</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>605</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201200668</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>03</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>04</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522180</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>3608</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>1</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>33500</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>40</wert>
+							</mm>
+							<mm name="Baujahr">
+								<wert>1995</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>4620</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201200669</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>04</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>04</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522050</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>2002</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>1</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>76500</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>26</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>1805</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201200711</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>16</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>04</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522080</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>2825</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>1</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>30000</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>39</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>6130</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201200713</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>11</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>04</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522250</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>2871</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>1</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>52000</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>41</wert>
+							</mm>
+							<mm name="Baujahr">
+								<wert>1996</wert>
+							</mm>
+							<mm name="Wohnflaeche">
+								<wert>104</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>2506</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201200736</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>05</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>04</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522180</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>3608</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>1</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>90000</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>53</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>1837</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201200756</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>17</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>04</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522050</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>2002</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>1</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>0</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>26</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>520</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201200801</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>04</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>04</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522180</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>3608</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>1</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>20000</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>40</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>10</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>26886</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201200832</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>10</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>04</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522180</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>3608</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>2</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>149000</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>33</wert>
+							</mm>
+							<mm name="Baujahr">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Wohnflaeche">
+								<wert>109</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>1390</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201200833</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>12</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>04</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522180</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>3608</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>2</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>161000</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>33</wert>
+							</mm>
+							<mm name="Baujahr">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Wohnflaeche">
+								<wert>135</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>1390</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201200834</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>04</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>04</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522060</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>2104</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>1</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>70000</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>45</wert>
+							</mm>
+							<mm name="Baujahr">
+								<wert>1930</wert>
+							</mm>
+							<mm name="Wohnflaeche">
+								<wert>140</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>1330</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201200835</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>04</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>04</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522060</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>2104</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>1</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>50000</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>45</wert>
+							</mm>
+							<mm name="Baujahr">
+								<wert>1930</wert>
+							</mm>
+							<mm name="Wohnflaeche">
+								<wert>75</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>1330</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201200836</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>03</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>04</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522150</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>4509</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>2</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>58000</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>42</wert>
+							</mm>
+							<mm name="Baujahr">
+								<wert>1996</wert>
+							</mm>
+							<mm name="Wohnflaeche">
+								<wert>53</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>10</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>1270</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201200837</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>03</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>04</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522150</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>4509</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>2</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>35500</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>42</wert>
+							</mm>
+							<mm name="Baujahr">
+								<wert>1996</wert>
+							</mm>
+							<mm name="Wohnflaeche">
+								<wert>26</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>10</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>705</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201200856</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>16</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>04</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522050</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>2017</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>1</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>35000</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>14</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>917</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201200866</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>21</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>04</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522150</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>4509</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>2</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>69000</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>42</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>10</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>705</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201200868</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>27</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>04</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522240</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>3614</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>1</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>14650</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>15</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>3310</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201200888</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>24</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>04</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522150</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>3531</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>1</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>95000</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>40</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>10</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>714</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201200893</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>24</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>04</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522050</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>2003</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>1</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>44500</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>26</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>945</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201200897</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>26</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>04</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522180</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>3608</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>2</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>125000</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>85</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>1706</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201200932</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>19</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>06</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522050</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>2017</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>1</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>25000</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>14</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>1036</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201200945</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>04</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>06</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522180</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>3608</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>2</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>144937</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>50</wert>
+							</mm>
+							<mm name="Baujahr">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>2730</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201200987</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>09</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>05</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522050</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>2017</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>1</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>18500</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>14</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>1250</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201201007</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>04</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>05</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522180</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>3608</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>2</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>2</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>128000</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>85</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>1706</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201201010</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>09</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>05</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522240</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>3614</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>1</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>35500</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>15</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>1656</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201201016</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>09</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>05</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522260</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>2119</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>2</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>25000</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>39</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>850</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201201047</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>01</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>05</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522380</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>2133</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>1</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>14000</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>41</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>4103</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201201050</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>14</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>05</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522180</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>3608</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>2</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>200648</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>33</wert>
+							</mm>
+							<mm name="Baujahr">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Wohnflaeche">
+								<wert>141</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>1390</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201201055</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>11</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>05</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522180</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>3608</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>1</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>39000</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>53</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>1436</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201201067</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>14</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>05</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522330</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>4550</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>1</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>27000</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>21</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>757</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201201084</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>14</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>05</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522020</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>3502</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>1</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>100000</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>49</wert>
+							</mm>
+							<mm name="Baujahr">
+								<wert>1924</wert>
+							</mm>
+							<mm name="Wohnflaeche">
+								<wert>137</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>360</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201201090</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>24</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>05</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522260</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>2119</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>1</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>2</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>12000</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>39</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>870</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201201097</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>01</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>06</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522020</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>3502</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>2</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>99000</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>49</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>5940</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201201122</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>03</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>05</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522260</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>2119</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>1</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>2</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>25500</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>39</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>10</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>3398</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201201164</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>14</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>05</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522150</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>4509</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>2</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>64500</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>42</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>10</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>1270</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201201185</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>31</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>05</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522180</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>3642</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>1</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>90000</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>40</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>1873</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201201190</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>21</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>05</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522150</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>4509</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>2</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>66900</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>42</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>10</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>705</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201201199</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>30</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>05</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522080</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>2825</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>1</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>2</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>14000</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>34</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>350</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201201203</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>07</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>06</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522420</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>3528</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>1</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>40000</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>85</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>1572</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201201224</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>21</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>06</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522260</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>2119</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>2</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>33000</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>39</wert>
+							</mm>
+							<mm name="Baujahr">
+								<wert>1920</wert>
+							</mm>
+							<mm name="Wohnflaeche">
+								<wert>67</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>850</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201201225</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>21</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>06</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522260</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>2119</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>2</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>17000</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>39</wert>
+							</mm>
+							<mm name="Baujahr">
+								<wert>1920</wert>
+							</mm>
+							<mm name="Wohnflaeche">
+								<wert>39</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>870</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201201227</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>25</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>04</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522360</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>4540</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>1</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>10000</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>38</wert>
+							</mm>
+							<mm name="Baujahr">
+								<wert>1994</wert>
+							</mm>
+							<mm name="Wohnflaeche">
+								<wert>33</wert>
+							</mm>
+							<mm name="Lagequalitaet">
+								<wert>4</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>13638</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201201322</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>08</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>06</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522340</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>2019</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>1</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>20000</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>16</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>2647</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201201335</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>08</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>06</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522180</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>3608</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>2</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>213266</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>50</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>2730</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201201339</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>13</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>06</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522180</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>3608</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>1</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>32500</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>76</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>343</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201201349</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>12</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>06</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522080</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>2835</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>1</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>49500</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>39</wert>
+							</mm>
+							<mm name="Baujahr">
+								<wert>1996</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>5076</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201201363</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>30</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>04</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522140</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>3512</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>2</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>92400</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>28</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>7040</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201201373</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>07</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>06</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522450</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>2942</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>2</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>19000</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>15</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>37245</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201201576</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>29</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>06</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522590</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>2001</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>1</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>149500</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>22</wert>
+							</mm>
+							<mm name="Baujahr">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>1298</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201201605</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>25</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>06</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522180</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>3608</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>2</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>201500</wert>
+							</mm>
+							<mm name="Bodenrichtwert">
+								<wert>50</wert>
+							</mm>
+							<mm name="Baujahr">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Wohnflaeche">
+								<wert>105</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>2730</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+				<satz kennung="SA-Bebaute-Grundstücke">
+					<mm name="Satzart">
+						<wert>1</wert>
+					</mm>
+					<mmgr name="Bebaute_Grundstuecke">
+						<mmgr name="PWI">
+							<mm name="Kennummer_Kauffall">
+								<wert>201201910</wert>
+							</mm>
+							<mm name="Kaufdatum_TT">
+								<wert>31</wert>
+							</mm>
+							<mm name="Kaufdatum_MM">
+								<wert>05</wert>
+							</mm>
+							<mm name="Kaufdatum_JJJJ">
+								<wert>2012</wert>
+							</mm>
+							<mm name="Gemeindeschluessel">
+								<wert>14522510</wert>
+							</mm>
+							<mm name="Gemarkungsschluessel">
+								<wert>2961</wert>
+							</mm>
+							<mm name="Veraeusserer">
+								<wert>2</wert>
+							</mm>
+							<mm name="Erwerber">
+								<wert>1</wert>
+							</mm>
+							<mm name="Kaufpreis">
+								<wert>33950</wert>
+							</mm>
+							<mm name="Flaechenart">
+								<wert>21</wert>
+							</mm>
+						</mmgr>
+						<mmgr name="Grundstuecke">
+							<mm name="Grundstuecksflaeche">
+								<wert>410</wert>
+							</mm>
+						</mmgr>
+					</mmgr>
+				</satz>
+			</datensegment>
+		</segment>
+	</nachricht>
+</DatML-RAW-D>

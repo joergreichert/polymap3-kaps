@@ -22,27 +22,7 @@ import org.polymap.rhei.form.IFormEditorPage;
 import org.polymap.rhei.form.IFormPageProvider;
 
 import org.polymap.kaps.model.KapsRepository;
-import org.polymap.kaps.model.data.AusstattungBewertungComposite;
-import org.polymap.kaps.model.data.BodennutzungComposite;
-import org.polymap.kaps.model.data.ErmittlungModernisierungsgradComposite;
-import org.polymap.kaps.model.data.ErtragswertverfahrenComposite;
-import org.polymap.kaps.model.data.FlurComposite;
-import org.polymap.kaps.model.data.FlurstuecksdatenAgrarComposite;
-import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
-import org.polymap.kaps.model.data.GebaeudeArtComposite;
-import org.polymap.kaps.model.data.GebaeudeComposite;
-import org.polymap.kaps.model.data.GemarkungComposite;
-import org.polymap.kaps.model.data.GemeindeComposite;
-import org.polymap.kaps.model.data.KaeuferKreisComposite;
-import org.polymap.kaps.model.data.NHK2010BewertungComposite;
-import org.polymap.kaps.model.data.NutzungComposite;
-import org.polymap.kaps.model.data.RichtwertzoneComposite;
-import org.polymap.kaps.model.data.RichtwertzoneZeitraumComposite;
-import org.polymap.kaps.model.data.StrasseComposite;
-import org.polymap.kaps.model.data.VertragComposite;
-import org.polymap.kaps.model.data.VertragsArtComposite;
-import org.polymap.kaps.model.data.WohnungComposite;
-import org.polymap.kaps.model.data.WohnungseigentumComposite;
+import org.polymap.kaps.model.data.*;
 import org.polymap.kaps.ui.form.*;
 
 /**
@@ -62,6 +42,9 @@ public class FormPageProvider
             result.add( new KaufvertragFlurstueckeFormEditorPage( formEditor, feature, formEditor.getFeatureStore() ) );
             result.add( new KaufvertragErweitertFormEditorPage( formEditor, feature, formEditor.getFeatureStore() ) );
         }
+        else if (name.equalsIgnoreCase( FlurstueckComposite.NAME )) {
+            result.add( new DontUseThisFormEditorPage( "Bitte benutzen Sie zum Anlegen und Bearbeiten von Flurstücken das Formular in Verträge.", feature, formEditor.getFeatureStore() ));
+        }
         else if (name.equalsIgnoreCase( RichtwertzoneComposite.NAME )) {
             result.add( new RichtwertzoneGrunddatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
             result.add( new RichtwertzoneWeitereDatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
@@ -72,7 +55,8 @@ public class FormPageProvider
         }
         else if (name.equalsIgnoreCase( FlurstuecksdatenBaulandComposite.NAME )) {
             result.add( new FlurstuecksdatenBaulandGrunddatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
-            result.add( new FlurstuecksdatenBaulandBodenwertFormEditorPage( formEditor, feature, formEditor.getFeatureStore() ) );
+            result.add( new FlurstuecksdatenBaulandBodenwertFormEditorPage( formEditor, feature, formEditor
+                    .getFeatureStore() ) );
             result.add( new FlurstuecksdatenBaulandRichtwertFormEditorPage( formEditor, feature, formEditor
                     .getFeatureStore() ) );
             result.add( new FlurstuecksdatenBaulandSonstigesFormEditorPage( feature, formEditor.getFeatureStore() ) );
@@ -87,7 +71,8 @@ public class FormPageProvider
             result.add( new WohnungseigentumFormEditorPage( feature, formEditor.getFeatureStore() ) );
         }
         else if (name.equalsIgnoreCase( AusstattungBewertungComposite.NAME )) {
-            result.add( new BewertungAnhandVonAustattungsmerkmalenFormEditorPage( formEditor, feature, formEditor.getFeatureStore() ) );
+            result.add( new BewertungAnhandVonAustattungsmerkmalenFormEditorPage( formEditor, feature, formEditor
+                    .getFeatureStore() ) );
         }
         else if (name.equalsIgnoreCase( ErmittlungModernisierungsgradComposite.NAME )) {
             result.add( new ErmittlungModernisierungsgradFormEditorPage( formEditor, feature, formEditor

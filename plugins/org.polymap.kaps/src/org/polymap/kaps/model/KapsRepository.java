@@ -125,7 +125,7 @@ public class KapsRepository
                     new SimpleEntityProvider<RichtwertzoneZeitraumComposite>( this,
                             RichtwertzoneZeitraumComposite.class, new NameImpl( KapsRepository.NAMESPACE,
                                     RichtwertzoneZeitraumComposite.NAME ) ),
-
+                    new FlurstueckEntityProvider( this ),
                     // new SimpleEntityProvider<StalaComposite>( this,
                     // StalaComposite.class, new NameImpl(
                     // KapsRepository.NAMESPACE, "Stala" ) ),
@@ -269,8 +269,9 @@ public class KapsRepository
         Date upperDate = cal.getTime();
 
         VertragComposite template = templateFor( VertragComposite.class );
-        BooleanExpression exp = //QueryExpressions.and( QueryExpressions.ge( template.vertragsDatum(), lowerDate ),
-                QueryExpressions.lt( template.vertragsDatum(), upperDate );
+        BooleanExpression exp = // QueryExpressions.and( QueryExpressions.ge(
+                                // template.vertragsDatum(), lowerDate ),
+        QueryExpressions.lt( template.vertragsDatum(), upperDate );
 
         Query<VertragComposite> entities = findEntities( VertragComposite.class, exp, 0, -1 );
         entities.orderBy( orderBy( template.eingangsNr(), OrderBy.Order.DESCENDING ) );
