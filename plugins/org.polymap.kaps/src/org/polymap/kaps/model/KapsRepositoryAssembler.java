@@ -104,7 +104,8 @@ public class KapsRepositoryAssembler
                 BodenRichtwertRichtlinieErgaenzungComposite.class,
                 BodenRichtwertRichtlinieArtDerNutzungComposite.class, NHK2010Anbauten.class,
                 NHK2010Baupreisindex.class, NHK2010BewertungComposite.class, NHK2010BewertungGebaeudeComposite.class,
-                ErmittlungModernisierungsgradComposite.class, ErtragswertverfahrenComposite.class );
+                ErmittlungModernisierungsgradComposite.class, ErtragswertverfahrenComposite.class,
+                GebaeudeTypStaBuComposite.class, StockwerkStaBuComposite.class, ImmobilienArtStaBuComposite.class );
 
         // persistence: workspace/Lucene
         File root = new File( Polymap.getWorkspacePath().toFile(), "data" );
@@ -155,6 +156,9 @@ public class KapsRepositoryAssembler
             GebaeudeArtStaBuComposite.Mixin.createInitData( schlCreator );
             ArtDerBauflaecheStaBuComposite.Mixin.createInitData( schlCreator );
             KaeuferKreisStaBuComposite.Mixin.createInitData( schlCreator );
+            GebaeudeTypStaBuComposite.Mixin.createInitData( schlCreator );
+            StockwerkStaBuComposite.Mixin.createInitData( schlCreator );
+            ImmobilienArtStaBuComposite.Mixin.createInitData( schlCreator );
         }
         uow.complete();
         log.info( "Create Init Data Completed" );

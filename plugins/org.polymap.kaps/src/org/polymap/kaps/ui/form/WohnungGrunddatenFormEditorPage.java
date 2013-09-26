@@ -55,6 +55,8 @@ import org.polymap.kaps.model.data.ErmittlungModernisierungsgradComposite;
 import org.polymap.kaps.model.data.EtageComposite;
 import org.polymap.kaps.model.data.FlurstueckComposite;
 import org.polymap.kaps.model.data.HimmelsrichtungComposite;
+import org.polymap.kaps.model.data.ImmobilienArtStaBuComposite;
+import org.polymap.kaps.model.data.StockwerkStaBuComposite;
 import org.polymap.kaps.model.data.WohnungComposite;
 import org.polymap.kaps.ui.ActionButton;
 import org.polymap.kaps.ui.BooleanFormField;
@@ -310,6 +312,15 @@ public class WohnungGrunddatenFormEditorPage
                 .setLayoutData( left().top( lastLine ).create() ).setParent( parent ).create();
         newFormField( "Bemerkung" ).setToolTipText( "Bemerkung zur Etage" )
                 .setProperty( new PropertyAdapter( wohnung.etageBeschreibung() ) ).setField( new StringFormField() )
+                .setLayoutData( right().top( lastLine ).create() ).setParent( parent ).create();
+
+        lastLine = newLine;
+        newLine = newFormField( "Stockwerk" ).setToolTipText( "Stockwerk entsprechend Statistischem Bundesamt" ).setProperty( new AssociationAdapter<StockwerkStaBuComposite>( wohnung.stockwerkStaBu() ) )
+                .setField( namedAssocationsPicklist( StockwerkStaBuComposite.class ) )
+                .setLayoutData( left().top( lastLine ).create() ).setParent( parent ).create();
+
+        newLine = newFormField( "Art" ).setToolTipText( "Art entsprechend Statistischem Bundesamt" ).setProperty( new AssociationAdapter<ImmobilienArtStaBuComposite>( wohnung.immobilienArtStaBu() ) )
+                .setField( namedAssocationsPicklist( ImmobilienArtStaBuComposite.class ) )
                 .setLayoutData( right().top( lastLine ).create() ).setParent( parent ).create();
 
         lastLine = newLine;

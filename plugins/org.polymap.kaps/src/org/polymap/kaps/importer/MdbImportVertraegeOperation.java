@@ -38,13 +38,13 @@ import org.polymap.kaps.ui.form.EingangsNummerFormatter;
  * 
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
-public class MdbImportOperation
+public class MdbImportVertraegeOperation
         extends AbstractMdbImportOperation {
 
-    private static Log log = LogFactory.getLog( MdbImportOperation.class );
+    private static Log log = LogFactory.getLog( MdbImportVertraegeOperation.class );
 
 
-    public MdbImportOperation( File dbFile, String[] tableNames ) {
+    public MdbImportVertraegeOperation( File dbFile, String[] tableNames ) {
         super( dbFile, tableNames, "Kaufpreissammlung importieren" );
     }
 
@@ -116,6 +116,15 @@ public class MdbImportOperation
                     // find VKREIS
                     entity.verkaeuferKreis().set( findSchlNamed( KaeuferKreisComposite.class, builderRow, "VKREIS" ) );
 
+                    entity.gebaeudeArtStaBu().set(
+                            findSchlNamed( GebaeudeArtStaBuComposite.class, builderRow, "STABU_GEBART" ) );
+
+                    entity.gebaeudeTypStaBu().set(
+                            findSchlNamed( GebaeudeTypStaBuComposite.class, builderRow, "STABU_GEBTYP" ) );
+                    
+                    entity.keller().set(
+                            findSchlNamed( KellerComposite.class, builderRow, "KELLER" ) );
+
                     // fix imports
                     if (builderRow.get( "KANTZ" ) == null) {
                         entity.kaufpreisAnteilZaehler().set( 1.0 );
@@ -178,6 +187,10 @@ public class MdbImportOperation
                     // entity );
                 }
             } );
+
+            sub = new SubMonitor( monitor, 10 );
+            importFlurZwiAgrar( db, sub, parentFolder );
+
             sub = new SubMonitor( monitor, 10 );
             importEntity( db, sub, NutzungComposite.class, new EntityCallback<NutzungComposite>() {
 
@@ -419,7 +432,9 @@ public class MdbImportOperation
                     entity.nutzung().set( findSchlNamed( NutzungComposite.class, builderRow, "NUTZUNG" ) );
                     String strasse = (String)builderRow.get( "STRNR" );
                     if (strasse != null && gemeinde != null) {
-                        entity.strasse().set( StrasseComposite.Mixin.findStrasse( findSchlNamed( GemeindeComposite.class, gemeinde ), strasse ) );
+                        entity.strasse().set(
+                                StrasseComposite.Mixin.findStrasse( findSchlNamed( GemeindeComposite.class, gemeinde ),
+                                        strasse ) );
                     }
                     entity.gebaeudeArt().set( findSchlNamed( GebaeudeArtComposite.class, builderRow, "GEBART" ) );
                     entity.artDesBaugebiets().set(
@@ -429,8 +444,9 @@ public class MdbImportOperation
                     entity.flur().set( flur );
 
                     // String gemarkung = (String)builderRow.get( "GEMARKUNG" );
-//                    Integer flurstueckNummer = (Integer)builderRow.get( "FLSTNR1" );
-//                    entity.nummer().set( flurstueckNummer );
+                    // Integer flurstueckNummer = (Integer)builderRow.get( "FLSTNR1"
+                    // );
+                    // entity.nummer().set( flurstueckNummer );
                     // String unterNummer = (String)builderRow.get( "FLSTNR1U" );
                     // // check if always loaded
                     // String key = gemarkung + "-" + flurstueckNummer + "-" +
@@ -451,7 +467,7 @@ public class MdbImportOperation
                     // allFlurstuecke.put( key, flurstueck );
                     // }
                     // entity.flurstueck().set( flurstueck );
-//                    repo.commitChanges();
+                    // repo.commitChanges();
                 }
             } );
             // allFlurstuecke.clear();
@@ -762,8 +778,9 @@ public class MdbImportOperation
                                 String gemeinde = builderRow.get( "RIZOGEM" + number ).toString();
                                 Date jahr = (Date)builderRow.get( "RIZOJAHR" + number );
                                 //
-                                return MdbImportOperation.this.findRichtwertZone( w, allRichtwertZoneGueltigkeit, zone,
-                                        gemeinde, jahr, FlurstuecksdatenAgrarComposite.class,
+                                return MdbImportVertraegeOperation.this.findRichtwertZone( w,
+                                        allRichtwertZoneGueltigkeit, zone, gemeinde, jahr,
+                                        FlurstuecksdatenAgrarComposite.class,
                                         EingangsNummerFormatter.format( entity.vertrag().get().eingangsNr().get() ) );
                             }
                             return null;
@@ -785,31 +802,42 @@ public class MdbImportOperation
     }
 
 
-    //
-    //
-    // protected final StalaComposite findStala( List<StalaComposite> allStalas,
-    // String columnName,
-    // Map<String, Object> builderRow, String neededArt ) {
-    // String stalaSchl = (String)builderRow.get( columnName );
-    // StalaComposite foundStala = null;
-    // if (stalaSchl != null && !stalaSchl.isEmpty()) {
-    // for (StalaComposite stala : allStalas) {
-    // String schl = stala.schl().get();
-    // String art = stala.art().get();
-    // if (schl != null && schl.trim().equals( stalaSchl.trim() ) && art != null
-    // && art.trim().equals( neededArt.trim() )) {
-    // foundStala = stala;
-    // break;
-    // }
-    // }
-    // if (foundStala == null) {
-    // throw new IllegalStateException( "no stala found for schl '" + stalaSchl +
-    // "'!" );
-    // }
-    // }
-    // return foundStala;
-    // }
-    //
+    private void importFlurZwiAgrar( Database db, SubMonitor monitor, File parentFolder ) throws Exception {
+        Table table = db.getTable( "FLURZWI_AGRAR" );
+        monitor.beginTask( "Tabelle: " + table.getName(), table.getRowCount() );
+
+        File wmvaopf = new File( parentFolder, "FLURZWI_AGRAR.txt" );
+        final BufferedWriter wmvaopfW = new BufferedWriter( new FileWriter( wmvaopf ) );
+        // data rows
+        Map<String, Object> builderRow = null;
+        int count = 0;
+        while ((builderRow = table.getNextRow()) != null) {
+
+            Integer eingangsnummer = (Integer)builderRow.get( "EINGANGSNR" );
+            if (eingangsnummer != null) {
+                VertragComposite vertragTemplate = QueryExpressions.templateFor( VertragComposite.class );
+                BooleanExpression expr = QueryExpressions.eq( vertragTemplate.eingangsNr(), eingangsnummer.intValue() );
+                VertragComposite vertrag = KapsRepository.instance().findEntities( VertragComposite.class, expr, 0, 1 )
+                        .find();
+                if (vertrag == null) {
+                    throw new IllegalStateException( "no vertrag found for " + eingangsnummer );
+                }
+                vertrag.flaecheLandwirtschaftStala().set( (Double)builderRow.get( "FL_LANDW" ) );
+                vertrag.hypothekStala().set( (Double)builderRow.get( "HYPOTHEK" ) );
+                vertrag.wertTauschStala().set( (Double)builderRow.get( "TAUSCHGRUND" ) );
+                vertrag.wertSonstigesStala().set( (Double)builderRow.get( "WERTSONST" ) );
+                vertrag.bemerkungStala().set( (String)builderRow.get( "BEM_AGRAR" ) );
+            }
+            else {
+                throw new IllegalStateException( "no vertrag EINGANGSNR found" );
+            }
+        }
+        wmvaopfW.flush();
+        wmvaopfW.close();
+        repo.commitChanges();
+        log.info( "Imported and committed: FLURZWI_AGRAR -> " + count );
+        monitor.done();
+    }
 
     protected void importStalas( Database db, IProgressMonitor monitor )
             throws Exception {

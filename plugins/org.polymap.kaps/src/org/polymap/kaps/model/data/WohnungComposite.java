@@ -899,7 +899,8 @@ public interface WohnungComposite
                             + gebaeudeFortfuehrung().get() + "/" + wohnungsNummer().get() + "/"
                             + wohnungsFortfuehrung().get();
                 }
-                
+
+
                 @Override
                 public void set( String anIgnoredValue )
                         throws IllegalArgumentException, IllegalStateException {
@@ -964,4 +965,11 @@ public interface WohnungComposite
         }
 
     }
+
+
+    @Optional
+    Association<StockwerkStaBuComposite> stockwerkStaBu();
+    
+    @Optional
+    Association<ImmobilienArtStaBuComposite> immobilienArtStaBu();
 }

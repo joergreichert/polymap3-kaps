@@ -68,13 +68,13 @@ public class MdbImportWizard
 
     public boolean performFinish() {
         try {
-            // MdbImportOperation op =
+            // MdbImportVertraegeOperation op =
             AbstractModelChangeOperation op = new AbstractModelChangeOperation( "WinAKPS importieren" ) {
 
                 @Override
                 protected IStatus doExecute( IProgressMonitor monitor, IAdaptable info )
                         throws Exception {
-                    new MdbImportOperation( importPage.dbFile, importPage.tableNames ).doExecute( monitor, info );
+                    new MdbImportVertraegeOperation( importPage.dbFile, importPage.tableNames ).doExecute( monitor, info );
                     new MdbImportWohneigentumOperation( importPage.dbFile, importPage.tableNames ).doExecute( monitor,
                             info );
                     new MdbImportBewertungenOperation( importPage.dbFile, importPage.tableNames ).doExecute( monitor,

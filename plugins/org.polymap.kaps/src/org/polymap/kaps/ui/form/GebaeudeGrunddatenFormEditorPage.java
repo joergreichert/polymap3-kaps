@@ -155,6 +155,12 @@ public class GebaeudeGrunddatenFormEditorPage
                 .setLayoutData( left().top( lastLine ).create() )
                 .setValidator( new MyNumberValidator( Double.class ) ).create();
 
+        lastLine = newLine;
+        newLine = newFormField( "Anzahl Geschosse" ).setParent( parent )
+                .setProperty( new PropertyAdapter( gebaeude.anzahlGeschosse() ) ).setField( new StringFormField(StringFormField.Style.ALIGN_RIGHT) )
+                .setLayoutData( left().top( lastLine ).create() )
+                .setValidator( new MyNumberValidator( Integer.class ) ).create();
+
         newFormField( "Wohn-/Gewerbeeinheiten" ).setParent( parent )
                 .setProperty( new PropertyAdapter( gebaeude.wohnEinheiten() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )

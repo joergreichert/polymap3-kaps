@@ -43,8 +43,8 @@ import org.polymap.kaps.model.KapsRepository;
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 @Concerns({ PropertyChangeSupport.Concern.class })
-@Mixins({ VertragComposite.Mixin.class, PropertyChangeSupport.Mixin.class,
-        ModelChangeSupport.Mixin.class, QiEntity.Mixin.class,
+@Mixins({ VertragComposite.Mixin.class, PropertyChangeSupport.Mixin.class, ModelChangeSupport.Mixin.class,
+        QiEntity.Mixin.class,
 // JsonState.Mixin.class
 })
 @ImportTable("K_BUCH")
@@ -83,7 +83,13 @@ public interface VertragComposite
     // STALA_AUSG TIMESTAMP,
     // GUTACHTNR1 VARCHAR(12),
     // GESPLITTET VARCHAR(1),
-    // GESPLITTET_EINGANGSNR INTEGER
+    // GESPLITTET_EINGANGSNR INTEGER,
+    // STABU_GEBART VARCHAR(1),
+    // STABU_GEBTYP VARCHAR(1),
+    // KELLER VARCHAR(1),
+    // GARAGE VARCHAR(1),
+    // STELLPLATZ VARCHAR(1),
+    // CARPORT VARCHAR(1)
     // );
     //
     // CREATE INDEX K_KKREISK_BUCH ON K_BUCH (KKREIS ASC);
@@ -121,8 +127,9 @@ public interface VertragComposite
     // @Optional
     // Property<MultiPolygon> geom();
     //
- 
+
     final static String NAME = "Vertrag";
+
 
     /** Eingangsnummer. */
     // EINGANGSNR DOUBLE,
@@ -190,28 +197,28 @@ public interface VertragComposite
     // J oder N
     // zur Auswertung geeignet
     @UseDefaults
-    //@ImportColumn("VERARBKZ")
+    // @ImportColumn("VERARBKZ")
     Property<Boolean> fuerAuswertungGeeignet();
 
 
     // BEM1 VARCHAR(60),
     @Optional
-    //@ImportColumn("BEM1")
+    // @ImportColumn("BEM1")
     Property<String> bemerkungen();
 
 
     // BEM2 VARCHAR(60),
-    //@Optional
-    //@ImportColumn("BEM2")
-    //Property<String> bemerkungen2();
-
+    // @Optional
+    // @ImportColumn("BEM2")
+    // Property<String> bemerkungen2();
 
     // VERKAUF VARCHAR(9),
     // letzter Verkauf, Referenz auf anderen Vertrag
     @Optional
     @ImportColumn("VERKAUF")
     Property<String> verkaufEingangsnr();
-    
+
+
     @Computed
     @Optional
     Association<VertragComposite> letzterVerkauf();
@@ -219,15 +226,14 @@ public interface VertragComposite
 
     // ANFR1 VARCHAR(60),
     @Optional
-//    @ImportColumn("ANFR1")
+    // @ImportColumn("ANFR1")
     Property<String> anfragen();
 
 
     // ANFR2 VARCHAR(60),
-//    @Optional
-//    @ImportColumn("ANFR2")
-//    Property<String> anfragen2();
-
+    // @Optional
+    // @ImportColumn("ANFR2")
+    // Property<String> anfragen2();
 
     // ANKSRSTAM TIMESTAMP,
     // Anschreiben Kaeufer erstellt am
@@ -308,7 +314,7 @@ public interface VertragComposite
     // GESPLITTET VARCHAR(1),
     // Grundstück geht über mehrere Gemeinden
     @Optional
-    //@ImportColumn("GESPLITTET")
+    // @ImportColumn("GESPLITTET")
     Property<Boolean> gesplittet();
 
 
@@ -316,7 +322,8 @@ public interface VertragComposite
     @Optional
     @ImportColumn("GESPLITTET_EINGANGSNR")
     Property<String> gesplittetEingangsnr();
-    
+
+
     @Computed
     @Optional
     Association<VertragComposite> gesplitteterHauptvertrag();
@@ -329,13 +336,48 @@ public interface VertragComposite
 
     @Optional
     Property<Boolean> fuerGewosGeeignet();
-    
+
+
     @Optional
     Association<VertragsdatenErweitertComposite> erweiterteVertragsdaten();
 
-//    @Optional
-//    @Computed
-//    Association<FlurstueckComposite> hauptFlurstueck();
+
+    // STABU_GEBART VARCHAR(1),
+    @Optional
+    Association<GebaeudeArtStaBuComposite> gebaeudeArtStaBu();
+
+
+    // STABU_GEBTYP VARCHAR(1),
+    @Optional
+    Association<GebaeudeTypStaBuComposite> gebaeudeTypStaBu();
+
+
+    // KELLER VARCHAR(1),
+    @Optional
+    Association<KellerComposite> keller();
+
+
+    // GARAGE VARCHAR(1),
+    @Optional
+    @ImportColumn("GARAGE")
+    Property<String> garage();
+
+
+    // Boolean STELLPLATZ VARCHAR(1)
+    @Optional
+    @ImportColumn("STELLPLATZ")
+    Property<String> stellplaetze();
+
+
+    // Boolean CARPORT VARCHAR(1)
+    @Optional
+    @ImportColumn("CARPORT")
+    Property<String> carport();
+
+
+    // @Optional
+    // @Computed
+    // Association<FlurstueckComposite> hauptFlurstueck();
 
     /**
      * Methods and transient fields.
@@ -344,39 +386,64 @@ public interface VertragComposite
             implements VertragComposite {
 
         private static Log log = LogFactory.getLog( Mixin.class );
-        
+
+
         @Override
         public void beforeCompletion()
                 throws UnitOfWorkCompletionException {
             if (eingangsNr().get() == null) {
-                eingangsNr().set( KapsRepository.instance().highestEingangsNummer(vertragsDatum().get()) );
-                EventManager.instance().publish( new PropertyChangeEvent( this, eingangsNr().qualifiedName().name(), null, eingangsNr().get() ) );
+                eingangsNr().set( KapsRepository.instance().highestEingangsNummer( vertragsDatum().get() ) );
+                EventManager.instance().publish(
+                        new PropertyChangeEvent( this, eingangsNr().qualifiedName().name(), null, eingangsNr().get() ) );
             }
         }
+
 
         public Association<VertragComposite> gesplitteterHauptvertrag() {
             // TODO
             return null;
         }
-        
-//        private AssociationInfo KaufvertragCompositeAss = new GenericAssociationInfo( VertragComposite.class, "hauptFlurstueck" );
-//        private final VertragComposite kc = this;
-//        
-//        @Override
-//        public Association<FlurstueckComposite> hauptFlurstueck() {
-//            return new ComputedAssociationInstance<FlurstueckComposite>( KaufvertragCompositeAss ) {
-//
-//                public FlurstueckComposite get() {
-//                    return FlurstueckComposite.Mixin.mainForEntity( kc );
-//                }
-//                
-//                @Override
-//                public void set( FlurstueckComposite anIgnoredValue )
-//                        throws IllegalArgumentException, IllegalStateException {
-//                        // ignored
-//                }
-//            };
-//        }
+
+        // private AssociationInfo KaufvertragCompositeAss = new
+        // GenericAssociationInfo( VertragComposite.class, "hauptFlurstueck" );
+        // private final VertragComposite kc = this;
+        //
+        // @Override
+        // public Association<FlurstueckComposite> hauptFlurstueck() {
+        // return new ComputedAssociationInstance<FlurstueckComposite>(
+        // KaufvertragCompositeAss ) {
+        //
+        // public FlurstueckComposite get() {
+        // return FlurstueckComposite.Mixin.mainForEntity( kc );
+        // }
+        //
+        // @Override
+        // public void set( FlurstueckComposite anIgnoredValue )
+        // throws IllegalArgumentException, IllegalStateException {
+        // // ignored
+        // }
+        // };
+        // }
     }
+
+
+    @Optional
+    Property<Double> flaecheLandwirtschaftStala();
+
+
+    @Optional
+    Property<Double> hypothekStala();
+
+
+    @Optional
+    Property<Double> wertTauschStala();
+
+
+    @Optional
+    Property<Double> wertSonstigesStala();
+
+
+    @Optional
+    Property<String> bemerkungStala();
 
 }

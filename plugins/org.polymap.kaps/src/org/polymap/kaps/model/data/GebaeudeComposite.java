@@ -122,7 +122,10 @@ public interface GebaeudeComposite
     @Optional
     @ImportColumn("Weinheit")
     Property<Integer> wohnEinheiten();
-
+    
+    @Optional
+    @ImportColumn("ANZGESCHOSSE")
+    Property<Integer> anzahlGeschosse();
 
     // SANANFEND - String
     @Optional

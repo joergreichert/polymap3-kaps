@@ -21,7 +21,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.polymap.core.runtime.DefaultSessionContextProvider;
 import org.polymap.core.runtime.ISessionContextProvider;
 import org.polymap.core.runtime.SessionContext;
-import org.polymap.kaps.importer.MdbImportOperation;
+import org.polymap.kaps.importer.MdbImportVertraegeOperation;
 import org.qi4j.bootstrap.Energy4Java;
 
 /**
@@ -39,7 +39,7 @@ public class ImporterTest
         // wahrscheinlihc muss ich das Qi4jModule und den KapsRepositoryAssembler
         // vorher per OSGi initialisieren
         File dbFile = new File( "kaufdat.mdb" );
-        MdbImportOperation mdbImportOperation = new MdbImportOperation( dbFile, null );
+        MdbImportVertraegeOperation mdbImportOperation = new MdbImportVertraegeOperation( dbFile, null );
         try {
             mdbImportOperation.execute( new NullProgressMonitor(), null );
         }

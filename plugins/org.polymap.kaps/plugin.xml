@@ -42,11 +42,11 @@
             tooltip="Richtwertzone als CSV im Format BORIS exportieren.">
       </featureOperation>
       <featureOperation
-            class="org.polymap.kaps.exporter.FlurstueckStaBuExporter"
+            class="org.polymap.kaps.exporter.VertragStaBuExporter"
             icon="icons/exportas.gif"
-            id="org.polymap.kaps.exporter.FlurstueckStaBuExporter"
+            id="org.polymap.kaps.exporter.VertragStaBuExporter"
             label="Exportieren für StaBu"
-            tooltip="Flurstücke für StaBu exportieren">
+            tooltip="Verträge für Statistisches Bundesamt Wiesbaden exportieren">
       </featureOperation>
    </extension>
    <extension

@@ -39,8 +39,10 @@ import org.polymap.kaps.model.data.GebaeudeArtComposite;
 import org.polymap.kaps.model.data.GebaeudeComposite;
 import org.polymap.kaps.model.data.GemarkungComposite;
 import org.polymap.kaps.model.data.HimmelsrichtungComposite;
+import org.polymap.kaps.model.data.ImmobilienArtStaBuComposite;
 import org.polymap.kaps.model.data.NutzungComposite;
 import org.polymap.kaps.model.data.RichtwertzoneComposite;
+import org.polymap.kaps.model.data.StockwerkStaBuComposite;
 import org.polymap.kaps.model.data.StrasseComposite;
 import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.WohnungComposite;
@@ -182,6 +184,9 @@ public class MdbImportWohneigentumOperation
                     
                     entity.eigentumsArt().set( findSchlNamed( EigentumsartComposite.class, builderRow, "EIGENTART" ) );
                     entity.etage().set( findSchlNamed( EtageComposite.class, builderRow, "GESCHOSS" ) );
+                    entity.stockwerkStaBu().set( findSchlNamed( StockwerkStaBuComposite.class, builderRow, "STOCKWERK" ) );
+                    entity.immobilienArtStaBu().set( findSchlNamed( ImmobilienArtStaBuComposite.class, builderRow, "STAT_BUND" ) );
+                    
                     entity.himmelsrichtung().set(
                             findSchlNamed( HimmelsrichtungComposite.class, builderRow, "HIMMELSRI" ) );
                     entity.gebaeudeArtGarage().set( findSchlNamed( GebaeudeArtComposite.class, builderRow, "GEBARTG" ) );
