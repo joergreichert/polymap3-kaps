@@ -146,7 +146,7 @@ public interface FlurstuecksdatenBaulandComposite
     Property<Double> wertDerBaulichenAnlagen();
 
 
-    // Text = "Wert der bauliche Anlagen" o.ä. 
+    // Text = "Wert der bauliche Anlagen" o.ä.
     // VERFAHREN VARCHAR(36),
     @Optional
     @ImportColumn("VERFAHREN")
@@ -334,13 +334,13 @@ public interface FlurstuecksdatenBaulandComposite
     @ImportColumn("FAKTOR")
     Property<Double> faktorBereinigterKaufpreis();
 
-//
-//    // FAKTOR2 DOUBLE,
-//    // TODO default 1
-//    @Optional
-//    @ImportColumn("FAKTOR2")
-//    Property<Double> faktorOhneStrassenplatz();
 
+    //
+    // // FAKTOR2 DOUBLE,
+    // // TODO default 1
+    // @Optional
+    // @ImportColumn("FAKTOR2")
+    // Property<Double> faktorOhneStrassenplatz();
 
     // KPANTGEB DOUBLE,
     @Optional
@@ -1014,13 +1014,45 @@ public interface FlurstuecksdatenBaulandComposite
     @Optional
     Property<Boolean> zurRichtwertermittlungGeeignet();
 
-//    // http://polymap.org/kaps/ticket/104#comment:8
-//    @Optional
-//    Property<Double> differenzGebaeudeZuBodenwert();
-//    
+
+    // // http://polymap.org/kaps/ticket/104#comment:8
+    // @Optional
+    // Property<Double> differenzGebaeudeZuBodenwert();
+    //
 
     @Optional
     Property<String> bemerkungen();
+
+
+    // importiert aus K_BUCH
+    // STABU_GEBART VARCHAR(1),
+    @Optional
+    Association<GebaeudeArtStaBuComposite> gebaeudeArtStaBu();
+
+
+    // STABU_GEBTYP VARCHAR(1),
+    @Optional
+    Association<GebaeudeTypStaBuComposite> gebaeudeTypStaBu();
+
+
+    @Optional
+    Association<WohnlageStaBuComposite> wohnlageStaBu();
+
+
+    // GARAGE VARCHAR(1),
+    @Optional
+    Property<String> garage();
+
+
+    // Boolean STELLPLATZ VARCHAR(1)
+    @Optional
+    Property<String> stellplaetze();
+
+
+    // Boolean CARPORT VARCHAR(1)
+    @Optional
+    Property<String> carport();
+
 
     // );
     //
@@ -1048,6 +1080,14 @@ public interface FlurstuecksdatenBaulandComposite
                     .templateFor( FlurstuecksdatenBaulandComposite.class );
             BooleanExpression expr = QueryExpressions.eq( template.flurstueck(), flurstueck );
             return KapsRepository.instance().findEntities( FlurstuecksdatenBaulandComposite.class, expr, 0, 1 ).find();
+        }
+
+
+        public static Iterable<FlurstuecksdatenBaulandComposite> forVertrag( VertragComposite vertrag ) {
+            FlurstuecksdatenBaulandComposite template = QueryExpressions
+                    .templateFor( FlurstuecksdatenBaulandComposite.class );
+            BooleanExpression expr = QueryExpressions.eq( template.vertrag(), vertrag );
+            return KapsRepository.instance().findEntities( FlurstuecksdatenBaulandComposite.class, expr, 0, -1 );
         }
 
 

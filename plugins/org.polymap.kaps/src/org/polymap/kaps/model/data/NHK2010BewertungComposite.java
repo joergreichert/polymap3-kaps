@@ -56,7 +56,7 @@ public interface NHK2010BewertungComposite
     // ANBAUTEN - String
     @Optional
     // TODO @ImportColumn("ANBAUTEN")
-    ManyAssociation<NHK2010Anbauten> anbauten();
+    ManyAssociation<NHK2010AnbautenComposite> anbauten();
 
 
     // ZWSUMSONST - Double

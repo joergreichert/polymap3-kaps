@@ -55,8 +55,7 @@ public class EinzelneVertragsdatenAgrarFilter
     public Composite createControl( Composite parent, IFilterEditorSite site ) {
         Composite result = site.createStandardLayout( parent );
 
-        site.addStandardLayout( site.newFormField( result, "eingangsNr", Integer.class,
-                new StringFormField(),
+        site.addStandardLayout( site.newFormField( result, "eingangsNr", Integer.class, new StringFormField(),
                 new MyNumberValidator( Integer.class ), "Eingangsnummer" ) );
 
         return result;
@@ -67,14 +66,12 @@ public class EinzelneVertragsdatenAgrarFilter
         VertragComposite template = QueryExpressions.templateFor( VertragComposite.class );
 
         Integer nummer = (Integer)site.getFieldValue( "eingangsNr" );
-        BooleanExpression expr = nummer != null ? QueryExpressions.eq( template.eingangsNr(),
-                nummer ) : null;
+        BooleanExpression expr = nummer != null ? QueryExpressions.eq( template.eingangsNr(), nummer ) : null;
 
-        Query<VertragComposite> kaufvertraege = KapsRepository.instance().findEntities(
-                VertragComposite.class, expr, 0, getMaxResults() );
+        Query<VertragComposite> kaufvertraege = KapsRepository.instance().findEntities( VertragComposite.class, expr,
+                0, getMaxResults() );
 
-        FlurstuecksdatenAgrarComposite templateB = QueryExpressions
-                .templateFor( FlurstuecksdatenAgrarComposite.class );
+        FlurstuecksdatenAgrarComposite templateB = QueryExpressions.templateFor( FlurstuecksdatenAgrarComposite.class );
         BooleanExpression inExpr = null;
         for (VertragComposite kv : kaufvertraege) {
             BooleanExpression newExpr = QueryExpressions.eq( templateB.vertrag(), kv );
@@ -85,8 +82,11 @@ public class EinzelneVertragsdatenAgrarFilter
                 inExpr = QueryExpressions.or( inExpr, newExpr );
             }
         }
-        return KapsRepository.instance().findEntities( FlurstuecksdatenAgrarComposite.class, inExpr,
-                0, getMaxResults() );
+        if (inExpr == null) {
+            inExpr = QueryExpressions.eq( template.identity(), "unknown" );
+        }
+        return KapsRepository.instance()
+                .findEntities( FlurstuecksdatenAgrarComposite.class, inExpr, 0, getMaxResults() );
 
     }
 }

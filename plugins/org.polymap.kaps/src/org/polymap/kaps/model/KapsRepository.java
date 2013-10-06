@@ -167,10 +167,10 @@ public class KapsRepository
                     new SimpleEntityProvider<WohnungComposite>( this, WohnungComposite.class, new NameImpl(
                             KapsRepository.NAMESPACE, WohnungComposite.NAME ) ),
 
-                    new SimpleEntityProvider<NHK2010Anbauten>( this, NHK2010Anbauten.class, new NameImpl(
-                            KapsRepository.NAMESPACE, NHK2010Anbauten.NAME ) ),
-                    new SimpleEntityProvider<NHK2010Baupreisindex>( this, NHK2010Baupreisindex.class, new NameImpl(
-                            KapsRepository.NAMESPACE, NHK2010Baupreisindex.NAME ) ),
+                    new SimpleEntityProvider<NHK2010AnbautenComposite>( this, NHK2010AnbautenComposite.class, new NameImpl(
+                            KapsRepository.NAMESPACE, NHK2010AnbautenComposite.NAME ) ),
+                    new SimpleEntityProvider<NHK2010BaupreisIndexComposite>( this, NHK2010BaupreisIndexComposite.class, new NameImpl(
+                            KapsRepository.NAMESPACE, NHK2010BaupreisIndexComposite.NAME ) ),
                     new SimpleEntityProvider<NHK2010BewertungComposite>( this, NHK2010BewertungComposite.class,
                             new NameImpl( KapsRepository.NAMESPACE, NHK2010BewertungComposite.NAME ) ),
                     new SimpleEntityProvider<ErmittlungModernisierungsgradComposite>( this,

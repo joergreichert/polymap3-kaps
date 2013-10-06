@@ -18,9 +18,9 @@ import java.util.List;
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
-public class NHK2010Gebaeudeart {
+public class NHK2010GebaeudeArtComposite {
 
-    private final List<NHK2010Gebaeudeart> children;
+    private final List<NHK2010GebaeudeArtComposite> children;
 
     private Integer                        stufe1;
 
@@ -74,7 +74,7 @@ public class NHK2010Gebaeudeart {
     private String                         qualifiedName;
 
 
-    public NHK2010Gebaeudeart( int hauptnr, int nummer, int unternummer, String name, String id, Integer gndVon,
+    public NHK2010GebaeudeArtComposite( int hauptnr, int nummer, int unternummer, String name, String id, Integer gndVon,
             Integer gndBis, Integer korrekturGroesse1, Double korrekturFaktor1, Integer korrekturGroesse2,
             Double korrekturFaktor2, Integer korrekturGroesse3, Double korrekturFaktor3 ) {
         this.hauptnr = hauptnr;
@@ -92,11 +92,11 @@ public class NHK2010Gebaeudeart {
         this.korrekturGroesse3 = korrekturGroesse3;
         this.korrekturFaktor3 = korrekturFaktor3;
         this.selectable = id != null;
-        children = new ArrayList<NHK2010Gebaeudeart>();
+        children = new ArrayList<NHK2010GebaeudeArtComposite>();
     }
 
 
-    public void add( NHK2010Gebaeudeart child ) {
+    public void add( NHK2010GebaeudeArtComposite child ) {
         child.addNamePrefix( qualifiedName );
         children.add( child );
     }
@@ -116,7 +116,7 @@ public class NHK2010Gebaeudeart {
     }
 
 
-    public List<NHK2010Gebaeudeart> getChildren() {
+    public List<NHK2010GebaeudeArtComposite> getChildren() {
         return children;
     }
 

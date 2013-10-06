@@ -102,14 +102,17 @@ public class RichtwertZoneZeitraumFilter
                         RichtwertzoneZeitraumComposite.class, expr2, 0, -1 );
 
                 for (RichtwertzoneZeitraumComposite kv : daten) {
-                    BooleanExpression newExpr = QueryExpressions.eq( template.identity(), kv.zone().get()
-                            .identity().get() );
+                    BooleanExpression newExpr = QueryExpressions.eq( template.identity(), kv.zone().get().identity()
+                            .get() );
                     if (dExpr == null) {
                         dExpr = newExpr;
                     }
                     else {
                         dExpr = QueryExpressions.or( dExpr, newExpr );
                     }
+                }
+                if (dExpr == null) {
+                    dExpr = QueryExpressions.eq( template.identity(), "unknown" );
                 }
             }
         }

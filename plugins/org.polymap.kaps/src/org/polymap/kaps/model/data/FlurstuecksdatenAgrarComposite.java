@@ -61,7 +61,7 @@ public interface FlurstuecksdatenAgrarComposite
 
     // VERARBKZ - String
     @Optional
-//    @ImportColumn("VERARBKZ")
+    // @ImportColumn("VERARBKZ")
     Property<Boolean> fuerStatistikGeeignet();
 
 
@@ -373,24 +373,24 @@ public interface FlurstuecksdatenAgrarComposite
     @ImportColumn("RESD1")
     Property<Double> RESD1();
 
-//
-//    // TODO NUTZUNG - String
-//    @Optional
-//    @ImportColumn("NUTZUNG")
-//    Property<String> NUTZUNG();
 
+    //
+    // // TODO NUTZUNG - String
+    // @Optional
+    // @ImportColumn("NUTZUNG")
+    // Property<String> NUTZUNG();
 
     // TODO BHKZ - String
     @Optional
     @ImportColumn("BHKZ")
     Property<String> BHKZ();
 
-//
-//    // TODO GEMEINDE - Long
-//    @Optional
-//    @ImportColumn("GEMEINDE")
-//    Property<Long> GEMEINDE();
 
+    //
+    // // TODO GEMEINDE - Long
+    // @Optional
+    // @ImportColumn("GEMEINDE")
+    // Property<Long> GEMEINDE();
 
     @Optional
     // @ImportColumn("GEBART")
@@ -434,6 +434,8 @@ public interface FlurstuecksdatenAgrarComposite
     Property<String> FLST_AUSWERTUNG();
 
 
+    //
+    //
     @Optional
     Association<FlurstueckComposite> flurstueck();
 
@@ -474,6 +476,26 @@ public interface FlurstuecksdatenAgrarComposite
     Association<RichtwertzoneZeitraumComposite> richtwertZone6();
 
 
+    @Optional
+    Property<Double> flaecheLandwirtschaftStala();
+
+
+    @Optional
+    Property<Double> hypothekStala();
+
+
+    @Optional
+    Property<Double> wertTauschStala();
+
+
+    @Optional
+    Property<Double> wertSonstigesStala();
+
+
+    @Optional
+    Property<String> bemerkungStala();
+
+
     /**
      * Methods and transient fields.
      */
@@ -490,25 +512,32 @@ public interface FlurstuecksdatenAgrarComposite
             return KapsRepository.instance().findEntities( FlurstuecksdatenAgrarComposite.class, expr, 0, 1 ).find();
         }
 
-//
-//        @Override
-//        public Association<RichtwertzoneComposite> richtwertZone() {
-//            return new ComputedAssociationInstance<RichtwertzoneComposite>( new GenericAssociationInfo(
-//                    FlurstuecksdatenAgrarComposite.class, "richtwertZone" ) ) {
-//
-//                public RichtwertzoneComposite get() {
-//                    FlurstueckComposite flurstueck = flurstueck().get();
-//                    return flurstueck != null ? flurstueck.richtwertZone().get() : null;
-//                }
-//
-//                @Override
-//                public void set( RichtwertzoneComposite anIgnoredValue )
-//                        throws IllegalArgumentException, IllegalStateException {
-//                    // ignored
-//                }
-//            };
-//        }
 
+        public static Iterable<FlurstuecksdatenAgrarComposite> forVertrag( VertragComposite vertrag ) {
+            FlurstuecksdatenAgrarComposite template = QueryExpressions
+                    .templateFor( FlurstuecksdatenAgrarComposite.class );
+            BooleanExpression expr = QueryExpressions.eq( template.vertrag(), vertrag );
+            return KapsRepository.instance().findEntities( FlurstuecksdatenAgrarComposite.class, expr, 0, -1 );
+        }
+        //
+        // @Override
+        // public Association<RichtwertzoneComposite> richtwertZone() {
+        // return new ComputedAssociationInstance<RichtwertzoneComposite>( new
+        // GenericAssociationInfo(
+        // FlurstuecksdatenAgrarComposite.class, "richtwertZone" ) ) {
+        //
+        // public RichtwertzoneComposite get() {
+        // FlurstueckComposite flurstueck = flurstueck().get();
+        // return flurstueck != null ? flurstueck.richtwertZone().get() : null;
+        // }
+        //
+        // @Override
+        // public void set( RichtwertzoneComposite anIgnoredValue )
+        // throws IllegalArgumentException, IllegalStateException {
+        // // ignored
+        // }
+        // };
+        // }
 
         //
         // @Override
@@ -531,26 +560,27 @@ public interface FlurstuecksdatenAgrarComposite
         // };
         // }
         //
-//
-//        @Override
-//        public Property<Double> richtwert() {
-//            return new ComputedPropertyInstance<Double>( new GenericPropertyInfo( FlurstuecksdatenAgrarComposite.class,
-//                    "richtwert" ) ) {
-//
-//                @Override
-//                public Double get() {
-//                    RichtwertzoneZeitraumComposite rz = richtwertZoneG().get();
-//                    return rz != null ? rz.euroQm().get() : null;
-//                }
-//
-//
-//                @Override
-//                public void set( Double anIgnoredValue )
-//                        throws IllegalArgumentException, IllegalStateException {
-//                    // ignored
-//                }
-//            };
-//        }
+        //
+        // @Override
+        // public Property<Double> richtwert() {
+        // return new ComputedPropertyInstance<Double>( new GenericPropertyInfo(
+        // FlurstuecksdatenAgrarComposite.class,
+        // "richtwert" ) ) {
+        //
+        // @Override
+        // public Double get() {
+        // RichtwertzoneZeitraumComposite rz = richtwertZoneG().get();
+        // return rz != null ? rz.euroQm().get() : null;
+        // }
+        //
+        //
+        // @Override
+        // public void set( Double anIgnoredValue )
+        // throws IllegalArgumentException, IllegalStateException {
+        // // ignored
+        // }
+        // };
+        // }
 
         //
         // @Override

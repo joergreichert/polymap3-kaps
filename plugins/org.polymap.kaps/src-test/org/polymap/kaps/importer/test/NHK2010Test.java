@@ -18,8 +18,8 @@ import junit.framework.TestCase;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.polymap.kaps.model.NHK2010GebaeudeartenProvider;
-import org.polymap.kaps.model.data.NHK2010Gebaeudeart;
+import org.polymap.kaps.model.NHK2010GebaeudeArtProvider;
+import org.polymap.kaps.model.data.NHK2010GebaeudeArtComposite;
 
 
 /**
@@ -31,14 +31,14 @@ public class NHK2010Test
     private static Log log = LogFactory.getLog( NHK2010Test.class );
     
     public void testStufe5VomSchweinestall() {
-        NHK2010GebaeudeartenProvider provider = NHK2010GebaeudeartenProvider.instance();
-        NHK2010Gebaeudeart art = provider.gebaeudeForNumber(18,3,2);
+        NHK2010GebaeudeArtProvider provider = NHK2010GebaeudeArtProvider.instance();
+        NHK2010GebaeudeArtComposite art = provider.gebaeudeForNumber(18,3,2);
         Assert.assertEquals( 570, (int)art.getStufe5());
     }
 
     public void testKrankenhaus() {
-        NHK2010GebaeudeartenProvider provider = NHK2010GebaeudeartenProvider.instance();
-        NHK2010Gebaeudeart art = provider.gebaeudeForNumber(10,1,1);
+        NHK2010GebaeudeArtProvider provider = NHK2010GebaeudeArtProvider.instance();
+        NHK2010GebaeudeArtComposite art = provider.gebaeudeForNumber(10,1,1);
         Assert.assertEquals( 1720, (int)art.getStufe3());
         Assert.assertEquals( 2080, (int)art.getStufe4());
         Assert.assertEquals( 2765, (int)art.getStufe5());
@@ -49,15 +49,15 @@ public class NHK2010Test
     
 
     public void testGarageById() {
-        NHK2010GebaeudeartenProvider provider = NHK2010GebaeudeartenProvider.instance();
-        NHK2010Gebaeudeart art = provider.gebaeudeForId("14.3");
+        NHK2010GebaeudeArtProvider provider = NHK2010GebaeudeArtProvider.instance();
+        NHK2010GebaeudeArtComposite art = provider.gebaeudeForId("14.3");
         Assert.assertEquals( 560, (int)art.getStufe3());
     }
     
 
     public void testNHK() {
-        NHK2010GebaeudeartenProvider provider = NHK2010GebaeudeartenProvider.instance();
-        NHK2010Gebaeudeart art = provider.gebaeudeForId("1.01");
+        NHK2010GebaeudeArtProvider provider = NHK2010GebaeudeArtProvider.instance();
+        NHK2010GebaeudeArtComposite art = provider.gebaeudeForId("1.01");
         Assert.assertEquals( 835, (int)art.getStufe3());
         Assert.assertEquals( 1005, (int)art.getStufe4());
 

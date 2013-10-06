@@ -23,6 +23,8 @@ import org.qi4j.api.common.Optional;
 import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.mixin.Mixins;
+import org.qi4j.api.property.ComputedPropertyInstance;
+import org.qi4j.api.property.GenericPropertyInfo;
 import org.qi4j.api.property.Property;
 import org.qi4j.api.query.QueryExpressions;
 
@@ -39,12 +41,12 @@ import org.polymap.kaps.model.KapsRepository;
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 @Concerns({ PropertyChangeSupport.Concern.class })
-@Mixins({ NHK2010Baupreisindex.Mixin.class, PropertyChangeSupport.Mixin.class, ModelChangeSupport.Mixin.class,
+@Mixins({ NHK2010BaupreisIndexComposite.Mixin.class, PropertyChangeSupport.Mixin.class, ModelChangeSupport.Mixin.class,
         QiEntity.Mixin.class
 // JsonState.Mixin.class
 })
 @ImportTable("K_EBKIND10")
-public interface NHK2010Baupreisindex
+public interface NHK2010BaupreisIndexComposite
         extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite {
 
     final static String NAME = "NHK 2010 - Baupreisindex";
@@ -98,23 +100,47 @@ public interface NHK2010Baupreisindex
     Property<Double> gewerbeBetrieb();
 
 
+    @Optional
+    Property<String> schl();
+
+
     /**
      * Methods and transient fields.
      */
     public static abstract class Mixin
-            implements NHK2010Baupreisindex {
+            implements NHK2010BaupreisIndexComposite {
 
         private static Log log = LogFactory.getLog( Mixin.class );
+
+
+        @Override
+        public Property<String> schl() {
+            return new ComputedPropertyInstance<String>( new GenericPropertyInfo( NHK2010BaupreisIndexComposite.class,
+                    "schl" ) ) {
+
+                @Override
+                public String get() {
+                    return jahr().get() + " " + monatVon().get() + "/" + monatBis().get();
+                }
+
+
+                @Override
+                public void set( String anIgnoredValue )
+                        throws IllegalArgumentException, IllegalStateException {
+                    // really ignore
+                }
+            };
+        }
 
 
         public final static Values indexFor( String indexType, Date wertErmittlungsStichtag ) {
             // durchschnitt für 2010 für den Typ berechnen
             Values result = new Values();
-            NHK2010Baupreisindex template = QueryExpressions.templateFor( NHK2010Baupreisindex.class );
+            NHK2010BaupreisIndexComposite template = QueryExpressions.templateFor( NHK2010BaupreisIndexComposite.class );
             KapsRepository repo = KapsRepository.instance();
             Double summe = 0.0d;
             Integer count = 0;
-            for (NHK2010Baupreisindex index : repo.findEntities( NHK2010Baupreisindex.class,
+            for (NHK2010BaupreisIndexComposite index : repo.findEntities( NHK2010BaupreisIndexComposite.class,
                     QueryExpressions.eq( template.jahr(), 2010 ), 0, 100 )) {
                 count++;
                 summe += indexFor( indexType, index );
@@ -123,12 +149,12 @@ public interface NHK2010Baupreisindex
 
             // danach wert für datum und typ finden
             Calendar cal = GregorianCalendar.getInstance();
-            cal.setTime( wertErmittlungsStichtag);
+            cal.setTime( wertErmittlungsStichtag );
             int year = cal.get( Calendar.YEAR );
             int month = cal.get( Calendar.MONTH ) + 1;
             Double indexValue = 0.0d;
             Integer lastMonatBis = -1;
-            for (NHK2010Baupreisindex index : repo.findEntities( NHK2010Baupreisindex.class,
+            for (NHK2010BaupreisIndexComposite index : repo.findEntities( NHK2010BaupreisIndexComposite.class,
                     QueryExpressions.eq( template.jahr(), year ), 0, 100 )) {
                 Double currentIndex = indexFor( indexType, index );
 
@@ -137,35 +163,44 @@ public interface NHK2010Baupreisindex
                 if (monatVon <= month && monatBis >= month) {
                     indexValue = currentIndex;
                     // jahr noch nicht komplett so den höchsten Wert nehmen
-                } else if (monatBis > lastMonatBis) {
+                }
+                else if (monatBis > lastMonatBis) {
                     indexValue = currentIndex;
                     lastMonatBis = monatBis;
                 }
             }
             result.index = indexValue;
-            result.result = result.index /result.durchschnitt;
+            result.result = result.index / result.durchschnitt;
             return result;
         }
 
 
-        public final static Double indexFor( String indexType, NHK2010Baupreisindex index ) {
+        public final static Double indexFor( String indexType, NHK2010BaupreisIndexComposite index ) {
             if ("E".equals( indexType )) {
                 return index.einfamilienGebaeude().get();
-            } else if ("M".equals( indexType )) {
+            }
+            else if ("M".equals( indexType )) {
                 return index.mehrfamilienGebaeude().get();
-            } else if ("B".equals( indexType )) {
+            }
+            else if ("B".equals( indexType )) {
                 return index.bueroGebaeude().get();
-            } else if ("G".equals( indexType )) {
+            }
+            else if ("G".equals( indexType )) {
                 return index.gewerbeBetrieb().get();
-            } else {
-                throw new IllegalStateException("Unknown indexType " + indexType);
+            }
+            else {
+                throw new IllegalStateException( "Unknown indexType " + indexType );
             }
         }
     }
-    
+
+
     public static class Values {
+
         public Double durchschnitt;
+
         public Double index;
+
         public Double result;
     }
 

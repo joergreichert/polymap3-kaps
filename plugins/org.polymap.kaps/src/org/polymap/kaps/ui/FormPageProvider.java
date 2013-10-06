@@ -43,7 +43,9 @@ public class FormPageProvider
             result.add( new KaufvertragErweitertFormEditorPage( formEditor, feature, formEditor.getFeatureStore() ) );
         }
         else if (name.equalsIgnoreCase( FlurstueckComposite.NAME )) {
-            result.add( new DontUseThisFormEditorPage( "Bitte benutzen Sie zum Anlegen und Bearbeiten von Flurstücken das Formular in Verträge.", feature, formEditor.getFeatureStore() ));
+            result.add( new DontUseThisFormEditorPage(
+                    "Bitte benutzen Sie zum Anlegen und Bearbeiten von Flurstücken das Formular in Verträge.", feature,
+                    formEditor.getFeatureStore() ) );
         }
         else if (name.equalsIgnoreCase( RichtwertzoneComposite.NAME )) {
             result.add( new RichtwertzoneGrunddatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
@@ -60,12 +62,14 @@ public class FormPageProvider
             result.add( new FlurstuecksdatenBaulandRichtwertFormEditorPage( formEditor, feature, formEditor
                     .getFeatureStore() ) );
             result.add( new FlurstuecksdatenBaulandSonstigesFormEditorPage( feature, formEditor.getFeatureStore() ) );
+            result.add( new FlurstuecksdatenBaulandStaBuFormEditorPage( feature, formEditor.getFeatureStore() ) );
         }
         else if (name.equalsIgnoreCase( FlurstuecksdatenAgrarComposite.NAME )) {
             result.add( new FlurstuecksdatenAgrarGrunddatenFormEditorPage( formEditor, feature, formEditor
                     .getFeatureStore() ) );
             result.add( new FlurstuecksdatenAgrarBodenwertFormEditorPage( formEditor, feature, formEditor
                     .getFeatureStore() ) );
+            result.add( new FlurstuecksdatenAgrarStaLaFormEditorPage( formEditor, feature, formEditor.getFeatureStore() ) );
         }
         else if (name.equalsIgnoreCase( WohnungseigentumComposite.NAME )) {
             result.add( new WohnungseigentumFormEditorPage( feature, formEditor.getFeatureStore() ) );
@@ -77,6 +81,9 @@ public class FormPageProvider
         else if (name.equalsIgnoreCase( ErmittlungModernisierungsgradComposite.NAME )) {
             result.add( new ErmittlungModernisierungsgradFormEditorPage( formEditor, feature, formEditor
                     .getFeatureStore() ) );
+        }
+        else if (name.equalsIgnoreCase( NHK2010BaupreisIndexComposite.NAME )) {
+            result.add( new BaupreisIndexFormEditorPage( feature, formEditor.getFeatureStore() ) );
         }
         else if (name.equalsIgnoreCase( ErtragswertverfahrenComposite.NAME )) {
             result.add( new ErtragswertverfahrenBetriebskostenFormEditorPage( feature, formEditor.getFeatureStore() ) );

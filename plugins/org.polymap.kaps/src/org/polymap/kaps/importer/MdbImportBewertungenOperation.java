@@ -26,15 +26,15 @@ import org.eclipse.core.runtime.Status;
 import org.polymap.core.runtime.SubMonitor;
 
 import org.polymap.kaps.model.KapsRepository;
-import org.polymap.kaps.model.NHK2010GebaeudeartenProvider;
+import org.polymap.kaps.model.NHK2010GebaeudeArtProvider;
 import org.polymap.kaps.model.data.ErmittlungModernisierungsgradComposite;
 import org.polymap.kaps.model.data.ErtragswertverfahrenComposite;
 import org.polymap.kaps.model.data.EtageComposite;
 import org.polymap.kaps.model.data.FlurstueckComposite;
 import org.polymap.kaps.model.data.FlurstuecksdatenAgrarComposite;
 import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
-import org.polymap.kaps.model.data.NHK2010Anbauten;
-import org.polymap.kaps.model.data.NHK2010Baupreisindex;
+import org.polymap.kaps.model.data.NHK2010AnbautenComposite;
+import org.polymap.kaps.model.data.NHK2010BaupreisIndexComposite;
 import org.polymap.kaps.model.data.NHK2010BewertungComposite;
 import org.polymap.kaps.model.data.NHK2010BewertungGebaeudeComposite;
 import org.polymap.kaps.model.data.VertragComposite;
@@ -68,19 +68,19 @@ public class MdbImportBewertungenOperation
             SubMonitor sub = null;
 
             sub = new SubMonitor( monitor, 10 );
-            importEntity( db, monitor, NHK2010Anbauten.class, new EntityCallback<NHK2010Anbauten>() {
+            importEntity( db, monitor, NHK2010AnbautenComposite.class, new EntityCallback<NHK2010AnbautenComposite>() {
 
                 @Override
-                public void fillEntity( NHK2010Anbauten entity, Map<String, Object> builderRow ) {
+                public void fillEntity( NHK2010AnbautenComposite entity, Map<String, Object> builderRow ) {
                     // bewertung finden
                     entity.schl().set( String.valueOf( (Integer)builderRow.get( "SCHL" ) ) );
                 }
             } );
             sub = new SubMonitor( monitor, 10 );
-            importEntity( db, monitor, NHK2010Baupreisindex.class, new EntityCallback<NHK2010Baupreisindex>() {
+            importEntity( db, monitor, NHK2010BaupreisIndexComposite.class, new EntityCallback<NHK2010BaupreisIndexComposite>() {
 
                 @Override
-                public void fillEntity( NHK2010Baupreisindex entity, Map<String, Object> builderRow ) {
+                public void fillEntity( NHK2010BaupreisIndexComposite entity, Map<String, Object> builderRow ) {
                     // jahr von bis
                     Double value = (Double)builderRow.get( "JAHR" );
                     entity.jahr().set( value.intValue() );
@@ -221,10 +221,10 @@ public class MdbImportBewertungenOperation
                             if (anbauteTrimmed.startsWith( "0" )) {
                                 anbauteTrimmed = anbauteTrimmed.substring( 1 );
                             }
-                            NHK2010Anbauten anbauTemplate = QueryExpressions.templateFor( NHK2010Anbauten.class );
+                            NHK2010AnbautenComposite anbauTemplate = QueryExpressions.templateFor( NHK2010AnbautenComposite.class );
                             BooleanExpression expr2 = QueryExpressions.eq( anbauTemplate.schl(), anbauteTrimmed );
-                            NHK2010Anbauten anbau = KapsRepository.instance()
-                                    .findEntities( NHK2010Anbauten.class, expr2, 0, 1 ).find();
+                            NHK2010AnbautenComposite anbau = KapsRepository.instance()
+                                    .findEntities( NHK2010AnbautenComposite.class, expr2, 0, 1 ).find();
                             if (anbau == null) {
                                 throw new IllegalStateException( "no anbau found for " + anbauteTrimmed );
                             }
@@ -249,7 +249,7 @@ public class MdbImportBewertungenOperation
         AnnotatedCompositeImporter bewertungGebaeudeImporter = new AnnotatedCompositeImporter(
                 NHK2010BewertungGebaeudeComposite.class, table );
         count = 0;
-        NHK2010GebaeudeartenProvider gebaeudeArtenProvider = NHK2010GebaeudeartenProvider.instance();
+        NHK2010GebaeudeArtProvider gebaeudeArtenProvider = NHK2010GebaeudeArtProvider.instance();
         while ((builderRow = table.getNextRow()) != null) {
             // alle Bewertungen importieren
 

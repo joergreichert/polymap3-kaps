@@ -67,6 +67,8 @@ import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.ArtDerBauflaecheStaBuComposite;
 import org.polymap.kaps.model.data.FlurstueckComposite;
 import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
+import org.polymap.kaps.model.data.GebaeudeArtStaBuComposite;
+import org.polymap.kaps.model.data.GebaeudeTypStaBuComposite;
 import org.polymap.kaps.model.data.GemarkungComposite;
 import org.polymap.kaps.model.data.GemeindeComposite;
 import org.polymap.kaps.model.data.KaeuferKreisComposite;
@@ -75,6 +77,7 @@ import org.polymap.kaps.model.data.KellerComposite;
 import org.polymap.kaps.model.data.NutzungComposite;
 import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.VertragsdatenErweitertComposite;
+import org.polymap.kaps.model.data.WohnlageStaBuComposite;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -288,6 +291,14 @@ public class VertragStaBuExporter
         Double bodenrichtwert = null;
         Integer baujahr = null;
         Double wohnflaeche = null;
+        GebaeudeTypStaBuComposite gebaeudeTyp = null;
+        GebaeudeArtStaBuComposite gebaeudeArt = null;
+        WohnlageStaBuComposite wohnlage = null;
+        String stellplatz = null;
+        String garage = null;
+        String carport = null;
+
+        KellerComposite keller = null;
         double grundstuecksflaeche = 0.0d;
         for (FlurstueckComposite f : flurstuecke) {
             NutzungComposite nutzung = f.nutzung().get();
@@ -298,6 +309,13 @@ public class VertragStaBuExporter
                     bodenrichtwert = baulandComposite.richtwert().get();
                     baujahr = baulandComposite.baujahr().get();
                     wohnflaeche = baulandComposite.wohnflaeche().get();
+                    gebaeudeTyp = baulandComposite.gebaeudeTypStaBu().get();
+                    gebaeudeArt = baulandComposite.gebaeudeArtStaBu().get();
+                    keller = baulandComposite.keller().get();
+                    wohnlage = baulandComposite.wohnlageStaBu().get();
+                    stellplatz = baulandComposite.stellplaetze().get();
+                    carport = baulandComposite.carport().get();
+                    garage = baulandComposite.garage().get();
                     flurstueck = f;
                 }
                 // TODO können mehrere sein
@@ -305,6 +323,9 @@ public class VertragStaBuExporter
                 // WohnungComposite.Mixin.findWohnungenFor( f );
                 grundstuecksflaeche += f.verkaufteFlaeche().get() != null ? f.verkaufteFlaeche().get().doubleValue()
                         : 0.0d;
+            }
+            if (flurstueck == null) {
+                flurstueck = f;
             }
         }
 
@@ -390,6 +411,13 @@ public class VertragStaBuExporter
             addMM( pwi, "Wohnflaeche", String.valueOf( wohnflaeche.intValue() ) );
         }
         // TODO Stellplatz
+        // if (carport != null && carport.equals( "J" ) || )
+
+        if (wohnlage != null) {
+            addMM( pwi, "Lagequalitaet", wohnlage.schl().get() );
+        }
+
+        // TODO Unterscheidung Wohnungseigentum vs. Grundstuecke
         // if (nutzung.isWohneigentum().get()) {
         // Element wohnungseigentum = addElement( mmgrOuter, "Wohnungseigentum" );
         // }
@@ -398,16 +426,21 @@ public class VertragStaBuExporter
         if (grundstuecksflaeche != 0.0d) {
             addMM( grundstuecke, "Grundstuecksflaeche", String.valueOf( new Double( grundstuecksflaeche ).intValue() ) );
         }
-        if (vertrag.gebaeudeArtStaBu().get() != null) {
-            addMM( grundstuecke, "Gebaeudeart", vertrag.gebaeudeArtStaBu().get().schl().get() );
-        }
-        if (vertrag.gebaeudeTypStaBu().get() != null) {
-            addMM( grundstuecke, "Gebaeudetyp", vertrag.gebaeudeTypStaBu().get().schl().get() );
-        }
-        // TODO check ob nicht besser von erweiterte Vertragsdaten holen
-        KellerComposite keller = vertrag.keller().get();
 
-        // }
+        if (gebaeudeArt != null) {
+            addMM( grundstuecke, "Gebaeudeart", gebaeudeArt.schl().get() );
+        }
+        if (gebaeudeTyp != null) {
+            addMM( grundstuecke, "Gebaeudetyp", gebaeudeTyp.schl().get() );
+        }
+        if (keller != null && !keller.schl().get().endsWith( "1" )) {
+            if (keller.schl().get().equals( "2" )) {
+                addMM( grundstuecke, "Unterkellerung", "0" );
+            }
+            else {
+                addMM( grundstuecke, "Unterkellerung", "1" );
+            }
+        }
 
     }
 

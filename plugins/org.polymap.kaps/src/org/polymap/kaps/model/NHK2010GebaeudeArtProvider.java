@@ -23,39 +23,39 @@ import org.apache.commons.logging.LogFactory;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
-import org.polymap.kaps.model.data.NHK2010Gebaeudeart;
+import org.polymap.kaps.model.data.NHK2010GebaeudeArtComposite;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
-public class NHK2010GebaeudeartenProvider
+public class NHK2010GebaeudeArtProvider
         implements ITreeContentProvider {
 
-    private static Log                          log          = LogFactory.getLog( NHK2010GebaeudeartenProvider.class );
+    private static Log                          log          = LogFactory.getLog( NHK2010GebaeudeArtProvider.class );
 
-    private static NHK2010GebaeudeartenProvider instance;
+    private static NHK2010GebaeudeArtProvider instance;
 
-    private final List<NHK2010Gebaeudeart>      rootElements = new ArrayList<NHK2010Gebaeudeart>();
+    private final List<NHK2010GebaeudeArtComposite>      rootElements = new ArrayList<NHK2010GebaeudeArtComposite>();
 
-    private Map<String, NHK2010Gebaeudeart>     registry     = new HashMap<String, NHK2010Gebaeudeart>();
+    private Map<String, NHK2010GebaeudeArtComposite>     registry     = new HashMap<String, NHK2010GebaeudeArtComposite>();
 
-    private Map<String, NHK2010Gebaeudeart>     idRegistry   = new HashMap<String, NHK2010Gebaeudeart>();
+    private Map<String, NHK2010GebaeudeArtComposite>     idRegistry   = new HashMap<String, NHK2010GebaeudeArtComposite>();
 
 
-    private NHK2010GebaeudeartenProvider() {
+    private NHK2010GebaeudeArtProvider() {
         initializeData();
     }
 
 
-    public final static NHK2010GebaeudeartenProvider instance() {
+    public final static NHK2010GebaeudeArtProvider instance() {
         if (instance == null) {
-            instance = new NHK2010GebaeudeartenProvider();
+            instance = new NHK2010GebaeudeArtProvider();
         }
         return instance;
     }
 
 
-    public List<NHK2010Gebaeudeart> getElements() {
+    public List<NHK2010GebaeudeArtComposite> getElements() {
         return rootElements;
     }
 
@@ -66,31 +66,31 @@ public class NHK2010GebaeudeartenProvider
     }
 
 
-    private void add( NHK2010Gebaeudeart rootElement ) {
+    private void add( NHK2010GebaeudeArtComposite rootElement ) {
         rootElements.add( rootElement );
     }
 
 
-    private NHK2010Gebaeudeart create( int hauptnr, int nummer, int unternummer, String name ) {
+    private NHK2010GebaeudeArtComposite create( int hauptnr, int nummer, int unternummer, String name ) {
         return create( hauptnr, nummer, unternummer, name, null );
     }
 
 
-    private NHK2010Gebaeudeart create( int hauptnr, int nummer, int unternummer, String name, String id ) {
+    private NHK2010GebaeudeArtComposite create( int hauptnr, int nummer, int unternummer, String name, String id ) {
         return create( hauptnr, nummer, unternummer, name, id, null, null );
     }
 
 
-    private NHK2010Gebaeudeart create( int hauptnr, int nummer, int unternummer, String name, String id,
+    private NHK2010GebaeudeArtComposite create( int hauptnr, int nummer, int unternummer, String name, String id,
             Integer gndVon, Integer gndBis ) {
         return create( hauptnr, nummer, unternummer, name, id, gndVon, gndBis, null, null, null, null, null, null );
     }
 
 
-    private NHK2010Gebaeudeart create( int hauptnr, int nummer, int unternummer, String name, String id,
+    private NHK2010GebaeudeArtComposite create( int hauptnr, int nummer, int unternummer, String name, String id,
             Integer gndVon, Integer gndBis, Integer korrekturGroesse1, Double korrekturFaktor1,
             Integer korrekturGroesse2, Double korrekturFaktor2, Integer korrekturGroesse3, Double korrekturFaktor3 ) {
-        NHK2010Gebaeudeart art = new NHK2010Gebaeudeart( hauptnr, nummer, unternummer, name, id, gndVon, gndBis,
+        NHK2010GebaeudeArtComposite art = new NHK2010GebaeudeArtComposite( hauptnr, nummer, unternummer, name, id, gndVon, gndBis,
                 korrekturGroesse3, korrekturFaktor3, korrekturGroesse3, korrekturFaktor3, korrekturGroesse3,
                 korrekturFaktor3 );
         registry.put( art.getNumber(), art );
@@ -106,7 +106,7 @@ public class NHK2010GebaeudeartenProvider
 
     private void setValues( Integer hnr, Integer nr, Integer unternr, Integer stufe, Integer wert, Double briBgf,
             Double bgfNutz, Integer bnk, String nutzeinheit ) {
-        NHK2010Gebaeudeart art = registry.get( createKey( hnr, nr, unternr ) );
+        NHK2010GebaeudeArtComposite art = registry.get( createKey( hnr, nr, unternr ) );
         art.setValues( stufe, wert, briBgf, bgfNutz, bnk, nutzeinheit );
     }
 
@@ -116,159 +116,159 @@ public class NHK2010GebaeudeartenProvider
     }
 
 
-    public NHK2010Gebaeudeart gebaeudeForNumber( Integer hnr, Integer nr, Integer unternr ) {
+    public NHK2010GebaeudeArtComposite gebaeudeForNumber( Integer hnr, Integer nr, Integer unternr ) {
         return registry.get( createKey( hnr, nr, unternr ) );
     }
 
 
-    public NHK2010Gebaeudeart gebaeudeForId( String id ) {
+    public NHK2010GebaeudeArtComposite gebaeudeForId( String id ) {
         return idRegistry.get( id );
     }
 
 
     private void initializeGebaeude() {
-        NHK2010Gebaeudeart n100 = create( 1, 0, 0, "Ein- und Zweifamilienhäuser freistehend" );
+        NHK2010GebaeudeArtComposite n100 = create( 1, 0, 0, "Ein- und Zweifamilienhäuser freistehend" );
         add( n100 );
-        NHK2010Gebaeudeart n110 = create( 1, 1, 0, "Keller-, Erdgeschoss" );
+        NHK2010GebaeudeArtComposite n110 = create( 1, 1, 0, "Keller-, Erdgeschoss" );
         n100.add( n110 );
         n110.add( create( 1, 1, 1, "Dachgeschoss voll ausgebaut", "1.01" ) );
         n110.add( create( 1, 1, 2, "Dachgeschoss nicht ausgebaut", "1.02" ) );
         n110.add( create( 1, 1, 3, "Flachdach oder flach geneigtes Dach", "1.03" ) );
-        NHK2010Gebaeudeart n120 = create( 1, 2, 0, "Keller-, Erd-, Obergeschoss" );
+        NHK2010GebaeudeArtComposite n120 = create( 1, 2, 0, "Keller-, Erd-, Obergeschoss" );
         n100.add( n120 );
         n120.add( create( 1, 2, 1, "Dachgeschoss voll ausgebaut", "1.11" ) );
         n120.add( create( 1, 2, 2, "Dachgeschoss nicht ausgebaut", "1.12" ) );
         n120.add( create( 1, 2, 3, "Flachdach oder flach geneigtes Dach", "1.13" ) );
-        NHK2010Gebaeudeart n130 = create( 1, 3, 0, "Erdgeschoss, nicht unterkellert" );
+        NHK2010GebaeudeArtComposite n130 = create( 1, 3, 0, "Erdgeschoss, nicht unterkellert" );
         n100.add( n130 );
         n130.add( create( 1, 3, 1, "Dachgeschoss voll ausgebaut", "1.21" ) );
         n130.add( create( 1, 3, 2, "Dachgeschoss nicht ausgebaut", "1.22" ) );
         n130.add( create( 1, 3, 3, "Flachdach oder flach geneigtes Dach", "1.23" ) );
-        NHK2010Gebaeudeart n140 = create( 1, 4, 0, "Erd-, Obergeschoss, nicht unterkellert" );
+        NHK2010GebaeudeArtComposite n140 = create( 1, 4, 0, "Erd-, Obergeschoss, nicht unterkellert" );
         n100.add( n140 );
         n140.add( create( 1, 4, 1, "Dachgeschoss voll ausgebaut", "1.31" ) );
         n140.add( create( 1, 4, 2, "Dachgeschoss nicht ausgebaut", "1.32" ) );
         n140.add( create( 1, 4, 3, "Flachdach oder flach geneigtes Dach", "1.33" ) );
-        NHK2010Gebaeudeart n200 = create( 2, 0, 0, "Doppel- und Reihenendhäuser" );
+        NHK2010GebaeudeArtComposite n200 = create( 2, 0, 0, "Doppel- und Reihenendhäuser" );
         add( n200 );
-        NHK2010Gebaeudeart n210 = create( 2, 1, 0, "Keller-, Erdgeschoss" );
+        NHK2010GebaeudeArtComposite n210 = create( 2, 1, 0, "Keller-, Erdgeschoss" );
         n200.add( n210 );
         n210.add( create( 2, 1, 1, "Dachgeschoss voll ausgebaut", "2.01" ) );
         n210.add( create( 2, 1, 2, "Dachgeschoss nicht ausgebaut", "2.02" ) );
         n210.add( create( 2, 1, 3, "Flachdach oder flach geneigtes Dach", "2.03" ) );
-        NHK2010Gebaeudeart n220 = create( 2, 2, 0, "Keller-, Erd-, Obergeschoss" );
+        NHK2010GebaeudeArtComposite n220 = create( 2, 2, 0, "Keller-, Erd-, Obergeschoss" );
         n200.add( n220 );
         n220.add( create( 2, 2, 1, "Dachgeschoss voll ausgebaut", "2.11" ) );
         n220.add( create( 2, 2, 2, "Dachgeschoss nicht ausgebaut", "2.12" ) );
         n220.add( create( 2, 2, 3, "Flachdach oder flach geneigtes Dach", "2.13" ) );
-        NHK2010Gebaeudeart n230 = create( 2, 3, 0, "Erdgeschoss, nicht unterkellert" );
+        NHK2010GebaeudeArtComposite n230 = create( 2, 3, 0, "Erdgeschoss, nicht unterkellert" );
         n200.add( n230 );
         n230.add( create( 2, 3, 1, "Dachgeschoss voll ausgebaut", "2.21" ) );
         n230.add( create( 2, 3, 2, "Dachgeschoss nicht ausgebaut", "2.22" ) );
         n230.add( create( 2, 3, 3, "Flachdach oder flach geneigtes Dach", "2.23" ) );
-        NHK2010Gebaeudeart n240 = create( 2, 4, 0, "Erd-, Obergeschoss, nicht unterkellert" );
+        NHK2010GebaeudeArtComposite n240 = create( 2, 4, 0, "Erd-, Obergeschoss, nicht unterkellert" );
         n200.add( n240 );
         n240.add( create( 2, 4, 1, "Dachgeschoss voll ausgebaut", "2.31" ) );
         n240.add( create( 2, 4, 2, "Dachgeschoss nicht ausgebaut", "2.32" ) );
         n240.add( create( 2, 4, 3, "Flachdach oder flach geneigtes Dach", "2.33" ) );
-        NHK2010Gebaeudeart n300 = create( 3, 0, 0, "Reihenmittelhäuser" );
+        NHK2010GebaeudeArtComposite n300 = create( 3, 0, 0, "Reihenmittelhäuser" );
         add( n300 );
-        NHK2010Gebaeudeart n310 = create( 3, 1, 0, "Keller-, Erdgeschoss" );
+        NHK2010GebaeudeArtComposite n310 = create( 3, 1, 0, "Keller-, Erdgeschoss" );
         n300.add( n310 );
         n310.add( create( 3, 1, 1, "Dachgeschoss voll ausgebaut", "3.01" ) );
         n310.add( create( 3, 1, 2, "Dachgeschoss nicht ausgebaut", "3.02" ) );
         n310.add( create( 3, 1, 3, "Flachdach oder flach geneigtes Dach", "3.03" ) );
-        NHK2010Gebaeudeart n320 = create( 3, 2, 0, "Keller-, Erd-, Obergeschoss" );
+        NHK2010GebaeudeArtComposite n320 = create( 3, 2, 0, "Keller-, Erd-, Obergeschoss" );
         n300.add( n320 );
         n320.add( create( 3, 2, 1, "Dachgeschoss voll ausgebaut", "3.11" ) );
         n320.add( create( 3, 2, 2, "Dachgeschoss nicht ausgebaut", "3.12" ) );
         n320.add( create( 3, 2, 3, "Flachdach oder flach geneigtes Dach", "3.13" ) );
-        NHK2010Gebaeudeart n330 = create( 3, 3, 0, "Erdgeschoss, nicht unterkellert" );
+        NHK2010GebaeudeArtComposite n330 = create( 3, 3, 0, "Erdgeschoss, nicht unterkellert" );
         n300.add( n330 );
         n330.add( create( 3, 3, 1, "Dachgeschoss voll ausgebaut", "3.21" ) );
         n330.add( create( 3, 3, 2, "Dachgeschoss nicht ausgebaut", "3.22" ) );
         n330.add( create( 3, 3, 3, "Flachdach oder flach geneigtes Dach", "3.23" ) );
-        NHK2010Gebaeudeart n340 = create( 3, 4, 0, "Erd-, Obergeschoss, nicht unterkellert" );
+        NHK2010GebaeudeArtComposite n340 = create( 3, 4, 0, "Erd-, Obergeschoss, nicht unterkellert" );
         n300.add( n340 );
         n340.add( create( 3, 4, 1, "Dachgeschoss voll ausgebaut", "3.31" ) );
         n340.add( create( 3, 4, 2, "Dachgeschoss nicht ausgebaut", "3.32" ) );
         n340.add( create( 3, 4, 3, "Flachdach oder flach geneigtes Dach", "3.33" ) );
-        NHK2010Gebaeudeart n410 = create( 4, 0, 0, "Mehrfamilienhäuser" );
+        NHK2010GebaeudeArtComposite n410 = create( 4, 0, 0, "Mehrfamilienhäuser" );
         add( n410 );
         n410.add( create( 4, 1, 1, "mit bis zu 6 WE", "4.1", 60, 80 ) );
         n410.add( create( 4, 1, 2, "mit 7 bis 20 WE", "4.2", 60, 80 ) );
         n410.add( create( 4, 1, 3, "mit mehr als 20 WE", "4.3", 60, 80 ) );
-        NHK2010Gebaeudeart n510 = create( 5, 0, 0, "Wohnhäuser mit Mischnutzung, Banken und Geschäftshäuser" );
+        NHK2010GebaeudeArtComposite n510 = create( 5, 0, 0, "Wohnhäuser mit Mischnutzung, Banken und Geschäftshäuser" );
         add( n510 );
         n510.add( create( 5, 1, 1, "Wohnhäuser mit Mischnutzung", "5.1", 60, 80 ) );
         n510.add( create( 5, 1, 2, "Banken und Geschäftshäuser mit Wohnungen", "5.2", 50, 70 ) );
         n510.add( create( 5, 1, 3, "Banken und Geschäftshäuser ohne Wohnungen", "5.3", 50, 70 ) );
-        NHK2010Gebaeudeart n610 = create( 6, 0, 0, "Bürogebäude" );
+        NHK2010GebaeudeArtComposite n610 = create( 6, 0, 0, "Bürogebäude" );
         add( n610 );
         n610.add( create( 6, 1, 1, "Massivbau", "6.1", 50, 70 ) );
         n610.add( create( 6, 1, 2, "Stahlbetonskelettbau", "6.2", 50, 70 ) );
-        NHK2010Gebaeudeart n710 = create( 7, 0, 0, "Gemeindezentren, Saalbauten und Veranstaltungsgebäude" );
+        NHK2010GebaeudeArtComposite n710 = create( 7, 0, 0, "Gemeindezentren, Saalbauten und Veranstaltungsgebäude" );
         add( n710 );
         n710.add( create( 7, 1, 1, "Gemeindezentren", "7.1", 30, 50 ) );
         n710.add( create( 7, 1, 2, "Saalbauten und Veranstaltungsgebäude", "7.2", 30, 50 ) );
-        NHK2010Gebaeudeart n810 = create( 8, 0, 0, "Kindergärten, Schulen" );
+        NHK2010GebaeudeArtComposite n810 = create( 8, 0, 0, "Kindergärten, Schulen" );
         add( n810 );
         n810.add( create( 8, 1, 1, "Kindergärten", "8.1", 40, 60 ) );
         n810.add( create( 8, 1, 2, "Allgemeinbildende Schulen, Berufsbildende Schulen", "8.2", 40, 60 ) );
         n810.add( create( 8, 1, 3, "Sonderschulen", "8.3", 40, 60 ) );
-        NHK2010Gebaeudeart n910 = create( 9, 0, 0, "Wohnheime, Alten- und Pflegeheime" );
+        NHK2010GebaeudeArtComposite n910 = create( 9, 0, 0, "Wohnheime, Alten- und Pflegeheime" );
         add( n910 );
         n910.add( create( 9, 1, 1, "Wohnheime und Internate", "9.1", 40, 60 ) );
         n910.add( create( 9, 1, 2, "Alten- und Pflegeheime", "9.2", 40, 60 ) );
-        NHK2010Gebaeudeart n1010 = create( 10, 0, 0, "Krankenhäuser, Tageskliniken" );
+        NHK2010GebaeudeArtComposite n1010 = create( 10, 0, 0, "Krankenhäuser, Tageskliniken" );
         add( n1010 );
         n1010.add( create( 10, 1, 1, "Krankenhäuser und Kliniken", "10.1", 30, 50 ) );
         n1010.add( create( 10, 1, 2, "Tageskliniken und Ärztehäuser", "10.2", 30, 50 ) );
-        NHK2010Gebaeudeart n1110 = create( 11, 0, 0, "Beherbergungsstätten, Verpflegungseinrichtungen" );
+        NHK2010GebaeudeArtComposite n1110 = create( 11, 0, 0, "Beherbergungsstätten, Verpflegungseinrichtungen" );
         add( n1110 );
         n1110.add( create( 11, 1, 1, "Hotels", "11.1", 30, 50 ) );
-        NHK2010Gebaeudeart n1210 = create( 12, 0, 0, "Sporthallen, Freizeitbäder und Heilbäder" );
+        NHK2010GebaeudeArtComposite n1210 = create( 12, 0, 0, "Sporthallen, Freizeitbäder und Heilbäder" );
         add( n1210 );
         n1210.add( create( 12, 1, 1, "Sporthallen (Einfeldhallen)", "12.1", 30, 50 ) );
         n1210.add( create( 12, 1, 2, "Sporthallen (Dreifeldhallen und Mehrzweckhallen)", "12.2", 30, 50 ) );
         n1210.add( create( 12, 1, 3, "Tennishallen", "12.3", 30, 50 ) );
         n1210.add( create( 12, 1, 4, "Freizeitbäder und Heilbäder", "12.4", 30, 50 ) );
-        NHK2010Gebaeudeart n1310 = create( 13, 0, 0, "Verbrauchermärkte, Kauf- und Warenhäuser, Autohäuser" );
+        NHK2010GebaeudeArtComposite n1310 = create( 13, 0, 0, "Verbrauchermärkte, Kauf- und Warenhäuser, Autohäuser" );
         add( n1310 );
         n1310.add( create( 13, 1, 1, "Verbrauchermärkte", "13.1", 20, 40 ) );
         n1310.add( create( 13, 1, 2, "Kauf- und Warenhäuser", "13.2", 40, 60 ) );
         n1310.add( create( 13, 1, 3, "Autohäuser ohne Werkstatt", "13.3", 20, 40 ) );
-        NHK2010Gebaeudeart n1410 = create( 14, 0, 0, "Garagen" );
+        NHK2010GebaeudeArtComposite n1410 = create( 14, 0, 0, "Garagen" );
         add( n1410 );
         n1410.add( create( 14, 1, 1, "Einzelgaragen und Mehrfachgaragen", "14.1", 50, 70 ) );
         n1410.add( create( 14, 1, 2, "Hochgaragen", "14.2", 30, 50 ) );
         n1410.add( create( 14, 1, 3, "Tiefgaragen", "14.3", 30, 50 ) );
         n1410.add( create( 14, 1, 4, "Nutzfahrzeuggaragen", "14.4", 30, 50 ) );
-        NHK2010Gebaeudeart n1510 = create( 15, 0, 0, "Betriebs- und Werkstätten, Produktionsgebäude" );
+        NHK2010GebaeudeArtComposite n1510 = create( 15, 0, 0, "Betriebs- und Werkstätten, Produktionsgebäude" );
         add( n1510 );
         n1510.add( create( 15, 1, 1, "Betriebs- und Werkstätten, eingeschossig", "15.1", 30, 50 ) );
         n1510.add( create( 15, 1, 2, "Betriebs- und Werkstätten, mehrgeschossig, ohne Hallenanteil", "15.2", 30, 50 ) );
         n1510.add( create( 15, 1, 3, "Betriebs- und Werkstätten, mehrgeschossig, hoher Hallenanteil", "15.3", 30, 50 ) );
         n1510.add( create( 15, 1, 4, "Industrielle Produktionsgebäude, Massivbauweise", "15.4", 30, 50 ) );
         n1510.add( create( 15, 1, 5, "Industrielle Produktionsgebäude, überwiegend Skelettbauweise", "15.5", 30, 50 ) );
-        NHK2010Gebaeudeart n1610 = create( 16, 0, 0, "Lagergebäude" );
+        NHK2010GebaeudeArtComposite n1610 = create( 16, 0, 0, "Lagergebäude" );
         add( n1610 );
         n1610.add( create( 16, 1, 1, "Lagergebäude ohne Mischnutzung, Kaltlager", "16.1", 30, 50 ) );
         n1610.add( create( 16, 1, 2, "Lagergebäude mit bis zu 25 % Mischnutzung", "16.2", 30, 50 ) );
         n1610.add( create( 16, 1, 3, "Lagergebäude mit mehr als 25 % Mischnutzung", "16.3", 30, 50 ) );
-        NHK2010Gebaeudeart n1710 = create( 17, 0, 0, "Sonstige Gebäude" );
+        NHK2010GebaeudeArtComposite n1710 = create( 17, 0, 0, "Sonstige Gebäude" );
         add( n1710 );
         n1710.add( create( 17, 1, 1, "Museen", "17.1" ) );
         n1710.add( create( 17, 1, 2, "Theater", "17.2" ) );
         n1710.add( create( 17, 1, 3, "Sakralbauten", "17.3" ) );
         n1710.add( create( 17, 1, 4, "Friedhofsgebäude", "17.4" ) );
-        NHK2010Gebaeudeart n1800 = create( 18, 0, 0, "Landwirtschaftliche Betriebsgebäude" );
+        NHK2010GebaeudeArtComposite n1800 = create( 18, 0, 0, "Landwirtschaftliche Betriebsgebäude" );
         add( n1800 );
-        NHK2010Gebaeudeart n1810 = create( 18, 1, 0, "Reithallen, Pferdeställe" );
+        NHK2010GebaeudeArtComposite n1810 = create( 18, 1, 0, "Reithallen, Pferdeställe" );
         n1800.add( n1810 );
         n1810.add( create( 18, 1, 1, "Reithallen", "18.1.1", 20, 40, 500, 1.2, 1000, 1.0, 1000, 1.0 ) );
         n1810.add( create( 18, 1, 2, "Pferdeställe", "18.1.2", 20, 40, 250, 1.2, 500, 1.0, 500, 1.0 ) );
-        NHK2010Gebaeudeart n1820 = create( 18, 2, 0, "Rinderställe, Melkhäuser" );
+        NHK2010GebaeudeArtComposite n1820 = create( 18, 2, 0, "Rinderställe, Melkhäuser" );
         n1800.add( n1820 );
         n1820.add( create( 18, 2, 1, "Kälberställe", "18.2.1", 20, 40, 100, 1.2, 150, 1.0, 150, 1.0 ) );
         n1820.add( create( 18, 2, 2, "Jungvieh- und Mastbullen- und Milchviehställe ohne Melkstand und Warteraum",
@@ -278,14 +278,14 @@ public class NHK2010GebaeudeartenProvider
         n1820.add( create( 18, 2, 4,
                 "Melkhäuser mit Milchlager und Nebenräume als Einzelgebäude ohne Warteraum und Selektion", "18.2.4",
                 20, 40, 100, 1.2, 150, 1.0, 150, 1.0 ) );
-        NHK2010Gebaeudeart n1830 = create( 18, 3, 0, "Schweineställe" );
+        NHK2010GebaeudeArtComposite n1830 = create( 18, 3, 0, "Schweineställe" );
         n1800.add( n1830 );
         n1830.add( create( 18, 3, 1, "Ferkelaufzuchtställe", "18.3.1", 20, 40, 400, 1.2, 600, 1.0, 600, 1.0 ) );
         n1830.add( create( 18, 3, 2, "Mastschweineställe", "18.3.2", 20, 40, 750, 1.2, 1250, 1.0, 1250, 1.0 ) );
         n1830.add( create( 18, 3, 3, "Zuchtschweineställe, Deck-, Warte- und Abferkelbereich", "18.3.3", 20, 40, 750,
                 1.2, 1250, 1.0, 1250, 1.0 ) );
         n1830.add( create( 18, 3, 4, "Abferkelstall als Einzelgebäude", "18.3.4", 20, 40, 200, 1.2, 400, 1.0, 400, 1.0 ) );
-        NHK2010Gebaeudeart n1840 = create( 18, 4, 0, "Geflügelställe" );
+        NHK2010GebaeudeArtComposite n1840 = create( 18, 4, 0, "Geflügelställe" );
         n1800.add( n1840 );
         n1840.add( create( 18, 4, 1, "Mastgeflügel, Bodenhaltung (Hähnchen, Puten, Gänse)", "18.4.1", 20, 40, 1000,
                 1.2, 1900, 1.0, 1900, 1.0 ) );
@@ -293,11 +293,11 @@ public class NHK2010GebaeudeartenProvider
         n1840.add( create( 18, 4, 3, "Legehennen, Volierenhaltung", "18.4.3", 20, 40, 500, 1.2, 1600, 1.0, 1600, 1.0 ) );
         n1840.add( create( 18, 4, 4, "Legehennen, Kleingruppenhaltung, ausgestalteter Käfig", "18.4.4", 20, 40, 500,
                 1.2, 1200, 1.0, 1200, 1.0 ) );
-        NHK2010Gebaeudeart n1850 = create( 18, 5, 0, "Landwirtschaftliche Mehrzweckhallen" );
+        NHK2010GebaeudeArtComposite n1850 = create( 18, 5, 0, "Landwirtschaftliche Mehrzweckhallen" );
         n1800.add( n1850 );
         n1850.add( create( 18, 5, 1, "Landwirtschaftliche Mehrzweckhallen", "18.5", 20, 40, 250, 1.2, 800, 1.0, 800,
                 1.0 ) );
-        NHK2010Gebaeudeart n1860 = create( 18, 6, 0, "Außenanlagen zu allen landwirtschaftlichen Betriebsgebäuden" );
+        NHK2010GebaeudeArtComposite n1860 = create( 18, 6, 0, "Außenanlagen zu allen landwirtschaftlichen Betriebsgebäuden" );
         n1800.add( n1860 );
         n1860.add( create( 18, 6, 1, "Außenanlagen zu allen landwirtschaftlichen Betriebsgebäuden", "18.6", 20, 40 ) );
     }
@@ -665,7 +665,7 @@ public class NHK2010GebaeudeartenProvider
 
     @Override
     public Object[] getChildren( Object parentElement ) {
-        return ((NHK2010Gebaeudeart)parentElement).getChildren().toArray();
+        return ((NHK2010GebaeudeArtComposite)parentElement).getChildren().toArray();
     }
 
 

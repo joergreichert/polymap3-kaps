@@ -22,9 +22,13 @@ import org.qi4j.api.common.UseDefaults;
 import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.entity.association.Association;
+import org.qi4j.api.entity.association.kaps.AssociationInfo;
+import org.qi4j.api.entity.association.kaps.ComputedAssociationInstance;
+import org.qi4j.api.entity.association.kaps.GenericAssociationInfo;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.property.Computed;
 import org.qi4j.api.property.Property;
+import org.qi4j.api.query.QueryExpressions;
 import org.qi4j.api.unitofwork.UnitOfWorkCompletionException;
 
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -275,29 +279,26 @@ public interface VertragComposite
     // KAUFPREIS_EURO DOUBLE DEFAULT 0,
     // wird nicht benutzt
 
-    // GESFLAECHE DOUBLE DEFAULT 0,
-    @UseDefaults
-    @ImportColumn("GESFLAECHE")
-    Property<Double> gesamtFlaeche();
-
+    // // GESFLAECHE DOUBLE DEFAULT 0,
+    // @UseDefaults
+    // @ImportColumn("GESFLAECHE")
+    // Property<Double> gesamtFlaeche();
 
     // verkaufbem VARCHAR(25),
-    @Optional
-    @ImportColumn("verkaufbem")
-    Property<String> bemerkungLetzterVerkauf();
-
-
+    // @Optional
+    // @ImportColumn("verkaufbem")
+    // Property<String> bemerkungLetzterVerkauf();
+    // wird nicht benutzt
     // EURO_UMSTELL VARCHAR(1),
     // wird nicht benutzt
-
-    // GESVERKFL DOUBLE,
-    // korrelliert mit Zähler/Nenner
-    // bspw. N = 2, Z = 1 ergibt gesflaeche 800 und gesverkflaeche 400
-    @UseDefaults
-    @ImportColumn("GESVERKFL")
-    Property<Double> gesamtVerkaufsFlaeche();
-
-
+    //
+    // // GESVERKFL DOUBLE,
+    // TODO muss aus Flurstücken berechnet werden
+    // // korrelliert mit Zähler/Nenner
+    // // bspw. N = 2, Z = 1 ergibt gesflaeche 800 und gesverkflaeche 400
+    // @UseDefaults
+    // @ImportColumn("GESVERKFL")
+    // Property<Double> gesamtVerkaufsFlaeche();
     // STALA_AUSG TIMESTAMP,
     // Schalter ob schon nach STALA exportiert
     @Optional
@@ -342,39 +343,6 @@ public interface VertragComposite
     Association<VertragsdatenErweitertComposite> erweiterteVertragsdaten();
 
 
-    // STABU_GEBART VARCHAR(1),
-    @Optional
-    Association<GebaeudeArtStaBuComposite> gebaeudeArtStaBu();
-
-
-    // STABU_GEBTYP VARCHAR(1),
-    @Optional
-    Association<GebaeudeTypStaBuComposite> gebaeudeTypStaBu();
-
-
-    // KELLER VARCHAR(1),
-    @Optional
-    Association<KellerComposite> keller();
-
-
-    // GARAGE VARCHAR(1),
-    @Optional
-    @ImportColumn("GARAGE")
-    Property<String> garage();
-
-
-    // Boolean STELLPLATZ VARCHAR(1)
-    @Optional
-    @ImportColumn("STELLPLATZ")
-    Property<String> stellplaetze();
-
-
-    // Boolean CARPORT VARCHAR(1)
-    @Optional
-    @ImportColumn("CARPORT")
-    Property<String> carport();
-
-
     // @Optional
     // @Computed
     // Association<FlurstueckComposite> hauptFlurstueck();
@@ -398,52 +366,37 @@ public interface VertragComposite
             }
         }
 
+        private AssociationInfo vertragCompositeAss = new GenericAssociationInfo( VertragComposite.class,
+                                                            "gesplitteterHauptvertrag" );
+
 
         public Association<VertragComposite> gesplitteterHauptvertrag() {
-            // TODO
-            return null;
+            return new ComputedAssociationInstance<VertragComposite>( vertragCompositeAss ) {
+
+                @Override
+                public VertragComposite get() {
+                    if (gesplittetEingangsnr().get() != null) {
+                        VertragComposite template = QueryExpressions.templateFor( VertragComposite.class );
+
+                        return KapsRepository
+                                .instance()
+                                .findEntities(
+                                        VertragComposite.class,
+                                        QueryExpressions.eq( template.eingangsNr(),
+                                                Integer.parseInt( gesplittetEingangsnr().get() ) ), 0, 1 ).find();
+                    }
+
+                    return null;
+
+                }
+
+
+                @Override
+                public void set( VertragComposite vertrag )
+                        throws IllegalArgumentException, IllegalStateException {
+                    gesplittetEingangsnr().set( vertrag.eingangsNr().get() + "" );
+                }
+            };
         }
-
-        // private AssociationInfo KaufvertragCompositeAss = new
-        // GenericAssociationInfo( VertragComposite.class, "hauptFlurstueck" );
-        // private final VertragComposite kc = this;
-        //
-        // @Override
-        // public Association<FlurstueckComposite> hauptFlurstueck() {
-        // return new ComputedAssociationInstance<FlurstueckComposite>(
-        // KaufvertragCompositeAss ) {
-        //
-        // public FlurstueckComposite get() {
-        // return FlurstueckComposite.Mixin.mainForEntity( kc );
-        // }
-        //
-        // @Override
-        // public void set( FlurstueckComposite anIgnoredValue )
-        // throws IllegalArgumentException, IllegalStateException {
-        // // ignored
-        // }
-        // };
-        // }
     }
-
-
-    @Optional
-    Property<Double> flaecheLandwirtschaftStala();
-
-
-    @Optional
-    Property<Double> hypothekStala();
-
-
-    @Optional
-    Property<Double> wertTauschStala();
-
-
-    @Optional
-    Property<Double> wertSonstigesStala();
-
-
-    @Optional
-    Property<String> bemerkungStala();
-
 }

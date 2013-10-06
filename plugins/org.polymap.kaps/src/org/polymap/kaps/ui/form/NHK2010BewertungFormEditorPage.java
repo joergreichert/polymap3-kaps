@@ -63,15 +63,15 @@ import org.polymap.rhei.form.IFormEditorPageSite;
 
 import org.polymap.kaps.KapsPlugin;
 import org.polymap.kaps.model.KapsRepository;
-import org.polymap.kaps.model.NHK2010GebaeudeartenProvider;
+import org.polymap.kaps.model.NHK2010GebaeudeArtProvider;
 import org.polymap.kaps.model.data.ErmittlungModernisierungsgradComposite;
 import org.polymap.kaps.model.data.FlurstueckComposite;
 import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
-import org.polymap.kaps.model.data.NHK2010Baupreisindex;
-import org.polymap.kaps.model.data.NHK2010Baupreisindex.Values;
+import org.polymap.kaps.model.data.NHK2010BaupreisIndexComposite;
+import org.polymap.kaps.model.data.NHK2010BaupreisIndexComposite.Values;
 import org.polymap.kaps.model.data.NHK2010BewertungComposite;
 import org.polymap.kaps.model.data.NHK2010BewertungGebaeudeComposite;
-import org.polymap.kaps.model.data.NHK2010Gebaeudeart;
+import org.polymap.kaps.model.data.NHK2010GebaeudeArtComposite;
 import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.ui.ActionButton;
 import org.polymap.kaps.ui.FieldSummation;
@@ -101,7 +101,7 @@ public class NHK2010BewertungFormEditorPage
 
     private Action                      gebaeudeStandardAction;
 
-    private NHK2010Gebaeudeart          selectedGebaeudeArt;
+    private NHK2010GebaeudeArtComposite          selectedGebaeudeArt;
 
     private IFormFieldListener          gebaeudeArtListener;
 
@@ -214,7 +214,7 @@ public class NHK2010BewertungFormEditorPage
     protected void refreshReloadables()
             throws Exception {
         NHK2010BewertungGebaeudeComposite composite = selectedComposite.get();
-        selectedGebaeudeArt = NHK2010GebaeudeartenProvider.instance().gebaeudeForId(
+        selectedGebaeudeArt = NHK2010GebaeudeArtProvider.instance().gebaeudeForId(
                 composite != null ? composite.gebaeudeArtId().get() : null );
         selectedGebaeudeStandard = composite != null ? composite.gebaeudeStandard().get() : null;
 
@@ -238,8 +238,8 @@ public class NHK2010BewertungFormEditorPage
             pageSite.setFieldEnabled( getPropertyName( nameTemplate.altersWertMinderung() ), false );
             pageSite.setFieldEnabled( getPropertyName( nameTemplate.zeitwertRnd() ), false );
             // if (composite != null) {
-            // // NHK2010Gebaeudeart art =
-            // NHK2010GebaeudeartenProvider.instance().gebaeudeForId(
+            // // NHK2010GebaeudeArtComposite art =
+            // NHK2010GebaeudeArtProvider.instance().gebaeudeForId(
             // composite.gebaeudeArtId().get() );
             // // gebaeudeArtLabel.setText( art != null ? art.getQualifiedName() : ""
             // );
@@ -423,7 +423,7 @@ public class NHK2010BewertungFormEditorPage
         // gebäudeselectionaction
         gebaeudeArtAction = new NHK2010GebaeudeartSelector( pageSite.getToolkit() ) {
 
-            protected void adopt( NHK2010Gebaeudeart toAdopt )
+            protected void adopt( NHK2010GebaeudeArtComposite toAdopt )
                     throws Exception {
                 assert toAdopt != null;
                 pageSite.setFieldValue( prefix + "gebaeudeArtId", toAdopt.getId() );
@@ -579,7 +579,7 @@ public class NHK2010BewertungFormEditorPage
                     // selectedGebaeudeArt.getId() ))) {
                     // selectedGebaeudeArt = toAdopt;
 
-                    selectedGebaeudeArt = NHK2010GebaeudeartenProvider.instance().gebaeudeForId(
+                    selectedGebaeudeArt = NHK2010GebaeudeArtProvider.instance().gebaeudeForId(
                             (String)ev.getNewValue() );
                     gebaeudeArtLabel.setText( selectedGebaeudeArt != null ? selectedGebaeudeArt.getQualifiedName() : "" );
                     gebaeudeBnkLabel.setText( selectedGebaeudeArt != null && selectedGebaeudeArt.getBnk() != null ? "inkl. Baunebenkosten von "
@@ -1075,7 +1075,7 @@ public class NHK2010BewertungFormEditorPage
                                 && (selectedComposite.get() != null && !indexType.equals( selectedComposite.get()
                                         .baukostenIndexTyp().get() ))) {
                             // TODO Wertermittlungsstichtag festhalten?
-                            result = NHK2010Baupreisindex.Mixin.indexFor( indexType, new Date() );
+                            result = NHK2010BaupreisIndexComposite.Mixin.indexFor( indexType, new Date() );
 
                             pageSite.setFieldValue(
                                     getPropertyName( nameTemplate.baukostenIndexWert() ),
@@ -1172,7 +1172,7 @@ public class NHK2010BewertungFormEditorPage
                         String id = (String)ev.getNewValue();
                         StringBuffer tooltip = new StringBuffer( "Gesamtnutzungsdauer" );
                         if (id != null) {
-                            NHK2010Gebaeudeart art = NHK2010GebaeudeartenProvider.instance().gebaeudeForId( id );
+                            NHK2010GebaeudeArtComposite art = NHK2010GebaeudeArtProvider.instance().gebaeudeForId( id );
                             Integer bis = art.getGndBis();
                             Integer von = art.getGndVon();
                             if (von != null && bis != null) {

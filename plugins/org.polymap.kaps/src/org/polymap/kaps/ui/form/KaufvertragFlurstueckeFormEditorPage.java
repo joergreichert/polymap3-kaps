@@ -69,6 +69,7 @@ import org.polymap.kaps.model.data.GemeindeComposite;
 import org.polymap.kaps.model.data.NHK2010BewertungComposite;
 import org.polymap.kaps.model.data.NutzungComposite;
 import org.polymap.kaps.model.data.RichtwertzoneComposite;
+import org.polymap.kaps.model.data.RichtwertzoneZeitraumComposite;
 import org.polymap.kaps.model.data.StrasseComposite;
 import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.VertragsdatenErweitertComposite;
@@ -685,6 +686,11 @@ public class KaufvertragFlurstueckeFormEditorPage
                             bauland.flurstueck().set( flurstueck );
                             bauland.vertrag().set( flurstueck.vertrag().get() );
                             bauland.richtwertZone().set( flurstueck.richtwertZone().get() );
+                            // richtwertzonezeitraum auch schon setzen nach
+                            // vertragsdatum
+                            bauland.richtwertZoneG().set(
+                                    RichtwertzoneZeitraumComposite.Mixin.findZeitraumFor( flurstueck.richtwertZone()
+                                            .get(), kaufvertrag.vertragsDatum().get() ) );
                         }
                         KapsPlugin.openEditor( fs, FlurstuecksdatenBaulandComposite.NAME, bauland );
                     }

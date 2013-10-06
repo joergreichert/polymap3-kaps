@@ -116,15 +116,6 @@ public class MdbImportVertraegeOperation
                     // find VKREIS
                     entity.verkaeuferKreis().set( findSchlNamed( KaeuferKreisComposite.class, builderRow, "VKREIS" ) );
 
-                    entity.gebaeudeArtStaBu().set(
-                            findSchlNamed( GebaeudeArtStaBuComposite.class, builderRow, "STABU_GEBART" ) );
-
-                    entity.gebaeudeTypStaBu().set(
-                            findSchlNamed( GebaeudeTypStaBuComposite.class, builderRow, "STABU_GEBTYP" ) );
-                    
-                    entity.keller().set(
-                            findSchlNamed( KellerComposite.class, builderRow, "KELLER" ) );
-
                     // fix imports
                     if (builderRow.get( "KANTZ" ) == null) {
                         entity.kaufpreisAnteilZaehler().set( 1.0 );
@@ -187,9 +178,6 @@ public class MdbImportVertraegeOperation
                     // entity );
                 }
             } );
-
-            sub = new SubMonitor( monitor, 10 );
-            importFlurZwiAgrar( db, sub, parentFolder );
 
             sub = new SubMonitor( monitor, 10 );
             importEntity( db, sub, NutzungComposite.class, new EntityCallback<NutzungComposite>() {
@@ -519,6 +507,7 @@ public class MdbImportVertraegeOperation
                                 throw new IllegalStateException( "no vertrag found for " + eingangsnummer );
                             }
                             entity.vertrag().set( vertrag );
+
                             // }
                             // VertragComposite vertrag = repo.findEntity(
                             // VertragComposite.class,
@@ -787,6 +776,12 @@ public class MdbImportVertraegeOperation
                         }
                     } );
 
+            sub = new SubMonitor( monitor, 10 );
+            importFlurZwiAgrar( db, sub, parentFolder );
+
+            sub = new SubMonitor( monitor, 10 );
+            importStabuVertragsdaten( db, sub, parentFolder );
+
             w.flush();
             w.close();
             log.error( "WRITTEN LOG TO FILE: " + importfehler.getAbsolutePath() );
@@ -802,7 +797,8 @@ public class MdbImportVertraegeOperation
     }
 
 
-    private void importFlurZwiAgrar( Database db, SubMonitor monitor, File parentFolder ) throws Exception {
+    private void importFlurZwiAgrar( Database db, SubMonitor monitor, File parentFolder )
+            throws Exception {
         Table table = db.getTable( "FLURZWI_AGRAR" );
         monitor.beginTask( "Tabelle: " + table.getName(), table.getRowCount() );
 
@@ -822,11 +818,19 @@ public class MdbImportVertraegeOperation
                 if (vertrag == null) {
                     throw new IllegalStateException( "no vertrag found for " + eingangsnummer );
                 }
-                vertrag.flaecheLandwirtschaftStala().set( (Double)builderRow.get( "FL_LANDW" ) );
-                vertrag.hypothekStala().set( (Double)builderRow.get( "HYPOTHEK" ) );
-                vertrag.wertTauschStala().set( (Double)builderRow.get( "TAUSCHGRUND" ) );
-                vertrag.wertSonstigesStala().set( (Double)builderRow.get( "WERTSONST" ) );
-                vertrag.bemerkungStala().set( (String)builderRow.get( "BEM_AGRAR" ) );
+                // suchen nach FlurstuecksDatenAgrar
+                boolean found = false;
+                for (FlurstuecksdatenAgrarComposite agrar : FlurstuecksdatenAgrarComposite.Mixin.forVertrag( vertrag )) {
+                    found = true;
+                    agrar.flaecheLandwirtschaftStala().set( (Double)builderRow.get( "FL_LANDW" ) );
+                    agrar.hypothekStala().set( (Double)builderRow.get( "HYPOTHEK" ) );
+                    agrar.wertTauschStala().set( (Double)builderRow.get( "TAUSCHGRUND" ) );
+                    agrar.wertSonstigesStala().set( (Double)builderRow.get( "WERTSONST" ) );
+                    agrar.bemerkungStala().set( (String)builderRow.get( "BEM_AGRAR" ) );
+                }
+                if (!found) {
+                    wmvaopfW.write( "no flurstuecksdatenagrar found for " + eingangsnummer + "\n" );
+                }
             }
             else {
                 throw new IllegalStateException( "no vertrag EINGANGSNR found" );
@@ -838,6 +842,75 @@ public class MdbImportVertraegeOperation
         log.info( "Imported and committed: FLURZWI_AGRAR -> " + count );
         monitor.done();
     }
+
+
+    private void importStabuVertragsdaten( Database db, SubMonitor monitor, File parentFolder )
+            throws Exception {
+        Table table = db.getTable( "K_BUCH" );
+        monitor.beginTask( "Tabelle: " + table.getName(), table.getRowCount() );
+
+        File wmvaopf = new File( parentFolder, "K_BUCH_STABU.txt" );
+        final BufferedWriter wmvaopfW = new BufferedWriter( new FileWriter( wmvaopf ) );
+        // data rows
+        Map<String, Object> builderRow = null;
+        int count = 0;
+        while ((builderRow = table.getNextRow()) != null) {
+
+            Double eingangsnummer = (Double)builderRow.get( "EINGANGSNR" );
+            GebaeudeArtStaBuComposite gebaeudeArtStaBuComposite = findSchlNamed( GebaeudeArtStaBuComposite.class,
+                    builderRow, "STABU_GEBART" );
+            GebaeudeTypStaBuComposite gebaeudeTypStaBuComposite = findSchlNamed( GebaeudeTypStaBuComposite.class,
+                    builderRow, "STABU_GEBTYP" );
+            KellerComposite kellerComposite = findSchlNamed( KellerComposite.class, builderRow, "KELLER" );
+            String stellplaetze = (String)builderRow.get( "STELLPLATZ" );
+            String garage = (String)builderRow.get( "GARAGE" );
+            String carport = (String)builderRow.get( "CARPORT" );
+
+            if (gebaeudeArtStaBuComposite != null || gebaeudeTypStaBuComposite != null || kellerComposite != null
+                    || stellplaetze != null || garage != null || carport != null) {
+                if (eingangsnummer != null) {
+                    VertragComposite vertragTemplate = QueryExpressions.templateFor( VertragComposite.class );
+                    BooleanExpression expr = QueryExpressions.eq( vertragTemplate.eingangsNr(),
+                            eingangsnummer.intValue() );
+                    VertragComposite vertrag = KapsRepository.instance()
+                            .findEntities( VertragComposite.class, expr, 0, 1 ).find();
+                    if (vertrag == null) {
+                        throw new IllegalStateException( "no vertrag found for " + eingangsnummer );
+                    }
+                    // suchen nach FlurstuecksDatenAgrar
+                    boolean found = false;
+                    for (FlurstuecksdatenBaulandComposite bauland : FlurstuecksdatenBaulandComposite.Mixin
+                            .forVertrag( vertrag )) {
+                        found = true;
+
+                        bauland.gebaeudeArtStaBu().set( gebaeudeArtStaBuComposite );
+
+                        bauland.gebaeudeTypStaBu().set( gebaeudeTypStaBuComposite );
+                        // keller ist doppelt beleget, also heir nur setzen wenn
+                        // nicht null
+                        if (kellerComposite != null) {
+                            bauland.keller().set( kellerComposite );
+                        }
+                        bauland.garage().set( garage );
+                        bauland.stellplaetze().set( stellplaetze );
+                        bauland.carport().set( carport );
+                    }
+                    if (!found) {
+                        wmvaopfW.write( "no flurstuecksdatenbauland found for " + eingangsnummer + "\n" );
+                    }
+                }
+                else {
+                    throw new IllegalStateException( "no vertrag EINGANGSNR found" );
+                }
+            }
+        }
+        wmvaopfW.flush();
+        wmvaopfW.close();
+        repo.commitChanges();
+        log.info( "Imported and committed: K_BUCH_STABU -> " + count );
+        monitor.done();
+    }
+
 
     protected void importStalas( Database db, IProgressMonitor monitor )
             throws Exception {

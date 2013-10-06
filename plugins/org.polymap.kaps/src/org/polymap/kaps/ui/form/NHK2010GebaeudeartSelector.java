@@ -41,8 +41,8 @@ import org.polymap.core.workbench.PolymapWorkbench;
 import org.polymap.rhei.form.IFormEditorToolkit;
 
 import org.polymap.kaps.KapsPlugin;
-import org.polymap.kaps.model.NHK2010GebaeudeartenProvider;
-import org.polymap.kaps.model.data.NHK2010Gebaeudeart;
+import org.polymap.kaps.model.NHK2010GebaeudeArtProvider;
+import org.polymap.kaps.model.data.NHK2010GebaeudeArtComposite;
 
 /**
  * 
@@ -67,7 +67,7 @@ public abstract class NHK2010GebaeudeartSelector
     }
 
 
-    protected abstract void adopt( NHK2010Gebaeudeart element )
+    protected abstract void adopt( NHK2010GebaeudeArtComposite element )
             throws Exception;
 
 
@@ -97,7 +97,7 @@ public abstract class NHK2010GebaeudeartSelector
 
         private TreeViewer         viewer;
 
-        private NHK2010Gebaeudeart result;
+        private NHK2010GebaeudeArtComposite result;
 
 
         public TreeDialog() {
@@ -132,13 +132,13 @@ public abstract class NHK2010GebaeudeartSelector
 //            tree.setLayoutData( new SimpleFormData().fill().create()  );
             tree.setHeaderVisible( false );
 
-            viewer.setContentProvider( NHK2010GebaeudeartenProvider.instance() );
+            viewer.setContentProvider( NHK2010GebaeudeArtProvider.instance() );
             viewer.setInput( "_" );
             // viewer
             viewer.setLabelProvider( new LabelProvider() {
                 @Override
                 public String getText( Object element ) {
-                    return ((NHK2010Gebaeudeart)element).getName();
+                    return ((NHK2010GebaeudeArtComposite)element).getName();
                 }
             } );
 
@@ -149,8 +149,8 @@ public abstract class NHK2010GebaeudeartSelector
                     ISelection sel = event.getSelection();
                     if (sel != null && sel instanceof IStructuredSelection) {
                         Object elm = ((IStructuredSelection)sel).getFirstElement();
-                        if (elm != null && elm instanceof NHK2010Gebaeudeart) {
-                            result = (NHK2010Gebaeudeart)elm;
+                        if (elm != null && elm instanceof NHK2010GebaeudeArtComposite) {
+                            result = (NHK2010GebaeudeArtComposite)elm;
                         }
                     }
                     getButton( IDialogConstants.OK_ID ).setEnabled( result != null && result.isSelectable() );
