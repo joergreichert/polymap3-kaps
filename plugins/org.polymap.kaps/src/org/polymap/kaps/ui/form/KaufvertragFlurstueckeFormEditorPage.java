@@ -60,8 +60,6 @@ import org.polymap.kaps.model.data.BelastungComposite;
 import org.polymap.kaps.model.data.ErtragswertverfahrenComposite;
 import org.polymap.kaps.model.data.FlurComposite;
 import org.polymap.kaps.model.data.FlurstueckComposite;
-import org.polymap.kaps.model.data.FlurstuecksdatenAgrarComposite;
-import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
 import org.polymap.kaps.model.data.GebaeudeArtComposite;
 import org.polymap.kaps.model.data.GebaeudeComposite;
 import org.polymap.kaps.model.data.GemarkungComposite;
@@ -72,6 +70,8 @@ import org.polymap.kaps.model.data.RichtwertzoneComposite;
 import org.polymap.kaps.model.data.RichtwertzoneZeitraumComposite;
 import org.polymap.kaps.model.data.StrasseComposite;
 import org.polymap.kaps.model.data.VertragComposite;
+import org.polymap.kaps.model.data.VertragsdatenAgrarComposite;
+import org.polymap.kaps.model.data.VertragsdatenBaulandComposite;
 import org.polymap.kaps.model.data.VertragsdatenErweitertComposite;
 import org.polymap.kaps.model.data.WohnungComposite;
 import org.polymap.kaps.ui.ActionButton;
@@ -626,25 +626,31 @@ public class KaufvertragFlurstueckeFormEditorPage
 
             @Override
             public void run() {
-                FlurstueckComposite flurstueck = selectedComposite.get();
-                if (flurstueck != null) {
-                    if (site.isDirty()) {
-                        MessageDialog.openInformation( PolymapWorkbench.getShellToParentOn(), "Formular speichern",
-                                "Bitte speichern Sie zuerst die Daten in diesem Formular, bevor Sie das nächste Formular öffnen." );
-                    }
-                    else {
-                        FlurstuecksdatenAgrarComposite agrar = FlurstuecksdatenAgrarComposite.Mixin
-                                .forFlurstueck( flurstueck );
-                        if (agrar == null) {
-
-                            agrar = repository.newEntity( FlurstuecksdatenAgrarComposite.class, null );
-                            agrar.flurstueck().set( flurstueck );
-                            agrar.vertrag().set( flurstueck.vertrag().get() );
-                            // agrar.richtwertZone1().set(
+                VertragsdatenAgrarComposite agrar = VertragsdatenAgrarComposite.Mixin.forVertrag( kaufvertrag );
+                if (agrar == null) {
+                    RichtwertzoneComposite richtwertZone = kaufvertrag.richtwertZoneAgrar().get();
+                    if (richtwertZone != null) {
+                        if (site.isDirty()) {
+                            MessageDialog.openInformation( PolymapWorkbench.getShellToParentOn(), "Formular speichern",
+                                    "Bitte speichern Sie dieses Formular, bevor Sie die erweiterten Vertragsdaten öffnen." );
+                        }
+                        else {
+                            agrar = repository.newEntity( VertragsdatenAgrarComposite.class, null );
+                            // agrar.flurstueck().set( flurstueck );
+                            agrar.vertrag().set( kaufvertrag );
+                            // agrar.richtwertZone1().set( richtwertZone );
                             // flurstueck.richtwertZone().get() );
                         }
-                        KapsPlugin.openEditor( fs, FlurstuecksdatenAgrarComposite.NAME, agrar );
                     }
+                    else {
+                        MessageDialog.openInformation(
+                                PolymapWorkbench.getShellToParentOn(),
+                                "Formular speichern",
+                                "Es wurde kein Flurstück mit Nutzungsart Agrar gefunden. Bitte speichern Sie gegebenenfalls zuerst die Daten in diesem Formular, bevor Sie die erweiterten Vertragsdaten öffnen." );
+                    }
+                }
+                if (agrar != null) {
+                    KapsPlugin.openEditor( fs, VertragsdatenAgrarComposite.NAME, agrar );
                 }
             }
 
@@ -652,14 +658,11 @@ public class KaufvertragFlurstueckeFormEditorPage
 
             @Override
             public void setEnabled( boolean enabled ) {
-                if (enabled) {
-                    FlurstueckComposite flurstueck = selectedComposite.get();
-                    if (flurstueck != null && FlurstuecksdatenAgrarComposite.Mixin.forFlurstueck( flurstueck ) != null) {
-                        setText( "Daten Agrarland bearbeiten" );
-                    }
-                    else {
-                        setText( "Daten Agrarland anlegen" );
-                    }
+                if (VertragsdatenAgrarComposite.Mixin.forVertrag( kaufvertrag ) != null) {
+                    setText( "Daten Agrarland bearbeiten" );
+                }
+                else {
+                    setText( "Daten Agrarland anlegen" );
                 }
                 super.setEnabled( enabled );
             };
@@ -671,29 +674,36 @@ public class KaufvertragFlurstueckeFormEditorPage
 
             @Override
             public void run() {
-                FlurstueckComposite flurstueck = selectedComposite.get();
-                if (flurstueck != null) {
-                    if (site.isDirty()) {
-                        MessageDialog.openInformation( PolymapWorkbench.getShellToParentOn(), "Formular speichern",
-                                "Bitte speichern Sie zuerst die Daten in diesem Formular, bevor Sie das nächste Formular öffnen." );
-                    }
-                    else {
+                VertragsdatenBaulandComposite bauland = VertragsdatenBaulandComposite.Mixin.forVertrag( kaufvertrag );
+                if (bauland == null) {
+                    RichtwertzoneComposite richtwertZone = kaufvertrag.richtwertZoneBauland().get();
+                    if (richtwertZone != null) {
+                        if (site.isDirty()) {
+                            MessageDialog.openInformation( PolymapWorkbench.getShellToParentOn(), "Formular speichern",
+                                    "Bitte speichern Sie dieses Formular, bevor Sie die erweiterten Vertragsdaten öffnen." );
+                        }
+                        else {
 
-                        FlurstuecksdatenBaulandComposite bauland = FlurstuecksdatenBaulandComposite.Mixin
-                                .forFlurstueck( flurstueck );
-                        if (bauland == null) {
-                            bauland = repository.newEntity( FlurstuecksdatenBaulandComposite.class, null );
-                            bauland.flurstueck().set( flurstueck );
-                            bauland.vertrag().set( flurstueck.vertrag().get() );
-                            bauland.richtwertZone().set( flurstueck.richtwertZone().get() );
+                            bauland = repository.newEntity( VertragsdatenBaulandComposite.class, null );
+                            // bauland.flurstueck().set( flurstueck );
+                            bauland.vertrag().set( kaufvertrag );
+                            bauland.richtwertZone().set( richtwertZone );
                             // richtwertzonezeitraum auch schon setzen nach
                             // vertragsdatum
                             bauland.richtwertZoneG().set(
-                                    RichtwertzoneZeitraumComposite.Mixin.findZeitraumFor( flurstueck.richtwertZone()
-                                            .get(), kaufvertrag.vertragsDatum().get() ) );
+                                    RichtwertzoneZeitraumComposite.Mixin.findZeitraumFor( richtwertZone, kaufvertrag
+                                            .vertragsDatum().get() ) );
                         }
-                        KapsPlugin.openEditor( fs, FlurstuecksdatenBaulandComposite.NAME, bauland );
                     }
+                    else {
+                        MessageDialog.openInformation(
+                                PolymapWorkbench.getShellToParentOn(),
+                                "Formular speichern",
+                                "Es wurde kein Flurstück mit Nutzungsart Bauland gefunden. Bitte speichern Sie gegebenenfalls zuerst die Daten in diesem Formular, bevor Sie die erweiterten Vertragsdaten öffnen." );
+                    }
+                }
+                if (bauland != null) {
+                    KapsPlugin.openEditor( fs, VertragsdatenBaulandComposite.NAME, bauland );
                 }
             }
 
@@ -701,15 +711,11 @@ public class KaufvertragFlurstueckeFormEditorPage
 
             @Override
             public void setEnabled( boolean enabled ) {
-                if (enabled) {
-                    FlurstueckComposite flurstueck = selectedComposite.get();
-                    if (flurstueck != null
-                            && FlurstuecksdatenBaulandComposite.Mixin.forFlurstueck( flurstueck ) != null) {
-                        setText( "Daten Bauland bearbeiten" );
-                    }
-                    else {
-                        setText( "Daten Bauland anlegen" );
-                    }
+                if (VertragsdatenBaulandComposite.Mixin.forVertrag( kaufvertrag ) != null) {
+                    setText( "Daten Bauland bearbeiten" );
+                }
+                else {
+                    setText( "Daten Bauland anlegen" );
                 }
                 super.setEnabled( enabled );
             };
@@ -878,13 +884,14 @@ public class KaufvertragFlurstueckeFormEditorPage
                     // Bodenwertanteil übergeben, sind gespeichert also keine
                     // FieldListener einsetzen
                     Double bodenwertAnteil = 0.0d;
-                    for (FlurstueckComposite flurstueck : FlurstueckComposite.Mixin.forEntity( kaufvertrag )) {
-                        FlurstuecksdatenBaulandComposite bauland = FlurstuecksdatenBaulandComposite.Mixin
-                                .forFlurstueck( flurstueck );
-                        if (bauland != null && bauland.bodenwertGesamt().get() != null) {
-                            bodenwertAnteil += bauland.bodenwertGesamt().get();
-                        }
+                    // for (FlurstueckComposite flurstueck :
+                    // FlurstueckComposite.Mixin.forEntity( kaufvertrag )) {
+                    VertragsdatenBaulandComposite bauland = VertragsdatenBaulandComposite.Mixin
+                            .forVertrag( kaufvertrag );
+                    if (bauland != null && bauland.bodenwertGesamt().get() != null) {
+                        bodenwertAnteil += bauland.bodenwertGesamt().get();
                     }
+                    // }
                     EventManager.instance().publish(
                             new InterEditorPropertyChangeEvent( formEditor, targetEditor, bewertungComposite,
                                     bewertungComposite.bodenwertAnteil().qualifiedName().name(), bewertungComposite
@@ -968,5 +975,12 @@ public class KaufvertragFlurstueckeFormEditorPage
             vdec.basispreis().set( kaufvertrag.kaufpreis().get() );
         }
         return vdec;
+    }
+
+
+    @Override
+    public void doSubmit( IProgressMonitor monitor )
+            throws Exception {
+        super.doSubmit( monitor );
     }
 }

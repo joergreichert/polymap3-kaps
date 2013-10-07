@@ -29,7 +29,7 @@
 //import org.polymap.rhei.form.IFormEditorPageSite;
 //
 //import org.polymap.kaps.model.data.BodenwertAufteilungTextComposite;
-//import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
+//import org.polymap.kaps.model.data.VertragsdatenBaulandComposite;
 //import org.polymap.kaps.model.data.VertragComposite;
 //import org.polymap.kaps.model.data.VertragsdatenErweitertComposite;
 //
@@ -41,7 +41,7 @@
 //
 //    private final IFormEditorPageSite              site;
 //
-//    private final FlurstuecksdatenBaulandComposite vb;
+//    private final VertragsdatenBaulandComposite vb;
 //
 //    private final HashSet<String>                  names;
 //
@@ -53,7 +53,7 @@
 //     * @param site
 //     * @param kaufvertrag
 //     */
-//    public FaktorOhneStrassenplatzCalculator( IFormEditorPageSite site, FlurstuecksdatenBaulandComposite vb ) {
+//    public FaktorOhneStrassenplatzCalculator( IFormEditorPageSite site, VertragsdatenBaulandComposite vb ) {
 //        this.site = site;
 //        this.vb = vb;
 //        names = new HashSet<String>();

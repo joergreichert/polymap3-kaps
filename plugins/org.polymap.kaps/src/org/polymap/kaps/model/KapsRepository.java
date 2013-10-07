@@ -152,14 +152,14 @@ public class KapsRepository
 
                     new SimpleEntityProvider<GemarkungComposite>( this, GemarkungComposite.class, new NameImpl(
                             KapsRepository.NAMESPACE, GemarkungComposite.NAME ) ),
-                    new SimpleEntityProvider<FlurstuecksdatenBaulandComposite>( this,
-                            FlurstuecksdatenBaulandComposite.class, new NameImpl( KapsRepository.NAMESPACE,
-                                    FlurstuecksdatenBaulandComposite.NAME ) ),
+                    new SimpleEntityProvider<VertragsdatenBaulandComposite>( this,
+                            VertragsdatenBaulandComposite.class, new NameImpl( KapsRepository.NAMESPACE,
+                                    VertragsdatenBaulandComposite.NAME ) ),
                     new SimpleEntityProvider<AusstattungBewertungComposite>( this, AusstattungBewertungComposite.class,
                             new NameImpl( KapsRepository.NAMESPACE, AusstattungBewertungComposite.NAME ) ),
-                    new SimpleEntityProvider<FlurstuecksdatenAgrarComposite>( this,
-                            FlurstuecksdatenAgrarComposite.class, new NameImpl( KapsRepository.NAMESPACE,
-                                    FlurstuecksdatenAgrarComposite.NAME ) ), new SimpleEntityProvider<FlurComposite>(
+                    new SimpleEntityProvider<VertragsdatenAgrarComposite>( this,
+                            VertragsdatenAgrarComposite.class, new NameImpl( KapsRepository.NAMESPACE,
+                                    VertragsdatenAgrarComposite.NAME ) ), new SimpleEntityProvider<FlurComposite>(
                             this, FlurComposite.class, new NameImpl( KapsRepository.NAMESPACE, FlurComposite.NAME ) ),
 
                     new SimpleEntityProvider<WohnungseigentumComposite>( this, WohnungseigentumComposite.class,

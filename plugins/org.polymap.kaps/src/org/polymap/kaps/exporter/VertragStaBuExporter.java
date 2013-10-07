@@ -66,7 +66,6 @@ import org.polymap.core.runtime.Polymap;
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.ArtDerBauflaecheStaBuComposite;
 import org.polymap.kaps.model.data.FlurstueckComposite;
-import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
 import org.polymap.kaps.model.data.GebaeudeArtStaBuComposite;
 import org.polymap.kaps.model.data.GebaeudeTypStaBuComposite;
 import org.polymap.kaps.model.data.GemarkungComposite;
@@ -76,6 +75,7 @@ import org.polymap.kaps.model.data.KaeuferKreisStaBuComposite;
 import org.polymap.kaps.model.data.KellerComposite;
 import org.polymap.kaps.model.data.NutzungComposite;
 import org.polymap.kaps.model.data.VertragComposite;
+import org.polymap.kaps.model.data.VertragsdatenBaulandComposite;
 import org.polymap.kaps.model.data.VertragsdatenErweitertComposite;
 import org.polymap.kaps.model.data.WohnlageStaBuComposite;
 
@@ -286,8 +286,9 @@ public class VertragStaBuExporter
 
     private void createSegment( Element datenSegment, VertragComposite vertrag ) {
 
-        Iterable<FlurstueckComposite> flurstuecke = FlurstueckComposite.Mixin.forEntity( vertrag );
-        FlurstueckComposite flurstueck = null;
+        // Iterable<FlurstueckComposite> flurstuecke =
+        // FlurstueckComposite.Mixin.forEntity( vertrag );
+        // FlurstueckComposite flurstueck = null;
         Double bodenrichtwert = null;
         Integer baujahr = null;
         Double wohnflaeche = null;
@@ -299,33 +300,27 @@ public class VertragStaBuExporter
         String carport = null;
 
         KellerComposite keller = null;
-        double grundstuecksflaeche = 0.0d;
-        for (FlurstueckComposite f : flurstuecke) {
+        Double grundstuecksflaeche = null;
+        VertragsdatenBaulandComposite baulandComposite = VertragsdatenBaulandComposite.Mixin.forVertrag( vertrag );
+        if (baulandComposite != null) {
+            bodenrichtwert = baulandComposite.richtwert().get();
+            baujahr = baulandComposite.baujahr().get();
+            wohnflaeche = baulandComposite.wohnflaeche().get();
+            gebaeudeTyp = baulandComposite.gebaeudeTypStaBu().get();
+            gebaeudeArt = baulandComposite.gebaeudeArtStaBu().get();
+            keller = baulandComposite.keller().get();
+            wohnlage = baulandComposite.wohnlageStaBu().get();
+            stellplatz = baulandComposite.stellplaetze().get();
+            carport = baulandComposite.carport().get();
+            garage = baulandComposite.garage().get();
+            grundstuecksflaeche = baulandComposite.verkaufteFlaeche().get();
+        }
+        FlurstueckComposite flurstueck = null;
+        for (FlurstueckComposite f : FlurstueckComposite.Mixin.forEntity( vertrag )) {
             NutzungComposite nutzung = f.nutzung().get();
             if (nutzung.isAgrar().get() != null && !nutzung.isAgrar().get().booleanValue()) {
-                FlurstuecksdatenBaulandComposite baulandComposite = FlurstuecksdatenBaulandComposite.Mixin
-                        .forFlurstueck( f );
-                if (baulandComposite != null) {
-                    bodenrichtwert = baulandComposite.richtwert().get();
-                    baujahr = baulandComposite.baujahr().get();
-                    wohnflaeche = baulandComposite.wohnflaeche().get();
-                    gebaeudeTyp = baulandComposite.gebaeudeTypStaBu().get();
-                    gebaeudeArt = baulandComposite.gebaeudeArtStaBu().get();
-                    keller = baulandComposite.keller().get();
-                    wohnlage = baulandComposite.wohnlageStaBu().get();
-                    stellplatz = baulandComposite.stellplaetze().get();
-                    carport = baulandComposite.carport().get();
-                    garage = baulandComposite.garage().get();
-                    flurstueck = f;
-                }
-                // TODO können mehrere sein
-                // WohnungComposite wohnung =
-                // WohnungComposite.Mixin.findWohnungenFor( f );
-                grundstuecksflaeche += f.verkaufteFlaeche().get() != null ? f.verkaufteFlaeche().get().doubleValue()
-                        : 0.0d;
-            }
-            if (flurstueck == null) {
                 flurstueck = f;
+                break;
             }
         }
 

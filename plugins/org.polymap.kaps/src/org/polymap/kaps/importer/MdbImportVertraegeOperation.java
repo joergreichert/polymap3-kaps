@@ -3,8 +3,10 @@ package org.polymap.kaps.importer;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -476,11 +478,11 @@ public class MdbImportVertraegeOperation
             sub = new SubMonitor( monitor, 10 );
             final AnnotatedCompositeImporter vertragsdatenErweitertCompositeImporter = new AnnotatedCompositeImporter(
                     VertragsdatenErweitertComposite.class, db.getTable( "K_BEVERW" ) );
-            importEntity( db, sub, FlurstuecksdatenBaulandComposite.class,
-                    new EntityCallback<FlurstuecksdatenBaulandComposite>() {
+            importEntity( db, sub, VertragsdatenBaulandComposite.class,
+                    new EntityCallback<VertragsdatenBaulandComposite>() {
 
                         @Override
-                        public void fillEntity( FlurstuecksdatenBaulandComposite entity,
+                        public void fillEntity( VertragsdatenBaulandComposite entity,
                                 final Map<String, Object> builderRow )
                                 throws Exception {
                             // defaults
@@ -566,7 +568,7 @@ public class MdbImportVertraegeOperation
                                         "no richtwertzone found for %s, %s, %s in %s", zone, gemeinde, jahr, entity
                                                 .vertrag().get().eingangsNr().get() ) );
                             }
-                            // entity.richtwertZone().set( found.zone().get() );
+                            entity.richtwertZone().set( found.zone().get() );
                             entity.richtwertZoneG().set( found );
 
                             // Flurstück setzen, bisher Hauptflurstück, ab jetzt je
@@ -579,7 +581,7 @@ public class MdbImportVertraegeOperation
                                         "no flurstueck found for FlurstuecksdatenBauland for vertrag %s", entity
                                                 .vertrag().get().eingangsNr().get() ) );
                             }
-                            entity.flurstueck().set( flurstueck );
+                            // entity.flurstueck().set( flurstueck );
 
                             // ERBBAU setzen an übergeordnetem Flurstück
                             String erbbau = (String)builderRow.get( "ERBBAU" );
@@ -604,30 +606,34 @@ public class MdbImportVertraegeOperation
 
                             // checken ob Flurstück tatsächlich agrar ist, in der DB
                             // ist ganz schöner Mist drin
-                            if (flurstueck.nutzung().get().isAgrar().get()) {
-                                // log.error( String.format(
-                                // "Flurstück ist AGRAR müsste aber Bauland sein für Vertrag %s mit Nutzung %s",
-                                // entity.vertrag().get().eingangsNr().get(),
-                                // flurstueck.nutzung().get().schl()
-                                // .get() ) );
-                                w.write( String.format(
-                                        "Flurstück ist AGRAR müsste aber Bauland sein für Vertrag %s mit Nutzung %s\n",
-                                        entity.vertrag().get().eingangsNr().get(), flurstueck.nutzung().get().schl()
-                                                .get() ) );
-                            }
+                            // if (flurstueck.nutzung().get().isAgrar().get()) {
+                            // // log.error( String.format(
+                            // //
+                            // "Flurstück ist AGRAR müsste aber Bauland sein für Vertrag %s mit Nutzung %s",
+                            // // entity.vertrag().get().eingangsNr().get(),
+                            // // flurstueck.nutzung().get().schl()
+                            // // .get() ) );
+                            // w.write( String.format(
+                            // "Flurstück ist AGRAR müsste aber Bauland sein für Vertrag %s mit Nutzung %s\n",
+                            // entity.vertrag().get().eingangsNr().get(),
+                            // flurstueck.nutzung().get().schl()
+                            // .get() ) );
+                            // }
                         }
                     } );
 
             final AnnotatedCompositeImporter vertragsdatenErweitertAgrarCompositeImporter = new AnnotatedCompositeImporter(
                     VertragsdatenErweitertComposite.class, db.getTable( "K_BEVERL" ) );
 
+            final Set<Double> foundVertraege = new HashSet<Double>();
+            final Set<Double> duplicateVertraege = new HashSet<Double>();
+
             sub = new SubMonitor( monitor, 10 );
-            importEntity( db, sub, FlurstuecksdatenAgrarComposite.class,
-                    new EntityCallback<FlurstuecksdatenAgrarComposite>() {
+            importEntity( db, sub, VertragsdatenAgrarComposite.class,
+                    new EntityCallback<VertragsdatenAgrarComposite>() {
 
                         @Override
-                        public void fillEntity( FlurstuecksdatenAgrarComposite entity,
-                                final Map<String, Object> builderRow )
+                        public void fillEntity( VertragsdatenAgrarComposite entity, final Map<String, Object> builderRow )
                                 throws Exception {
                             // // defaults
                             // if (entity.sanierungswert() == null) {
@@ -657,109 +663,123 @@ public class MdbImportVertraegeOperation
                             if (vertrag == null) {
                                 throw new IllegalStateException( "no vertrag found for " + eingangsnummer );
                             }
-                            entity.vertrag().set( vertrag );
-                            // }
-                            // entity.erbbauRecht2().set( (String)builderRow.get(
-                            // "ERBBAU" ) );
-                            entity.zurRichtwertermittlungGeeignet().set( getBooleanValue( builderRow, "RIWEGEEIGNET" ) );
-                            entity.istBebaut().set( getBooleanValue( builderRow, "bebaut" ) );
-                            entity.fuerStatistikGeeignet().set( getBooleanValue( builderRow, "VERARBKZ" ) );
-
-                            // entity.richtwertZone().set( found.zone().get() );
-                            entity.richtwertZone1().set(
-                                    findRichtwertZone( allRichtwertZoneGueltigkeit, entity, builderRow, "1" ) );
-                            entity.richtwertZone2().set(
-                                    findRichtwertZone( allRichtwertZoneGueltigkeit, entity, builderRow, "2" ) );
-                            entity.richtwertZone3().set(
-                                    findRichtwertZone( allRichtwertZoneGueltigkeit, entity, builderRow, "3" ) );
-                            entity.richtwertZone4().set(
-                                    findRichtwertZone( allRichtwertZoneGueltigkeit, entity, builderRow, "4" ) );
-                            entity.richtwertZone5().set(
-                                    findRichtwertZone( allRichtwertZoneGueltigkeit, entity, builderRow, "5" ) );
-                            entity.richtwertZone6().set(
-                                    findRichtwertZone( allRichtwertZoneGueltigkeit, entity, builderRow, "6" ) );
-                            entity.bodennutzung1().set(
-                                    findSchlNamed( BodennutzungComposite.class, builderRow, "BONU1" ) );
-                            entity.bodennutzung2().set(
-                                    findSchlNamed( BodennutzungComposite.class, builderRow, "BONU2" ) );
-                            entity.bodennutzung3().set(
-                                    findSchlNamed( BodennutzungComposite.class, builderRow, "BONU3" ) );
-                            entity.bodennutzung4().set(
-                                    findSchlNamed( BodennutzungComposite.class, builderRow, "BONU4" ) );
-                            entity.bodennutzung5().set(
-                                    findSchlNamed( BodennutzungComposite.class, builderRow, "BONU5" ) );
-                            entity.bodennutzung6().set(
-                                    findSchlNamed( BodennutzungComposite.class, builderRow, "BONU6" ) );
-
-                            String separator = System.getProperty( "line.separator" );
-                            // BEM1 und BEM2 zusammenfassen
-                            String bem1 = (String)builderRow.get( "BEM1" );
-                            String bem2 = (String)builderRow.get( "BEM2" );
-                            StringBuilder bem = new StringBuilder();
-                            if (bem1 != null) {
-                                bem.append( bem1 );
-                                if (bem2 != null) {
-                                    bem.append( separator );
-                                }
+                            if (foundVertraege.contains( eingangsnummer )) {
+                                duplicateVertraege.add( eingangsnummer );
                             }
-                            if (bem2 != null) {
-                                bem.append( bem2 );
-                            }
-                            entity.bemerkungen().set( bem.toString() );
+                            else {
+                                foundVertraege.add( eingangsnummer );
+                                // dont set them here, because it must be a 1-1
+                                entity.vertrag().set( vertrag );
 
-                            // Flurstück setzen, bisher Hauptflurstück, ab jetzt je
-                            // Flurstück einmal
-                            // erweiterte Daten
-                            FlurstueckComposite flurstueck = allHauptflurstueckeI.get( eingangsnummer.intValue() );
-                            if (flurstueck == null) {
-                                throw new IllegalStateException( String.format(
-                                        "no flurstueck found for FlurstuecksdatenAgrar for vertrag %s", entity
-                                                .vertrag().get().eingangsNr().get() ) );
-                            }
-                            entity.flurstueck().set( flurstueck );
-
-                            // checken ob Flurstück tatsächlich agrar ist, in der DB
-                            // ist ganz schöner Mist drin
-                            //
-                            if (flurstueck.nutzung().get().isAgrar().get()
-                                    || vertrag.erweiterteVertragsdaten().get().bereinigterVollpreis().get() == null) {
-                                // subcreate VertragsdatenErweitert
-                                // in der Tabelle K_BEVERW sind Vertrags- und
-                                // Flurstücksdaten, letztere werden hier separate
-                                // erzeugt
-                                // VertragsdatenErweitertComposite vdec =
-                                // repo.newEntity(
-                                // VertragsdatenErweitertComposite.class, null,
-                                // new
-                                // EntityCreator<VertragsdatenErweitertComposite>() {
-                                //
-                                // public void create(
-                                // VertragsdatenErweitertComposite prototype )
-                                // throws Exception {
-                                vertragsdatenErweitertAgrarCompositeImporter.fillEntity( vertrag
-                                        .erweiterteVertragsdaten().get(), builderRow );
                                 // }
-                                // } );
-                                // vertrag.eingangsNr().get();
-                                // vertrag.erweiterteVertragsdaten().set( vdec );
-                            }
-                            if (flurstueck.nutzung().get().isAgrar().get()) {
-                                // log.error( String.format(
+                                // entity.erbbauRecht2().set( (String)builderRow.get(
+                                // "ERBBAU" ) );
+                                entity.zurRichtwertermittlungGeeignet().set(
+                                        getBooleanValue( builderRow, "RIWEGEEIGNET" ) );
+                                entity.istBebaut().set( getBooleanValue( builderRow, "bebaut" ) );
+                                entity.fuerStatistikGeeignet().set( getBooleanValue( builderRow, "VERARBKZ" ) );
+
+                                // entity.richtwertZone().set( found.zone().get() );
+                                entity.richtwertZone1().set(
+                                        findRichtwertZone( allRichtwertZoneGueltigkeit, entity, builderRow, "1" ) );
+                                entity.richtwertZone2().set(
+                                        findRichtwertZone( allRichtwertZoneGueltigkeit, entity, builderRow, "2" ) );
+                                entity.richtwertZone3().set(
+                                        findRichtwertZone( allRichtwertZoneGueltigkeit, entity, builderRow, "3" ) );
+                                entity.richtwertZone4().set(
+                                        findRichtwertZone( allRichtwertZoneGueltigkeit, entity, builderRow, "4" ) );
+                                entity.richtwertZone5().set(
+                                        findRichtwertZone( allRichtwertZoneGueltigkeit, entity, builderRow, "5" ) );
+                                entity.richtwertZone6().set(
+                                        findRichtwertZone( allRichtwertZoneGueltigkeit, entity, builderRow, "6" ) );
+                                entity.bodennutzung1().set(
+                                        findSchlNamed( BodennutzungComposite.class, builderRow, "BONU1" ) );
+                                entity.bodennutzung2().set(
+                                        findSchlNamed( BodennutzungComposite.class, builderRow, "BONU2" ) );
+                                entity.bodennutzung3().set(
+                                        findSchlNamed( BodennutzungComposite.class, builderRow, "BONU3" ) );
+                                entity.bodennutzung4().set(
+                                        findSchlNamed( BodennutzungComposite.class, builderRow, "BONU4" ) );
+                                entity.bodennutzung5().set(
+                                        findSchlNamed( BodennutzungComposite.class, builderRow, "BONU5" ) );
+                                entity.bodennutzung6().set(
+                                        findSchlNamed( BodennutzungComposite.class, builderRow, "BONU6" ) );
+
+                                String separator = System.getProperty( "line.separator" );
+                                // BEM1 und BEM2 zusammenfassen
+                                String bem1 = (String)builderRow.get( "BEM1" );
+                                String bem2 = (String)builderRow.get( "BEM2" );
+                                StringBuilder bem = new StringBuilder();
+                                if (bem1 != null) {
+                                    bem.append( bem1 );
+                                    if (bem2 != null) {
+                                        bem.append( separator );
+                                    }
+                                }
+                                if (bem2 != null) {
+                                    bem.append( bem2 );
+                                }
+                                entity.bemerkungen().set( bem.toString() );
+
+                                // Flurstück setzen, bisher Hauptflurstück, ab jetzt
+                                // je
+                                // Flurstück einmal
+                                // erweiterte Daten
+                                FlurstueckComposite flurstueck = allHauptflurstueckeI.get( eingangsnummer.intValue() );
+                                if (flurstueck == null) {
+                                    throw new IllegalStateException( String.format(
+                                            "no flurstueck found for FlurstuecksdatenAgrar for vertrag %s", entity
+                                                    .vertrag().get().eingangsNr().get() ) );
+                                }
+                                // entity.flurstueck().set( flurstueck );
+
+                                // checken ob Flurstück tatsächlich agrar ist, in der
+                                // DB
+                                // ist ganz schöner Mist drin
+                                //
+                                if (// flurstueck.nutzung().get().isAgrar().get()
+                                    // ||
+                                vertrag.erweiterteVertragsdaten().get().bereinigterVollpreis().get() == null) {
+                                    // subcreate VertragsdatenErweitert
+                                    // in der Tabelle K_BEVERW sind Vertrags- und
+                                    // Flurstücksdaten, letztere werden hier separate
+                                    // erzeugt
+                                    // VertragsdatenErweitertComposite vdec =
+                                    // repo.newEntity(
+                                    // VertragsdatenErweitertComposite.class, null,
+                                    // new
+                                    // EntityCreator<VertragsdatenErweitertComposite>()
+                                    // {
+                                    //
+                                    // public void create(
+                                    // VertragsdatenErweitertComposite prototype )
+                                    // throws Exception {
+                                    vertragsdatenErweitertAgrarCompositeImporter.fillEntity( vertrag
+                                            .erweiterteVertragsdaten().get(), builderRow );
+                                    // }
+                                    // } );
+                                    // vertrag.eingangsNr().get();
+                                    // vertrag.erweiterteVertragsdaten().set( vdec );
+                                }
+                                // if (flurstueck.nutzung().get().isAgrar().get()) {
+                                // // log.error( String.format(
+                                // //
                                 // "Flurstück ist Bauland müsste aber AGRAR sein für Vertrag %s",
-                                // entity.vertrag()
-                                // .get().eingangsNr().get() ) );
-                                w.write( String.format(
-                                        "Flurstück ist Bauland müsste aber AGRAR sein für Vertrag %s mit Nutzung %s\n",
-                                        entity.vertrag().get().eingangsNr().get(), flurstueck.nutzung().get().schl()
-                                                .get() ) );
+                                // // entity.vertrag()
+                                // // .get().eingangsNr().get() ) );
+                                // w.write( String.format(
+                                // "Flurstück ist Bauland müsste aber AGRAR sein für Vertrag %s mit Nutzung %s\n",
+                                // entity.vertrag().get().eingangsNr().get(),
+                                // flurstueck.nutzung().get().schl()
+                                // .get() ) );
+                                // }
                             }
                         }
 
 
                         private RichtwertzoneZeitraumComposite findRichtwertZone(
                                 final Map<String, List<RichtwertzoneZeitraumComposite>> allRichtwertZoneGueltigkeit,
-                                FlurstuecksdatenAgrarComposite entity, final Map<String, Object> builderRow,
-                                String number )
+                                VertragsdatenAgrarComposite entity, final Map<String, Object> builderRow, String number )
                                 throws IOException {
                             // RIZONE
                             String zone = (String)builderRow.get( "RIZO" + number );
@@ -769,12 +789,16 @@ public class MdbImportVertraegeOperation
                                 //
                                 return MdbImportVertraegeOperation.this.findRichtwertZone( w,
                                         allRichtwertZoneGueltigkeit, zone, gemeinde, jahr,
-                                        FlurstuecksdatenAgrarComposite.class,
+                                        VertragsdatenAgrarComposite.class,
                                         EingangsNummerFormatter.format( entity.vertrag().get().eingangsNr().get() ) );
                             }
                             return null;
                         }
                     } );
+
+            for (Double eingangsNr : duplicateVertraege) {
+                w.write( "Mehr als 1 VertragsdatenErweitertAgrar gefunden für " + eingangsNr + "\n" );
+            }
 
             sub = new SubMonitor( monitor, 10 );
             importFlurZwiAgrar( db, sub, parentFolder );
@@ -819,16 +843,16 @@ public class MdbImportVertraegeOperation
                     throw new IllegalStateException( "no vertrag found for " + eingangsnummer );
                 }
                 // suchen nach FlurstuecksDatenAgrar
-                boolean found = false;
-                for (FlurstuecksdatenAgrarComposite agrar : FlurstuecksdatenAgrarComposite.Mixin.forVertrag( vertrag )) {
-                    found = true;
+                // boolean found = false;
+                VertragsdatenAgrarComposite agrar = VertragsdatenAgrarComposite.Mixin.forVertrag( vertrag );
+                if (agrar != null) {
                     agrar.flaecheLandwirtschaftStala().set( (Double)builderRow.get( "FL_LANDW" ) );
                     agrar.hypothekStala().set( (Double)builderRow.get( "HYPOTHEK" ) );
                     agrar.wertTauschStala().set( (Double)builderRow.get( "TAUSCHGRUND" ) );
                     agrar.wertSonstigesStala().set( (Double)builderRow.get( "WERTSONST" ) );
                     agrar.bemerkungStala().set( (String)builderRow.get( "BEM_AGRAR" ) );
                 }
-                if (!found) {
+                else {
                     wmvaopfW.write( "no flurstuecksdatenagrar found for " + eingangsnummer + "\n" );
                 }
             }
@@ -878,10 +902,8 @@ public class MdbImportVertraegeOperation
                         throw new IllegalStateException( "no vertrag found for " + eingangsnummer );
                     }
                     // suchen nach FlurstuecksDatenAgrar
-                    boolean found = false;
-                    for (FlurstuecksdatenBaulandComposite bauland : FlurstuecksdatenBaulandComposite.Mixin
-                            .forVertrag( vertrag )) {
-                        found = true;
+                    VertragsdatenBaulandComposite bauland = VertragsdatenBaulandComposite.Mixin.forVertrag( vertrag );
+                    if (bauland != null) {
 
                         bauland.gebaeudeArtStaBu().set( gebaeudeArtStaBuComposite );
 
@@ -895,7 +917,7 @@ public class MdbImportVertraegeOperation
                         bauland.stellplaetze().set( stellplaetze );
                         bauland.carport().set( carport );
                     }
-                    if (!found) {
+                    else {
                         wmvaopfW.write( "no flurstuecksdatenbauland found for " + eingangsnummer + "\n" );
                     }
                 }

@@ -29,7 +29,7 @@ import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.filter.IFilterEditorSite;
 
 import org.polymap.kaps.model.KapsRepository;
-import org.polymap.kaps.model.data.FlurstuecksdatenAgrarComposite;
+import org.polymap.kaps.model.data.VertragsdatenAgrarComposite;
 import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.ui.MyNumberValidator;
 
@@ -43,7 +43,7 @@ public class EinzelneVertragsdatenAgrarFilter
 
 
     public EinzelneVertragsdatenAgrarFilter( ILayer layer ) {
-        super( "__kaps--", layer, "einzelner Vertrag...", null, 10000, FlurstuecksdatenAgrarComposite.class );
+        super( "__kaps--", layer, "einzelner Vertrag...", null, 10000, VertragsdatenAgrarComposite.class );
     }
 
 
@@ -71,7 +71,7 @@ public class EinzelneVertragsdatenAgrarFilter
         Query<VertragComposite> kaufvertraege = KapsRepository.instance().findEntities( VertragComposite.class, expr,
                 0, getMaxResults() );
 
-        FlurstuecksdatenAgrarComposite templateB = QueryExpressions.templateFor( FlurstuecksdatenAgrarComposite.class );
+        VertragsdatenAgrarComposite templateB = QueryExpressions.templateFor( VertragsdatenAgrarComposite.class );
         BooleanExpression inExpr = null;
         for (VertragComposite kv : kaufvertraege) {
             BooleanExpression newExpr = QueryExpressions.eq( templateB.vertrag(), kv );
@@ -86,7 +86,7 @@ public class EinzelneVertragsdatenAgrarFilter
             inExpr = QueryExpressions.eq( template.identity(), "unknown" );
         }
         return KapsRepository.instance()
-                .findEntities( FlurstuecksdatenAgrarComposite.class, inExpr, 0, getMaxResults() );
+                .findEntities( VertragsdatenAgrarComposite.class, inExpr, 0, getMaxResults() );
 
     }
 }

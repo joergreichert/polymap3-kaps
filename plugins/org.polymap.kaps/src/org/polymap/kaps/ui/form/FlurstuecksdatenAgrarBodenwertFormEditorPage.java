@@ -306,8 +306,8 @@ public class FlurstuecksdatenAgrarBodenwertFormEditorPage
 
         newFormField( IFormFieldLabel.NO_LABEL ).setProperty( new PropertyAdapter( vb.ackerzahl1() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new MyNumberValidator( Long.class ) )
-                .setLayoutData( three().top( lastLine ).create() ).setParent( client ).create();
+                .setValidator( new MyNumberValidator( Long.class ) ).setLayoutData( three().top( lastLine ).create() )
+                .setParent( client ).create();
 
         createFlaecheField( vb.flaechenAnteil1(), four().top( lastLine ), client, true );
         createPreisField( vb.bodenrichtwert1(), five().top( lastLine ), client, true );
@@ -321,8 +321,8 @@ public class FlurstuecksdatenAgrarBodenwertFormEditorPage
                         && ev.getFieldName().equals( vb.richtwertZone1().qualifiedName().name() )) {
                     RichtwertzoneZeitraumComposite zone = (RichtwertzoneZeitraumComposite)ev.getNewValue();
                     Double wert = zone != null ? zone.euroQm().get() : null;
-                    site.setFieldValue( vb.bodenrichtwert1().qualifiedName().name(), wert != null ? NumberFormatter.getFormatter( 2 )
-                            .format( wert ) : null );
+                    site.setFieldValue( vb.bodenrichtwert1().qualifiedName().name(), wert != null ? NumberFormatter
+                            .getFormatter( 2 ).format( wert ) : null );
                 }
             }
         } );
@@ -342,8 +342,8 @@ public class FlurstuecksdatenAgrarBodenwertFormEditorPage
 
         newFormField( IFormFieldLabel.NO_LABEL ).setProperty( new PropertyAdapter( vb.ackerzahl2() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new MyNumberValidator( Long.class ) )
-                .setLayoutData( three().top( lastLine ).create() ).setParent( client ).create();
+                .setValidator( new MyNumberValidator( Long.class ) ).setLayoutData( three().top( lastLine ).create() )
+                .setParent( client ).create();
 
         createFlaecheField( vb.flaechenAnteil2(), four().top( lastLine ), client, true );
         createPreisField( vb.bodenrichtwert2(), five().top( lastLine ), client, true );
@@ -378,8 +378,8 @@ public class FlurstuecksdatenAgrarBodenwertFormEditorPage
 
         newFormField( IFormFieldLabel.NO_LABEL ).setProperty( new PropertyAdapter( vb.ackerzahl3() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new MyNumberValidator( Long.class ) )
-                .setLayoutData( three().top( lastLine ).create() ).setParent( client ).create();
+                .setValidator( new MyNumberValidator( Long.class ) ).setLayoutData( three().top( lastLine ).create() )
+                .setParent( client ).create();
 
         createFlaecheField( vb.flaechenAnteil3(), four().top( lastLine ), client, true );
         createPreisField( vb.bodenrichtwert3(), five().top( lastLine ), client, true );
@@ -414,8 +414,8 @@ public class FlurstuecksdatenAgrarBodenwertFormEditorPage
 
         newFormField( IFormFieldLabel.NO_LABEL ).setProperty( new PropertyAdapter( vb.ackerzahl4() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new MyNumberValidator( Long.class ) )
-                .setLayoutData( three().top( lastLine ).create() ).setParent( client ).create();
+                .setValidator( new MyNumberValidator( Long.class ) ).setLayoutData( three().top( lastLine ).create() )
+                .setParent( client ).create();
 
         createFlaecheField( vb.flaechenAnteil4(), four().top( lastLine ), client, true );
         createPreisField( vb.bodenrichtwert4(), five().top( lastLine ), client, true );
@@ -448,8 +448,8 @@ public class FlurstuecksdatenAgrarBodenwertFormEditorPage
 
         newFormField( IFormFieldLabel.NO_LABEL ).setProperty( new PropertyAdapter( vb.ackerzahl5() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new MyNumberValidator( Long.class ) )
-                .setLayoutData( three().top( lastLine ).create() ).setParent( client ).create();
+                .setValidator( new MyNumberValidator( Long.class ) ).setLayoutData( three().top( lastLine ).create() )
+                .setParent( client ).create();
 
         createFlaecheField( vb.flaechenAnteil5(), four().top( lastLine ), client, true );
         createPreisField( vb.bodenrichtwert5(), five().top( lastLine ), client, true );
@@ -482,8 +482,8 @@ public class FlurstuecksdatenAgrarBodenwertFormEditorPage
 
         newFormField( IFormFieldLabel.NO_LABEL ).setProperty( new PropertyAdapter( vb.ackerzahl6() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new MyNumberValidator( Long.class ) )
-                .setLayoutData( three().top( lastLine ).create() ).setParent( client ).create();
+                .setValidator( new MyNumberValidator( Long.class ) ).setLayoutData( three().top( lastLine ).create() )
+                .setParent( client ).create();
 
         createFlaecheField( vb.flaechenAnteil6(), four().top( lastLine ), client, true );
         createPreisField( vb.bodenrichtwert6(), five().top( lastLine ), client, true );
@@ -524,10 +524,9 @@ public class FlurstuecksdatenAgrarBodenwertFormEditorPage
         // lastLine = newLine;
         newLine = createLabel( client, "Verkaufte Fläche", one().top( lastLine ), SWT.RIGHT );
         newFormField( IFormFieldLabel.NO_LABEL ).setEnabled( false )
-                .setProperty( new PropertyAdapter( vb.flurstueck().get().verkaufteFlaeche() ) )
-                .setValidator( new MyNumberValidator( Double.class, 2 ) )
-                .setField( new StringFormField() ).setLayoutData( two().top( lastLine ).bottom( 100 ).create() )
-                .setParent( client ).create();
+                .setProperty( new PropertyAdapter( vb.verkaufteFlaeche() ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) ).setField( new StringFormField() )
+                .setLayoutData( two().top( lastLine ).bottom( 100 ).create() ).setParent( client ).create();
         createFlaecheField( vb.flaechenAnteilGesamt(), four().top( lastLine ), client, false );
         site.addFieldListener( flaecheSummation = new FieldSummation( site, 0, vb.flaechenAnteilGesamt(), vb
                 .flaechenAnteil1(), vb.flaechenAnteil2(), vb.flaechenAnteil3(), vb.flaechenAnteil4(), vb
@@ -613,7 +612,7 @@ public class FlurstuecksdatenAgrarBodenwertFormEditorPage
 
     private Map<String, RichtwertzoneZeitraumComposite> searchZonen() {
         TreeMap<String, RichtwertzoneZeitraumComposite> zonen = new TreeMap<String, RichtwertzoneZeitraumComposite>();
-        GemeindeComposite gemeinde = vb.flurstueck().get().richtwertZone().get().gemeinde().get();
+        GemeindeComposite gemeinde = vb.vertrag().get().richtwertZoneAgrar().get().gemeinde().get();
         Iterable<RichtwertzoneComposite> iterable = RichtwertzoneComposite.Mixin.findZoneIn( gemeinde );
         for (RichtwertzoneComposite zone : iterable) {
             String prefix = zone.schl().get();
@@ -640,8 +639,8 @@ public class FlurstuecksdatenAgrarBodenwertFormEditorPage
 
         if (vb.richtwertZone1().get() == null) {
             // set the default zone from flurstueck
-            RichtwertzoneZeitraumComposite zone = RichtwertzoneZeitraumComposite.Mixin.findZeitraumFor( vb.flurstueck()
-                    .get().richtwertZone().get(), vb.vertrag().get().vertragsDatum().get() );
+            RichtwertzoneZeitraumComposite zone = RichtwertzoneZeitraumComposite.Mixin.findZeitraumFor( vb.vertrag()
+                    .get().richtwertZoneAgrar().get(), vb.vertrag().get().vertragsDatum().get() );
             // vb.richtwertZone1().set( zone );
             pageSite.setFieldValue( vb.richtwertZone1().qualifiedName().name(), zone );
         }

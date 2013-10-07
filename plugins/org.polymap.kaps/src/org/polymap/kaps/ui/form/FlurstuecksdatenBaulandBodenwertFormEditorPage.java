@@ -56,65 +56,64 @@ import org.polymap.kaps.ui.NumberFormatter;
 public class FlurstuecksdatenBaulandBodenwertFormEditorPage
         extends FlurstuecksdatenBaulandFormEditorPage {
 
-    private static Log                        log = LogFactory
-                                                          .getLog( FlurstuecksdatenBaulandBodenwertFormEditorPage.class );
+    private static Log          log = LogFactory.getLog( FlurstuecksdatenBaulandBodenwertFormEditorPage.class );
 
     @SuppressWarnings("unused")
-    private IFormFieldListener                line1multiplicator;
+    private IFormFieldListener  line1multiplicator;
 
     @SuppressWarnings("unused")
-    private IFormFieldListener                line2multiplicator;
+    private IFormFieldListener  line2multiplicator;
 
     @SuppressWarnings("unused")
-    private IFormFieldListener                line3multiplicator;
+    private IFormFieldListener  line3multiplicator;
 
     @SuppressWarnings("unused")
-    private IFormFieldListener                line4multiplicator;
+    private IFormFieldListener  line4multiplicator;
 
     @SuppressWarnings("unused")
-    private IFormFieldListener                line5multiplicator;
+    private IFormFieldListener  line5multiplicator;
 
     @SuppressWarnings("unused")
-    private IFormFieldListener                line6multiplicator;
+    private IFormFieldListener  line6multiplicator;
 
     @SuppressWarnings("unused")
-    private IFormFieldListener                flaecheSummation;
+    private IFormFieldListener  flaecheSummation;
 
     @SuppressWarnings("unused")
-    private IFormFieldListener                bodenwertSummation;
+    private IFormFieldListener  bodenwertSummation;
 
     @SuppressWarnings("unused")
-    private IFormFieldListener                bereinCalculator;
+    private IFormFieldListener  bereinCalculator;
 
     @SuppressWarnings("unused")
-    private IFormFieldListener                sachwertSummation;
+    private IFormFieldListener  sachwertSummation;
 
     @SuppressWarnings("unused")
-    private IFormFieldListener                anteilBodenwert;
+    private IFormFieldListener  anteilBodenwert;
 
-//    private FaktorOhneStrassenplatzCalculator faktorStrassenplatz;
+    // private FaktorOhneStrassenplatzCalculator faktorStrassenplatz;
 
-    private FieldMultiplication               line1multiplicator2;
+    private FieldMultiplication line1multiplicator2;
 
-    private FieldMultiplication               line2multiplicator2;
+    private FieldMultiplication line2multiplicator2;
 
-    private FieldMultiplication               line3multiplicator2;
+    private FieldMultiplication line3multiplicator2;
 
-    private FieldMultiplication               line4multiplicator2;
+    private FieldMultiplication line4multiplicator2;
 
-    private FieldMultiplication               line5multiplicator2;
+    private FieldMultiplication line5multiplicator2;
 
-    private FieldMultiplication               line6multiplicator2;
+    private FieldMultiplication line6multiplicator2;
 
-    private IFormFieldListener                bodenpreis;
+    private IFormFieldListener  bodenpreis;
 
-    protected Double                          bodenpreisBebaut;
+    protected Double            bodenpreisBebaut;
 
-    private IFormFieldListener                bodenpreisListener;
+    private IFormFieldListener  bodenpreisListener;
 
-    private FieldListener                     fieldListener;
+    private FieldListener       fieldListener;
 
-    private InterEditorListener               editorListener;
+    private InterEditorListener editorListener;
 
 
     // private IFormFieldListener gemeindeListener;
@@ -134,8 +133,8 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
                     protected void onChangedValue( IFormEditorPageSite site, Entity entity, String fieldName,
                             Object newValue ) {
                         if (fieldName.equals( vb.wertDerBaulichenAnlagen().qualifiedName().name() )) {
-                            site.setFieldValue( fieldName, newValue != null ? NumberFormatter.getFormatter( 2 ).format( newValue )
-                                    : null );
+                            site.setFieldValue( fieldName,
+                                    newValue != null ? NumberFormatter.getFormatter( 2 ).format( newValue ) : null );
                         }
                         else if (fieldName.equals( vb.bewertungsMethode().qualifiedName().name() )) {
                             pageSite.setFieldValue( fieldName, newValue );
@@ -262,9 +261,9 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
         newLine = createFlaecheField( vb.verkaufteFlaecheGesamt(), two().top( lastLine ), client, false );
 
         lastLine = newLine;
-        newLine = createLabel( client, "Fläche Flurstück", one().top( lastLine ), SWT.RIGHT );
+        newLine = createLabel( client, "Verkaufte Fläche", one().top( lastLine ), SWT.RIGHT );
         newFormField( IFormFieldLabel.NO_LABEL ).setEnabled( false )
-                .setProperty( new PropertyAdapter( vb.flurstueck().get().verkaufteFlaeche() ) )
+                .setProperty( new PropertyAdapter( vb.verkaufteFlaeche() ) )
                 .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setLayoutData( two().top( lastLine ).bottom( 100 ).create() ).setParent( client ).create();
@@ -359,15 +358,19 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
             }
         } );
 
-//        // kaufpreis / (bodenwert - Wert aller strflaechen)
-//        createLabel( client, "ohne Straßenplatz", three().top( lastLine, 12 ), SWT.RIGHT );
-//        newFormField( IFormFieldLabel.NO_LABEL )
-//                .setToolTipText( "Faktor bereinigter Kaufpreis/Sachwert ohne Straßenplatz" )
-//                .setProperty( new PropertyAdapter( vb.faktorOhneStrassenplatz() ) )
-//                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-//                .setValidator( new MyNumberValidator( Double.class, 12, 4, 1, 4 ) )
-//                .setLayoutData( four().top( lastLine ).create() ).setParent( client ).setEnabled( false ).create();
-//        site.addFieldListener( faktorStrassenplatz = new FaktorOhneStrassenplatzCalculator( site, vb ) );
+        // // kaufpreis / (bodenwert - Wert aller strflaechen)
+        // createLabel( client, "ohne Straßenplatz", three().top( lastLine, 12 ),
+        // SWT.RIGHT );
+        // newFormField( IFormFieldLabel.NO_LABEL )
+        // .setToolTipText( "Faktor bereinigter Kaufpreis/Sachwert ohne Straßenplatz"
+        // )
+        // .setProperty( new PropertyAdapter( vb.faktorOhneStrassenplatz() ) )
+        // .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
+        // .setValidator( new MyNumberValidator( Double.class, 12, 4, 1, 4 ) )
+        // .setLayoutData( four().top( lastLine ).create() ).setParent( client
+        // ).setEnabled( false ).create();
+        // site.addFieldListener( faktorStrassenplatz = new
+        // FaktorOhneStrassenplatzCalculator( site, vb ) );
 
         lastLine = newLine;
         newLine = createLabel( client, "Kaufpreisanteil", one().top( lastLine, 12 ), SWT.RIGHT );

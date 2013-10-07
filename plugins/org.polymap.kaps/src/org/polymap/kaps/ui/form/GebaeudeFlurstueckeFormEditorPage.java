@@ -431,32 +431,32 @@ public class GebaeudeFlurstueckeFormEditorPage
         // if (flurstueck != null) {
         // NutzungComposite nutzung = flurstueck.nutzung().get();
         // if (nutzung.isAgrar().get()) {
-        // FlurstuecksdatenAgrarComposite agrar =
-        // FlurstuecksdatenAgrarComposite.Mixin
+        // VertragsdatenAgrarComposite agrar =
+        // VertragsdatenAgrarComposite.Mixin
         // .forFlurstueck( flurstueck );
         // if (agrar == null) {
-        // agrar = repository.newEntity( FlurstuecksdatenAgrarComposite.class, null
+        // agrar = repository.newEntity( VertragsdatenAgrarComposite.class, null
         // );
         // agrar.flurstueck().set( flurstueck );
         // agrar.vertrag().set( flurstueck.vertrag().get() );
         // // agrar.richtwertZone1().set(
         // // flurstueck.richtwertZone().get() );
         // }
-        // KapsPlugin.openEditor( fs, FlurstuecksdatenAgrarComposite.NAME, agrar );
+        // KapsPlugin.openEditor( fs, VertragsdatenAgrarComposite.NAME, agrar );
         // }
         // else {
-        // FlurstuecksdatenBaulandComposite bauland =
-        // FlurstuecksdatenBaulandComposite.Mixin
+        // VertragsdatenBaulandComposite bauland =
+        // VertragsdatenBaulandComposite.Mixin
         // .forFlurstueck( flurstueck );
         // if (bauland == null) {
-        // bauland = repository.newEntity( FlurstuecksdatenBaulandComposite.class,
+        // bauland = repository.newEntity( VertragsdatenBaulandComposite.class,
         // null );
         // bauland.flurstueck().set( flurstueck );
         // bauland.vertrag().set( flurstueck.vertrag().get() );
         // // bauland.richtwertZone().set(
         // // flurstueck.richtwertZone().get() );
         // }
-        // KapsPlugin.openEditor( fs, FlurstuecksdatenBaulandComposite.NAME, bauland
+        // KapsPlugin.openEditor( fs, VertragsdatenBaulandComposite.NAME, bauland
         // );
         // }
         // }

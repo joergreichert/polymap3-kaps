@@ -38,7 +38,7 @@ import org.polymap.rhei.filter.IFilterEditorSite;
 
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.FlurstueckComposite;
-import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
+import org.polymap.kaps.model.data.VertragsdatenBaulandComposite;
 import org.polymap.kaps.model.data.GebaeudeArtComposite;
 import org.polymap.kaps.model.data.GemarkungComposite;
 import org.polymap.kaps.model.data.GemeindeComposite;
@@ -169,8 +169,8 @@ public class VertraegeFuerBaujahrUndGebaeudeartFilter
         Object[] jahre = (Object[])site.getFieldValue( "baujahr" );
         BooleanExpression baujahrExpr = null;
         if (jahre != null) {
-            FlurstuecksdatenBaulandComposite dateTemplate = QueryExpressions
-                    .templateFor( FlurstuecksdatenBaulandComposite.class );
+            VertragsdatenBaulandComposite dateTemplate = QueryExpressions
+                    .templateFor( VertragsdatenBaulandComposite.class );
             BooleanExpression expr2 = null;
 
             BooleanExpression ge = jahre[0] != null ? QueryExpressions.ge( dateTemplate.baujahr(),
@@ -186,10 +186,10 @@ public class VertraegeFuerBaujahrUndGebaeudeartFilter
                 expr2 = expr2 == null ? le : QueryExpressions.and( ge, le );
             }
             if (expr2 != null) {
-                Query<FlurstuecksdatenBaulandComposite> daten = KapsRepository.instance().findEntities(
-                        FlurstuecksdatenBaulandComposite.class, expr2, 0, -1 );
+                Query<VertragsdatenBaulandComposite> daten = KapsRepository.instance().findEntities(
+                        VertragsdatenBaulandComposite.class, expr2, 0, -1 );
                 Set<Integer> eingangsNummern = new HashSet<Integer>();
-                for (FlurstuecksdatenBaulandComposite kv : daten) {
+                for (VertragsdatenBaulandComposite kv : daten) {
                     Integer eingangsNummer = kv.vertrag().get().eingangsNr().get();
                     if (!eingangsNummern.contains( eingangsNummer )) {
                         eingangsNummern.add( eingangsNummer );

@@ -42,9 +42,8 @@ import org.polymap.rhei.form.IFormEditorPageSite;
 
 import org.polymap.kaps.KapsPlugin;
 import org.polymap.kaps.model.data.ErmittlungModernisierungsgradComposite;
-import org.polymap.kaps.model.data.FlurstueckComposite;
-import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
 import org.polymap.kaps.model.data.VertragComposite;
+import org.polymap.kaps.model.data.VertragsdatenBaulandComposite;
 import org.polymap.kaps.model.data.VertragsdatenErweitertComposite;
 import org.polymap.kaps.ui.ActionButton;
 import org.polymap.kaps.ui.FieldCalculation;
@@ -114,13 +113,16 @@ public class ErtragswertverfahrenErtragswertFormEditorPage
                     protected void onChangedValue( IFormEditorPageSite site, Entity entity, String fieldName,
                             Object value ) {
                         if (fieldName.equals( vb.bereinigtesBaujahr().qualifiedName().name() )) {
-                            site.setFieldValue( fieldName, value != null ? NumberFormatter.getFormatter( 0, false ).format( value ) : null );
+                            site.setFieldValue( fieldName, value != null ? NumberFormatter.getFormatter( 0, false )
+                                    .format( value ) : null );
                         }
                         else if (fieldName.equals( vb.bodenwertAnteil().qualifiedName().name() )) {
-                            site.setFieldValue( fieldName, value != null ? NumberFormatter.getFormatter( 2 ).format( value ) : null );
+                            site.setFieldValue( fieldName,
+                                    value != null ? NumberFormatter.getFormatter( 2 ).format( value ) : null );
                         }
                         else if (fieldName.equals( vb.bereinigterKaufpreis().qualifiedName().name() )) {
-                            site.setFieldValue( fieldName, value != null ? NumberFormatter.getFormatter( 2 ).format( value ) : null );
+                            site.setFieldValue( fieldName,
+                                    value != null ? NumberFormatter.getFormatter( 2 ).format( value ) : null );
                         }
                     }
                 }, new InterEditorListener.EventFilter( vb ) );
@@ -143,8 +145,8 @@ public class ErtragswertverfahrenErtragswertFormEditorPage
         VertragsdatenErweitertComposite ev = vertrag.erweiterteVertragsdaten().get();
         if (ev != null) {
             Double preis = ev.bereinigterVollpreis().get();
-            pageSite.setFieldValue( vb.bereinigterKaufpreis().qualifiedName().name(), preis != null ? NumberFormatter.getFormatter( 2 )
-                    .format( preis ) : null );
+            pageSite.setFieldValue( vb.bereinigterKaufpreis().qualifiedName().name(), preis != null ? NumberFormatter
+                    .getFormatter( 2 ).format( preis ) : null );
         }
         fieldListener.flush( pageSite );
         editorListener.flush( pageSite );
@@ -350,51 +352,49 @@ public class ErtragswertverfahrenErtragswertFormEditorPage
         createPreisField( vb.ertragswert(), three().top( lastLine, 30 ).bottom( 100 ), client, false );
         site.addFieldListener( ertragsWert = new FieldSummation( site, 2, vb.ertragswert(), vb
                 .bodenwertAbzglFreilegung(), vb.ertragswertDerBaulichenAnlagenZwischensumme() ) );
-        
+
         site.addFieldListener( ertragsWertListener = new NonFiringFieldListener( vb.ertragswert() ) );
-        
+
         final VertragComposite vertrag = vb.vertrag().get();
         String label = vertrag == null ? "kein Vertrag" : "Übernehmen";
         ActionButton openErweiterteDaten = new ActionButton( parent, new Action( label ) {
 
             @Override
             public void run() {
-                Iterable<FlurstueckComposite> flurstuecke = FlurstueckComposite.Mixin.forEntity( vertrag );
-                int count = 0;
-                for (FlurstueckComposite flurstueck : flurstuecke) {
-                    FlurstuecksdatenBaulandComposite erweitert = FlurstuecksdatenBaulandComposite.Mixin
-                            .forFlurstueck( flurstueck );
-                    if (erweitert != null) {
-                        Double newValue = ertragsWertListener.get( vb.ertragswert() );
-                        if (newValue != null) { // && !newValue.equals( erweitert.wertDerBaulichenAnlagen() )) {
-                            count++;
-                            FormEditor editor = KapsPlugin.openEditor( fs, FlurstuecksdatenBaulandComposite.NAME,
-                                    erweitert );
-                            editor.setActivePage( FlurstuecksdatenBaulandBodenwertFormEditorPage.class.getName() );
-                            EventManager.instance().publish(
-                                    new InterEditorPropertyChangeEvent( formEditor, editor, erweitert, erweitert
-                                            .wertDerBaulichenAnlagen().qualifiedName().name(), erweitert
-                                            .wertDerBaulichenAnlagen().get(), newValue ) );
-                            EventManager.instance().publish(
-                                    new InterEditorPropertyChangeEvent( formEditor, editor, erweitert, erweitert
-                                            .bewertungsMethode().qualifiedName().name(), erweitert.bewertungsMethode()
-                                            .get(), "Ertragswert-normal" ) );
-                        }
+                // Iterable<FlurstueckComposite> flurstuecke =
+                // FlurstueckComposite.Mixin.forEntity( vertrag );
+                // int count = 0;
+                // for (FlurstueckComposite flurstueck : flurstuecke) {
+                VertragsdatenBaulandComposite erweitert = VertragsdatenBaulandComposite.Mixin.forVertrag( vertrag );
+                if (erweitert != null) {
+                    Double newValue = ertragsWertListener.get( vb.ertragswert() );
+                    if (newValue != null) { // && !newValue.equals(
+                                            // erweitert.wertDerBaulichenAnlagen() ))
+                                            // {
+                                            // count++;
+                        FormEditor editor = KapsPlugin.openEditor( fs, VertragsdatenBaulandComposite.NAME, erweitert );
+                        editor.setActivePage( FlurstuecksdatenBaulandBodenwertFormEditorPage.class.getName() );
+                        EventManager.instance().publish(
+                                new InterEditorPropertyChangeEvent( formEditor, editor, erweitert, erweitert
+                                        .wertDerBaulichenAnlagen().qualifiedName().name(), erweitert
+                                        .wertDerBaulichenAnlagen().get(), newValue ) );
+                        EventManager.instance().publish(
+                                new InterEditorPropertyChangeEvent( formEditor, editor, erweitert, erweitert
+                                        .bewertungsMethode().qualifiedName().name(), erweitert.bewertungsMethode()
+                                        .get(), "Ertragswert-normal" ) );
                     }
-                }
-                if (count > 0) {
                     MessageDialog.openInformation(
                             PolymapWorkbench.getShellToParentOn(),
                             "Wert übernommen",
                             "Der Gesamtwert der baulichen Anlagen wurde in \"Wert der baulichen Anlagen\" im Reiter \"Boden- und Gebäudewert \" in "
-                                    + count
-                                    + " " + FlurstuecksdatenBaulandComposite.NAME + " übernommen. Die Formulare werden entsprechend angezeigt." );
+                                    + VertragsdatenBaulandComposite.NAME
+                                    + " übernommen. Die Formulare werden entsprechend angezeigt." );
                 }
             }
         } );
         openErweiterteDaten.setToolTipText( vertrag == null ? "Kein Vertrag zugewiesen" : "In Vertrag "
                 + EingangsNummerFormatter.format( vertrag.eingangsNr().get() ) + " übernehmen" );
-        openErweiterteDaten.setLayoutData( four().height( 25 ).width(40).top( lastLine, 30 ).create() );
+        openErweiterteDaten.setLayoutData( four().height( 25 ).width( 40 ).top( lastLine, 30 ).create() );
         openErweiterteDaten.setEnabled( vertrag != null );
     }
 

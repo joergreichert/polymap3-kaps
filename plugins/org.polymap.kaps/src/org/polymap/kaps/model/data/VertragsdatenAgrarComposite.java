@@ -20,6 +20,9 @@ import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.entity.association.Association;
 import org.qi4j.api.mixin.Mixins;
+import org.qi4j.api.property.Computed;
+import org.qi4j.api.property.ComputedPropertyInstance;
+import org.qi4j.api.property.GenericPropertyInfo;
 import org.qi4j.api.property.Property;
 import org.qi4j.api.query.QueryExpressions;
 import org.qi4j.api.query.grammar.BooleanExpression;
@@ -37,15 +40,15 @@ import org.polymap.kaps.model.KapsRepository;
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 @Concerns({ PropertyChangeSupport.Concern.class })
-@Mixins({ FlurstuecksdatenAgrarComposite.Mixin.class, PropertyChangeSupport.Mixin.class,
-        ModelChangeSupport.Mixin.class, QiEntity.Mixin.class,
+@Mixins({ VertragsdatenAgrarComposite.Mixin.class, PropertyChangeSupport.Mixin.class, ModelChangeSupport.Mixin.class,
+        QiEntity.Mixin.class,
 // JsonState.Mixin.class
 })
 @ImportTable("K_BEVERL")
-public interface FlurstuecksdatenAgrarComposite
+public interface VertragsdatenAgrarComposite
         extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite {
 
-    String NAME = "Erweiterte Flurstücksdaten Agrar";
+    String NAME = "Erweiterte Vertragsdaten Agrar";
 
 
     @Optional
@@ -434,11 +437,10 @@ public interface FlurstuecksdatenAgrarComposite
     Property<String> FLST_AUSWERTUNG();
 
 
-    //
-    //
-    @Optional
-    Association<FlurstueckComposite> flurstueck();
-
+    // //
+    // //
+    // @Optional
+    // Association<FlurstueckComposite> flurstueck();
 
     // TODO KEYGES - String
     @Optional
@@ -500,31 +502,63 @@ public interface FlurstuecksdatenAgrarComposite
      * Methods and transient fields.
      */
     public static abstract class Mixin
-            implements FlurstuecksdatenAgrarComposite {
+            implements VertragsdatenAgrarComposite {
 
         private static Log log = LogFactory.getLog( Mixin.class );
 
 
-        public static FlurstuecksdatenAgrarComposite forFlurstueck( FlurstueckComposite flurstueck ) {
-            FlurstuecksdatenAgrarComposite template = QueryExpressions
-                    .templateFor( FlurstuecksdatenAgrarComposite.class );
-            BooleanExpression expr = QueryExpressions.eq( template.flurstueck(), flurstueck );
-            return KapsRepository.instance().findEntities( FlurstuecksdatenAgrarComposite.class, expr, 0, 1 ).find();
+        // public static VertragsdatenAgrarComposite forFlurstueck(
+        // FlurstueckComposite flurstueck ) {
+        // VertragsdatenAgrarComposite template = QueryExpressions.templateFor(
+        // VertragsdatenAgrarComposite.class );
+        // BooleanExpression expr = QueryExpressions.eq( template.flurstueck(),
+        // flurstueck );
+        // return KapsRepository.instance().findEntities(
+        // VertragsdatenAgrarComposite.class, expr, 0, 1 ).find();
+        // }
+
+        public static VertragsdatenAgrarComposite forVertrag( VertragComposite vertrag ) {
+            VertragsdatenAgrarComposite template = QueryExpressions.templateFor( VertragsdatenAgrarComposite.class );
+            BooleanExpression expr = QueryExpressions.eq( template.vertrag(), vertrag );
+            return KapsRepository.instance().findEntities( VertragsdatenAgrarComposite.class, expr, 0, -1 ).find();
         }
 
 
-        public static Iterable<FlurstuecksdatenAgrarComposite> forVertrag( VertragComposite vertrag ) {
-            FlurstuecksdatenAgrarComposite template = QueryExpressions
-                    .templateFor( FlurstuecksdatenAgrarComposite.class );
-            BooleanExpression expr = QueryExpressions.eq( template.vertrag(), vertrag );
-            return KapsRepository.instance().findEntities( FlurstuecksdatenAgrarComposite.class, expr, 0, -1 );
+        @Override
+        public Property<Double> verkaufteFlaeche() {
+            return new ComputedPropertyInstance<Double>( new GenericPropertyInfo( VertragsdatenBaulandComposite.class,
+                    "verkaufteFlaeche" ) ) {
+
+                @Override
+                public Double get() {
+                    double ret = 0.0d;
+                    for (FlurstueckComposite flurstueck : FlurstueckComposite.Mixin.forEntity( vertrag().get() )) {
+                        NutzungComposite nutzung = flurstueck.nutzung().get();
+                        if (nutzung != null && nutzung.isAgrar().get() != null
+                                && nutzung.isAgrar().get() == Boolean.TRUE) {
+                            Double flaeche = flurstueck.verkaufteFlaeche().get();
+                            if (flaeche != null) {
+                                ret += flaeche.doubleValue();
+                            }
+                        }
+                    }
+                    return ret;
+                }
+
+
+                @Override
+                public void set( Double anIgnoredValue )
+                        throws IllegalArgumentException, IllegalStateException {
+                    // ignored
+                }
+            };
         }
         //
         // @Override
         // public Association<RichtwertzoneComposite> richtwertZone() {
         // return new ComputedAssociationInstance<RichtwertzoneComposite>( new
         // GenericAssociationInfo(
-        // FlurstuecksdatenAgrarComposite.class, "richtwertZone" ) ) {
+        // VertragsdatenAgrarComposite.class, "richtwertZone" ) ) {
         //
         // public RichtwertzoneComposite get() {
         // FlurstueckComposite flurstueck = flurstueck().get();
@@ -544,7 +578,7 @@ public interface FlurstuecksdatenAgrarComposite
         // public Association<GebaeudeArtComposite> gebaeudeArt() {
         // return new ComputedAssociationInstance<GebaeudeArtComposite>( new
         // GenericAssociationInfo(
-        // FlurstuecksdatenAgrarComposite.class, "gebaeudeArt" ) ) {
+        // VertragsdatenAgrarComposite.class, "gebaeudeArt" ) ) {
         //
         // public GebaeudeArtComposite get() {
         // FlurstueckComposite flurstueck = flurstueck().get();
@@ -564,7 +598,7 @@ public interface FlurstuecksdatenAgrarComposite
         // @Override
         // public Property<Double> richtwert() {
         // return new ComputedPropertyInstance<Double>( new GenericPropertyInfo(
-        // FlurstuecksdatenAgrarComposite.class,
+        // VertragsdatenAgrarComposite.class,
         // "richtwert" ) ) {
         //
         // @Override
@@ -586,7 +620,7 @@ public interface FlurstuecksdatenAgrarComposite
         // @Override
         // public Property<String> gfzBereich() {
         // return new ComputedPropertyInstance<String>( new GenericPropertyInfo(
-        // FlurstuecksdatenAgrarComposite.class,
+        // VertragsdatenAgrarComposite.class,
         // "gfzBereich" ) ) {
         //
         // @Override
@@ -606,7 +640,7 @@ public interface FlurstuecksdatenAgrarComposite
         // @Override
         // public Association<BodennutzungComposite> bodennutzung() {
         // return new ComputedAssociationInstance<BodennutzungComposite>(
-        // new GenericAssociationInfo( FlurstuecksdatenBaulandComposite.class,
+        // new GenericAssociationInfo( VertragsdatenBaulandComposite.class,
         // "bodennutzung" ) ) {
         //
         // public BodennutzungComposite get() {
@@ -623,4 +657,9 @@ public interface FlurstuecksdatenAgrarComposite
         // };
         // }
     }
+
+
+    @Optional
+    @Computed
+    Property<Double> verkaufteFlaeche();
 }

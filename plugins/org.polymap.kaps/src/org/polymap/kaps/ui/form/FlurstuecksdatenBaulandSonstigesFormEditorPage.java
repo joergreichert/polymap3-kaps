@@ -26,12 +26,10 @@ import org.eclipse.swt.widgets.Control;
 
 import org.eclipse.ui.forms.widgets.Section;
 
-import org.polymap.rhei.data.entityfeature.AssociationAdapter;
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
 import org.polymap.rhei.field.PicklistFormField;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
-import org.polymap.kaps.model.data.KellerComposite;
 import org.polymap.kaps.ui.BooleanFormField;
 
 /**
@@ -40,13 +38,13 @@ import org.polymap.kaps.ui.BooleanFormField;
 public class FlurstuecksdatenBaulandSonstigesFormEditorPage
         extends FlurstuecksdatenBaulandFormEditorPage {
 
-
-
     private static Log log = LogFactory.getLog( FlurstuecksdatenBaulandSonstigesFormEditorPage.class );
+
 
     public FlurstuecksdatenBaulandSonstigesFormEditorPage( Feature feature, FeatureStore featureStore ) {
         super( FlurstuecksdatenBaulandSonstigesFormEditorPage.class.getName(), "Sonstiges", feature, featureStore );
     }
+
 
     @SuppressWarnings("unchecked")
     @Override
@@ -58,11 +56,13 @@ public class FlurstuecksdatenBaulandSonstigesFormEditorPage
 
         Composite client = parent;
 
-//        newLine = newFormField( "Erbbaurecht" ).setEnabled( true )
-//                .setProperty( new PropertyAdapter( vb.erbbaurecht() ) ).setField( new BooleanFormField() )
-//                .setLayoutData( left().top( lastLine ).create() ).setParent( client ).create();
-//
-//        lastLine = newLine;
+        // newLine = newFormField( "Erbbaurecht" ).setEnabled( true )
+        // .setProperty( new PropertyAdapter( vb.erbbaurecht() ) ).setField( new
+        // BooleanFormField() )
+        // .setLayoutData( left().top( lastLine ).create() ).setParent( client
+        // ).create();
+        //
+        // lastLine = newLine;
         newLine = newFormField( "Denkmalschutz" ).setEnabled( true )
                 .setProperty( new PropertyAdapter( vb.denkmalschutz() ) ).setField( new BooleanFormField() )
                 .setLayoutData( left().top( lastLine ).create() ).setParent( client ).create();
@@ -114,10 +114,11 @@ public class FlurstuecksdatenBaulandSonstigesFormEditorPage
         newLine = createFlaecheField( "Bruttorauminhalt (m³)", vb.bruttoRaumInhalt(), left().top( lastLine ), client,
                 true );
 
-        lastLine = newLine;
-        newLine = newFormField( "Keller" )
-                .setProperty( new AssociationAdapter<KellerComposite>( vb.keller() ) )
-                .setField( namedAssocationsPicklist( KellerComposite.class ) )
-                .setLayoutData( left().top( lastLine ).bottom( 100 ).create() ).setParent( client ).create();
+        // lastLine = newLine;
+        // newLine = newFormField( "Keller" )
+        // .setProperty( new AssociationAdapter<KellerComposite>( vb.keller() ) )
+        // .setField( namedAssocationsPicklist( KellerComposite.class ) )
+        // .setLayoutData( left().top( lastLine ).bottom( 100 ).create() ).setParent(
+        // client ).create();
     }
 }

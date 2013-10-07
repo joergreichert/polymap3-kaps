@@ -46,9 +46,6 @@ import org.polymap.kaps.KapsPlugin;
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.BodennutzungComposite;
 import org.polymap.kaps.model.data.ErschliessungsBeitragComposite;
-import org.polymap.kaps.model.data.FlurstueckComposite;
-import org.polymap.kaps.model.data.GebaeudeArtComposite;
-import org.polymap.kaps.model.data.GemeindeComposite;
 import org.polymap.kaps.model.data.RichtwertzoneComposite;
 import org.polymap.kaps.model.data.RichtwertzoneZeitraumComposite;
 import org.polymap.kaps.model.data.VertragComposite;
@@ -116,21 +113,23 @@ public class FlurstuecksdatenBaulandGrunddatenFormEditorPage
 
         newLine = newFormField( "Lageklasse" ).setProperty( new PropertyAdapter( vb.lageklasse() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new MyNumberValidator( Double.class,  2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( left().right( 33 ).top( lastLine ).create() ).setParent( client ).create();
         newFormField( "zul. GFZ" ).setProperty( new PropertyAdapter( vb.gfz() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new MyNumberValidator( Double.class,  2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( left().left( 33 ).right( 66 ).top( lastLine ).create() ).setParent( client ).create();
         newFormField( "zul. Vollgeschosse" ).setProperty( new PropertyAdapter( vb.zulaessigeVollgeschosse() ) )
                 .setField( new StringFormField() ).setLayoutData( right().left( 66 ).top( lastLine ).create() )
                 .setParent( client ).create();
 
-        lastLine = newLine;
-        newLine = newFormField( "Gebäudeart" ).setEnabled( false )
-                .setProperty( new AssociationAdapter<GebaeudeArtComposite>( vb.gebaeudeArt() ) )
-                .setField( namedAssocationsPicklist( GebaeudeArtComposite.class ) )
-                .setLayoutData( left().top( lastLine ).create() ).setParent( client ).create();
+        // lastLine = newLine;
+        // newLine = newFormField( "Gebäudeart" ).setEnabled( false )
+        // .setProperty( new AssociationAdapter<GebaeudeArtComposite>(
+        // vb.gebaeudeArt() ) )
+        // .setField( namedAssocationsPicklist( GebaeudeArtComposite.class ) )
+        // .setLayoutData( left().top( lastLine ).create() ).setParent( client
+        // ).create();
 
         lastLine = newLine;
         newLine = newFormField( "Bodennutzung" )
@@ -146,8 +145,8 @@ public class FlurstuecksdatenBaulandGrunddatenFormEditorPage
         lastLine = newLine;
         newLine = newFormField( "Baujahr tatsächlich" ).setProperty( new PropertyAdapter( vb.baujahr() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new MyNumberValidator( Integer.class ) )
-                .setLayoutData( left().top( lastLine ).create() ).setParent( client ).create();
+                .setValidator( new MyNumberValidator( Integer.class ) ).setLayoutData( left().top( lastLine ).create() )
+                .setParent( client ).create();
         newFormField( "Baujahr bereinigt" ).setProperty( new PropertyAdapter( vb.baujahrBereinigt() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setValidator( new MyNumberValidator( Integer.class ) )
@@ -156,20 +155,21 @@ public class FlurstuecksdatenBaulandGrunddatenFormEditorPage
         lastLine = newLine;
         TreeMap<String, Object> zonen = new TreeMap<String, Object>();
         TreeMap<String, Object> zeitraeume = new TreeMap<String, Object>();
-        FlurstueckComposite flurstueck = vb.flurstueck().get();
-        RichtwertzoneComposite richtwertZone;
-        if (flurstueck != null) {
-            GemeindeComposite gemeinde = flurstueck.richtwertZone().get().gemeinde().get();
-            Iterable<RichtwertzoneComposite> iterable = RichtwertzoneComposite.Mixin.findZoneIn( gemeinde );
-            for (RichtwertzoneComposite zone : iterable) {
-                String prefix = zone.schl().get();
-                if (prefix.startsWith( "00" )) {
-                    prefix = "*" + prefix;
-                }
-                zonen.put( prefix + " - " + zone.name().get(), zone );
+        // FlurstueckComposite flurstueck = vb.flurstueck().get();
+        RichtwertzoneComposite richtwertZone = vb.vertrag().get().richtwertZoneBauland().get();
+        if (richtwertZone != null) {
+            // GemeindeComposite gemeinde = richtwertZone.gemeinde().get();
+            // Iterable<RichtwertzoneComposite> iterable =
+            // RichtwertzoneComposite.Mixin.findZoneIn( gemeinde );
+            // for (RichtwertzoneComposite zone : iterable) {
+            String prefix = richtwertZone.schl().get();
+            if (prefix.startsWith( "00" )) {
+                prefix = "*" + prefix;
             }
+            zonen.put( prefix + " - " + richtwertZone.name().get(), richtwertZone );
+            // }
 
-            richtwertZone = flurstueck.richtwertZone().get();
+            // richtwertZone = flurstueck.richtwertZone().get();
             if (richtwertZone != null) {
                 for (RichtwertzoneZeitraumComposite zeitraum : RichtwertzoneZeitraumComposite.Mixin
                         .forZone( richtwertZone )) {
@@ -194,8 +194,10 @@ public class FlurstuecksdatenBaulandGrunddatenFormEditorPage
                 if (ev.getEventCode() == IFormFieldListener.VALUE_CHANGE
                         && ev.getFieldName().equals( vb.richtwertZoneG().qualifiedName().name() )) {
                     RichtwertzoneZeitraumComposite rzc = (RichtwertzoneZeitraumComposite)ev.getNewValue();
-                    pageSite.setFieldValue( vb.richtwert().qualifiedName().name(), rzc != null
-                            && rzc.euroQm().get() != null ? NumberFormatter.getFormatter( 2 ).format( rzc.euroQm().get() ) : "0" );
+                    pageSite.setFieldValue(
+                            vb.richtwert().qualifiedName().name(),
+                            rzc != null && rzc.euroQm().get() != null ? NumberFormatter.getFormatter( 2 ).format(
+                                    rzc.euroQm().get() ) : "0" );
                     pageSite.setFieldValue( vb.erschliessungsBeitrag().qualifiedName().name(), rzc != null ? rzc
                             .erschliessungsBeitrag().get() : null );
                 }
@@ -208,13 +210,13 @@ public class FlurstuecksdatenBaulandGrunddatenFormEditorPage
         lastLine = newLine;
         newLine = newFormField( "Richtwert" ).setEnabled( false ).setProperty( new PropertyAdapter( vb.richtwert() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new MyNumberValidator( Double.class,  2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( left().left( 25 ).top( lastLine ).create() ).setParent( client ).create();
 
         lastLine = newLine;
         newLine = newFormField( "GFZ-bereinigt" ).setToolTipText( "GFZ bereinigter Bodenpreis" ).setEnabled( false )
                 .setProperty( new PropertyAdapter( vb.gfzBereinigterBodenpreis() ) )
-                .setValidator( new MyNumberValidator( Double.class,  2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setLayoutData( left().left( 25 ).top( lastLine ).create() ).setParent( client ).create();
         newFormField( "verwenden?" ).setToolTipText( "GFZ bereinigten Bodenpreis verwenden?" )
@@ -229,7 +231,7 @@ public class FlurstuecksdatenBaulandGrunddatenFormEditorPage
         newLine = newFormField( "Bereinigung in €/m²" ).setToolTipText( "Richtwertbereinigung in €/m² (+/-)" )
                 .setProperty( new PropertyAdapter( vb.richtwertBereinigung() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new MyNumberValidator( Double.class,  2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( left().left( 25 ).top( lastLine ).create() ).setParent( client ).create();
         newFormField( "Bemerkung" ).setToolTipText( "Bemerkung zur Richwertbereinigung" )
                 .setProperty( new PropertyAdapter( vb.richtwertBereinigungBemerkung() ) )
@@ -240,12 +242,12 @@ public class FlurstuecksdatenBaulandGrunddatenFormEditorPage
         newLine = newFormField( "Zuschlag in %" ).setToolTipText( "Richtwertzuschlag in %" )
                 .setProperty( new PropertyAdapter( vb.richtwertZuschlagProzent() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new MyNumberValidator( Double.class,  2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( left().right( 25 ).top( lastLine ).create() ).setParent( client ).create();
         newLine = newFormField( "in €/m²" ).setEnabled( false )
                 .setProperty( new PropertyAdapter( vb.richtwertZuschlagBerechnet() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new MyNumberValidator( Double.class,  2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( left().left( 25 ).top( lastLine ).create() ).setParent( client ).create();
         site.addFieldListener( riwezuschlag = new FieldCalculation( site, 2, vb.richtwertZuschlagBerechnet(), vb
                 .richtwert(), vb.richtwertBereinigung(), vb.richtwertZuschlagProzent() ) {
@@ -275,12 +277,12 @@ public class FlurstuecksdatenBaulandGrunddatenFormEditorPage
         newLine = newFormField( "Abschlag in %" ).setToolTipText( "Richtwertabschlag in %" )
                 .setProperty( new PropertyAdapter( vb.richtwertAbschlagProzent() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new MyNumberValidator( Double.class,  2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( left().right( 25 ).top( lastLine ).create() ).setParent( client ).create();
         newLine = newFormField( "in €/m²" ).setEnabled( false )
                 .setProperty( new PropertyAdapter( vb.richtwertAbschlagBerechnet() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new MyNumberValidator( Double.class,  2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( left().left( 25 ).top( lastLine ).create() ).setParent( client ).create();
         pageSite.addFieldListener( riweabschlag = new FieldCalculation( site, 2, vb.richtwertAbschlagBerechnet(), vb
                 .richtwert(), vb.richtwertBereinigung(), vb.richtwertAbschlagProzent() ) {
@@ -311,14 +313,14 @@ public class FlurstuecksdatenBaulandGrunddatenFormEditorPage
                 .setToolTipText( "Erschließungskosten in €/m² anrechenbarer Grundstücksgröße" )
                 .setProperty( new PropertyAdapter( vb.erschliessungsKosten() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new MyNumberValidator( Double.class,  2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( left().left( 25 ).top( lastLine ).create() ).setParent( client ).create();
 
         lastLine = newLine;
         newLine = newFormField( "Preis unbebaut in €/m²" ).setToolTipText( "Bodenpreis unbebaut in €/m²" )
                 .setEnabled( false ).setProperty( new PropertyAdapter( vb.bodenpreisUnbebaut() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new MyNumberValidator( Double.class,  2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( left().left( 25 ).top( lastLine ).create() ).setParent( client ).create();
         pageSite.addFieldListener( preisunbebaut = new FieldCalculation( pageSite, 2, vb.bodenpreisUnbebaut(), vb
                 .richtwert(), vb.richtwertBereinigung(), vb.richtwertZuschlagBerechnet(), vb
@@ -357,12 +359,12 @@ public class FlurstuecksdatenBaulandGrunddatenFormEditorPage
         lastLine = newLine;
         newLine = newFormField( "Beb.-abschlag in %" ).setProperty( new PropertyAdapter( vb.bebAbschlag() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new MyNumberValidator( Double.class,  2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( left().right( 25 ).top( lastLine ).create() ).setParent( client ).create();
         newLine = newFormField( "in €/m²" ).setEnabled( false )
                 .setProperty( new PropertyAdapter( vb.bebAbschlagBerechnet() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new MyNumberValidator( Double.class,  2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( left().left( 25 ).top( lastLine ).create() ).setParent( client ).create();
         pageSite.addFieldListener( bebabschlag = new FieldCalculation( pageSite, 2, vb.bebAbschlagBerechnet(), vb
                 .bodenpreisUnbebaut(), vb.bebAbschlag() ) {
@@ -384,7 +386,7 @@ public class FlurstuecksdatenBaulandGrunddatenFormEditorPage
         newLine = newFormField( "Bodenpreis in €/m²" ).setEnabled( false )
                 .setProperty( new PropertyAdapter( vb.bodenpreisBebaut() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new MyNumberValidator( Double.class,  2 ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( left().left( 25 ).top( lastLine ).bottom( 100 ).create() ).setParent( client ).create();
         pageSite.addFieldListener( bodenpreisbebaut = new FieldCalculation( pageSite, 2, vb.bodenpreisBebaut(), vb
                 .bebAbschlagBerechnet(), vb.bodenpreisUnbebaut() ) {
@@ -412,7 +414,7 @@ public class FlurstuecksdatenBaulandGrunddatenFormEditorPage
 
         if (vb.richtwertZoneG().get() == null) {
             // set the default zone from flurstueck
-            RichtwertzoneComposite zone = vb.flurstueck().get().richtwertZone().get();
+            RichtwertzoneComposite zone = vb.vertrag().get().richtwertZoneBauland().get();
             RichtwertzoneZeitraumComposite zeitraum = RichtwertzoneZeitraumComposite.Mixin.findZeitraumFor( zone, vb
                     .vertrag().get().vertragsDatum().get() );
             // vb.richtwertZone().set( zone );

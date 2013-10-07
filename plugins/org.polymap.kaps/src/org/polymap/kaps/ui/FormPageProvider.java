@@ -55,7 +55,7 @@ public class FormPageProvider
             result.add( new RichtwertzoneZeitraumGrunddatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
             result.add( new RichtwertzoneZeitraumWeitereDatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
         }
-        else if (name.equalsIgnoreCase( FlurstuecksdatenBaulandComposite.NAME )) {
+        else if (name.equalsIgnoreCase( VertragsdatenBaulandComposite.NAME )) {
             result.add( new FlurstuecksdatenBaulandGrunddatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
             result.add( new FlurstuecksdatenBaulandBodenwertFormEditorPage( formEditor, feature, formEditor
                     .getFeatureStore() ) );
@@ -64,7 +64,7 @@ public class FormPageProvider
             result.add( new FlurstuecksdatenBaulandSonstigesFormEditorPage( feature, formEditor.getFeatureStore() ) );
             result.add( new FlurstuecksdatenBaulandStaBuFormEditorPage( feature, formEditor.getFeatureStore() ) );
         }
-        else if (name.equalsIgnoreCase( FlurstuecksdatenAgrarComposite.NAME )) {
+        else if (name.equalsIgnoreCase( VertragsdatenAgrarComposite.NAME )) {
             result.add( new FlurstuecksdatenAgrarGrunddatenFormEditorPage( formEditor, feature, formEditor
                     .getFeatureStore() ) );
             result.add( new FlurstuecksdatenAgrarBodenwertFormEditorPage( formEditor, feature, formEditor

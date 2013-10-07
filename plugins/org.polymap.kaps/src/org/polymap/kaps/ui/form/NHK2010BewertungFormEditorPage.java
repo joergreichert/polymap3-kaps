@@ -65,14 +65,13 @@ import org.polymap.kaps.KapsPlugin;
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.NHK2010GebaeudeArtProvider;
 import org.polymap.kaps.model.data.ErmittlungModernisierungsgradComposite;
-import org.polymap.kaps.model.data.FlurstueckComposite;
-import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
 import org.polymap.kaps.model.data.NHK2010BaupreisIndexComposite;
 import org.polymap.kaps.model.data.NHK2010BaupreisIndexComposite.Values;
 import org.polymap.kaps.model.data.NHK2010BewertungComposite;
 import org.polymap.kaps.model.data.NHK2010BewertungGebaeudeComposite;
 import org.polymap.kaps.model.data.NHK2010GebaeudeArtComposite;
 import org.polymap.kaps.model.data.VertragComposite;
+import org.polymap.kaps.model.data.VertragsdatenBaulandComposite;
 import org.polymap.kaps.ui.ActionButton;
 import org.polymap.kaps.ui.FieldSummation;
 import org.polymap.kaps.ui.InterEditorListener;
@@ -101,7 +100,7 @@ public class NHK2010BewertungFormEditorPage
 
     private Action                      gebaeudeStandardAction;
 
-    private NHK2010GebaeudeArtComposite          selectedGebaeudeArt;
+    private NHK2010GebaeudeArtComposite selectedGebaeudeArt;
 
     private IFormFieldListener          gebaeudeArtListener;
 
@@ -353,38 +352,28 @@ public class NHK2010BewertungFormEditorPage
 
             @Override
             public void run() {
-                Iterable<FlurstueckComposite> flurstuecke = FlurstueckComposite.Mixin.forEntity( vertrag );
-                int count = 0;
-                for (FlurstueckComposite flurstueck : flurstuecke) {
-                    FlurstuecksdatenBaulandComposite erweitert = FlurstuecksdatenBaulandComposite.Mixin
-                            .forFlurstueck( flurstueck );
-                    if (erweitert != null) {
-                        Double newValue = gesamtWert.getLastResultValue() == null ? bewertung.gesamtWert().get()
-                                : gesamtWert.getLastResultValue();
-                        if (newValue != null && !newValue.equals( erweitert.wertDerBaulichenAnlagen() )) {
-                            count++;
-                            FormEditor editor = KapsPlugin.openEditor( fs, FlurstuecksdatenBaulandComposite.NAME,
-                                    erweitert );
-                            editor.setActivePage( FlurstuecksdatenBaulandBodenwertFormEditorPage.class.getName() );
-                            EventManager.instance().publish(
-                                    new InterEditorPropertyChangeEvent( formEditor, editor, erweitert, erweitert
-                                            .wertDerBaulichenAnlagen().qualifiedName().name(), erweitert
-                                            .wertDerBaulichenAnlagen().get(), newValue ) );
-                            EventManager.instance().publish(
-                                    new InterEditorPropertyChangeEvent( formEditor, editor, erweitert, erweitert
-                                            .bewertungsMethode().qualifiedName().name(), erweitert.bewertungsMethode()
-                                            .get(), "NHK2010" ) );
-                        }
+                VertragsdatenBaulandComposite erweitert = VertragsdatenBaulandComposite.Mixin.forVertrag( vertrag );
+                if (erweitert != null) {
+                    Double newValue = gesamtWert.getLastResultValue() == null ? bewertung.gesamtWert().get()
+                            : gesamtWert.getLastResultValue();
+                    if (newValue != null && !newValue.equals( erweitert.wertDerBaulichenAnlagen() )) {
+                        FormEditor editor = KapsPlugin.openEditor( fs, VertragsdatenBaulandComposite.NAME, erweitert );
+                        editor.setActivePage( FlurstuecksdatenBaulandBodenwertFormEditorPage.class.getName() );
+                        EventManager.instance().publish(
+                                new InterEditorPropertyChangeEvent( formEditor, editor, erweitert, erweitert
+                                        .wertDerBaulichenAnlagen().qualifiedName().name(), erweitert
+                                        .wertDerBaulichenAnlagen().get(), newValue ) );
+                        EventManager.instance().publish(
+                                new InterEditorPropertyChangeEvent( formEditor, editor, erweitert, erweitert
+                                        .bewertungsMethode().qualifiedName().name(), erweitert.bewertungsMethode()
+                                        .get(), "NHK2010" ) );
                     }
-                }
-                if (count > 0) {
+
                     MessageDialog.openInformation(
                             PolymapWorkbench.getShellToParentOn(),
                             "Wert übernommen",
                             "Der Gesamtwert der baulichen Anlagen wurde in \"Wert der baulichen Anlagen\" im Reiter \"Boden- und Gebäudewert \" in "
-                                    + count
-                                    + " "
-                                    + FlurstuecksdatenBaulandComposite.NAME
+                                    + VertragsdatenBaulandComposite.NAME
                                     + " übernommen. Die Formulare werden entsprechend angezeigt." );
                 }
             }
@@ -579,8 +568,8 @@ public class NHK2010BewertungFormEditorPage
                     // selectedGebaeudeArt.getId() ))) {
                     // selectedGebaeudeArt = toAdopt;
 
-                    selectedGebaeudeArt = NHK2010GebaeudeArtProvider.instance().gebaeudeForId(
-                            (String)ev.getNewValue() );
+                    selectedGebaeudeArt = NHK2010GebaeudeArtProvider.instance()
+                            .gebaeudeForId( (String)ev.getNewValue() );
                     gebaeudeArtLabel.setText( selectedGebaeudeArt != null ? selectedGebaeudeArt.getQualifiedName() : "" );
                     gebaeudeBnkLabel.setText( selectedGebaeudeArt != null && selectedGebaeudeArt.getBnk() != null ? "inkl. Baunebenkosten von "
                             + selectedGebaeudeArt.getBnk() + " %"

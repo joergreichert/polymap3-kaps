@@ -58,7 +58,7 @@ public class FlurstuecksdatenAgrarStaLaFormEditorPage
         Composite client = parent;
 
         newLine = newFormField( "Verkaufte Fläche" ).setToolTipText( "Gesamte verkaufte Fläche" )
-                .setProperty( new PropertyAdapter( vb.flurstueck().get().verkaufteFlaeche() ) ).setEnabled( false )
+                .setProperty( new PropertyAdapter( vb.verkaufteFlaeche() ) ).setEnabled( false )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setValidator( new MyNumberValidator( Double.class, 0 ) )
                 .setLayoutData( left().top( lastLine ).create() ).setParent( client ).create();

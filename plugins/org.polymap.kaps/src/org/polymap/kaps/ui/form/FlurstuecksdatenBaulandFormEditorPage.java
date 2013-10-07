@@ -18,7 +18,7 @@ import org.opengis.feature.Feature;
 import org.polymap.rhei.form.IFormEditorPage;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
-import org.polymap.kaps.model.data.FlurstuecksdatenBaulandComposite;
+import org.polymap.kaps.model.data.VertragsdatenBaulandComposite;
 import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.ui.KapsDefaultFormEditorPage;
 
@@ -29,13 +29,13 @@ public abstract class FlurstuecksdatenBaulandFormEditorPage
         extends KapsDefaultFormEditorPage
         implements IFormEditorPage {
 
-    protected FlurstuecksdatenBaulandComposite vb;
+    protected VertragsdatenBaulandComposite vb;
 
 
     public FlurstuecksdatenBaulandFormEditorPage( String id, String title, Feature feature, FeatureStore featureStore ) {
         super( id, title, feature, featureStore );
 
-        vb = repository.findEntity( FlurstuecksdatenBaulandComposite.class, feature.getIdentifier().getID() );
+        vb = repository.findEntity( VertragsdatenBaulandComposite.class, feature.getIdentifier().getID() );
         if (vb.vertrag().get() == null) {
             throw new IllegalStateException("Zum Anlegen von Flurstücksdaten Bauland nutzen Sie bitte 'bewerten' bei den Flurstücken in einem Vertrag.");
         }

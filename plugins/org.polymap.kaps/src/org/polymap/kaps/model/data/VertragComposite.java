@@ -370,6 +370,7 @@ public interface VertragComposite
                                                             "gesplitteterHauptvertrag" );
 
 
+        @Override
         public Association<VertragComposite> gesplitteterHauptvertrag() {
             return new ComputedAssociationInstance<VertragComposite>( vertragCompositeAss ) {
 
@@ -398,5 +399,73 @@ public interface VertragComposite
                 }
             };
         }
+
+        private final VertragComposite vertrag = this;
+
+
+        @Override
+        public Association<RichtwertzoneComposite> richtwertZoneBauland() {
+            return new ComputedAssociationInstance<RichtwertzoneComposite>( new GenericAssociationInfo(
+                    VertragComposite.class, "richtwertZoneBauland" ) ) {
+
+                @Override
+                public RichtwertzoneComposite get() {
+                    for (FlurstueckComposite flurstueck : FlurstueckComposite.Mixin.forEntity( vertrag )) {
+                        NutzungComposite nutzung = flurstueck.nutzung().get();
+                        if (nutzung != null
+                                && (nutzung.isAgrar().get() == null || nutzung.isAgrar().get() == Boolean.FALSE)) {
+                            return flurstueck.richtwertZone().get();
+                        }
+                    }
+                    return null;
+
+                }
+
+
+                @Override
+                public void set( RichtwertzoneComposite vertrag )
+                        throws IllegalArgumentException, IllegalStateException {
+                    // ignore
+                }
+            };
+        }
+
+
+        @Override
+        public Association<RichtwertzoneComposite> richtwertZoneAgrar() {
+            return new ComputedAssociationInstance<RichtwertzoneComposite>( new GenericAssociationInfo(
+                    VertragComposite.class, "richtwertZoneAgrar" ) ) {
+
+                @Override
+                public RichtwertzoneComposite get() {
+                    for (FlurstueckComposite flurstueck : FlurstueckComposite.Mixin.forEntity( vertrag )) {
+                        NutzungComposite nutzung = flurstueck.nutzung().get();
+                        if (nutzung != null && nutzung.isAgrar().get() != null
+                                && nutzung.isAgrar().get() == Boolean.TRUE) {
+                            return flurstueck.richtwertZone().get();
+                        }
+                    }
+                    return null;
+
+                }
+
+
+                @Override
+                public void set( RichtwertzoneComposite vertrag )
+                        throws IllegalArgumentException, IllegalStateException {
+                    // ignore
+                }
+            };
+        }
     }
+
+
+    @Optional
+    @Computed
+    Association<RichtwertzoneComposite> richtwertZoneBauland();
+
+
+    @Optional
+    @Computed
+    Association<RichtwertzoneComposite> richtwertZoneAgrar();
 }
