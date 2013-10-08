@@ -36,6 +36,7 @@ import org.eclipse.swt.widgets.Text;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -55,7 +56,7 @@ import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter.CompositePr
 import org.polymap.kaps.KapsPlugin;
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.FlurstueckComposite;
-import org.polymap.kaps.model.data.WohnungComposite;
+import org.polymap.kaps.model.data.GebaeudeComposite;
 import org.polymap.kaps.ui.ActionButton;
 import org.polymap.kaps.ui.NamedCompositesFeatureContentProvider;
 
@@ -63,26 +64,26 @@ import org.polymap.kaps.ui.NamedCompositesFeatureContentProvider;
  * 
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
-public abstract class WohnungSearcher
+public abstract class GebaeudeSearcher
         extends Action {
 
-    private static Log                                   log     = LogFactory.getLog( WohnungSearcher.class );
+    private static Log                                   log     = LogFactory.getLog( GebaeudeSearcher.class );
 
-    private List<WohnungComposite>                       content = new ArrayList<WohnungComposite>();
+    private List<GebaeudeComposite>                      content = new ArrayList<GebaeudeComposite>();
 
     private final CompositeProvider<FlurstueckComposite> selectedComposite;
 
 
-    public WohnungSearcher( CompositeProvider<FlurstueckComposite> selectedComposite ) {
-        super( "vorhandene Wohnung suchen" );
+    public GebaeudeSearcher( CompositeProvider<FlurstueckComposite> selectedComposite ) {
+        super( "Wohnung anlegen" );
 
-        setToolTipText( "vorhandene Wohnung suchen und mit Flurstück verknüpfen" );
+        setToolTipText( "vorhandene Gebäude suchen und Wohnung darin anlegen" );
         setEnabled( false );
         this.selectedComposite = selectedComposite;
     }
 
 
-    protected abstract void adopt( WohnungComposite element )
+    protected abstract void adopt( GebaeudeComposite element )
             throws Exception;
 
 
@@ -92,24 +93,16 @@ public abstract class WohnungSearcher
             WohnungTableDialog dialog = new WohnungTableDialog();
             dialog.setBlockOnOpen( true );
             int returnCode = dialog.open();
-            if (returnCode == IDialogConstants.OK_ID || returnCode == IDialogConstants.NEXT_ID) {
+            if (returnCode == IDialogConstants.OK_ID) {
                 assert dialog.sel.length == 1 : "Selected: " + dialog.sel.length;
                 final IFeatureTableElement sel = dialog.sel[0];
-                WohnungComposite wohnung = Iterables.find( content, new Predicate<WohnungComposite>() {
+                GebaeudeComposite wohnung = Iterables.find( content, new Predicate<GebaeudeComposite>() {
 
-                    public boolean apply( WohnungComposite input ) {
+                    public boolean apply( GebaeudeComposite input ) {
                         return input.id().equals( sel.fid() );
                     }
                 } );
 
-                if (returnCode == IDialogConstants.NEXT_ID) {
-                    // fortführung erstellen
-                    wohnung = KapsRepository.instance().clone( WohnungComposite.class, wohnung );
-                    Integer fortf = wohnung.wohnungsFortfuehrung().get();
-
-                    wohnung.wohnungsFortfuehrung().set(
-                            fortf == null ? Integer.valueOf( 0 ) : Integer.valueOf( fortf.intValue() + 1 ) );
-                }
                 adopt( wohnung );
             }
         }
@@ -148,7 +141,7 @@ public abstract class WohnungSearcher
 
 
         protected Control createDialogArea( Composite parent ) {
-            getShell().setText( "Wohnungen suchen" );
+            getShell().setText( "Gebäude suchen" );
             // Section section = new Section( parent, Section.TITLE_BAR );
             // section.setText( "Wohnung suchen" );
             // Composite composite = (Composite)section.getClient();
@@ -161,7 +154,7 @@ public abstract class WohnungSearcher
             // composite.setLayoutData( new SimpleFormData().fill() );
             // section.setClient( composite );
             // Composite area = (Composite)super.createDialogArea( parent );
-            setMessage( "Bitte geben Sie in Ziffern Objektnummer, Gebäudenummer, Wohnungsnummer oder -fortführung ein und klicken Sie auf Suchen. Anschließend können Sie aus den maximal 50 Ergebnissen eines wählen, das mit Klick auf \"Übernehmen\" direkt übernommen wird oder mit Klick auf \"Fortführen\" fortgeführt. Die Suche nach dem Flurstück wird bereits im Hintergrund ausgeführt." );
+            setMessage( "Wählen Sie das Gebäude für die neue Wohnung. Wenn Sie kein Gebäude finden, legen Sie dies bitte vorher an." );
 
             // 6 Textfelder mit den Suchboxen nach Objektnummer
             final Text t1 = new Text( composite, SWT.RIGHT | SWT.BORDER );
@@ -182,19 +175,11 @@ public abstract class WohnungSearcher
             // t4.setLayoutData( new SimpleFormData().left( 34 ).right( 49 ).create()
             // );
 
-            final Text t5 = new Text( composite, SWT.RIGHT | SWT.BORDER );
-            t5.setToolTipText( "Wohnungsnummer" );
-            t5.setLayoutData( new SimpleFormData().left( 32 ).right( 47 ).create() );
-
-            final Text t6 = new Text( composite, SWT.RIGHT | SWT.BORDER );
-            t6.setToolTipText( "Wohnungsfortführung" );
-            t6.setLayoutData( new SimpleFormData().left( 48 ).right( 63 ).create() );
-
             // ein suchenknopf der nach den 6 Feldern sucht
             Action searchAction = new Action( "Suchen" ) {
 
                 public void run() {
-                    WohnungComposite template = QueryExpressions.templateFor( WohnungComposite.class );
+                    GebaeudeComposite template = QueryExpressions.templateFor( GebaeudeComposite.class );
                     BooleanExpression expr = null;
                     String text = t1.getText();
                     if (text != null && !text.isEmpty()) {
@@ -221,51 +206,9 @@ public abstract class WohnungSearcher
                     // template.gebaeudeFortfuehrung(), asInteger );
                     // expr = expr == null ? q : QueryExpressions.and( expr, q );
                     // }
-                    text = t5.getText();
-                    if (text != null && !text.isEmpty()) {
-                        Integer asInteger = Integer.parseInt( text );
-                        BooleanExpression q = QueryExpressions.eq( template.wohnungsNummer(), asInteger );
-                        expr = expr == null ? q : QueryExpressions.and( expr, q );
-                    }
-                    text = t6.getText();
-                    if (text != null && !text.isEmpty()) {
-                        Integer asInteger = Integer.parseInt( text );
-                        BooleanExpression q = QueryExpressions.eq( template.wohnungsFortfuehrung(), asInteger );
-                        expr = expr == null ? q : QueryExpressions.and( expr, q );
-                    }
-
-                    // add search for flurstück
-                    FlurstueckComposite flurstueck = selectedComposite.get();
-                    BooleanExpression fsExpr = null;
-                    if (flurstueck != null) {
-                        // alle flurstücke mit gleicher gemarkung, nummer,
-                        // unternummer finden
-                        // und dann alle wohnungen suchen, die zu einem der
-                        // flurstuecke gehören
-                        FlurstueckComposite fsTemplate = QueryExpressions.templateFor( FlurstueckComposite.class );
-                        BooleanExpression bExpr = QueryExpressions.and(
-                                QueryExpressions.eq( fsTemplate.gemarkung(), flurstueck.gemarkung().get() ),
-                                QueryExpressions.eq( fsTemplate.hauptNummer(), flurstueck.hauptNummer().get() ),
-                                QueryExpressions.eq( fsTemplate.unterNummer(), flurstueck.unterNummer().get() ) );
-                        for (FlurstueckComposite fsFound : KapsRepository.instance().findEntities(
-                                FlurstueckComposite.class, bExpr, 0, -1 )) {
-
-                            fsExpr = fsExpr == null ? QueryExpressions.eq( template.flurstueck(), fsFound )
-                                    : QueryExpressions.or( QueryExpressions.eq( template.flurstueck(), fsFound ),
-                                            fsExpr );
-                        }
-                    }
-                    if (fsExpr != null) {
-                        if (expr != null) {
-                            expr = QueryExpressions.and( expr, fsExpr );
-                        }
-                        else {
-                            expr = fsExpr;
-                        }
-                    }
 
                     content.clear();
-                    for (WohnungComposite wohnung : KapsRepository.instance().findEntities( WohnungComposite.class,
+                    for (GebaeudeComposite wohnung : KapsRepository.instance().findEntities( GebaeudeComposite.class,
                             expr, 0, 100 )) {
                         content.add( wohnung );
                     }
@@ -285,7 +228,7 @@ public abstract class WohnungSearcher
 
             // entity types
             final KapsRepository repo = KapsRepository.instance();
-            final EntityType<WohnungComposite> type = repo.entityType( WohnungComposite.class );
+            final EntityType<GebaeudeComposite> type = repo.entityType( GebaeudeComposite.class );
 
             // columns
             PropertyDescriptor prop = null;
@@ -301,12 +244,18 @@ public abstract class WohnungSearcher
             // "gebaeudeFortfuehrung" ) );
             // viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader(
             // "-fortf." ) );
-            prop = new PropertyDescriptorAdapter( type.getProperty( "wohnungsNummer" ) );
-            viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader( "Wohnung" ).setWeight( 1, 50 ) );
-            prop = new PropertyDescriptorAdapter( type.getProperty( "wohnungsFortfuehrung" ) );
-            viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader( "-fortf." ).setWeight( 1, 50 ) );
-            prop = new PropertyDescriptorAdapter( type.getProperty( "flurstueck" ) );
-            viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader( "Flurstück" ).setWeight( 5, 100 ) );
+            // prop = new PropertyDescriptorAdapter( type.getProperty(
+            // "wohnungsNummer" ) );
+            // viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader(
+            // "Wohnung" ).setWeight( 1, 50 ) );
+            // prop = new PropertyDescriptorAdapter( type.getProperty(
+            // "wohnungsFortfuehrung" ) );
+            // viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader(
+            // "-fortf." ).setWeight( 1, 50 ) );
+            // prop = new PropertyDescriptorAdapter( type.getProperty( "flurstueck" )
+            // );
+            // viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader(
+            // "Flurstück" ).setWeight( 5, 100 ) );
             // prop = new PropertyDescriptorAdapter( type.getProperty(
             // "wohnungsNummer" ) );
             // viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader(
@@ -333,23 +282,60 @@ public abstract class WohnungSearcher
                 public void selectionChanged( SelectionChangedEvent ev ) {
                     sel = viewer.getSelectedElements();
                     getButton( IDialogConstants.OK_ID ).setEnabled( sel.length > 0 );
-                    getButton( IDialogConstants.NEXT_ID ).setEnabled( sel.length > 0 );
                 }
             } );
 
             composite.pack();
-            searchAction.run();
+            searchForFlurstueck();
             return composite;
         }
 
 
+        /**
+         *
+         */
+        private void searchForFlurstueck() {
+            GebaeudeComposite template = QueryExpressions.templateFor( GebaeudeComposite.class );
+
+            content.clear();
+            FlurstueckComposite flurstueck = selectedComposite.get();
+            if (flurstueck != null) {
+                FlurstueckComposite fsTemplate = QueryExpressions.templateFor( FlurstueckComposite.class );
+                BooleanExpression bExpr = QueryExpressions.and(
+                        QueryExpressions.eq( fsTemplate.gemarkung(), flurstueck.gemarkung().get() ),
+                        QueryExpressions.eq( fsTemplate.hauptNummer(), flurstueck.hauptNummer().get() ),
+                        QueryExpressions.eq( fsTemplate.unterNummer(), flurstueck.unterNummer().get() ) );
+                for (FlurstueckComposite fsFound : KapsRepository.instance().findEntities( FlurstueckComposite.class,
+                        bExpr, 0, -1 )) {
+                    for (GebaeudeComposite gebaeude : KapsRepository.instance().findEntities( GebaeudeComposite.class,
+                            null, 0, -1 )) {
+                        if (gebaeude.flurstuecke().contains( fsFound )) {
+                            if (!content.contains( gebaeude )) {
+                                content.add( gebaeude );
+                            }
+                        }
+                    }
+                }
+            }
+            if (content.isEmpty()) {
+                MessageDialog
+                        .openWarning(
+                                PolymapWorkbench.getShellToParentOn(),
+                                "Keine Gebäude gefunden",
+                                "Es wurden keine Gebäude zu diesem Flurstück gefunden. Bitte benutzen Sie die Suche nach Objekt- und Gebäudenummer, falls das Gebäude schon existiert." );
+            }
+            viewer.setInput( content );
+        }
+
+
         protected void createButtonsForButtonBar( Composite parent ) {
-            // super.createButtonsForButtonBar( parent );
+            super.createButtonsForButtonBar( parent );
             // createButton( parent, RESET_BUTTON, "Zurücksetzen", false );
-            createButton( parent, IDialogConstants.NEXT_ID, "Fortführen", true );
-            createButton( parent, IDialogConstants.OK_ID, "Übernehmen", false );
-            createButton( parent, IDialogConstants.CANCEL_ID, "Abbrechen", false );
-            getButton( IDialogConstants.NEXT_ID ).setEnabled( false );
+            // createButton( parent, IDialogConstants.NEXT_ID, "Fortführen", true );
+            // createButton( parent, IDialogConstants.OK_ID, "Übernehmen", false );
+            // createButton( parent, IDialogConstants.CANCEL_ID, "Abbrechen", false
+            // );
+            // getButton( IDialogConstants.NEXT_ID ).setEnabled( false );
             getButton( IDialogConstants.OK_ID ).setEnabled( false );
         }
 

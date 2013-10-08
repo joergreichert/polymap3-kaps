@@ -244,7 +244,7 @@ public abstract class KapsDefaultFormEditorPage
                 }
             }
         } );
-        updates.clear();
+        // updates.clear();
     }
 
 

@@ -16,8 +16,11 @@ import static org.qi4j.api.query.QueryExpressions.orderBy;
 import static org.qi4j.api.query.QueryExpressions.templateFor;
 
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -38,6 +41,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 
 import org.polymap.core.catalog.model.CatalogRepository;
 import org.polymap.core.model.Entity;
+import org.polymap.core.model.EntityType;
 import org.polymap.core.model.EntityType.Property;
 import org.polymap.core.operation.IOperationSaveListener;
 import org.polymap.core.operation.OperationSupport;
@@ -109,6 +113,18 @@ public class KapsRepository
     }
 
 
+    public <T extends Entity> T clone( Class<T> type, T src )
+            throws Exception {
+        EntityType entityType = entityType( type );
+        T target = newEntity( type, null );
+        Collection<EntityType.Property> p = entityType.getProperties();
+        for (EntityType.Property prop : p) {
+            prop.setValue( target, prop.getValue( src ) );
+        }
+        return target;
+    }
+
+
     public void init( final Session session ) {
         try {
 
@@ -152,25 +168,26 @@ public class KapsRepository
 
                     new SimpleEntityProvider<GemarkungComposite>( this, GemarkungComposite.class, new NameImpl(
                             KapsRepository.NAMESPACE, GemarkungComposite.NAME ) ),
-                    new SimpleEntityProvider<VertragsdatenBaulandComposite>( this,
-                            VertragsdatenBaulandComposite.class, new NameImpl( KapsRepository.NAMESPACE,
-                                    VertragsdatenBaulandComposite.NAME ) ),
+                    new SimpleEntityProvider<VertragsdatenBaulandComposite>( this, VertragsdatenBaulandComposite.class,
+                            new NameImpl( KapsRepository.NAMESPACE, VertragsdatenBaulandComposite.NAME ) ),
                     new SimpleEntityProvider<AusstattungBewertungComposite>( this, AusstattungBewertungComposite.class,
                             new NameImpl( KapsRepository.NAMESPACE, AusstattungBewertungComposite.NAME ) ),
-                    new SimpleEntityProvider<VertragsdatenAgrarComposite>( this,
-                            VertragsdatenAgrarComposite.class, new NameImpl( KapsRepository.NAMESPACE,
-                                    VertragsdatenAgrarComposite.NAME ) ), new SimpleEntityProvider<FlurComposite>(
-                            this, FlurComposite.class, new NameImpl( KapsRepository.NAMESPACE, FlurComposite.NAME ) ),
-
-                    new SimpleEntityProvider<WohnungseigentumComposite>( this, WohnungseigentumComposite.class,
-                            new NameImpl( KapsRepository.NAMESPACE, WohnungseigentumComposite.NAME ) ),
+                    new SimpleEntityProvider<VertragsdatenAgrarComposite>( this, VertragsdatenAgrarComposite.class,
+                            new NameImpl( KapsRepository.NAMESPACE, VertragsdatenAgrarComposite.NAME ) ),
+                    new SimpleEntityProvider<FlurComposite>( this, FlurComposite.class, new NameImpl(
+                            KapsRepository.NAMESPACE, FlurComposite.NAME ) ),
+                    new WohnungseigentumEntityProvider( this ),
+                    // new SimpleEntityProvider<WohnungseigentumComposite>( this,
+                    // WohnungseigentumComposite.class,
+                    // new NameImpl( KapsRepository.NAMESPACE,
+                    // WohnungseigentumComposite.NAME ) ),
                     new SimpleEntityProvider<WohnungComposite>( this, WohnungComposite.class, new NameImpl(
                             KapsRepository.NAMESPACE, WohnungComposite.NAME ) ),
 
-                    new SimpleEntityProvider<NHK2010AnbautenComposite>( this, NHK2010AnbautenComposite.class, new NameImpl(
-                            KapsRepository.NAMESPACE, NHK2010AnbautenComposite.NAME ) ),
-                    new SimpleEntityProvider<NHK2010BaupreisIndexComposite>( this, NHK2010BaupreisIndexComposite.class, new NameImpl(
-                            KapsRepository.NAMESPACE, NHK2010BaupreisIndexComposite.NAME ) ),
+                    new SimpleEntityProvider<NHK2010AnbautenComposite>( this, NHK2010AnbautenComposite.class,
+                            new NameImpl( KapsRepository.NAMESPACE, NHK2010AnbautenComposite.NAME ) ),
+                    new SimpleEntityProvider<NHK2010BaupreisIndexComposite>( this, NHK2010BaupreisIndexComposite.class,
+                            new NameImpl( KapsRepository.NAMESPACE, NHK2010BaupreisIndexComposite.NAME ) ),
                     new SimpleEntityProvider<NHK2010BewertungComposite>( this, NHK2010BewertungComposite.class,
                             new NameImpl( KapsRepository.NAMESPACE, NHK2010BewertungComposite.NAME ) ),
                     new SimpleEntityProvider<ErmittlungModernisierungsgradComposite>( this,
@@ -232,7 +249,6 @@ public class KapsRepository
         return super.findEntities( compositeType, expression, firstResult, maxResults );
     }
 
-
     //
     // @Override
     // public void commitChanges()
@@ -250,7 +266,10 @@ public class KapsRepository
     // }
     // }
 
-    public int highestEingangsNummer( Date vertragsdatum ) {
+    private Map<Integer, Integer> highestNumbers = new HashMap<Integer, Integer>();
+
+
+    public synchronized int highestEingangsNummer( Date vertragsdatum ) {
         Calendar cal = new GregorianCalendar();
         cal.setTime( vertragsdatum );
         cal.set( Calendar.DAY_OF_YEAR, 1 );
@@ -263,23 +282,93 @@ public class KapsRepository
 
         // minimum aktuelles Jahr * 100000 + 1
         int currentYear = cal.get( Calendar.YEAR );
-        int currentMinimumNumber = currentYear * 100000;
 
-        cal.roll( Calendar.YEAR, true );
-        Date upperDate = cal.getTime();
+        Integer highest = highestNumbers.get( Integer.valueOf( currentYear ) );
+        if (highest == null) {
 
-        VertragComposite template = templateFor( VertragComposite.class );
-        BooleanExpression exp = // QueryExpressions.and( QueryExpressions.ge(
-                                // template.vertragsDatum(), lowerDate ),
-        QueryExpressions.lt( template.vertragsDatum(), upperDate );
+            int currentMinimumNumber = currentYear * 100000;
 
-        Query<VertragComposite> entities = findEntities( VertragComposite.class, exp, 0, -1 );
-        entities.orderBy( orderBy( template.eingangsNr(), OrderBy.Order.DESCENDING ) );
+            cal.roll( Calendar.YEAR, true );
+            Date upperDate = cal.getTime();
 
-        VertragComposite highest = entities.iterator().next();
-        int highestEingangsNr = highest != null ? highest.eingangsNr().get() : 0;
+            VertragComposite template = templateFor( VertragComposite.class );
+            BooleanExpression exp = // QueryExpressions.and( QueryExpressions.ge(
+                                    // template.vertragsDatum(), lowerDate ),
+            QueryExpressions.lt( template.vertragsDatum(), upperDate );
 
-        return Math.max( highestEingangsNr, currentMinimumNumber ) + 1;
+            Query<VertragComposite> entities = findEntities( VertragComposite.class, exp, 0, -1 );
+            entities.orderBy( orderBy( template.eingangsNr(), OrderBy.Order.DESCENDING ) );
+
+            VertragComposite v = entities.iterator().next();
+            int highestEingangsNr = v != null ? v.eingangsNr().get() : 0;
+
+            highest = Math.max( highestEingangsNr, currentMinimumNumber );
+        }
+        highest += 1;
+        highestNumbers.put( currentYear, highest );
+        return highest;
+
+    }
+
+    private Integer highestObjektNummer = null;
+
+
+    public synchronized int highestObjektNummer() {
+        if (highestObjektNummer == null) {
+            WohnungseigentumComposite template = templateFor( WohnungseigentumComposite.class );
+
+            Query<WohnungseigentumComposite> entities = findEntities( WohnungseigentumComposite.class, null, 0, -1 );
+            entities.orderBy( orderBy( template.objektNummer(), OrderBy.Order.DESCENDING ) );
+
+            WohnungseigentumComposite v = entities.iterator().next();
+            highestObjektNummer = v != null ? v.objektNummer().get() : Integer.valueOf( 0 );
+        }
+        highestObjektNummer += 1;
+        return highestObjektNummer;
+
+    }
+
+    private Integer highestGebaeudeNummer = null;
+
+
+    public synchronized int highestGebaeudeNummer( WohnungseigentumComposite parent ) {
+        if (highestGebaeudeNummer == null) {
+            GebaeudeComposite template = templateFor( GebaeudeComposite.class );
+
+            Query<GebaeudeComposite> entities = findEntities( GebaeudeComposite.class, QueryExpressions.and(
+                    QueryExpressions.eq( template.objektNummer(), parent.objektNummer().get() ),
+                    QueryExpressions.eq( template.objektFortfuehrung(), parent.objektFortfuehrung().get() ) ), 0, -1 );
+            entities.orderBy( orderBy( template.gebaeudeNummer(), OrderBy.Order.DESCENDING ) );
+
+            GebaeudeComposite v = entities.iterator().hasNext() ? entities.iterator().next() : null;
+            highestGebaeudeNummer = v != null ? v.gebaeudeNummer().get() : Integer.valueOf( 0 );
+        }
+        highestGebaeudeNummer += 1;
+        return highestGebaeudeNummer;
+
+    }
+
+    private Integer highestWohnungsNummer = null;
+
+
+    public synchronized int highestWohnungsNummer( GebaeudeComposite parent ) {
+        if (highestWohnungsNummer == null) {
+            WohnungComposite template = templateFor( WohnungComposite.class );
+
+            Query<WohnungComposite> entities = findEntities( WohnungComposite.class, QueryExpressions.and(
+                    QueryExpressions.eq( template.objektNummer(), parent.objektNummer().get() ),
+                    QueryExpressions.eq( template.objektFortfuehrung(), parent.objektFortfuehrung().get() ),
+                    QueryExpressions.eq( template.gebaeudeNummer(), parent.gebaeudeNummer().get() ),
+                    QueryExpressions.eq( template.gebaeudeFortfuehrung(), parent.gebaeudeFortfuehrung().get() ) ), 0,
+                    -1 );
+            entities.orderBy( orderBy( template.wohnungsNummer(), OrderBy.Order.DESCENDING ) );
+
+            WohnungComposite v = entities.iterator().hasNext() ? entities.iterator().next() : null;
+            highestWohnungsNummer = v != null ? v.wohnungsNummer().get() : Integer.valueOf( 0 );
+        }
+        highestWohnungsNummer += 1;
+        return highestWohnungsNummer;
+
     }
 
 

@@ -890,6 +890,12 @@ public interface WohnungComposite
         // }
 
         @Override
+        public WohnungComposite fuehreFort() {
+            return this;
+        }
+
+
+        @Override
         public Property<String> schl() {
             return new ComputedPropertyInstance<String>( new GenericPropertyInfo( WohnungComposite.class, "schl" ) ) {
 
@@ -969,7 +975,11 @@ public interface WohnungComposite
 
     @Optional
     Association<StockwerkStaBuComposite> stockwerkStaBu();
-    
+
+
     @Optional
     Association<ImmobilienArtStaBuComposite> immobilienArtStaBu();
+
+
+    WohnungComposite fuehreFort();
 }

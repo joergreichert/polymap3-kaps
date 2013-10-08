@@ -57,14 +57,12 @@ import org.polymap.kaps.KapsPlugin;
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.ArtDesBaugebietsComposite;
 import org.polymap.kaps.model.data.BelastungComposite;
-import org.polymap.kaps.model.data.ErtragswertverfahrenComposite;
 import org.polymap.kaps.model.data.FlurComposite;
 import org.polymap.kaps.model.data.FlurstueckComposite;
 import org.polymap.kaps.model.data.GebaeudeArtComposite;
 import org.polymap.kaps.model.data.GebaeudeComposite;
 import org.polymap.kaps.model.data.GemarkungComposite;
 import org.polymap.kaps.model.data.GemeindeComposite;
-import org.polymap.kaps.model.data.NHK2010BewertungComposite;
 import org.polymap.kaps.model.data.NutzungComposite;
 import org.polymap.kaps.model.data.RichtwertzoneComposite;
 import org.polymap.kaps.model.data.RichtwertzoneZeitraumComposite;
@@ -77,7 +75,6 @@ import org.polymap.kaps.model.data.WohnungComposite;
 import org.polymap.kaps.ui.ActionButton;
 import org.polymap.kaps.ui.BooleanFormField;
 import org.polymap.kaps.ui.FieldListener;
-import org.polymap.kaps.ui.InterEditorPropertyChangeEvent;
 import org.polymap.kaps.ui.KapsDefaultFormEditorPageWithFeatureTable;
 import org.polymap.kaps.ui.MyNumberValidator;
 import org.polymap.kaps.ui.NotNullMyNumberValidator;
@@ -155,13 +152,11 @@ public class KaufvertragFlurstueckeFormEditorPage
         site.setFormTitle( formattedTitle( "Kaufvertrag", kaufvertrag.eingangsNr().get(), getTitle() ) );
 
         Section tableSection = newSection( null, "Auswahl" );
-        createTableForm( (Composite)tableSection.getClient(), null, true );
+        createTableForm( (Composite)tableSection.getClient(), null, true, false );
 
         Composite schildForm = createFlurstueckForm( tableSection );
 
         Composite extendedForm = createErweiterteDatenForm( schildForm );
-
-        Composite bewertungForm = createBewertungenForm( extendedForm );
     }
 
 
@@ -610,15 +605,10 @@ public class KaufvertragFlurstueckeFormEditorPage
 
     private SimplePickList<WohnungComposite> wohnungPicklist;
 
-    private ActionButton                     openBewertungen;
-
-    private ActionButton                     openErtragswert;
-
 
     private Section createErweiterteDatenForm( Composite top ) {
 
         Section formSection = newSection( top, "Erweiterte Daten" );
-        formSection.setExpanded( false );
         Composite parent = (Composite)formSection.getClient();
         final IFormEditorPageSite site = pageSite;
 
@@ -763,47 +753,60 @@ public class KaufvertragFlurstueckeFormEditorPage
         };
         wohnungPicklist.setLayoutData( right().left( 40 ).right( 55 ).height( 25 ).top( null ).create() );
 
-        createWohnung = new ActionButton( parent, new Action( "Wohnung anlegen" ) {
+        createWohnung = new ActionButton( parent, new GebaeudeSearcher( selectedComposite ) {
 
             @Override
-            public void run() {
+            protected void adopt( GebaeudeComposite gebaeude )
+                    throws Exception {
                 final FlurstueckComposite flurstueck = selectedComposite.get();
-                if (flurstueck != null) {
+                if (flurstueck != null && gebaeude != null) {
+                    Integer nummer = KapsRepository.instance().highestWohnungsNummer( gebaeude );
                     WohnungComposite wohnung = repository.newEntity( WohnungComposite.class, null );
+                    wohnung.objektNummer().set( gebaeude.objektNummer().get() );
+                    wohnung.objektFortfuehrung().set( gebaeude.objektFortfuehrung().get() );
+                    wohnung.gebaeudeNummer().set( gebaeude.gebaeudeNummer().get() );
+                    wohnung.gebaeudeFortfuehrung().set( gebaeude.gebaeudeFortfuehrung().get() );
+                    wohnung.wohnungsNummer().set( nummer );
+                    wohnung.wohnungsFortfuehrung().set( 0 );
                     wohnung.flurstueck().set( flurstueck );
+
+                    if (gebaeude != null && !gebaeude.flurstuecke().contains( flurstueck )) {
+                        gebaeude.flurstuecke().add( flurstueck );
+                    }
+
                     // wohnung.vertrag().set( flurstueck.vertrag().get() );
                     KapsPlugin.openEditor( fs, WohnungComposite.NAME, wohnung );
                 }
-            }
 
+            }
         } );
         createWohnung.setLayoutData( left().left( 71 ).right( 85 ).height( 25 ).top( null ).create() );
         createWohnung.setEnabled( false );
 
-        searchWohnung = new ActionButton( parent, new WohnungSearcher() {
+        searchWohnung = new ActionButton( parent, new WohnungSearcher( selectedComposite ) {
 
             @Override
             protected void adopt( final WohnungComposite wohnung )
                     throws Exception {
                 if (wohnung != null) {
                     final FlurstueckComposite flurstueckComposite = selectedComposite.get();
-                    queue( new UpdateCommand() {
-
-                        @Override
-                        public void execute() {
-                            // Adapter der erst beim speichern der
-                            // Seite ausgeführt wird
-                            wohnung.flurstueck().set( flurstueckComposite );
-                            if (wohnung.gebaeudeNummer().get() != null) {
-                                GebaeudeComposite gebaeude = GebaeudeComposite.Mixin.forKeys( wohnung.objektNummer()
-                                        .get(), wohnung.objektFortfuehrung().get(), wohnung.gebaeudeNummer().get(),
-                                        wohnung.gebaeudeFortfuehrung().get() );
-                                if (gebaeude != null && !gebaeude.flurstuecke().contains( flurstueckComposite )) {
-                                    gebaeude.flurstuecke().add( flurstueckComposite );
-                                }
-                            }
+                    // queue( new UpdateCommand() {
+                    //
+                    // @Override
+                    // public void execute() {
+                    // Adapter der erst beim speichern der
+                    // Seite ausgeführt wird
+                    wohnung.flurstueck().set( flurstueckComposite );
+                    if (wohnung.gebaeudeNummer().get() != null) {
+                        GebaeudeComposite gebaeude = GebaeudeComposite.Mixin.forKeys( wohnung.objektNummer().get(),
+                                wohnung.objektFortfuehrung().get(), wohnung.gebaeudeNummer().get(), wohnung
+                                        .gebaeudeFortfuehrung().get() );
+                        if (gebaeude != null && !gebaeude.flurstuecke().contains( flurstueckComposite )) {
+                            gebaeude.flurstuecke().add( flurstueckComposite );
                         }
-                    } );
+                    }
+                    // }
+                    // } );
                 }
             }
         } );
@@ -816,106 +819,6 @@ public class KaufvertragFlurstueckeFormEditorPage
 
         // und daneben Knopf zum Wohnung anlegen
 
-        return formSection;
-    }
-
-
-    private Section createBewertungenForm( Composite top ) {
-
-        Section formSection = newSection( top, "Bewertungen" );
-        formSection.setExpanded( false );
-        Composite parent = (Composite)formSection.getClient();
-
-        openBewertungen = new ActionButton( parent, new Action( "nach NHK 2010 bewerten" ) {
-
-            @Override
-            public void run() {
-                NHK2010BewertungComposite bewertungComposite = NHK2010BewertungComposite.Mixin.forVertrag( kaufvertrag );
-                if (bewertungComposite == null) {
-                    bewertungComposite = repository.newEntity( NHK2010BewertungComposite.class, null );
-                    bewertungComposite.vertrag().set( kaufvertrag );
-                }
-                KapsPlugin.openEditor( fs, NHK2010BewertungComposite.NAME, bewertungComposite );
-            }
-        } ) {
-
-            @Override
-            public void setEnabled( boolean enabled ) {
-                if (enabled) {
-                    if (NHK2010BewertungComposite.Mixin.forVertrag( kaufvertrag ) != null) {
-                        setText( "Bewertung nach NHK 2010 anpassen" );
-                    }
-                    else {
-                        setText( "nach NHK 2010 bewerten" );
-                    }
-                }
-                super.setEnabled( enabled );
-            };
-        };
-        openBewertungen.setLayoutData( left().right( 25 ).height( 25 ).top( null ).bottom( 100 ).create() );
-        openBewertungen.setEnabled( true );
-
-        openErtragswert = new ActionButton( parent, new Action( "nach Ertragswertverfahren - normal bewerten" ) {
-
-            @Override
-            public void run() {
-                Double kaufpreis = fieldListener.get( kaufvertrag.erweiterteVertragsdaten().get()
-                        .bereinigterVollpreis() );
-                if (kaufpreis == null) {
-                    kaufpreis = fieldListener.get( kaufvertrag.kaufpreis() );
-                }
-                if (kaufpreis == null || isDirty()) {
-                    MessageDialog.openError( PolymapWorkbench.getShellToParentOn(), "Fehlende Daten",
-                            "Bitte geben Sie den Kaufpreis ein und speichern Sie den Vertrag, bevor Sie diese Berechnung starten." );
-                }
-                else {
-                    ErtragswertverfahrenComposite bewertungComposite = ErtragswertverfahrenComposite.Mixin
-                            .forVertrag( kaufvertrag );
-                    if (bewertungComposite == null) {
-                        bewertungComposite = repository.newEntity( ErtragswertverfahrenComposite.class, null );
-                        bewertungComposite.vertrag().set( kaufvertrag );
-                    }
-                    FormEditor targetEditor = KapsPlugin.openEditor( fs, ErtragswertverfahrenComposite.NAME,
-                            bewertungComposite );
-                    EventManager.instance().publish(
-                            new InterEditorPropertyChangeEvent( formEditor, targetEditor, bewertungComposite,
-                                    bewertungComposite.bereinigterKaufpreis().qualifiedName().name(),
-                                    bewertungComposite.bereinigterKaufpreis().get(), kaufpreis ) );
-                    // Bodenwertanteil übergeben, sind gespeichert also keine
-                    // FieldListener einsetzen
-                    Double bodenwertAnteil = 0.0d;
-                    // for (FlurstueckComposite flurstueck :
-                    // FlurstueckComposite.Mixin.forEntity( kaufvertrag )) {
-                    VertragsdatenBaulandComposite bauland = VertragsdatenBaulandComposite.Mixin
-                            .forVertrag( kaufvertrag );
-                    if (bauland != null && bauland.bodenwertGesamt().get() != null) {
-                        bodenwertAnteil += bauland.bodenwertGesamt().get();
-                    }
-                    // }
-                    EventManager.instance().publish(
-                            new InterEditorPropertyChangeEvent( formEditor, targetEditor, bewertungComposite,
-                                    bewertungComposite.bodenwertAnteil().qualifiedName().name(), bewertungComposite
-                                            .bodenwertAnteil().get(), bodenwertAnteil ) );
-                }
-            }
-        } ) {
-
-            @Override
-            public void setEnabled( boolean enabled ) {
-                if (enabled) {
-                    if (ErtragswertverfahrenComposite.Mixin.forVertrag( kaufvertrag ) != null) {
-                        setText( "Bewertung nach Ertragswertverfahren - normal anpassen" );
-                    }
-                    else {
-                        setText( "nach Ertragswertverfahren - normal bewerten" );
-                    }
-                }
-                super.setEnabled( enabled );
-            };
-        };
-        openErtragswert.setLayoutData( left().left( openBewertungen, 5 ).width( 25 ).height( 25 ).top( null )
-                .bottom( 100 ).create() );
-        openErtragswert.setEnabled( true );
         return formSection;
     }
 

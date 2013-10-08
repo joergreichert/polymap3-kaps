@@ -122,10 +122,12 @@ public interface GebaeudeComposite
     @Optional
     @ImportColumn("Weinheit")
     Property<Integer> wohnEinheiten();
-    
+
+
     @Optional
     @ImportColumn("ANZGESCHOSSE")
     Property<Integer> anzahlGeschosse();
+
 
     // SANANFEND - String
     @Optional
@@ -160,15 +162,6 @@ public interface GebaeudeComposite
         private static Log log = LogFactory.getLog( Mixin.class );
 
 
-//        @Override
-//        public void beforeCompletion()
-//                throws UnitOfWorkCompletionException {
-//            if (objektNummer().get() == null || objektFortfuehrung().get() == null || gebaeudeNummer().get() == null
-//                    || gebaeudeFortfuehrung().get() == null ) {
-//                throw new UnitOfWorkCompletionException( "Alle Nummern und Fortführungen müssen ausgefüllt sein!" );
-//            }
-//        }
-
         @Override
         public Property<String> schl() {
             return new ComputedPropertyInstance<String>( new GenericPropertyInfo( WohnungseigentumComposite.class,
@@ -178,6 +171,12 @@ public interface GebaeudeComposite
                 public String get() {
                     return objektNummer().get() + "/" + objektFortfuehrung().get() + "/" + gebaeudeNummer().get() + "/"
                             + gebaeudeFortfuehrung().get();
+                }
+
+
+                @Override
+                public void set( String anIgnoredValue )
+                        throws IllegalArgumentException, IllegalStateException {
                 }
             };
         }
@@ -194,8 +193,8 @@ public interface GebaeudeComposite
         }
 
 
-        public static GebaeudeComposite forKeys( final Integer objektNummer,
-                final Integer objektFortfuehrung, final Integer gebaeudeNummer, final Integer gebaeudeFortfuehrung ) {
+        public static GebaeudeComposite forKeys( final Integer objektNummer, final Integer objektFortfuehrung,
+                final Integer gebaeudeNummer, final Integer gebaeudeFortfuehrung ) {
             GebaeudeComposite template = QueryExpressions.templateFor( GebaeudeComposite.class );
             BooleanExpression expr = QueryExpressions.and(
                     QueryExpressions.eq( template.objektNummer(), objektNummer ),

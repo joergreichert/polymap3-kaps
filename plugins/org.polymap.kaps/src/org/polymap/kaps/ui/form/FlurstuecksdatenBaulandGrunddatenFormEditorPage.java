@@ -25,12 +25,15 @@ import org.apache.commons.logging.LogFactory;
 import org.eclipse.swt.widgets.Composite;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.dialogs.MessageDialog;
 
 import org.eclipse.ui.forms.widgets.Section;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.polymap.core.project.ui.util.SimpleFormData;
+import org.polymap.core.runtime.event.EventManager;
+import org.polymap.core.workbench.PolymapWorkbench;
 
 import org.polymap.rhei.data.entityfeature.AssociationAdapter;
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
@@ -40,17 +43,22 @@ import org.polymap.rhei.field.IFormFieldListener;
 import org.polymap.rhei.field.PicklistFormField;
 import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.field.TextFormField;
+import org.polymap.rhei.form.FormEditor;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
 import org.polymap.kaps.KapsPlugin;
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.BodennutzungComposite;
 import org.polymap.kaps.model.data.ErschliessungsBeitragComposite;
+import org.polymap.kaps.model.data.ErtragswertverfahrenComposite;
+import org.polymap.kaps.model.data.NHK2010BewertungComposite;
 import org.polymap.kaps.model.data.RichtwertzoneComposite;
 import org.polymap.kaps.model.data.RichtwertzoneZeitraumComposite;
 import org.polymap.kaps.model.data.VertragComposite;
+import org.polymap.kaps.model.data.VertragsdatenBaulandComposite;
 import org.polymap.kaps.ui.ActionButton;
 import org.polymap.kaps.ui.FieldCalculation;
+import org.polymap.kaps.ui.InterEditorPropertyChangeEvent;
 import org.polymap.kaps.ui.MyNumberValidator;
 import org.polymap.kaps.ui.NumberFormatter;
 
@@ -78,11 +86,24 @@ public class FlurstuecksdatenBaulandGrunddatenFormEditorPage
 
     private IFormFieldListener     richtwertzone;
 
+    private ActionButton           openBewertungen;
+
+    private ActionButton           openErtragswert;
+
+    private FormEditor             formEditor;
+
 
     // private IFormFieldListener gemeindeListener;
 
-    public FlurstuecksdatenBaulandGrunddatenFormEditorPage( Feature feature, FeatureStore featureStore ) {
+    public FlurstuecksdatenBaulandGrunddatenFormEditorPage( FormEditor formEditor, Feature feature,
+            FeatureStore featureStore ) {
         super( FlurstuecksdatenBaulandGrunddatenFormEditorPage.class.getName(), "Grunddaten", feature, featureStore );
+        this.formEditor = formEditor;
+        //
+        // EventManager.instance().subscribe(
+        // fieldListener = new FieldListener( kaufvertrag.vollpreis(),
+        // erweitert.bereinigterVollpreis() ),
+        // new FieldListener.EventFilter( formEditor ) );
     }
 
 
@@ -404,6 +425,108 @@ public class FlurstuecksdatenBaulandGrunddatenFormEditorPage
                 return null;
             }
         } );
+
+        section = createBewertungenForm( section );
+    }
+
+
+    private Section createBewertungenForm( Composite top ) {
+
+        Section formSection = newSection( top, "Bewertungen" );
+        formSection.setExpanded( true );
+        Composite parent = (Composite)formSection.getClient();
+
+        openBewertungen = new ActionButton( parent, new Action( "nach NHK 2010 bewerten" ) {
+
+            @Override
+            public void run() {
+                NHK2010BewertungComposite bewertungComposite = NHK2010BewertungComposite.Mixin.forVertrag( vb.vertrag()
+                        .get() );
+                if (bewertungComposite == null) {
+                    bewertungComposite = repository.newEntity( NHK2010BewertungComposite.class, null );
+                    bewertungComposite.vertrag().set( vb.vertrag().get() );
+                }
+                KapsPlugin.openEditor( fs, NHK2010BewertungComposite.NAME, bewertungComposite );
+            }
+        } ) {
+
+            @Override
+            public void setEnabled( boolean enabled ) {
+                if (enabled) {
+                    if (NHK2010BewertungComposite.Mixin.forVertrag( vb.vertrag().get() ) != null) {
+                        setText( "Bewertung nach NHK 2010 anpassen" );
+                    }
+                    else {
+                        setText( "nach NHK 2010 bewerten" );
+                    }
+                }
+                super.setEnabled( enabled );
+            };
+        };
+        openBewertungen.setLayoutData( left().right( 25 ).height( 25 ).top( null ).bottom( 100 ).create() );
+        openBewertungen.setEnabled( true );
+
+        openErtragswert = new ActionButton( parent, new Action( "nach Ertragswertverfahren - normal bewerten" ) {
+
+            @Override
+            public void run() {
+                Double kaufpreis = vb.vertrag().get().erweiterteVertragsdaten().get().bereinigterVollpreis().get();
+                if (kaufpreis == null) {
+                    kaufpreis = vb.vertrag().get().kaufpreis().get();
+                }
+                if (kaufpreis == null || isDirty()) {
+                    MessageDialog.openError( PolymapWorkbench.getShellToParentOn(), "Fehlende Daten",
+                            "Bitte geben Sie den Kaufpreis ein und speichern Sie den Vertrag, bevor Sie diese Berechnung starten." );
+                }
+                else {
+                    ErtragswertverfahrenComposite bewertungComposite = ErtragswertverfahrenComposite.Mixin
+                            .forVertrag( vb.vertrag().get() );
+                    if (bewertungComposite == null) {
+                        bewertungComposite = repository.newEntity( ErtragswertverfahrenComposite.class, null );
+                        bewertungComposite.vertrag().set( vb.vertrag().get() );
+                    }
+                    FormEditor targetEditor = KapsPlugin.openEditor( fs, ErtragswertverfahrenComposite.NAME,
+                            bewertungComposite );
+                    EventManager.instance().publish(
+                            new InterEditorPropertyChangeEvent( formEditor, targetEditor, bewertungComposite,
+                                    bewertungComposite.bereinigterKaufpreis().qualifiedName().name(),
+                                    bewertungComposite.bereinigterKaufpreis().get(), kaufpreis ) );
+                    // Bodenwertanteil übergeben, sind gespeichert also keine
+                    // FieldListener einsetzen
+                    Double bodenwertAnteil = 0.0d;
+                    // for (FlurstueckComposite flurstueck :
+                    // FlurstueckComposite.Mixin.forEntity( kaufvertrag )) {
+                    VertragsdatenBaulandComposite bauland = VertragsdatenBaulandComposite.Mixin.forVertrag( vb
+                            .vertrag().get() );
+                    if (bauland != null && bauland.bodenwertGesamt().get() != null) {
+                        bodenwertAnteil += bauland.bodenwertGesamt().get();
+                    }
+                    // }
+                    EventManager.instance().publish(
+                            new InterEditorPropertyChangeEvent( formEditor, targetEditor, bewertungComposite,
+                                    bewertungComposite.bodenwertAnteil().qualifiedName().name(), bewertungComposite
+                                            .bodenwertAnteil().get(), bodenwertAnteil ) );
+                }
+            }
+        } ) {
+
+            @Override
+            public void setEnabled( boolean enabled ) {
+                if (enabled) {
+                    if (ErtragswertverfahrenComposite.Mixin.forVertrag( vb.vertrag().get() ) != null) {
+                        setText( "Bewertung nach Ertragswertverfahren - normal anpassen" );
+                    }
+                    else {
+                        setText( "nach Ertragswertverfahren - normal bewerten" );
+                    }
+                }
+                super.setEnabled( enabled );
+            };
+        };
+        openErtragswert.setLayoutData( left().left( openBewertungen, 5 ).width( 25 ).height( 25 ).top( null )
+                .bottom( 100 ).create() );
+        openErtragswert.setEnabled( true );
+        return formSection;
     }
 
 

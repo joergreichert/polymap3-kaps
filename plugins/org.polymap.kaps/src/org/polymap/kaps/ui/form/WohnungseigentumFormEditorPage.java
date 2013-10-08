@@ -31,6 +31,7 @@ import org.polymap.rhei.field.TextFormField;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
 import org.polymap.kaps.KapsPlugin;
+import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.GebaeudeComposite;
 import org.polymap.kaps.model.data.WohnungseigentumComposite;
 import org.polymap.kaps.ui.ActionButton;
@@ -164,9 +165,14 @@ public class WohnungseigentumFormEditorPage
             @Override
             public void run() {
                 if (eigentum.objektNummer().get() != null) {
+                    Integer nummer = KapsRepository.instance().highestGebaeudeNummer( eigentum );
+
                     GebaeudeComposite gebaeude = repository.newEntity( GebaeudeComposite.class, null );
                     gebaeude.objektNummer().set( eigentum.objektNummer().get() );
                     gebaeude.objektFortfuehrung().set( eigentum.objektFortfuehrung().get() );
+                    // suche nach höchster Gebäudenummer
+                    gebaeude.gebaeudeNummer().set( nummer );
+                    gebaeude.gebaeudeFortfuehrung().set( Integer.valueOf( 0 ) );
                     // wohnung.vertrag().set( flurstueck.vertrag().get() );
                     KapsPlugin.openEditor( fs, GebaeudeComposite.NAME, gebaeude );
                 }
@@ -175,7 +181,7 @@ public class WohnungseigentumFormEditorPage
         } );
         createGebaeude.setLayoutData( left().left( 75 ).right( 95 ).height( 25 ).top( null ).create() );
         createGebaeude.setEnabled( true );
-        
+
         return formSection;
     }
 }

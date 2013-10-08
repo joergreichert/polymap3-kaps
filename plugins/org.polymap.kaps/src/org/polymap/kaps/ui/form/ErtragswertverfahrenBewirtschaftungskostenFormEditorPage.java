@@ -78,7 +78,7 @@ public class ErtragswertverfahrenBewirtschaftungskostenFormEditorPage
 
     // private Double bruttoRohertragProJahr;
 
-    private boolean             summePauschal;
+    private Boolean             summePauschal;
 
     private FieldListener       fieldListener;
 
@@ -93,7 +93,8 @@ public class ErtragswertverfahrenBewirtschaftungskostenFormEditorPage
         summePauschal = vb.pauschalBewirtschaftungskosten().get();
 
         EventManager.instance().subscribe(
-                fieldListener = new FieldListener( vb.jahresBetriebskosten(), vb.bruttoRohertragProJahr() ) , new FieldListener.EventFilter( formEditor ) );
+                fieldListener = new FieldListener( vb.jahresBetriebskosten(), vb.bruttoRohertragProJahr() ),
+                new FieldListener.EventFilter( formEditor ) );
     }
 
 
@@ -103,11 +104,13 @@ public class ErtragswertverfahrenBewirtschaftungskostenFormEditorPage
         EventManager.instance().unsubscribe( fieldListener );
     }
 
+
     @Override
     public void afterDoLoad( IProgressMonitor monitor )
             throws Exception {
         fieldListener.flush( pageSite );
     }
+
 
     @SuppressWarnings("unchecked")
     @Override

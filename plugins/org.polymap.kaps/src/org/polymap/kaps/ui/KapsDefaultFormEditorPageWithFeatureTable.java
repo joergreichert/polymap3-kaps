@@ -53,11 +53,11 @@ import org.polymap.kaps.ui.NamedCompositesFeatureContentProvider.FeatureTableEle
 public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity>
         extends KapsDefaultFormEditorPage {
 
-    
     public class LastNameInvocationHandler
             implements InvocationHandler {
 
         private String lastCall;
+
 
         @Override
         public Object invoke( Object proxy, Method method, Object[] args )
@@ -72,7 +72,6 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
 
     }
 
-
     protected FeatureStore         featureStore;
 
     private FeatureTableViewer     viewer;
@@ -86,13 +85,15 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
     private List<IFormField>       reloadables       = new ArrayList<IFormField>();
 
     private boolean                updatingElements;
-    
-    protected final T nameTemplate;
+
+    protected final T              nameTemplate;
+
 
     public KapsDefaultFormEditorPageWithFeatureTable( Class<T> type, String id, String title, Feature feature,
             FeatureStore featureStore ) {
         super( id, title, feature, featureStore );
-        nameTemplate = (T)Proxy.newProxyInstance( Thread.currentThread().getContextClassLoader(), new Class[]{type}, new LastNameInvocationHandler() );
+        nameTemplate = (T)Proxy.newProxyInstance( Thread.currentThread().getContextClassLoader(), new Class[] { type },
+                new LastNameInvocationHandler() );
     }
 
 
@@ -132,7 +133,11 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
 
 
     protected Composite createTableForm( Composite parent, Control top, boolean addAllowed ) {
+        return createTableForm( parent, top, addAllowed, true );
+    }
 
+
+    protected Composite createTableForm( Composite parent, Control top, boolean addAllowed, boolean deleteAllowed ) {
         int TOPSPACING = 20;
         viewer = new FeatureTableViewer( parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL );
         viewer.getTable().setLayoutData(
@@ -177,38 +182,40 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
                     .height( 30 ).create() );
         }
 
-        DeleteCompositeAction<T> deleteAction = new DeleteCompositeAction<T>() {
+        if (deleteAllowed) {
+            DeleteCompositeAction<T> deleteAction = new DeleteCompositeAction<T>() {
 
-            protected void execute()
-                    throws Exception {
+                protected void execute()
+                        throws Exception {
 
-                if (selectedComposite.get() != null) {
-                    T toSelect = selectedComposite.get();
-                    model.remove( toSelect );
-                    if (viewer != null) {
-                        Collection<T> viewerInput = (Collection<T>)viewer.getInput();
-                        viewerInput.remove( toSelect );
+                    if (selectedComposite.get() != null) {
+                        T toSelect = selectedComposite.get();
+                        model.remove( toSelect );
+                        if (viewer != null) {
+                            Collection<T> viewerInput = (Collection<T>)viewer.getInput();
+                            viewerInput.remove( toSelect );
+                        }
+                        deleteComposite( toSelect );
+
+                        selectedComposite.set( null );
+
+                        // pageSite.reloadEditor();
+                        doLoad( new NullProgressMonitor() );
+                        refreshReloadables();
+
+                        dirty = true;
+                        // pageSite.fireEvent( this, id,
+                        // IFormFieldListener.VALUE_CHANGE, null );
+                        // viewer.refresh( true );
+
                     }
-                    repository.removeEntity( toSelect );
-                    selectedComposite.set( null );
-
-                    // pageSite.reloadEditor();
-                    doLoad( new NullProgressMonitor() );
-                    refreshReloadables();
-
-                    dirty = true;
-                    // pageSite.fireEvent( this, id,
-                    // IFormFieldListener.VALUE_CHANGE, null );
-                    // viewer.refresh( true );
-
                 }
-            }
-        };
-        ActionButton delBtn = new ActionButton( parent, deleteAction );
-        delBtn.setLayoutData( new SimpleFormData().left( viewer.getTable(), 6 )
-                .top( addBtn != null ? addBtn : top, addBtn != null ? SPACING : TOPSPACING ).right( 100 ).height( 30 )
-                .create() );
-
+            };
+            ActionButton delBtn = new ActionButton( parent, deleteAction );
+            delBtn.setLayoutData( new SimpleFormData().left( viewer.getTable(), 6 )
+                    .top( addBtn != null ? addBtn : top, addBtn != null ? SPACING : TOPSPACING ).right( 100 )
+                    .height( 30 ).create() );
+        }
         parent.layout( true );
 
         viewer.addSelectionChangedListener( new ISelectionChangedListener() {
@@ -233,6 +240,11 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
             }
         } );
         return viewer.getTable();
+    }
+
+
+    protected void deleteComposite( T toSelect ) {
+        repository.removeEntity( toSelect );
     }
 
 

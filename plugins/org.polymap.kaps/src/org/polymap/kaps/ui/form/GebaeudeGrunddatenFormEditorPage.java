@@ -38,6 +38,7 @@ import org.polymap.rhei.field.TextFormField;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
 import org.polymap.kaps.KapsPlugin;
+import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.GebaeudeArtComposite;
 import org.polymap.kaps.model.data.GebaeudeComposite;
 import org.polymap.kaps.model.data.WohnungComposite;
@@ -54,13 +55,13 @@ import org.polymap.kaps.ui.SimplePickList;
 public class GebaeudeGrunddatenFormEditorPage
         extends KapsDefaultFormEditorPage {
 
-    private static Log        log = LogFactory.getLog( GebaeudeGrunddatenFormEditorPage.class );
+    private static Log                       log = LogFactory.getLog( GebaeudeGrunddatenFormEditorPage.class );
 
-    private GebaeudeComposite gebaeude;
+    private GebaeudeComposite                gebaeude;
 
     private SimplePickList<WohnungComposite> wohnungPicklist;
 
-    private ActionButton createWohnung;
+    private ActionButton                     createWohnung;
 
 
     // private FlurstueckSearcher sfAction;
@@ -140,8 +141,8 @@ public class GebaeudeGrunddatenFormEditorPage
         newLine = newFormField( "Baujahr tatsächlich" ).setToolTipText( "tatsächliches Baujahr" ).setParent( parent )
                 .setProperty( new PropertyAdapter( gebaeude.baujahrTatsaechlich() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setLayoutData( left().top( lastLine ).create() )
-                .setValidator( new MyNumberValidator( Integer.class ) ).create();
+                .setLayoutData( left().top( lastLine ).create() ).setValidator( new MyNumberValidator( Integer.class ) )
+                .create();
 
         newFormField( "Baujahr bereinigt" ).setToolTipText( "bereinigtes Baujahr" ).setParent( parent )
                 .setProperty( new PropertyAdapter( gebaeude.baujahr() ) )
@@ -152,14 +153,15 @@ public class GebaeudeGrunddatenFormEditorPage
         lastLine = newLine;
         newLine = newFormField( "Lageklasse" ).setParent( parent )
                 .setProperty( new PropertyAdapter( gebaeude.lageklasse() ) ).setField( new StringFormField() )
-                .setLayoutData( left().top( lastLine ).create() )
-                .setValidator( new MyNumberValidator( Double.class ) ).create();
+                .setLayoutData( left().top( lastLine ).create() ).setValidator( new MyNumberValidator( Double.class ) )
+                .create();
 
         lastLine = newLine;
         newLine = newFormField( "Anzahl Geschosse" ).setParent( parent )
-                .setProperty( new PropertyAdapter( gebaeude.anzahlGeschosse() ) ).setField( new StringFormField(StringFormField.Style.ALIGN_RIGHT) )
-                .setLayoutData( left().top( lastLine ).create() )
-                .setValidator( new MyNumberValidator( Integer.class ) ).create();
+                .setProperty( new PropertyAdapter( gebaeude.anzahlGeschosse() ) )
+                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
+                .setLayoutData( left().top( lastLine ).create() ).setValidator( new MyNumberValidator( Integer.class ) )
+                .create();
 
         newFormField( "Wohn-/Gewerbeeinheiten" ).setParent( parent )
                 .setProperty( new PropertyAdapter( gebaeude.wohnEinheiten() ) )
@@ -226,7 +228,7 @@ public class GebaeudeGrunddatenFormEditorPage
             @Override
             public SortedMap<String, WohnungComposite> getValues() {
                 SortedMap<String, WohnungComposite> values = new TreeMap<String, WohnungComposite>();
-                if (gebaeude.objektNummer().get() != null) {
+                if (gebaeude.gebaeudeNummer().get() != null) {
                     Iterable<WohnungComposite> iterable = WohnungComposite.Mixin.findWohnungenFor( gebaeude );
                     for (WohnungComposite zone : iterable) {
                         values.put( zone.schl().get(), zone );
@@ -251,11 +253,14 @@ public class GebaeudeGrunddatenFormEditorPage
             @Override
             public void run() {
                 if (gebaeude.objektNummer().get() != null) {
+                    Integer nummer = KapsRepository.instance().highestWohnungsNummer( gebaeude );
                     WohnungComposite wohnung = repository.newEntity( WohnungComposite.class, null );
                     wohnung.objektNummer().set( gebaeude.objektNummer().get() );
                     wohnung.objektFortfuehrung().set( gebaeude.objektFortfuehrung().get() );
                     wohnung.gebaeudeNummer().set( gebaeude.gebaeudeNummer().get() );
                     wohnung.gebaeudeFortfuehrung().set( gebaeude.gebaeudeFortfuehrung().get() );
+                    wohnung.wohnungsNummer().set( nummer );
+                    wohnung.wohnungsFortfuehrung().set( 0 );
                     // wohnung.vertrag().set( flurstueck.vertrag().get() );
                     KapsPlugin.openEditor( fs, WohnungComposite.NAME, wohnung );
                 }

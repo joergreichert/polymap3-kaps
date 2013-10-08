@@ -56,7 +56,8 @@ public class FormPageProvider
             result.add( new RichtwertzoneZeitraumWeitereDatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
         }
         else if (name.equalsIgnoreCase( VertragsdatenBaulandComposite.NAME )) {
-            result.add( new FlurstuecksdatenBaulandGrunddatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
+            result.add( new FlurstuecksdatenBaulandGrunddatenFormEditorPage( formEditor, feature, formEditor
+                    .getFeatureStore() ) );
             result.add( new FlurstuecksdatenBaulandBodenwertFormEditorPage( formEditor, feature, formEditor
                     .getFeatureStore() ) );
             result.add( new FlurstuecksdatenBaulandRichtwertFormEditorPage( formEditor, feature, formEditor

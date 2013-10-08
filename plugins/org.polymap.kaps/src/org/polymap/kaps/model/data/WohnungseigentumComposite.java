@@ -25,6 +25,7 @@ import org.qi4j.api.property.Computed;
 import org.qi4j.api.property.ComputedPropertyInstance;
 import org.qi4j.api.property.GenericPropertyInfo;
 import org.qi4j.api.property.Property;
+import org.qi4j.api.unitofwork.UnitOfWorkCompletionException;
 
 import org.polymap.core.qi4j.QiEntity;
 import org.polymap.core.qi4j.event.ModelChangeSupport;
@@ -32,6 +33,7 @@ import org.polymap.core.qi4j.event.PropertyChangeSupport;
 
 import org.polymap.kaps.importer.ImportColumn;
 import org.polymap.kaps.importer.ImportTable;
+import org.polymap.kaps.model.KapsRepository;
 
 /**
  * 
@@ -97,6 +99,17 @@ public interface WohnungseigentumComposite
             implements WohnungseigentumComposite {
 
         private static Log log = LogFactory.getLog( Mixin.class );
+
+
+        @Override
+        public void beforeCompletion()
+                throws UnitOfWorkCompletionException {
+            if (objektNummer().get() == null) {
+                objektNummer().set( KapsRepository.instance().highestObjektNummer() );
+                objektFortfuehrung().set( 0 );
+            }
+        }
+
 
         @Override
         public Property<String> schl() {

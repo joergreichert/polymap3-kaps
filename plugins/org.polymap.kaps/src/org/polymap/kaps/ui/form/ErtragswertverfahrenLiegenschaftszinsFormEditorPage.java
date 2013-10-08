@@ -153,7 +153,7 @@ public class ErtragswertverfahrenLiegenschaftszinsFormEditorPage
                     Double liziV = f1;
                     // neu
                     Double liziN = f1 - (liziV / (Math.pow( 1 + liziV, n ) - 1) * f2);
-                    
+
                     int iteration = 1;
                     while (Math.abs( liziN - liziV ) > 0.005d) {
                         liziV = liziN;
