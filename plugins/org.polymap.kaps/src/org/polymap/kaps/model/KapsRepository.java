@@ -98,6 +98,48 @@ public class KapsRepository
     };
 
 
+    public static class SchlEntityProvider<T extends SchlNamed>
+            extends KapsEntityProvider<T> {
+
+        Integer highestSchl = null;
+
+
+        public SchlEntityProvider( QiModule repo, Class<T> entityClass, Name entityName ) {
+            super( repo, entityClass, entityName );
+        }
+
+
+        @Override
+        public boolean modifyFeature( T entity, String propName, Object value )
+                throws Exception {
+            // set defaults
+            if (value == null) {
+                if (entity.schl().qualifiedName().name().equals( propName )) {
+                    entity.schl().set( nextSchl().toString() );
+                    return true;
+                }
+            }
+            return super.modifyFeature( entity, propName, value );
+        }
+
+
+        private synchronized Integer nextSchl() {
+            if (highestSchl == null) {
+                SchlNamed template = (SchlNamed)templateFor( getEntityType().getType() );
+
+                Query<SchlNamed> entities = KapsRepository.instance().findEntities( getEntityType().getType(), null, 0,
+                        -1 );
+                entities.orderBy( orderBy( template.schl(), OrderBy.Order.DESCENDING ) );
+
+                SchlNamed v = entities.iterator().next();
+                highestSchl = v != null ? Integer.parseInt( v.schl().get() ) : Integer.valueOf( 0 );
+            }
+            highestSchl += 1;
+            return highestSchl;
+        }
+    }
+
+
     public KapsRepository( final QiModuleAssembler assembler ) {
         super( assembler );
         log.debug( "Initializing Kaps module..." );
@@ -163,7 +205,7 @@ public class KapsRepository
 
                     new SimpleEntityProvider<GemeindeComposite>( this, GemeindeComposite.class, new NameImpl(
                             KapsRepository.NAMESPACE, GemeindeComposite.NAME ) ),
-                    new SimpleEntityProvider<StrasseComposite>( this, StrasseComposite.class, new NameImpl(
+                    new SchlEntityProvider<StrasseComposite>( this, StrasseComposite.class, new NameImpl(
                             KapsRepository.NAMESPACE, StrasseComposite.NAME ) ),
 
                     new SimpleEntityProvider<GemarkungComposite>( this, GemarkungComposite.class, new NameImpl(
