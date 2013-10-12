@@ -40,6 +40,7 @@ import org.polymap.kaps.ui.FieldCalculation;
 import org.polymap.kaps.ui.FieldCalculationWithTrigger;
 import org.polymap.kaps.ui.FieldListener;
 import org.polymap.kaps.ui.FieldSummation;
+import org.polymap.kaps.ui.NumberFormatter;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -97,12 +98,25 @@ public class WohnungLiegenschaftzinsFormEditorPage
     @SuppressWarnings("unused")
     private FieldCalculationWithTrigger liegenschaftsZins;
 
+
     public WohnungLiegenschaftzinsFormEditorPage( final FormEditor editor, Feature feature, FeatureStore featureStore ) {
         super( WohnungLiegenschaftzinsFormEditorPage.class.getName(), "Liegenschaftszins", feature, featureStore );
         EventManager.instance().subscribe(
                 fieldListener = new FieldListener( wohnung.wohnflaeche(), wohnung.bereinigterVollpreis(),
-                        wohnung.kaufpreis(), wohnung.baujahr(), wohnung.gesamtNutzungsDauer() ),
-                new FieldListener.EventFilter( editor ) );
+                        wohnung.kaufpreis(), wohnung.bereinigtesBaujahr(), wohnung.gesamtNutzungsDauer(),
+                        wohnung.bodenpreis() ) {
+
+                    @Override
+                    protected void onChangedValue( IFormEditorPageSite site, String fieldName, Object newValue ) {
+                        if (fieldName.equals( wohnung.bodenpreis().qualifiedName().name() )) {
+                            site.setFieldValue( fieldName,
+                                    newValue != null ? NumberFormatter.getFormatter( 2 ).format( newValue ) : null );
+                        }
+                        else {
+                            super.onChangedValue( site, fieldName, newValue );
+                        }
+                    }
+                }, new FieldListener.EventFilter( editor ) );
     }
 
 
@@ -161,7 +175,7 @@ public class WohnungLiegenschaftzinsFormEditorPage
         newFormField( IFormFieldLabel.NO_LABEL ).setProperty( new PropertyAdapter( wohnung.mietfestsetzungSeit() ) )
                 .setField( new DateTimeFormField() ).setLayoutData( two().top( lastLine ).create() ).create();
         createLabel( parent, "Bodenpreis in €/m²", three().top( lastLine ), SWT.RIGHT );
-        createPreisField( wohnung.bodenpreis(), five().top( lastLine ), parent, true );
+        createPreisField( wohnung.bodenpreis(), five().top( lastLine ), parent, false );
 
         lastLine = newLine;
         newLine = // createLabel( parent, "Richtwert in €/m²", one().top( lastLine ),
@@ -181,7 +195,7 @@ public class WohnungLiegenschaftzinsFormEditorPage
                     return null;
                 }
                 if (prozent == null) {
-                    return preis;
+                    return null;
                 }
                 return preis * prozent / 100;
             }
@@ -245,7 +259,7 @@ public class WohnungLiegenschaftzinsFormEditorPage
                     return null;
                 }
                 if (prozent == null) {
-                    return preis;
+                    return null;
                 }
                 return preis * prozent / 100;
             }
@@ -369,11 +383,11 @@ public class WohnungLiegenschaftzinsFormEditorPage
         createFlaecheField( wohnung.gebaeudewertAnteilZuKaufpreis(), five().top( lastLine ), parent, false );
         site.addFieldListener( gebaeudewertAnteilZuKaufpreis = new FieldCalculationWithTrigger( site, 2, wohnung
                 .gebaeudewertAnteilZuKaufpreis(), wohnung.garagenBeiLiegenschaftszinsBeruecksichtigen(), wohnung
-                .gebaeudewertAnteil(), wohnung.bereinigterVollpreis(), wohnung.kaufpreis() ) {
+                .gebaeudewertAnteilDerWohnung(), wohnung.bereinigterVollpreis(), wohnung.kaufpreis() ) {
 
             @Override
             protected Double calculate( ValueProvider values ) {
-                Double gebaeudewertAnteil = values.get( wohnung.gebaeudewertAnteil() );
+                Double gebaeudewertAnteil = values.get( wohnung.gebaeudewertAnteilDerWohnung() );
                 if (gebaeudewertAnteil != null) {
                     Double preis = this.triggerValue() != null && this.triggerValue().booleanValue() ? values
                             .get( wohnung.bereinigterVollpreis() ) : values.get( wohnung.kaufpreis() );
@@ -391,14 +405,14 @@ public class WohnungLiegenschaftzinsFormEditorPage
         site.addFieldListener( liegenschaftsZins = new FieldCalculationWithTrigger( site, 2, wohnung
                 .liegenschaftsZins(), wohnung.garagenBeiLiegenschaftszinsBeruecksichtigen(), wohnung
                 .gebaeudewertAnteilZuKaufpreis(), wohnung.jahresReinErtragZuKaufpreis(), wohnung.gesamtNutzungsDauer(),
-                wohnung.baujahr() ) {
+                wohnung.bereinigtesBaujahr() ) {
 
             @Override
             protected Double calculate( ValueProvider values ) {
                 Double faktor1 = values.get( wohnung.jahresReinErtragZuKaufpreis() );
                 Double faktor2 = values.get( wohnung.gebaeudewertAnteilZuKaufpreis() );
                 Double GND = values.get( wohnung.gesamtNutzungsDauer() );
-                Double baujahr = values.get( wohnung.baujahr() );
+                Double baujahr = values.get( wohnung.bereinigtesBaujahr() );
 
                 int currentYear = new Date().getYear() + 1900;
                 Double RND = (GND != null && baujahr != null) ? baujahr + GND - currentYear : null;

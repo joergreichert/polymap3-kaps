@@ -56,7 +56,11 @@ import org.polymap.kaps.model.data.EtageComposite;
 import org.polymap.kaps.model.data.FlurstueckComposite;
 import org.polymap.kaps.model.data.HimmelsrichtungComposite;
 import org.polymap.kaps.model.data.ImmobilienArtStaBuComposite;
+import org.polymap.kaps.model.data.RichtwertzoneComposite;
+import org.polymap.kaps.model.data.RichtwertzoneZeitraumComposite;
 import org.polymap.kaps.model.data.StockwerkStaBuComposite;
+import org.polymap.kaps.model.data.VertragComposite;
+import org.polymap.kaps.model.data.VertragsdatenErweitertComposite;
 import org.polymap.kaps.model.data.WohnungComposite;
 import org.polymap.kaps.ui.ActionButton;
 import org.polymap.kaps.ui.BooleanFormField;
@@ -103,6 +107,8 @@ public class WohnungGrunddatenFormEditorPage
 
     private IFormFieldListener        ausstattungListener;
 
+    private IFormFieldListener        flurstueckListener;
+
 
     public WohnungGrunddatenFormEditorPage( FormEditor formEditor, Feature feature, FeatureStore featureStore ) {
         super( WohnungGrunddatenFormEditorPage.class.getName(), "Grunddaten", feature, featureStore );
@@ -138,6 +144,56 @@ public class WohnungGrunddatenFormEditorPage
     public void afterDoLoad( IProgressMonitor monitor )
             throws Exception {
         editorListener.flush( pageSite );
+        pageSite.addFieldListener( flurstueckListener = new IFormFieldListener() {
+
+            @Override
+            public void fieldChange( FormFieldEvent ev ) {
+                if (ev.getEventCode() == IFormFieldListener.VALUE_CHANGE
+                        && ev.getFieldName().endsWith( wohnung.flurstueck().qualifiedName().name() )) {
+                    updateBodenPreis( (FlurstueckComposite)ev.getNewValue() );
+                }
+            }
+        } );
+        updateBodenPreis( wohnung.flurstueck().get() );
+        updateKaufpreis();
+    }
+
+
+    private void updateKaufpreis() {
+        VertragComposite vertrag = WohnungComposite.Mixin.vertragFor( wohnung );
+        Double kaufpreis = null;
+        if (vertrag != null) {
+            if (vertrag.erweiterteVertragsdaten().get() != null) {
+                VertragsdatenErweitertComposite vertragsdatenErweitertComposite = vertrag.erweiterteVertragsdaten()
+                        .get();
+                kaufpreis = vertragsdatenErweitertComposite.bereinigterVollpreis().get();
+            }
+            // erweiterte Daten kann leer sein
+            if (kaufpreis == null || kaufpreis == 0.0d) {
+                kaufpreis = vertrag.vollpreis().get();
+            }
+        }
+        if (kaufpreis != null && !kaufpreis.equals( wohnung.kaufpreis().get() )) {
+            pageSite.fireEvent( this, wohnung.kaufpreis().qualifiedName().name(), IFormFieldListener.VALUE_CHANGE,
+                    kaufpreis );
+        }
+    }
+
+
+    private void updateBodenPreis( FlurstueckComposite flurstueck ) {
+        // refresh bodenpreis aus richtwertzone vom flurstück
+        if (flurstueck != null) {
+            RichtwertzoneComposite richtwertzoneComposite = flurstueck.richtwertZone().get();
+            VertragComposite vertrag = flurstueck.vertrag().get();
+            if (vertrag != null && richtwertzoneComposite != null) {
+                RichtwertzoneZeitraumComposite zeitraum = RichtwertzoneZeitraumComposite.Mixin.findZeitraumFor(
+                        richtwertzoneComposite, vertrag.vertragsDatum().get() );
+                if (zeitraum != null) {
+                    pageSite.fireEvent( this, wohnung.bodenpreis().qualifiedName().name(),
+                            IFormFieldListener.VALUE_CHANGE, zeitraum.euroQm().get() );
+                }
+            }
+        }
     }
 
 
@@ -315,11 +371,13 @@ public class WohnungGrunddatenFormEditorPage
                 .setLayoutData( right().top( lastLine ).create() ).setParent( parent ).create();
 
         lastLine = newLine;
-        newLine = newFormField( "Stockwerk" ).setToolTipText( "Stockwerk entsprechend Statistischem Bundesamt" ).setProperty( new AssociationAdapter<StockwerkStaBuComposite>( wohnung.stockwerkStaBu() ) )
+        newLine = newFormField( "Stockwerk" ).setToolTipText( "Stockwerk entsprechend Statistischem Bundesamt" )
+                .setProperty( new AssociationAdapter<StockwerkStaBuComposite>( wohnung.stockwerkStaBu() ) )
                 .setField( namedAssocationsPicklist( StockwerkStaBuComposite.class ) )
                 .setLayoutData( left().top( lastLine ).create() ).setParent( parent ).create();
 
-        newLine = newFormField( "Art" ).setToolTipText( "Art entsprechend Statistischem Bundesamt" ).setProperty( new AssociationAdapter<ImmobilienArtStaBuComposite>( wohnung.immobilienArtStaBu() ) )
+        newLine = newFormField( "Art" ).setToolTipText( "Art entsprechend Statistischem Bundesamt" )
+                .setProperty( new AssociationAdapter<ImmobilienArtStaBuComposite>( wohnung.immobilienArtStaBu() ) )
                 .setField( namedAssocationsPicklist( ImmobilienArtStaBuComposite.class ) )
                 .setLayoutData( right().top( lastLine ).create() ).setParent( parent ).create();
 

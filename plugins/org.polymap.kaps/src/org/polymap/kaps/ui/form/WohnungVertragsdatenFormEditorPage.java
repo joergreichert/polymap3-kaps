@@ -12,10 +12,6 @@
  */
 package org.polymap.kaps.ui.form;
 
-import java.util.List;
-
-import java.beans.PropertyChangeEvent;
-
 import org.geotools.data.FeatureStore;
 import org.opengis.feature.Feature;
 
@@ -30,8 +26,6 @@ import org.eclipse.jface.action.Action;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import org.polymap.core.runtime.event.EventFilter;
-import org.polymap.core.runtime.event.EventHandler;
 import org.polymap.core.runtime.event.EventManager;
 
 import org.polymap.rhei.data.entityfeature.AssociationAdapter;
@@ -46,8 +40,6 @@ import org.polymap.rhei.form.IFormEditorPageSite;
 import org.polymap.kaps.KapsPlugin;
 import org.polymap.kaps.model.data.GebaeudeArtComposite;
 import org.polymap.kaps.model.data.VertragComposite;
-import org.polymap.kaps.model.data.VertragsdatenErweitertComposite;
-import org.polymap.kaps.model.data.WohnungComposite;
 import org.polymap.kaps.ui.ActionButton;
 import org.polymap.kaps.ui.BooleanFormField;
 import org.polymap.kaps.ui.FieldCalculation;
@@ -76,48 +68,26 @@ public class WohnungVertragsdatenFormEditorPage
 
     public WohnungVertragsdatenFormEditorPage( final FormEditor editor, Feature feature, FeatureStore featureStore ) {
         super( WohnungVertragsdatenFormEditorPage.class.getName(), "Vertragsdaten", feature, featureStore );
-        EventManager.instance().subscribe( fieldListener = new FieldListener( wohnung.wohnflaeche() ),
-                new FieldListener.EventFilter( editor ) );
+        EventManager.instance().subscribe(
+                fieldListener = new FieldListener( wohnung.wohnflaeche(), wohnung.kaufpreis() ) {
 
-        EventManager.instance().subscribe( this, new EventFilter<PropertyChangeEvent>() {
-
-            public boolean apply( PropertyChangeEvent ev ) {
-                Object source = ev.getSource();
-                if (source != null && source instanceof WohnungComposite) {
-                    if (source.equals( wohnung )) {
-                        return true;
+                    @Override
+                    protected void onChangedValue( IFormEditorPageSite site, String fieldName, Object newValue ) {
+                        if (fieldName.equals( wohnung.kaufpreis().qualifiedName().name() )) {
+                            site.setFieldValue( fieldName,
+                                    newValue != null ? NumberFormatter.getFormatter( 2 ).format( newValue ) : null );
+                        }
+                        else {
+                            super.onChangedValue( site, fieldName, newValue );
+                        }
                     }
-                }
-                return false;
-            }
-        } );
-    }
-
-
-    @EventHandler(display = true, delay = 1)
-    public void handleBaujahrberechnung( List<PropertyChangeEvent> events )
-            throws Exception {
-
-        for (PropertyChangeEvent ev : events) {
-
-            // GND und Baujahr
-            // check for gnd and baujahr, alle anderen Properties werden beim
-            // Speichern gefeuert
-            if (ev.getPropertyName().equals( wohnung.gesamtNutzungsDauer().qualifiedName().name() )
-                    || ev.getPropertyName().equals( wohnung.baujahr().qualifiedName().name() )) {
-                // System.out.println( ev );
-                pageSite.setFieldValue( ev.getPropertyName(),
-                        ev.getNewValue() != null ? getFormatter( 0, false ).format( ev.getNewValue() ) : null );
-                System.out.println( ev );
-            }
-        }
+                }, new FieldListener.EventFilter( editor ) );
     }
 
 
     @Override
     public void dispose() {
         super.dispose();
-        EventManager.instance().unsubscribe( this );
         EventManager.instance().unsubscribe( fieldListener );
     }
 
@@ -281,23 +251,6 @@ public class WohnungVertragsdatenFormEditorPage
     @Override
     public void afterDoLoad( IProgressMonitor monitor )
             throws Exception {
-        VertragComposite vertrag = WohnungComposite.Mixin.vertragFor( wohnung );
-        Double kaufpreis = null;
-        if (vertrag != null) {
-            if (vertrag.erweiterteVertragsdaten().get() != null) {
-                VertragsdatenErweitertComposite vertragsdatenErweitertComposite = vertrag.erweiterteVertragsdaten()
-                        .get();
-                kaufpreis = vertragsdatenErweitertComposite.bereinigterVollpreis().get();
-            }
-            // erweiterte Daten kann leer sein
-            if (kaufpreis == null || kaufpreis == 0.0d) {
-                kaufpreis = vertrag.vollpreis().get();
-            }
-        }
-        if (kaufpreis != null && !kaufpreis.equals( wohnung.kaufpreis().get() )) {
-            pageSite.setFieldValue( wohnung.kaufpreis().qualifiedName().name(), NumberFormatter.getFormatter( 2 ).format( kaufpreis ) );
-        }
-
         fieldListener.flush( pageSite );
     }
 }

@@ -603,11 +603,11 @@ public interface WohnungComposite
     Property<Double> bodenwertAnteilDerWohnung();
 
 
-    // GEBWERTANT - Double
-    @Optional
-    @ImportColumn("GEBWERTANT")
-    Property<Double> gebaeudewertAnteil();
-
+    //
+    // // GEBWERTANT - Double
+    // @Optional
+    // @ImportColumn("GEBWERTANT")
+    // Property<Double> gebaeudewertAnteil();
 
     // GEBWERTANTW - Double
     @Optional
