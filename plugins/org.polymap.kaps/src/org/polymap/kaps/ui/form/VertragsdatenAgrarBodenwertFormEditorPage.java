@@ -60,8 +60,8 @@ import org.polymap.kaps.ui.NumberFormatter;
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
-public class FlurstuecksdatenAgrarBodenwertFormEditorPage
-        extends FlurstuecksdatenAgrarFormEditorPage {
+public class VertragsdatenAgrarBodenwertFormEditorPage
+        extends VertragsdatenAgrarFormEditorPage {
 
     private static final int                          ONE   = 0;
 
@@ -80,7 +80,7 @@ public class FlurstuecksdatenAgrarBodenwertFormEditorPage
     private static final int                          EIGHT = 100;
 
     private static Log                                log   = LogFactory
-                                                                    .getLog( FlurstuecksdatenAgrarBodenwertFormEditorPage.class );
+                                                                    .getLog( VertragsdatenAgrarBodenwertFormEditorPage.class );
 
     private IFormFieldListener                        riwezone1;
 
@@ -137,9 +137,9 @@ public class FlurstuecksdatenAgrarBodenwertFormEditorPage
 
     // private IFormFieldListener gemeindeListener;
 
-    public FlurstuecksdatenAgrarBodenwertFormEditorPage( final FormEditor formEditor, Feature feature,
+    public VertragsdatenAgrarBodenwertFormEditorPage( final FormEditor formEditor, Feature feature,
             FeatureStore featureStore ) {
-        super( FlurstuecksdatenAgrarBodenwertFormEditorPage.class.getName(), "Bodenwertaufteilung", feature,
+        super( VertragsdatenAgrarBodenwertFormEditorPage.class.getName(), "Bodenwertaufteilung", feature,
                 featureStore );
 
         zonen = searchZonen();
@@ -277,7 +277,7 @@ public class FlurstuecksdatenAgrarBodenwertFormEditorPage
 
         newLine = createLabel( client, "Richtwertzone", one(), SWT.CENTER );
         createLabel( client, "Bodennutzung", two(), SWT.CENTER );
-        createLabel( client, "Acker-", three(), SWT.CENTER );
+        createLabel( client, "AZ/GZ", "Acker-/Grünlandzahl", three(), SWT.CENTER );
         createLabel( client, "Flächenanteil", four(), SWT.CENTER );
         createLabel( client, "Bodenpreis", five(), SWT.CENTER );
         createLabel( client, "Bodenwert", six(), SWT.CENTER );
@@ -287,7 +287,8 @@ public class FlurstuecksdatenAgrarBodenwertFormEditorPage
         // newLine = createLabel( client, "Richtwertzone", one().top( lastLine ),
         // SWT.CENTER );
         // createLabel( client, "Bodennutzung", two().top( lastLine ), SWT.CENTER );
-        newLine = createLabel( client, "Grünland", three().top( lastLine ), SWT.CENTER );
+        newLine = // createLabel( client, "Grünland", three().top( lastLine ),
+                  // SWT.CENTER );
         createLabel( client, "in m²", four().top( lastLine ), SWT.CENTER );
         createLabel( client, "in €/m²", five().top( lastLine ), SWT.CENTER );
         createLabel( client, "in €", six().top( lastLine ), SWT.CENTER );

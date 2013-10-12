@@ -31,16 +31,16 @@ import org.polymap.kaps.ui.MyNumberValidator;
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
-public class FlurstuecksdatenAgrarStaLaFormEditorPage
-        extends FlurstuecksdatenAgrarFormEditorPage {
+public class VertragsdatenAgrarStaLaFormEditorPage
+        extends VertragsdatenAgrarFormEditorPage {
 
-    private static Log log = LogFactory.getLog( FlurstuecksdatenAgrarStaLaFormEditorPage.class );
+    private static Log log = LogFactory.getLog( VertragsdatenAgrarStaLaFormEditorPage.class );
 
 
     // private IFormFieldListener informer;
 
-    public FlurstuecksdatenAgrarStaLaFormEditorPage( FormEditor formEditor, Feature feature, FeatureStore featureStore ) {
-        super( FlurstuecksdatenAgrarStaLaFormEditorPage.class.getName(), "Statistisches Landesamt", feature,
+    public VertragsdatenAgrarStaLaFormEditorPage( FormEditor formEditor, Feature feature, FeatureStore featureStore ) {
+        super( VertragsdatenAgrarStaLaFormEditorPage.class.getName(), "Statistisches Landesamt", feature,
                 featureStore );
     }
 

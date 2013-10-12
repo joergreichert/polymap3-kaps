@@ -117,21 +117,20 @@ public interface VertragsdatenBaulandComposite
     Property<Double> erschliessungsKosten();
 
 
-    // BERWEUNB DOUBLE,
-    @Optional
-    @ImportColumn("BERWEUNB")
-    Property<Double> bodenpreisUnbebaut();
-
-
-    // BERBOFAKT DOUBLE,
-    @Optional
-    @ImportColumn("BERBOFAKT")
-    Property<Double> bebAbschlag();
-
-
-    @Optional
-    Property<Double> bebAbschlagBerechnet();
-
+    //
+    // // BERWEUNB DOUBLE,
+    // @Optional
+    // @ImportColumn("BERWEUNB")
+    // Property<Double> bodenpreisUnbebaut();
+    //
+    // // BERBOFAKT DOUBLE,
+    // @Optional
+    // @ImportColumn("BERBOFAKT")
+    // Property<Double> bebAbschlag();
+    //
+    //
+    // @Optional
+    // Property<Double> bebAbschlagBerechnet();
 
     // BERWEBEB DOUBLE,
     @Optional
@@ -358,11 +357,11 @@ public interface VertragsdatenBaulandComposite
     Property<Double> bodenpreisAbgleichAufBaupreisBebaut();
 
 
-    // BPAKVUNB DOUBLE,
-    @Optional
-    @ImportColumn("BPAKVUNB")
-    Property<Double> bodenpreisAbgleichAufKaufpreisUnbebaut();
-
+    //
+    // // BPAKVUNB DOUBLE,
+    // @Optional
+    // @ImportColumn("BPAKVUNB")
+    // Property<Double> bodenpreisAbgleichAufKaufpreisUnbebaut();
 
     // VKWABFAKT DOUBLE,
     // TODO default 1

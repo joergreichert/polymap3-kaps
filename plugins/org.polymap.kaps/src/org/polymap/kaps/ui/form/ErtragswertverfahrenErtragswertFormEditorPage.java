@@ -373,7 +373,7 @@ public class ErtragswertverfahrenErtragswertFormEditorPage
                                             // {
                                             // count++;
                         FormEditor editor = KapsPlugin.openEditor( fs, VertragsdatenBaulandComposite.NAME, erweitert );
-                        editor.setActivePage( FlurstuecksdatenBaulandBodenwertFormEditorPage.class.getName() );
+                        editor.setActivePage( VertragsdatenBaulandBodenwertFormEditorPage.class.getName() );
                         EventManager.instance().publish(
                                 new InterEditorPropertyChangeEvent( formEditor, editor, erweitert, erweitert
                                         .wertDerBaulichenAnlagen().qualifiedName().name(), erweitert

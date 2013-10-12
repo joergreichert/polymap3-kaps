@@ -38,18 +38,18 @@ import org.polymap.kaps.ui.MyNumberValidator;
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
-public class FlurstuecksdatenAgrarGrunddatenFormEditorPage
-        extends FlurstuecksdatenAgrarFormEditorPage {
+public class VertragsdatenAgrarGrunddatenFormEditorPage
+        extends VertragsdatenAgrarFormEditorPage {
 
-    private static Log         log = LogFactory.getLog( FlurstuecksdatenAgrarGrunddatenFormEditorPage.class );
+    private static Log         log = LogFactory.getLog( VertragsdatenAgrarGrunddatenFormEditorPage.class );
 
     private IFormFieldListener listener;
 
 //    private IFormFieldListener informer;
 
 
-    public FlurstuecksdatenAgrarGrunddatenFormEditorPage( FormEditor formEditor, Feature feature, FeatureStore featureStore ) {
-        super( FlurstuecksdatenAgrarGrunddatenFormEditorPage.class.getName(), "Grunddaten", feature, featureStore );
+    public VertragsdatenAgrarGrunddatenFormEditorPage( FormEditor formEditor, Feature feature, FeatureStore featureStore ) {
+        super( VertragsdatenAgrarGrunddatenFormEditorPage.class.getName(), "Grunddaten", feature, featureStore );
     }
 
 

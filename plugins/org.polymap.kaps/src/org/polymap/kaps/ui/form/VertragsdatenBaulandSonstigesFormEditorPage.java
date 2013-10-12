@@ -35,14 +35,14 @@ import org.polymap.kaps.ui.BooleanFormField;
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
-public class FlurstuecksdatenBaulandSonstigesFormEditorPage
-        extends FlurstuecksdatenBaulandFormEditorPage {
+public class VertragsdatenBaulandSonstigesFormEditorPage
+        extends VertragsdatenBaulandFormEditorPage {
 
-    private static Log log = LogFactory.getLog( FlurstuecksdatenBaulandSonstigesFormEditorPage.class );
+    private static Log log = LogFactory.getLog( VertragsdatenBaulandSonstigesFormEditorPage.class );
 
 
-    public FlurstuecksdatenBaulandSonstigesFormEditorPage( Feature feature, FeatureStore featureStore ) {
-        super( FlurstuecksdatenBaulandSonstigesFormEditorPage.class.getName(), "Sonstiges", feature, featureStore );
+    public VertragsdatenBaulandSonstigesFormEditorPage( Feature feature, FeatureStore featureStore ) {
+        super( VertragsdatenBaulandSonstigesFormEditorPage.class.getName(), "Sonstiges", feature, featureStore );
     }
 
 

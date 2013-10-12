@@ -364,6 +364,24 @@ public interface VertragComposite
                 EventManager.instance().publish(
                         new PropertyChangeEvent( this, eingangsNr().qualifiedName().name(), null, eingangsNr().get() ) );
             }
+            if (erweiterteVertragsdaten().get() != null) {
+                VertragsdatenErweitertComposite vertragsdatenErweitertComposite = erweiterteVertragsdaten().get();
+                Double basisPreis = vertragsdatenErweitertComposite.basispreis().get();
+                Double kaufPreis = kaufpreis().get();
+                if (basisPreis == null || basisPreis.doubleValue() == 0.0d
+                        || basisPreis.doubleValue() != kaufPreis.doubleValue()) {
+                    vertragsdatenErweitertComposite.basispreis().set( kaufPreis );
+                    Double zuschlag = vertragsdatenErweitertComposite.zuschlag().get();
+                    if (zuschlag != null) {
+                        kaufPreis = Double.valueOf( kaufPreis.doubleValue() + zuschlag.doubleValue() );
+                    }
+                    Double abschlag = vertragsdatenErweitertComposite.abschlag().get();
+                    if (abschlag != null) {
+                        kaufPreis = Double.valueOf( kaufPreis.doubleValue() - abschlag.doubleValue() );
+                    }
+                    vertragsdatenErweitertComposite.bereinigterVollpreis().set( kaufPreis );
+                }
+            }
         }
 
         private AssociationInfo vertragCompositeAss = new GenericAssociationInfo( VertragComposite.class,

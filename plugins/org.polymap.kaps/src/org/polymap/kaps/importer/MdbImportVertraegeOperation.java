@@ -589,7 +589,7 @@ public class MdbImportVertraegeOperation
 
                             // subcreate VertragsdatenErweitert
                             // in der Tabelle K_BEVERW sind Vertrags- und
-                            // Flurstücksdaten, letztere werden hier separat
+                            // Vertragsdaten, letztere werden hier separat
                             // erzeugt
                             // VertragsdatenErweitertComposite vdec = repo.newEntity(
                             // VertragsdatenErweitertComposite.class, null,
@@ -742,7 +742,7 @@ public class MdbImportVertraegeOperation
                                 vertrag.erweiterteVertragsdaten().get().bereinigterVollpreis().get() == null) {
                                     // subcreate VertragsdatenErweitert
                                     // in der Tabelle K_BEVERW sind Vertrags- und
-                                    // Flurstücksdaten, letztere werden hier separate
+                                    // Vertragsdaten, letztere werden hier separate
                                     // erzeugt
                                     // VertragsdatenErweitertComposite vdec =
                                     // repo.newEntity(

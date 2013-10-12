@@ -38,7 +38,6 @@ import org.polymap.rhei.field.TextFormField;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
 import org.polymap.kaps.KapsPlugin;
-import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.GebaeudeArtComposite;
 import org.polymap.kaps.model.data.GebaeudeComposite;
 import org.polymap.kaps.model.data.WohnungComposite;
@@ -253,16 +252,9 @@ public class GebaeudeGrunddatenFormEditorPage
             @Override
             public void run() {
                 if (gebaeude.objektNummer().get() != null) {
-                    Integer nummer = KapsRepository.instance().highestWohnungsNummer( gebaeude );
-                    WohnungComposite wohnung = repository.newEntity( WohnungComposite.class, null );
-                    wohnung.objektNummer().set( gebaeude.objektNummer().get() );
-                    wohnung.objektFortfuehrung().set( gebaeude.objektFortfuehrung().get() );
-                    wohnung.gebaeudeNummer().set( gebaeude.gebaeudeNummer().get() );
-                    wohnung.gebaeudeFortfuehrung().set( gebaeude.gebaeudeFortfuehrung().get() );
-                    wohnung.wohnungsNummer().set( nummer );
-                    wohnung.wohnungsFortfuehrung().set( 0 );
+
                     // wohnung.vertrag().set( flurstueck.vertrag().get() );
-                    KapsPlugin.openEditor( fs, WohnungComposite.NAME, wohnung );
+                    KapsPlugin.openEditor( fs, WohnungComposite.NAME, WohnungComposite.Mixin.createFor( gebaeude ) );
                 }
             }
 

@@ -56,21 +56,21 @@ public class FormPageProvider
             result.add( new RichtwertzoneZeitraumWeitereDatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
         }
         else if (name.equalsIgnoreCase( VertragsdatenBaulandComposite.NAME )) {
-            result.add( new FlurstuecksdatenBaulandGrunddatenFormEditorPage( formEditor, feature, formEditor
+            result.add( new VertragsdatenBaulandGrunddatenFormEditorPage( formEditor, feature, formEditor
                     .getFeatureStore() ) );
-            result.add( new FlurstuecksdatenBaulandBodenwertFormEditorPage( formEditor, feature, formEditor
+            result.add( new VertragsdatenBaulandBodenwertFormEditorPage( formEditor, feature, formEditor
                     .getFeatureStore() ) );
-            result.add( new FlurstuecksdatenBaulandRichtwertFormEditorPage( formEditor, feature, formEditor
+            result.add( new VertragsdatenBaulandRichtwertFormEditorPage( formEditor, feature, formEditor
                     .getFeatureStore() ) );
-            result.add( new FlurstuecksdatenBaulandSonstigesFormEditorPage( feature, formEditor.getFeatureStore() ) );
-            result.add( new FlurstuecksdatenBaulandStaBuFormEditorPage( feature, formEditor.getFeatureStore() ) );
+            result.add( new VertragsdatenBaulandSonstigesFormEditorPage( feature, formEditor.getFeatureStore() ) );
+            result.add( new VertragsdatenBaulandStaBuFormEditorPage( feature, formEditor.getFeatureStore() ) );
         }
         else if (name.equalsIgnoreCase( VertragsdatenAgrarComposite.NAME )) {
-            result.add( new FlurstuecksdatenAgrarGrunddatenFormEditorPage( formEditor, feature, formEditor
+            result.add( new VertragsdatenAgrarGrunddatenFormEditorPage( formEditor, feature, formEditor
                     .getFeatureStore() ) );
-            result.add( new FlurstuecksdatenAgrarBodenwertFormEditorPage( formEditor, feature, formEditor
+            result.add( new VertragsdatenAgrarBodenwertFormEditorPage( formEditor, feature, formEditor
                     .getFeatureStore() ) );
-            result.add( new FlurstuecksdatenAgrarStaLaFormEditorPage( formEditor, feature, formEditor.getFeatureStore() ) );
+            result.add( new VertragsdatenAgrarStaLaFormEditorPage( formEditor, feature, formEditor.getFeatureStore() ) );
         }
         else if (name.equalsIgnoreCase( WohnungseigentumComposite.NAME )) {
             result.add( new WohnungseigentumFormEditorPage( feature, formEditor.getFeatureStore() ) );

@@ -41,7 +41,7 @@ import org.polymap.kaps.model.KapsRepository;
         ModelChangeSupport.Mixin.class, QiEntity.Mixin.class,
 // JsonState.Mixin.class
 })
-//@ImportTable("K_BEVERW")
+// @ImportTable("K_BEVERW")
 public interface VertragsdatenErweitertComposite
         extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite {
 
@@ -96,11 +96,12 @@ public interface VertragsdatenErweitertComposite
 
         private static Log log = LogFactory.getLog( Mixin.class );
 
+
         private VertragComposite kaufvertrag() {
             VertragComposite template = QueryExpressions.templateFor( VertragComposite.class );
             BooleanExpression expr = QueryExpressions.eq( template.erweiterteVertragsdaten(), this );
-            Query<VertragComposite> matches = KapsRepository.instance().findEntities(
-                    VertragComposite.class, expr, 0, 1 );
+            Query<VertragComposite> matches = KapsRepository.instance().findEntities( VertragComposite.class, expr, 0,
+                    1 );
             return matches.find();
         }
     }

@@ -970,6 +970,25 @@ public interface WohnungComposite
             return KapsRepository.instance().findEntities( WohnungComposite.class, expr, 0, -1 );
         }
 
+
+        public static WohnungComposite createFor( GebaeudeComposite gebaeude ) {
+            Integer nummer = KapsRepository.instance().highestWohnungsNummer( gebaeude );
+            WohnungComposite wohnung = KapsRepository.instance().newEntity( WohnungComposite.class, null );
+            wohnung.objektNummer().set( gebaeude.objektNummer().get() );
+            wohnung.objektFortfuehrung().set( gebaeude.objektFortfuehrung().get() );
+            wohnung.gebaeudeNummer().set( gebaeude.gebaeudeNummer().get() );
+            wohnung.gebaeudeFortfuehrung().set( gebaeude.gebaeudeFortfuehrung().get() );
+            wohnung.wohnungsNummer().set( nummer );
+            wohnung.wohnungsFortfuehrung().set( 0 );
+            if (gebaeude.baujahr().get() != null) {
+                wohnung.bereinigtesBaujahr().set( gebaeude.baujahr().get().doubleValue() );
+            }
+            if (gebaeude.baujahrTatsaechlich().get() != null) {
+                wohnung.baujahr().set( gebaeude.baujahrTatsaechlich().get().doubleValue() );
+            }
+            return wohnung;
+        }
+
     }
 
 

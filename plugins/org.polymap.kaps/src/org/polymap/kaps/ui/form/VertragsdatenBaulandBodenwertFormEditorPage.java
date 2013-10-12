@@ -53,10 +53,10 @@ import org.polymap.kaps.ui.NumberFormatter;
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
-public class FlurstuecksdatenBaulandBodenwertFormEditorPage
-        extends FlurstuecksdatenBaulandFormEditorPage {
+public class VertragsdatenBaulandBodenwertFormEditorPage
+        extends VertragsdatenBaulandFormEditorPage {
 
-    private static Log          log = LogFactory.getLog( FlurstuecksdatenBaulandBodenwertFormEditorPage.class );
+    private static Log          log = LogFactory.getLog( VertragsdatenBaulandBodenwertFormEditorPage.class );
 
     @SuppressWarnings("unused")
     private IFormFieldListener  line1multiplicator;
@@ -118,9 +118,9 @@ public class FlurstuecksdatenBaulandBodenwertFormEditorPage
 
     // private IFormFieldListener gemeindeListener;
 
-    public FlurstuecksdatenBaulandBodenwertFormEditorPage( FormEditor formEditor, Feature feature,
+    public VertragsdatenBaulandBodenwertFormEditorPage( FormEditor formEditor, Feature feature,
             FeatureStore featureStore ) {
-        super( FlurstuecksdatenBaulandBodenwertFormEditorPage.class.getName(), "Boden- und Gebäudewert", feature,
+        super( VertragsdatenBaulandBodenwertFormEditorPage.class.getName(), "Boden- und Gebäudewert", feature,
                 featureStore );
 
         EventManager.instance().subscribe( fieldListener = new FieldListener( vb.bodenpreisBebaut() ),

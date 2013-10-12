@@ -44,8 +44,8 @@ import org.polymap.kaps.ui.FieldSummation;
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
-public class FlurstuecksdatenBaulandRichtwertFormEditorPage
-        extends FlurstuecksdatenBaulandFormEditorPage {
+public class VertragsdatenBaulandRichtwertFormEditorPage
+        extends VertragsdatenBaulandFormEditorPage {
 
     private static final int   ONE   = 0;
 
@@ -57,7 +57,7 @@ public class FlurstuecksdatenBaulandRichtwertFormEditorPage
 
     private static final int   FIVE  = 100;
 
-    private static Log         log   = LogFactory.getLog( FlurstuecksdatenBaulandRichtwertFormEditorPage.class );
+    private static Log         log   = LogFactory.getLog( VertragsdatenBaulandRichtwertFormEditorPage.class );
 
     private IFormFieldListener bodenpreis;
 
@@ -67,7 +67,7 @@ public class FlurstuecksdatenBaulandRichtwertFormEditorPage
 
     private FieldListener      fieldListener;
 
-    private IFormFieldListener bodenpreisUnbebaut;
+    // private IFormFieldListener bodenpreisUnbebaut;
 
     private FieldCalculation   zwischensumme;
 
@@ -84,14 +84,14 @@ public class FlurstuecksdatenBaulandRichtwertFormEditorPage
 
     // private IFormFieldListener gemeindeListener;
 
-    public FlurstuecksdatenBaulandRichtwertFormEditorPage( final FormEditor editor, Feature feature,
+    public VertragsdatenBaulandRichtwertFormEditorPage( final FormEditor editor, Feature feature,
             FeatureStore featureStore ) {
-        super( FlurstuecksdatenBaulandRichtwertFormEditorPage.class.getName(), "Richtwert", feature, featureStore );
+        super( VertragsdatenBaulandRichtwertFormEditorPage.class.getName(), "Richtwert", feature, featureStore );
 
         EventManager.instance().subscribe(
-                fieldListener = new FieldListener( vb.bodenwertBereinigt1(), vb.bebAbschlag(),
-                        vb.richtwertAbschlagProzent(), vb.richtwertZuschlagProzent(), vb.erschliessungsKosten(),
-                        vb.bodenpreisBebaut() ), new FieldListener.EventFilter( editor ) );
+                fieldListener = new FieldListener( vb.bodenwertBereinigt1(), vb.richtwertAbschlagProzent(),
+                        vb.richtwertZuschlagProzent(), vb.erschliessungsKosten(), vb.bodenpreisBebaut() ),
+                new FieldListener.EventFilter( editor ) );
     }
 
 
@@ -154,44 +154,48 @@ public class FlurstuecksdatenBaulandRichtwertFormEditorPage
         Composite client = (Composite)section.getClient();
         // Composite client = parent;
 
-        createLabel( client, "Bodenpreis bebaut", one().top( lastLine, 12 ), SWT.RIGHT );
-        newLine = createPreisField( vb.bodenpreisAbgleichAufBaupreisBebaut(), two().top( lastLine ), client, false );
+        createLabel( client, "Bodenpreis bebaut", three().top( lastLine, 12 ), SWT.RIGHT );
+        newLine = createPreisField( vb.bodenpreisAbgleichAufBaupreisBebaut(), four().top( lastLine ), client, false );
         // wenn die seite bereits an ist dann per refresher
         site.addFieldListener( bodenpreis = new FieldSummation( site, 2, vb.bodenpreisAbgleichAufBaupreisBebaut(), vb
                 .bodenwertBereinigt1() ) );
-
-        createLabel( client, "Bodenpreis unbebaut", three().top( lastLine, 12 ), SWT.RIGHT );
-        createPreisField( vb.bodenpreisAbgleichAufKaufpreisUnbebaut(), four().top( lastLine ), client, false );
-        site.addFieldListener( bodenpreisUnbebaut = new FieldCalculation( site, 2, vb
-                .bodenpreisAbgleichAufKaufpreisUnbebaut(), vb.bodenpreisAbgleichAufBaupreisBebaut(), vb.bebAbschlag() ) {
-
-            @Override
-            protected Double calculate( ValueProvider values ) {
-                Double preis = values.get( vb.bodenpreisAbgleichAufBaupreisBebaut() );
-                if (preis == null) {
-                    preis = 0.0d;
-                }
-                Double abschlag = values.get( vb.bebAbschlag() );
-                if (abschlag == null) {
-                    abschlag = 0.0d;
-                }
-                return preis / ((100 - abschlag) / 100);
-            }
-        } );
+        //
+        // createLabel( client, "Bodenpreis unbebaut", three().top( lastLine, 12 ),
+        // SWT.RIGHT );
+        // createPreisField( vb.bodenpreisAbgleichAufKaufpreisUnbebaut(), four().top(
+        // lastLine ), client, false );
+        // site.addFieldListener( bodenpreisUnbebaut = new FieldCalculation( site, 2,
+        // vb
+        // .bodenpreisAbgleichAufKaufpreisUnbebaut(),
+        // vb.bodenpreisAbgleichAufBaupreisBebaut(), vb.bebAbschlag() ) {
+        //
+        // @Override
+        // protected Double calculate( ValueProvider values ) {
+        // Double preis = values.get( vb.bodenpreisAbgleichAufBaupreisBebaut() );
+        // if (preis == null) {
+        // preis = 0.0d;
+        // }
+        // Double abschlag = values.get( vb.bebAbschlag() );
+        // if (abschlag == null) {
+        // abschlag = 0.0d;
+        // }
+        // return preis / ((100 - abschlag) / 100);
+        // }
+        // } );
 
         lastLine = newLine;
-        createLabel( client, "Verkehrswertfaktor", one().top( lastLine, 12 ), SWT.RIGHT );
-        newLine = createPreisField( vb.verkehrswertFaktor(), two().top( lastLine ), client, true );
+        createLabel( client, "Verkehrswertfaktor", three().top( lastLine, 12 ), SWT.RIGHT );
+        newLine = createPreisField( vb.verkehrswertFaktor(), four().top( lastLine ), client, true );
 
         lastLine = newLine;
         createLabel( client, "Zwischensumme", three().top( lastLine, 12 ), SWT.RIGHT );
         newLine = createPreisField( vb.zwischensummeVerkehrswertfaktor(), four().top( lastLine ), client, true );
         site.addFieldListener( zwischensumme = new FieldCalculation( site, 2, vb.zwischensummeVerkehrswertfaktor(), vb
-                .bodenpreisAbgleichAufKaufpreisUnbebaut(), vb.verkehrswertFaktor() ) {
+                .bodenpreisAbgleichAufBaupreisBebaut(), vb.verkehrswertFaktor() ) {
 
             @Override
             protected Double calculate( ValueProvider values ) {
-                Double preis = values.get( vb.bodenpreisAbgleichAufKaufpreisUnbebaut() );
+                Double preis = values.get( vb.bodenpreisAbgleichAufBaupreisBebaut() );
                 if (preis == null) {
                     return null;
                 }

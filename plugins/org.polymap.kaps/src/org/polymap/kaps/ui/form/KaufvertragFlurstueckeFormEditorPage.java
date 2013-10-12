@@ -172,6 +172,7 @@ public class KaufvertragFlurstueckeFormEditorPage
         super.refreshReloadables();
         if (sfAction != null) {
             sfAction.refresh();
+            sfAction.setEnabled( composite != null );
             searchFlurstueckeButton.setEnabled( composite != null );
             openErweiterteDatenAgrar.setEnabled( composite != null );
             openErweiterteDatenBauland.setEnabled( composite != null );
@@ -187,7 +188,7 @@ public class KaufvertragFlurstueckeFormEditorPage
 
     private Composite createFlurstueckForm( Composite parent ) {
 
-        Section formSection = newSection( parent, "Flurstücksdaten" );
+        Section formSection = newSection( parent, "Vertragsdaten" );
         parent = (Composite)formSection.getClient();
 
         Composite line0 = newFormField( "Gemarkung" )
@@ -301,6 +302,18 @@ public class KaufvertragFlurstueckeFormEditorPage
                 pageSite.setFieldValue( prefix + "belastung", toAdopt.belastung().get() );
 
                 // refreshReloadables();
+            }
+
+
+            @Override
+            public void run() {
+                if (selectedComposite.get() == null) {
+                    MessageDialog.openInformation( PolymapWorkbench.getShellToParentOn(), "Flurstück auswählen",
+                            "Bitte wählen Sie ein Flurstück oder legen ein neues an, bevor Sie suchen." );
+                }
+                else {
+                    super.run();
+                }
             }
         };
         sfAction.setEnabled( false );
@@ -760,21 +773,12 @@ public class KaufvertragFlurstueckeFormEditorPage
                     throws Exception {
                 final FlurstueckComposite flurstueck = selectedComposite.get();
                 if (flurstueck != null && gebaeude != null) {
-                    Integer nummer = KapsRepository.instance().highestWohnungsNummer( gebaeude );
-                    WohnungComposite wohnung = repository.newEntity( WohnungComposite.class, null );
-                    wohnung.objektNummer().set( gebaeude.objektNummer().get() );
-                    wohnung.objektFortfuehrung().set( gebaeude.objektFortfuehrung().get() );
-                    wohnung.gebaeudeNummer().set( gebaeude.gebaeudeNummer().get() );
-                    wohnung.gebaeudeFortfuehrung().set( gebaeude.gebaeudeFortfuehrung().get() );
-                    wohnung.wohnungsNummer().set( nummer );
-                    wohnung.wohnungsFortfuehrung().set( 0 );
+                    WohnungComposite wohnung = WohnungComposite.Mixin.createFor( gebaeude );
                     wohnung.flurstueck().set( flurstueck );
 
                     if (gebaeude != null && !gebaeude.flurstuecke().contains( flurstueck )) {
                         gebaeude.flurstuecke().add( flurstueck );
                     }
-
-                    // wohnung.vertrag().set( flurstueck.vertrag().get() );
                     KapsPlugin.openEditor( fs, WohnungComposite.NAME, wohnung );
                 }
 

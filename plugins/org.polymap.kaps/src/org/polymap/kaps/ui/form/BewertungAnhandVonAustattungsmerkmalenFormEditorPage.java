@@ -185,7 +185,7 @@ public class BewertungAnhandVonAustattungsmerkmalenFormEditorPage
                     Double newValue = resultListener.get( vb.gesamtSumme() );
                     if (newValue != null) {
                         FormEditor editor = KapsPlugin.openEditor( fs, WohnungComposite.NAME, wohnung );
-                        editor.setActivePage( FlurstuecksdatenBaulandBodenwertFormEditorPage.class.getName() );
+                        editor.setActivePage( VertragsdatenBaulandBodenwertFormEditorPage.class.getName() );
                         EventManager.instance().publish(
                                 new InterEditorPropertyChangeEvent( formEditor, editor, wohnung, wohnung
                                         .bewertungsPunkte().qualifiedName().name(), wohnung.bewertungsPunkte().get(),
