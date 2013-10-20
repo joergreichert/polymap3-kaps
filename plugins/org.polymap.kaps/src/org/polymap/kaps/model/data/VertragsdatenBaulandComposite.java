@@ -313,11 +313,11 @@ public interface VertragsdatenBaulandComposite
     Property<Double> verkaufteFlaecheGesamt();
 
 
-    // FLGE2 DOUBLE, Gesamtfläche aus Vertrag
-    @Optional
-    @ImportColumn("FLGE2")
-    Property<Double> flaecheGesamt();
-
+    //
+    // // FLGE2 DOUBLE, Gesamtfläche aus Vertrag
+    // @Optional
+    // @ImportColumn("FLGE2")
+    // Property<Double> flaecheGesamt();
 
     // SACHWERT1 DOUBLE,
     @Optional
@@ -612,11 +612,10 @@ public interface VertragsdatenBaulandComposite
     // @Computed
     // Association<NutzungComposite> nutzung();
 
-    // GEMEINDE INTEGER,
-    @Optional
-    @Computed
-    Association<GemeindeComposite> gemeinde();
-
+    // // GEMEINDE INTEGER,
+    // @Optional
+    // @Computed
+    // Association<GemeindeComposite> gemeinde();
 
     // BRUTTOGRUNDFLAECHE DOUBLE DEFAULT 0,
     @Optional

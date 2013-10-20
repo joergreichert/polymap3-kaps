@@ -34,12 +34,12 @@ import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.SchlNamed;
 
 /**
- *  
+ * 
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 @Concerns({ PropertyChangeSupport.Concern.class })
-@Mixins({ ArtDesBaugebietsComposite.Mixin.class, PropertyChangeSupport.Mixin.class,
-        ModelChangeSupport.Mixin.class, QiEntity.Mixin.class
+@Mixins({ ArtDesBaugebietsComposite.Mixin.class, PropertyChangeSupport.Mixin.class, ModelChangeSupport.Mixin.class,
+        QiEntity.Mixin.class
 // JsonState.Mixin.class
 })
 public interface ArtDesBaugebietsComposite
@@ -75,7 +75,7 @@ public interface ArtDesBaugebietsComposite
         }
 
 
-        private static ArtDesBaugebietsComposite create(UnitOfWork uow, String schl, String name, Boolean isAgrar ) {
+        private static ArtDesBaugebietsComposite create( UnitOfWork uow, String schl, String name, Boolean isAgrar ) {
             EntityBuilder<ArtDesBaugebietsComposite> builder = uow.newEntityBuilder( ArtDesBaugebietsComposite.class );
             builder.instance().name().set( name );
             builder.instance().schl().set( schl );
@@ -85,8 +85,10 @@ public interface ArtDesBaugebietsComposite
 
 
         public static Iterable<ArtDesBaugebietsComposite> findByAgrar( Boolean agrar ) {
-            ArtDesBaugebietsComposite template = QueryExpressions
-                    .templateFor( ArtDesBaugebietsComposite.class );
+            ArtDesBaugebietsComposite template = QueryExpressions.templateFor( ArtDesBaugebietsComposite.class );
+            if (agrar == null) {
+                agrar = Boolean.FALSE;
+            }
             BooleanExpression expr = QueryExpressions.eq( template.isAgrar(), agrar );
             Query<ArtDesBaugebietsComposite> matches = KapsRepository.instance().findEntities(
                     ArtDesBaugebietsComposite.class, expr, 0, -1 );

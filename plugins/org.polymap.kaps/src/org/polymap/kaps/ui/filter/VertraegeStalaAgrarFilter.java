@@ -45,14 +45,14 @@ import org.polymap.kaps.ui.NotNullValidator;
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
-public class VertraegeStabuFilter
+public class VertraegeStalaAgrarFilter
         extends AbstractEntityFilter {
 
-    private static Log log = LogFactory.getLog( VertraegeStabuFilter.class );
+    private static Log log = LogFactory.getLog( VertraegeStalaAgrarFilter.class );
 
 
-    public VertraegeStabuFilter( ILayer layer ) {
-        super( "__kaps--", layer, "für StaBu...", null, 15000, VertragComposite.class );
+    public VertraegeStalaAgrarFilter( ILayer layer ) {
+        super( "__kaps--", layer, "für StaLa Agrar...", null, 15000, VertragComposite.class );
     }
 
 
@@ -154,7 +154,7 @@ public class VertraegeStabuFilter
                 Query<NutzungComposite> nutzungen = KapsRepository.instance().findEntities( NutzungComposite.class,
                         null, 0, -1 );
                 for (NutzungComposite nutzung : nutzungen) {
-                    if (nutzung.isAgrar().get() == null || nutzung.isAgrar().get() == Boolean.FALSE) {
+                    if (nutzung.isAgrar().get() != null && nutzung.isAgrar().get() == Boolean.TRUE) {
                         BooleanExpression newExpr = QueryExpressions.eq( flurstueckTemplate.nutzung(), nutzung );
                         if (nExpr == null) {
                             nExpr = newExpr;
@@ -183,12 +183,15 @@ public class VertraegeStabuFilter
                 }
             }
 
-            BooleanExpression expr = vExpr;
+            BooleanExpression expr = QueryExpressions.gt( flurstueckTemplate.verkaufteFlaeche(), 1000d );
+            if (vExpr != null) {
+                expr = QueryExpressions.and( expr, vExpr );
+            }
             if (nExpr != null) {
-                expr = expr == null ? nExpr : QueryExpressions.and( expr, nExpr );
+                expr = QueryExpressions.and( expr, nExpr );
             }
             if (gExpr != null) {
-                expr = expr == null ? gExpr : QueryExpressions.and( expr, gExpr );
+                expr = QueryExpressions.and( expr, gExpr );
             }
 
             Query<FlurstueckComposite> allFlurstuecke = KapsRepository.instance().findEntities(

@@ -38,19 +38,30 @@
             class="org.polymap.kaps.exporter.RichtwertzoneAsBorisExporter"
             icon="icons/exportas.gif"
             id="org.polymap.kaps.exporter.RichtwertzoneAsBorisExporter"
-            label="Exportieren als BORIS"
-            tooltip="Richtwertzone als CSV im Format BORIS exportieren.">
+            label="Exportieren als BORIS für GeoSN"
+            tooltip="Richtwertzone als CSV im Format BORIS für das GeoSN exportieren.">
       </featureOperation>
       <featureOperation
             class="org.polymap.kaps.exporter.VertragStaBuExporter"
             icon="icons/exportas.gif"
             id="org.polymap.kaps.exporter.VertragStaBuExporter"
-            label="Exportieren für StaBu"
+            label="Exportieren für Statistisches Bundesamt"
             tooltip="Verträge für Statistisches Bundesamt Wiesbaden exportieren">
       </featureOperation>
-   </extension>
-   <extension
-         point="org.polymap.core.data.featureOperations">
+      <featureOperation
+            class="org.polymap.kaps.exporter.VertragStaLaAgrarExporter"
+            icon="icons/exportas.gif"
+            id="org.polymap.kaps.exporter.VertragStaLaAgrarExporter"
+            label="Exportieren als Agrar für Statistisches Landesamt"
+            tooltip="Verträge mit Agrar für Statistisches Landesamt Kamenz exportieren">
+      </featureOperation>
+      <featureOperation
+            class="org.polymap.kaps.exporter.VertragStaLaBaulandExporter"
+            icon="icons/exportas.gif"
+            id="org.polymap.kaps.exporter.VertragStaLaBaulandExporter"
+            label="Exportieren als Bauland für Statistisches Landesamt"
+            tooltip="Verträge mit Bauland für Statistisches Landesamt Kamenz exportieren">
+      </featureOperation>
       <featureOperation
             class="org.polymap.kaps.importer.RichtwertzoneKoordinateImporter"
             icon="icons/import.gif"

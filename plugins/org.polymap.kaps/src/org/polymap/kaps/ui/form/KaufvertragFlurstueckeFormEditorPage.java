@@ -148,8 +148,8 @@ public class KaufvertragFlurstueckeFormEditorPage
     public void createFormContent( IFormEditorPageSite site ) {
         super.createFormContent( site );
 
-        site.setEditorTitle( formattedTitle( "Kaufvertrag", kaufvertrag.eingangsNr().get(), null ) );
-        site.setFormTitle( formattedTitle( "Kaufvertrag", kaufvertrag.eingangsNr().get(), getTitle() ) );
+        site.setEditorTitle( formattedTitle( "Vertrag", kaufvertrag.eingangsNr().get(), null ) );
+        site.setFormTitle( formattedTitle( "Vertrag", kaufvertrag.eingangsNr().get(), getTitle() ) );
 
         Section tableSection = newSection( null, "Auswahl" );
         createTableForm( (Composite)tableSection.getClient(), null, true, false );

@@ -45,14 +45,14 @@ import org.polymap.kaps.ui.NotNullValidator;
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
-public class VertraegeStabuFilter
+public class VertraegeStalaBaulandFilter
         extends AbstractEntityFilter {
 
-    private static Log log = LogFactory.getLog( VertraegeStabuFilter.class );
+    private static Log log = LogFactory.getLog( VertraegeStalaBaulandFilter.class );
 
 
-    public VertraegeStabuFilter( ILayer layer ) {
-        super( "__kaps--", layer, "für StaBu...", null, 15000, VertragComposite.class );
+    public VertraegeStalaBaulandFilter( ILayer layer ) {
+        super( "__kaps--", layer, "für StaLa Bauland...", null, 15000, VertragComposite.class );
     }
 
 
@@ -183,12 +183,15 @@ public class VertraegeStabuFilter
                 }
             }
 
-            BooleanExpression expr = vExpr;
+            BooleanExpression expr = QueryExpressions.gt( flurstueckTemplate.verkaufteFlaeche(), 100d );
+            if (vExpr != null) {
+                expr = QueryExpressions.and( expr, vExpr );
+            }
             if (nExpr != null) {
-                expr = expr == null ? nExpr : QueryExpressions.and( expr, nExpr );
+                expr = QueryExpressions.and( expr, nExpr );
             }
             if (gExpr != null) {
-                expr = expr == null ? gExpr : QueryExpressions.and( expr, gExpr );
+                expr = QueryExpressions.and( expr, gExpr );
             }
 
             Query<FlurstueckComposite> allFlurstuecke = KapsRepository.instance().findEntities(
