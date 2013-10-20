@@ -239,7 +239,7 @@ public class WohnungGrunddatenFormEditorPage
                 .setProperty( new PropertyAdapter( wohnung.wohnungsNummer() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setValidator( new NotNullMyNumberValidator( Integer.class ) )
-                .setEnabled( wohnung.wohnungsNummer().get() == null )
+                // .setEnabled( wohnung.wohnungsNummer().get() == null )
                 .setLayoutData( left().left( 69 ).right( 83 ).create() ).create();
 
         newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Fortführung" )
