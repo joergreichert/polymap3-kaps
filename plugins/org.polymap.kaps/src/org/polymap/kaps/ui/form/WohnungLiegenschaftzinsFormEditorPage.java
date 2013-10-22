@@ -33,6 +33,7 @@ import org.polymap.rhei.data.entityfeature.PropertyAdapter;
 import org.polymap.rhei.field.CheckboxFormField;
 import org.polymap.rhei.field.DateTimeFormField;
 import org.polymap.rhei.field.IFormFieldLabel;
+import org.polymap.rhei.field.IFormFieldListener;
 import org.polymap.rhei.form.FormEditor;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
@@ -130,6 +131,9 @@ public class WohnungLiegenschaftzinsFormEditorPage
     public void afterDoLoad( IProgressMonitor monitor )
             throws Exception {
         fieldListener.flush( pageSite );
+        // recalcualte imported wohnungen
+        pageSite.fireEvent( this, wohnung.monatlicherRohertrag().qualifiedName().name(),
+                IFormFieldListener.VALUE_CHANGE, wohnung.monatlicherRohertrag().get() );
     }
 
 
@@ -298,10 +302,10 @@ public class WohnungLiegenschaftzinsFormEditorPage
             @Override
             protected Double calculate( ValueProvider values ) {
                 if (wohnung.flurstueck().get() != null) {
-                    Double flaeche = values.get( wohnung.flurstueck().get().flaeche() );
+                    Double flaeche = wohnung.flurstueck().get().flaeche().get();
                     if (flaeche != null) {
-                        Double zaehler = values.get( wohnung.flurstueck().get().flaechenAnteilZaehler() );
-                        Double nenner = values.get( wohnung.flurstueck().get().flaechenAnteilNenner() );
+                        Double zaehler = wohnung.flurstueck().get().flaechenAnteilZaehler().get();
+                        Double nenner = wohnung.flurstueck().get().flaechenAnteilNenner().get();
                         Double preis = values.get( wohnung.bereinigterBodenpreis() );
                         if (zaehler != null) {
                             flaeche *= zaehler;
