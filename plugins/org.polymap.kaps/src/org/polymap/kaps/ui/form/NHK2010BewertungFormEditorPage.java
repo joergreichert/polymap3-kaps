@@ -1574,10 +1574,10 @@ public class NHK2010BewertungFormEditorPage
                 Double result = zeitwertRnd;
                 // Zu/-Abschläge nach ImmoWertV
                 if (result != null && abschlagBaumaengelBetrag != null) {
-                    result += abschlagBaumaengelBetrag;
+                    result -= abschlagBaumaengelBetrag;
                 }
                 if (result != null && abschlagRueckstauBetrag != null) {
-                    result += abschlagRueckstauBetrag;
+                    result -= abschlagRueckstauBetrag;
                 }
                 if (result != null && zuschlagZeile3Betrag != null) {
                     result += zuschlagZeile3Betrag;
