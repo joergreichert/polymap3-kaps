@@ -35,6 +35,13 @@
    <extension
          point="org.polymap.core.data.featureOperations">
       <featureOperation
+            class="org.polymap.kaps.exporter.VertragsdatenBaulandAlsBRLExporter"
+            icon="icons/exportas.gif"
+            id="org.polymap.kaps.exporter.VertragsdatenBaulandAlsBRLExporter"
+            label="Export Statistik BRL"
+            tooltip="Export Statistik BRL">
+      </featureOperation>
+      <featureOperation
             class="org.polymap.kaps.exporter.RichtwertzoneAsBorisExporter"
             icon="icons/exportas.gif"
             id="org.polymap.kaps.exporter.RichtwertzoneAsBorisExporter"

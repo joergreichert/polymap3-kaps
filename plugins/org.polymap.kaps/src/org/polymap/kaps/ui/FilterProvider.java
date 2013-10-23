@@ -47,6 +47,7 @@ import org.polymap.kaps.ui.filter.VertraegeFuerBaujahrUndGebaeudeartFilter;
 import org.polymap.kaps.ui.filter.VertraegeStabuFilter;
 import org.polymap.kaps.ui.filter.VertraegeStalaAgrarFilter;
 import org.polymap.kaps.ui.filter.VertraegeStalaBaulandFilter;
+import org.polymap.kaps.ui.filter.VertragsdatenBaulandBRLFilter;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -95,6 +96,7 @@ public class FilterProvider
                 }
                 else if (type.isAssignableFrom( VertragsdatenBaulandComposite.class )) {
                     result.add( new EinzelneVertragsdatenBaulandFilter( layer ) );
+                    result.add( new VertragsdatenBaulandBRLFilter( layer ) );
                     // result.add( new DefaultEntityFilter( layer, type, repo ) );
                 }
                 else if (type.isAssignableFrom( VertragsdatenAgrarComposite.class )) {

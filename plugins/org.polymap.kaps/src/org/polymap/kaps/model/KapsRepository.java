@@ -210,8 +210,7 @@ public class KapsRepository
 
                     new SimpleEntityProvider<GemarkungComposite>( this, GemarkungComposite.class, new NameImpl(
                             KapsRepository.NAMESPACE, GemarkungComposite.NAME ) ),
-                    new SimpleEntityProvider<VertragsdatenBaulandComposite>( this, VertragsdatenBaulandComposite.class,
-                            new NameImpl( KapsRepository.NAMESPACE, VertragsdatenBaulandComposite.NAME ) ),
+                    new VertragsdatenBaulandEntityProvider( this ),
                     new SimpleEntityProvider<AusstattungBewertungComposite>( this, AusstattungBewertungComposite.class,
                             new NameImpl( KapsRepository.NAMESPACE, AusstattungBewertungComposite.NAME ) ),
                     new SimpleEntityProvider<VertragsdatenAgrarComposite>( this, VertragsdatenAgrarComposite.class,
