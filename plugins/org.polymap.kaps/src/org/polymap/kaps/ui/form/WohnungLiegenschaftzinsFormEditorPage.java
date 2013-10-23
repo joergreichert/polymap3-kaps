@@ -105,11 +105,15 @@ public class WohnungLiegenschaftzinsFormEditorPage
         EventManager.instance().subscribe(
                 fieldListener = new FieldListener( wohnung.wohnflaeche(), wohnung.bereinigterVollpreis(),
                         wohnung.kaufpreis(), wohnung.bereinigtesBaujahr(), wohnung.gesamtNutzungsDauer(),
-                        wohnung.bodenpreis() ) {
+                        wohnung.bodenpreis(), wohnung.bodenrichtwert() ) {
 
                     @Override
                     protected void onChangedValue( IFormEditorPageSite site, String fieldName, Object newValue ) {
                         if (fieldName.equals( wohnung.bodenpreis().qualifiedName().name() )) {
+                            site.setFieldValue( fieldName,
+                                    newValue != null ? NumberFormatter.getFormatter( 2 ).format( newValue ) : null );
+                        }
+                        else if (fieldName.equals( wohnung.bodenrichtwert().qualifiedName().name() )) {
                             site.setFieldValue( fieldName,
                                     newValue != null ? NumberFormatter.getFormatter( 2 ).format( newValue ) : null );
                         }
@@ -175,16 +179,15 @@ public class WohnungLiegenschaftzinsFormEditorPage
         Control newLine, lastLine = null;
         Composite parent = pageSite.getPageBody();
 
+        newLine = createLabel( parent, "Richtwert in €/m²", one().top( lastLine ), SWT.RIGHT );
+        createPreisField( wohnung.bodenrichtwert(), two().top( lastLine ), parent, false );
+        createLabel( parent, "Bodenpreis in €/m²", three().top( lastLine ), SWT.RIGHT );
+        createPreisField( wohnung.bodenpreis(), five().top( lastLine ), parent, true );
+
+        lastLine = newLine;
         newLine = createLabel( parent, "Mietfestsetzung seit", one().top( lastLine ), SWT.RIGHT );
         newFormField( IFormFieldLabel.NO_LABEL ).setProperty( new PropertyAdapter( wohnung.mietfestsetzungSeit() ) )
                 .setField( new DateTimeFormField() ).setLayoutData( two().top( lastLine ).create() ).create();
-        createLabel( parent, "Bodenpreis in €/m²", three().top( lastLine ), SWT.RIGHT );
-        createPreisField( wohnung.bodenpreis(), five().top( lastLine ), parent, false );
-
-        lastLine = newLine;
-        newLine = // createLabel( parent, "Richtwert in €/m²", one().top( lastLine ),
-                  // SWT.RIGHT );
-        // createPreisField( wohnung., data, parent, editable )
         createLabel( parent, "Bebauungsabschlag in %", three().top( lastLine ), SWT.RIGHT );
         createFlaecheField( wohnung.bebauungsabschlagInProzent(), four().top( lastLine ), parent, true );
         createPreisField( wohnung.bebauungsabschlag(), five().top( lastLine ), parent, false );
@@ -363,7 +366,7 @@ public class WohnungLiegenschaftzinsFormEditorPage
 
         lastLine = newLine;
         newLine = createLabel( parent, "Jahresreinertrag/Kaufpreis", three().top( lastLine ), SWT.RIGHT );
-        createFlaecheField( wohnung.jahresReinErtragZuKaufpreis(), five().top( lastLine ), parent, false );
+        createPreisField( wohnung.jahresReinErtragZuKaufpreis(), five().top( lastLine ), parent, false );
         site.addFieldListener( jahresReinErtragZuKaufpreis = new FieldCalculationWithTrigger( site, 2, wohnung
                 .jahresReinErtragZuKaufpreis(), wohnung.garagenBeiLiegenschaftszinsBeruecksichtigen(), wohnung
                 .jahresReinertrag(), wohnung.bereinigterVollpreis(), wohnung.kaufpreis() ) {
@@ -384,7 +387,7 @@ public class WohnungLiegenschaftzinsFormEditorPage
 
         lastLine = newLine;
         newLine = createLabel( parent, "Gebäudewertanteil/Kaufpreis", three().top( lastLine ), SWT.RIGHT );
-        createFlaecheField( wohnung.gebaeudewertAnteilZuKaufpreis(), five().top( lastLine ), parent, false );
+        createPreisField( wohnung.gebaeudewertAnteilZuKaufpreis(), five().top( lastLine ), parent, false );
         site.addFieldListener( gebaeudewertAnteilZuKaufpreis = new FieldCalculationWithTrigger( site, 2, wohnung
                 .gebaeudewertAnteilZuKaufpreis(), wohnung.garagenBeiLiegenschaftszinsBeruecksichtigen(), wohnung
                 .gebaeudewertAnteilDerWohnung(), wohnung.bereinigterVollpreis(), wohnung.kaufpreis() ) {
@@ -405,7 +408,7 @@ public class WohnungLiegenschaftzinsFormEditorPage
 
         lastLine = newLine;
         newLine = createLabel( parent, "Liegenschaftszins in %", three().top( lastLine ), SWT.RIGHT );
-        createFlaecheField( wohnung.liegenschaftsZins(), five().top( lastLine ), parent, false );
+        createPreisField( wohnung.liegenschaftsZins(), five().top( lastLine ), parent, false );
         site.addFieldListener( liegenschaftsZins = new FieldCalculationWithTrigger( site, 2, wohnung
                 .liegenschaftsZins(), wohnung.garagenBeiLiegenschaftszinsBeruecksichtigen(), wohnung
                 .gebaeudewertAnteilZuKaufpreis(), wohnung.jahresReinErtragZuKaufpreis(), wohnung.gesamtNutzungsDauer(),

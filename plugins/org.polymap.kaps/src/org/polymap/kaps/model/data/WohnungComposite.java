@@ -1001,4 +1001,8 @@ public interface WohnungComposite
 
 
     WohnungComposite fuehreFort();
+
+
+    @Optional
+    Property<Double> bodenrichtwert();
 }

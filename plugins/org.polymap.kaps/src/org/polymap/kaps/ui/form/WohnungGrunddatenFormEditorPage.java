@@ -189,8 +189,13 @@ public class WohnungGrunddatenFormEditorPage
                 RichtwertzoneZeitraumComposite zeitraum = RichtwertzoneZeitraumComposite.Mixin.findZeitraumFor(
                         richtwertzoneComposite, vertrag.vertragsDatum().get() );
                 if (zeitraum != null) {
-                    pageSite.fireEvent( this, wohnung.bodenpreis().qualifiedName().name(),
+                    pageSite.fireEvent( this, wohnung.bodenrichtwert().qualifiedName().name(),
                             IFormFieldListener.VALUE_CHANGE, zeitraum.euroQm().get() );
+                    if (wohnung.bodenpreis().get() == null) {
+                        // set the bodenpreis also to this default value
+                        pageSite.fireEvent( this, wohnung.bodenpreis().qualifiedName().name(),
+                                IFormFieldListener.VALUE_CHANGE, zeitraum.euroQm().get() );
+                    }
                 }
             }
         }
