@@ -248,7 +248,7 @@ public class VertragsdatenBaulandAlsBRLExporter
         CsvListWriter csvWriter = null;
         try {
             // TODO Trennzeichen?
-            CsvPreference prefs = new CsvPreference( '"', ',', "\r\n" );
+            CsvPreference prefs = new CsvPreference( '"', ';', "\r\n" );
 
             writer = new OutputStreamWriter( out, "ISO-8859-1" );
 
