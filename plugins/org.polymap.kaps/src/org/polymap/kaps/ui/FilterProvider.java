@@ -47,6 +47,7 @@ import org.polymap.kaps.ui.filter.VertraegeFuerBaujahrUndGebaeudeartFilter;
 import org.polymap.kaps.ui.filter.VertraegeStabuFilter;
 import org.polymap.kaps.ui.filter.VertraegeStalaAgrarFilter;
 import org.polymap.kaps.ui.filter.VertraegeStalaBaulandFilter;
+import org.polymap.kaps.ui.filter.VertragsdatenAgrarAgrarFilter;
 import org.polymap.kaps.ui.filter.VertragsdatenBaulandBRLFilter;
 
 /**
@@ -101,6 +102,7 @@ public class FilterProvider
                 }
                 else if (type.isAssignableFrom( VertragsdatenAgrarComposite.class )) {
                     result.add( new EinzelneVertragsdatenAgrarFilter( layer ) );
+                    result.add( new VertragsdatenAgrarAgrarFilter( layer ) );
                 }
                 else if (type.isAssignableFrom( WohnungComposite.class )) {
                     result.add( new DefaultEntityFilter( layer, type, repo, "objektNummer", "objektFortfuehrung",

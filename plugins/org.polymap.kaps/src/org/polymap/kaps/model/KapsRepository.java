@@ -213,8 +213,7 @@ public class KapsRepository
                     new VertragsdatenBaulandEntityProvider( this ),
                     new SimpleEntityProvider<AusstattungBewertungComposite>( this, AusstattungBewertungComposite.class,
                             new NameImpl( KapsRepository.NAMESPACE, AusstattungBewertungComposite.NAME ) ),
-                    new SimpleEntityProvider<VertragsdatenAgrarComposite>( this, VertragsdatenAgrarComposite.class,
-                            new NameImpl( KapsRepository.NAMESPACE, VertragsdatenAgrarComposite.NAME ) ),
+                    new VertragsdatenAgrarEntityProvider( this ),
                     new SimpleEntityProvider<FlurComposite>( this, FlurComposite.class, new NameImpl(
                             KapsRepository.NAMESPACE, FlurComposite.NAME ) ),
                     new WohnungseigentumEntityProvider( this ),
