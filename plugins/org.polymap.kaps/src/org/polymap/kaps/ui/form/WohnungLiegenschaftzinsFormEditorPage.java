@@ -433,7 +433,8 @@ public class WohnungLiegenschaftzinsFormEditorPage
                         iteration++;
                     }
                     // in % umrechnen
-                    return liziN * 100;
+                    double result = liziN * 100;
+                    return Double.NaN == result ? 0.0d : result;
                 }
                 return null;
             }

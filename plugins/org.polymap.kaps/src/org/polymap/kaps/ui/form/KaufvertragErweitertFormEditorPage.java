@@ -15,6 +15,8 @@ package org.polymap.kaps.ui.form;
 import org.geotools.data.FeatureStore;
 import org.opengis.feature.Feature;
 
+import org.qi4j.api.entity.Entity;
+
 import org.eclipse.swt.widgets.Composite;
 
 import org.eclipse.ui.forms.widgets.Section;
@@ -33,7 +35,9 @@ import org.polymap.kaps.model.data.VertragsdatenErweitertComposite;
 import org.polymap.kaps.ui.FieldCalculation;
 import org.polymap.kaps.ui.FieldListener;
 import org.polymap.kaps.ui.FieldSummation;
+import org.polymap.kaps.ui.InterEditorListener;
 import org.polymap.kaps.ui.MyNumberValidator;
+import org.polymap.kaps.ui.NumberFormatter;
 
 /**
  * Erweiterte Vertragsdaten, Vertragsanteil Kaufpreis mit Zu- Abschlag
@@ -51,6 +55,8 @@ public class KaufvertragErweitertFormEditorPage
 
     private FieldSummation                        vollpreis;
 
+    private InterEditorListener                   editorListener;
+
 
     public KaufvertragErweitertFormEditorPage( FormEditor formEditor, Feature feature, FeatureStore featureStore ) {
         super( KaufvertragErweitertFormEditorPage.class.getName(), "Zu-/Abschlag", feature, featureStore );
@@ -58,12 +64,27 @@ public class KaufvertragErweitertFormEditorPage
         erweiterteVertragsdaten = getOrCreateErweiterteVertragsdaten( kaufvertrag );
         EventManager.instance().subscribe( fieldListener = new FieldListener( kaufvertrag.vollpreis() ),
                 new FieldListener.EventFilter( formEditor ) );
+        EventManager.instance().subscribe(
+                editorListener = new InterEditorListener( erweiterteVertragsdaten.wertbeeinflussendeUmstaende() ) {
+
+                    @Override
+                    protected void onChangedValue( IFormEditorPageSite site, Entity entity, String fieldName,
+                            Object newValue ) {
+                        if (fieldName.equals( erweiterteVertragsdaten.wertbeeinflussendeUmstaende().qualifiedName()
+                                .name() )) {
+                            site.setFieldValue( fieldName,
+                                    newValue != null ? NumberFormatter.getFormatter( 2 ).format( newValue ) : null );
+                        }
+                    }
+
+                }, new InterEditorListener.EventFilter( kaufvertrag ) );
     }
 
 
     @Override
     public void dispose() {
         EventManager.instance().unsubscribe( fieldListener );
+        EventManager.instance().unsubscribe( editorListener );
     }
 
 
@@ -71,6 +92,7 @@ public class KaufvertragErweitertFormEditorPage
     public void afterDoLoad( IProgressMonitor monitor )
             throws Exception {
         fieldListener.flush( pageSite );
+        editorListener.flush( pageSite );
     }
 
 
@@ -114,6 +136,14 @@ public class KaufvertragErweitertFormEditorPage
                 .create();
 
         lastLine = newLine;
+        newLine = newFormField( "Sonstiges" )
+                .setToolTipText( "Sonstige wertbeeinflußende Umstände, bspw. aus Ertragswertberechnung" )
+                .setProperty( new PropertyAdapter( erweiterteVertragsdaten.wertbeeinflussendeUmstaende() ) )
+                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
+                .setValidator( new MyNumberValidator( Double.class, 2 ) ).setEnabled( false )
+                .setLayoutData( left().top( lastLine ).create() ).setParent( client ).create();
+
+        lastLine = newLine;
         newLine = newFormField( "bereinigter Vollpreis" )
                 .setProperty( new PropertyAdapter( erweiterteVertragsdaten.bereinigterVollpreis() ) )
                 .setEnabled( false ).setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
@@ -122,13 +152,14 @@ public class KaufvertragErweitertFormEditorPage
 
         site.addFieldListener( refresher = new FieldCalculation( site, 2, erweiterteVertragsdaten
                 .bereinigterVollpreis(), erweiterteVertragsdaten.basispreis(), erweiterteVertragsdaten.zuschlag(),
-                erweiterteVertragsdaten.abschlag() ) {
+                erweiterteVertragsdaten.wertbeeinflussendeUmstaende(), erweiterteVertragsdaten.abschlag() ) {
 
             @Override
             protected Double calculate( ValueProvider values ) {
                 Double result = values.get( erweiterteVertragsdaten.basispreis() );
                 Double n = values.get( erweiterteVertragsdaten.zuschlag() );
                 Double z = values.get( erweiterteVertragsdaten.abschlag() );
+                Double w = values.get( erweiterteVertragsdaten.wertbeeinflussendeUmstaende() );
 
                 if (result != null && n != null) {
                     result += n;
@@ -136,12 +167,15 @@ public class KaufvertragErweitertFormEditorPage
                 if (result != null && z != null) {
                     result -= z;
                 }
+                if (result != null && w != null) {
+                    result += w;
+                }
                 return result;
             }
 
         } );
     }
-    
+
 
     private VertragsdatenErweitertComposite getOrCreateErweiterteVertragsdaten( VertragComposite kaufvertrag ) {
         VertragsdatenErweitertComposite vdec = kaufvertrag.erweiterteVertragsdaten().get();

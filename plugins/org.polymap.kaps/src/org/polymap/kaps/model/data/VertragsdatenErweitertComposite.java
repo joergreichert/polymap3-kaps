@@ -16,7 +16,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.qi4j.api.common.Optional;
-import org.qi4j.api.common.UseDefaults;
 import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.mixin.Mixins;
@@ -51,28 +50,24 @@ public interface VertragsdatenErweitertComposite
     // KAUFPREIS DOUBLE,
     @Optional
     @ImportColumn("KAUFPREIS")
-    @UseDefaults
     Property<Double> basispreis();
 
 
     // ZUSCHLAG DOUBLE,
     @Optional
     @ImportColumn("ZUSCHLAG")
-    @UseDefaults
     Property<Double> zuschlag();
 
 
     // ABSCHLAG DOUBLE,
     @Optional
     @ImportColumn("ABSCHLAG")
-    @UseDefaults
     Property<Double> abschlag();
 
 
     // BERKPREIS DOUBLE,
     @Optional
     @ImportColumn("BERKPREIS")
-    @UseDefaults
     Property<Double> bereinigterVollpreis();
 
 
@@ -105,4 +100,8 @@ public interface VertragsdatenErweitertComposite
             return matches.find();
         }
     }
+
+
+    @Optional
+    Property<Double> wertbeeinflussendeUmstaende();
 }

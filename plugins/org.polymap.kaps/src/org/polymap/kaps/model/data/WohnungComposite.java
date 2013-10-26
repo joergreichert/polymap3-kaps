@@ -21,6 +21,8 @@ import org.qi4j.api.common.Optional;
 import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.entity.association.Association;
+import org.qi4j.api.entity.association.kaps.ComputedAssociationInstance;
+import org.qi4j.api.entity.association.kaps.GenericAssociationInfo;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.property.Computed;
 import org.qi4j.api.property.ComputedPropertyInstance;
@@ -37,6 +39,8 @@ import org.polymap.core.qi4j.event.PropertyChangeSupport;
 import org.polymap.kaps.importer.ImportColumn;
 import org.polymap.kaps.importer.ImportTable;
 import org.polymap.kaps.model.KapsRepository;
+import org.polymap.kaps.model.Label;
+import org.polymap.kaps.model.LabelSupport;
 
 /**
  * 
@@ -44,12 +48,10 @@ import org.polymap.kaps.model.KapsRepository;
  */
 @Concerns({ PropertyChangeSupport.Concern.class })
 @Mixins({ WohnungComposite.Mixin.class, PropertyChangeSupport.Mixin.class, ModelChangeSupport.Mixin.class,
-        QiEntity.Mixin.class
-// JsonState.Mixin.class
-})
+        QiEntity.Mixin.class, LabelSupport.Mixin.class /* , JsonState.Mixin.class */})
 @ImportTable("K_EWOHN")
 public interface WohnungComposite
-        extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite {
+        extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite, LabelSupport {
 
     String NAME = "Wohnung";
 
@@ -57,36 +59,42 @@ public interface WohnungComposite
     // OBJEKTNR - Long
     @Optional
     @ImportColumn("OBJEKTNR")
+    @Label("Objektnummer")
     Property<Integer> objektNummer();
 
 
     // OBJEKTNRFORTF - Long
     @Optional
     @ImportColumn("OBJEKTNRFORTF")
+    @Label("Objektfortführung")
     Property<Integer> objektFortfuehrung();
 
 
     // GEBNR - Long
     @Optional
     @ImportColumn("GEBNR")
+    @Label("Gebäudenummer")
     Property<Integer> gebaeudeNummer();
 
 
     // GEBFORTF - Long
     @Optional
     @ImportColumn("GEBFORTF")
+    @Label("Gebäudefortführung")
     Property<Integer> gebaeudeFortfuehrung();
 
 
     // WOHNUNGSNR - Long
     @Optional
     @ImportColumn("WOHNUNGSNR")
+    @Label("Wohnungsnummer")
     Property<Integer> wohnungsNummer();
 
 
     // FORTF - Long
     @Optional
     @ImportColumn("FORTF")
+    @Label("Wohnungsfortführung")
     Property<Integer> wohnungsFortfuehrung();
 
 
@@ -104,12 +112,14 @@ public interface WohnungComposite
     // WOHNFL - Double
     @Optional
     @ImportColumn("WOHNFL")
+    @Label("Wohnfläche")
     Property<Double> wohnflaeche();
 
 
     // ZAHLZI - Double
     @Optional
     @ImportColumn("ZAHLZI")
+    @Label("Anzahl Zimmer")
     Property<Double> anzahlZimmer();
 
 
@@ -150,6 +160,7 @@ public interface WohnungComposite
     // BAUJAHR - Long
     @Optional
     // @ImportColumn("BAUJAHR")
+    @Label("tatsächliches Baujahr")
     Property<Double> baujahr();
 
 
@@ -162,6 +173,7 @@ public interface WohnungComposite
     // BERBAUJ - INT
     @Optional
     // @ImportColumn("BERBAUJ")
+    @Label("bereingtes Baujahr")
     Property<Double> bereinigtesBaujahr();
 
 
@@ -174,7 +186,7 @@ public interface WohnungComposite
     // TODO GAANZAHL - Double
     @Optional
     @ImportColumn("GAANZAHL")
-    Property<Double> GAANZAHL();
+    Property<Double> GAANZAHLL();
 
 
     // TODO GAART1 - String
@@ -307,12 +319,14 @@ public interface WohnungComposite
     // BERKPREIS - Double
     @Optional
     @ImportColumn("BERKPREIS")
+    @Label("Bereinigter Vollpreis")
     Property<Double> bereinigterVollpreis();
 
 
     // DMQM - Double
     @Optional
     @ImportColumn("DMQM")
+    @Label("Vollpreis Wohnfläche")
     Property<Double> vollpreisWohnflaeche();
 
 
@@ -331,6 +345,7 @@ public interface WohnungComposite
     // Boolean VERARBKZ - String
     @Optional
     // @ImportColumn("VERARBKZ")
+    @Label("zur Auswertung geeignet")
     Property<Boolean> zurAuswertungGeeignet();
 
 
@@ -916,6 +931,26 @@ public interface WohnungComposite
         }
 
 
+        @Override
+        public Association<VertragComposite> vertrag() {
+            return new ComputedAssociationInstance<VertragComposite>( new GenericAssociationInfo(
+                    WohnungComposite.class, "vertrag" ) ) {
+
+                @Override
+                public VertragComposite get() {
+                    return flurstueck().get() != null ? flurstueck().get().vertrag().get() : null;
+                }
+
+
+                @Override
+                public void set( VertragComposite anIgnoredValue )
+                        throws IllegalArgumentException, IllegalStateException {
+                    // really ignore
+                }
+            };
+        }
+
+
         public static Iterable<FlurstueckComposite> findFlurstueckeFor( WohnungComposite wohnung ) {
             GebaeudeComposite gebaeudeTemplate = QueryExpressions.templateFor( GebaeudeComposite.class );
             BooleanExpression expr3 = QueryExpressions
@@ -939,11 +974,6 @@ public interface WohnungComposite
                                     .gebaeudeNummer().get() ), QueryExpressions.eq(
                                     wohnungTemplate.gebaeudeFortfuehrung(), gebaeude.gebaeudeFortfuehrung().get() ) );
             return KapsRepository.instance().findEntities( WohnungComposite.class, expr3, 0, -1 );
-        }
-
-
-        public static VertragComposite vertragFor( WohnungComposite wohnung ) {
-            return wohnung.flurstueck().get() != null ? wohnung.flurstueck().get().vertrag().get() : null;
         }
 
 
@@ -998,6 +1028,11 @@ public interface WohnungComposite
 
     @Optional
     Association<ImmobilienArtStaBuComposite> immobilienArtStaBu();
+
+
+    @Optional
+    @Computed
+    Association<VertragComposite> vertrag();
 
 
     WohnungComposite fuehreFort();

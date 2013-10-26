@@ -353,7 +353,8 @@ public class ErtragswertverfahrenErtragswertFormEditorPage
         site.addFieldListener( ertragsWert = new FieldSummation( site, 2, vb.ertragswert(), vb
                 .bodenwertAbzglFreilegung(), vb.ertragswertDerBaulichenAnlagenZwischensumme() ) );
 
-        site.addFieldListener( ertragsWertListener = new NonFiringFieldListener( vb.ertragswert() ) );
+        site.addFieldListener( ertragsWertListener = new NonFiringFieldListener( vb.ertragswert(), vb
+                .wertbeeinflussendeUmstaende() ) );
 
         final VertragComposite vertrag = vb.vertrag().get();
         String label = vertrag == null ? "kein Vertrag" : "Übernehmen";
@@ -366,6 +367,7 @@ public class ErtragswertverfahrenErtragswertFormEditorPage
                 // int count = 0;
                 // for (FlurstueckComposite flurstueck : flurstuecke) {
                 VertragsdatenBaulandComposite erweitert = VertragsdatenBaulandComposite.Mixin.forVertrag( vertrag );
+                StringBuffer message = new StringBuffer();
                 if (erweitert != null) {
                     Double newValue = ertragsWertListener.get( vb.ertragswert() );
                     if (newValue != null) { // && !newValue.equals(
@@ -383,12 +385,29 @@ public class ErtragswertverfahrenErtragswertFormEditorPage
                                         .bewertungsMethode().qualifiedName().name(), erweitert.bewertungsMethode()
                                         .get(), "Ertragswert-normal" ) );
                     }
-                    MessageDialog.openInformation(
-                            PolymapWorkbench.getShellToParentOn(),
-                            "Wert übernommen",
-                            "Der Gesamtwert der baulichen Anlagen wurde in \"Wert der baulichen Anlagen\" im Reiter \"Boden- und Gebäudewert \" in "
-                                    + VertragsdatenBaulandComposite.NAME
-                                    + " übernommen. Die Formulare werden entsprechend angezeigt." );
+                    message.append( "Der Gesamtwert der baulichen Anlagen wurde in \"Wert der baulichen Anlagen\" im Reiter \"Boden- und Gebäudewert \" in "
+                            + VertragsdatenBaulandComposite.NAME + " übernommen.\n\n" );
+                }
+                VertragsdatenErweitertComposite verweitert = vertrag.erweiterteVertragsdaten().get();
+                if (verweitert != null) {
+                    Double newValue = ertragsWertListener.get( vb.wertbeeinflussendeUmstaende() );
+                    if (newValue != null) { // && !newValue.equals(
+                                            // erweitert.wertDerBaulichenAnlagen() ))
+                                            // {
+                                            // count++;
+                        FormEditor editor = KapsPlugin.openEditor( fs, VertragComposite.NAME, vertrag );
+                        editor.setActivePage( KaufvertragErweitertFormEditorPage.class.getName() );
+                        EventManager.instance().publish(
+                                new InterEditorPropertyChangeEvent( formEditor, editor, vertrag, verweitert
+                                        .wertbeeinflussendeUmstaende().qualifiedName().name(), verweitert
+                                        .wertbeeinflussendeUmstaende().get(), (newValue * -1) ) );
+                    }
+                    message.append( "Der Wert der sonstigen wertbeeinflußenden Umstände wurde in \"Zu-Abschlag \" in "
+                            + VertragComposite.NAME + " übernommen.\n\n" );
+                }
+                if (message.length() != 0) {
+                    MessageDialog.openInformation( PolymapWorkbench.getShellToParentOn(), "Wert übernommen", message
+                            .append( " Die Formulare werden entsprechend angezeigt." ).toString() );
                 }
             }
         } );

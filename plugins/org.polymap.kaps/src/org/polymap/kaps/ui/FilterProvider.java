@@ -20,6 +20,8 @@ import net.refractions.udig.catalog.IGeoResource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.google.common.collect.Lists;
+
 import org.polymap.core.project.ILayer;
 
 import org.polymap.rhei.data.entityfeature.EntityProvider;
@@ -38,6 +40,7 @@ import org.polymap.kaps.model.data.VertragsdatenAgrarComposite;
 import org.polymap.kaps.model.data.VertragsdatenBaulandComposite;
 import org.polymap.kaps.model.data.WohnungComposite;
 import org.polymap.kaps.ui.filter.DefaultEntityFilter;
+import org.polymap.kaps.ui.filter.DefaultEntityFilter.PropertyFilter;
 import org.polymap.kaps.ui.filter.EinzelneVertragsdatenAgrarFilter;
 import org.polymap.kaps.ui.filter.EinzelneVertragsdatenBaulandFilter;
 import org.polymap.kaps.ui.filter.EinzelnerVertragFilter;
@@ -49,6 +52,7 @@ import org.polymap.kaps.ui.filter.VertraegeStalaAgrarFilter;
 import org.polymap.kaps.ui.filter.VertraegeStalaBaulandFilter;
 import org.polymap.kaps.ui.filter.VertragsdatenAgrarAgrarFilter;
 import org.polymap.kaps.ui.filter.VertragsdatenBaulandBRLFilter;
+import org.polymap.kaps.ui.filter.WohnungETWFilter;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -105,15 +109,24 @@ public class FilterProvider
                     result.add( new VertragsdatenAgrarAgrarFilter( layer ) );
                 }
                 else if (type.isAssignableFrom( WohnungComposite.class )) {
-                    result.add( new DefaultEntityFilter( layer, type, repo, "objektNummer", "objektFortfuehrung",
-                            "gebaeudeNummer", "gebaeudeFortfuehrung", "wohnungsNummer", "wohnungsFortfuehrung" ) );
+                    result.add( new DefaultEntityFilter<WohnungComposite>( layer, type, repo,
+                            new PropertyFilter<WohnungComposite>() {
+
+                                @SuppressWarnings("unchecked")
+                                @Override
+                                public Iterable getVisibleProperties( WohnungComposite template ) {
+                                    return Lists.newArrayList( template.objektNummer(), template.gebaeudeNummer(),
+                                            template.wohnungsNummer(), template.wohnungsFortfuehrung() );
+                                }
+                            } ) );
+                    result.add( new WohnungETWFilter( layer ) );
                 }
                 else if (type.isAssignableFrom( NutzungComposite.class )) {
                     result.add( new DefaultEntityFilter( layer, type, repo ) );
                 }
                 else if (type.isAssignableFrom( GebaeudeComposite.class )) {
-                    result.add( new DefaultEntityFilter( layer, type, repo, "objektNummer", "objektFortfuehrung",
-                            "gebaeudeNummer", "gebaeudeFortfuehrung", "gebaeudeArt", "baujahr" ) );
+                    result.add( new DefaultEntityFilter( layer, type, repo, "objektNummer", "gebaeudeNummer",
+                            "gebaeudeArt", "baujahr" ) );
                 }
 
                 else {

@@ -170,23 +170,13 @@ public class KapsRepository
     public void init( final Session session ) {
         try {
 
-            kapsService = new KapsService(
-                    new KaufvertragEntityProvider( this ),
-                    new RichtwertzoneEntityProvider( this ),
-                    // new SimpleEntityProvider<RichtwertzoneZeitraumComposite>(
-                    // this,
-                    // RichtwertzoneZeitraumComposite.class, new NameImpl(
-                    // KapsRepository.NAMESPACE,
-                    // "Richtwertzone - Gültigkeit" ) ),
-                    new SimpleEntityProvider<VertragsArtComposite>( this, VertragsArtComposite.class, new NameImpl(
-                            KapsRepository.NAMESPACE, VertragsArtComposite.NAME ) ),
+            kapsService = new KapsService( new KaufvertragEntityProvider( this ),
+                    new RichtwertzoneEntityProvider( this ), new SimpleEntityProvider<VertragsArtComposite>( this,
+                            VertragsArtComposite.class, new NameImpl( KapsRepository.NAMESPACE,
+                                    VertragsArtComposite.NAME ) ),
                     new SimpleEntityProvider<RichtwertzoneZeitraumComposite>( this,
                             RichtwertzoneZeitraumComposite.class, new NameImpl( KapsRepository.NAMESPACE,
-                                    RichtwertzoneZeitraumComposite.NAME ) ),
-                    new FlurstueckEntityProvider( this ),
-                    // new SimpleEntityProvider<StalaComposite>( this,
-                    // StalaComposite.class, new NameImpl(
-                    // KapsRepository.NAMESPACE, "Stala" ) ),
+                                    RichtwertzoneZeitraumComposite.NAME ) ), new FlurstueckEntityProvider( this ),
                     new SimpleEntityProvider<KaeuferKreisComposite>( this, KaeuferKreisComposite.class, new NameImpl(
                             KapsRepository.NAMESPACE, KaeuferKreisComposite.NAME ) ),
                     new SimpleEntityProvider<BodenRichtwertRichtlinieErgaenzungComposite>( this,
@@ -213,16 +203,9 @@ public class KapsRepository
                     new VertragsdatenBaulandEntityProvider( this ),
                     new SimpleEntityProvider<AusstattungBewertungComposite>( this, AusstattungBewertungComposite.class,
                             new NameImpl( KapsRepository.NAMESPACE, AusstattungBewertungComposite.NAME ) ),
-                    new VertragsdatenAgrarEntityProvider( this ),
-                    new SimpleEntityProvider<FlurComposite>( this, FlurComposite.class, new NameImpl(
-                            KapsRepository.NAMESPACE, FlurComposite.NAME ) ),
-                    new WohnungseigentumEntityProvider( this ),
-                    // new SimpleEntityProvider<WohnungseigentumComposite>( this,
-                    // WohnungseigentumComposite.class,
-                    // new NameImpl( KapsRepository.NAMESPACE,
-                    // WohnungseigentumComposite.NAME ) ),
-                    new SimpleEntityProvider<WohnungComposite>( this, WohnungComposite.class, new NameImpl(
-                            KapsRepository.NAMESPACE, WohnungComposite.NAME ) ),
+                    new VertragsdatenAgrarEntityProvider( this ), new SimpleEntityProvider<FlurComposite>( this,
+                            FlurComposite.class, new NameImpl( KapsRepository.NAMESPACE, FlurComposite.NAME ) ),
+                    new WohnungseigentumEntityProvider( this ), new WohnungEntityProvider( this ),
 
                     new SimpleEntityProvider<NHK2010AnbautenComposite>( this, NHK2010AnbautenComposite.class,
                             new NameImpl( KapsRepository.NAMESPACE, NHK2010AnbautenComposite.NAME ) ),

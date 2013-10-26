@@ -13,9 +13,7 @@
 package org.polymap.kaps.ui.filter;
 
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -43,25 +41,26 @@ import org.polymap.rhei.filter.IFilterEditorSite;
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.BodennutzungComposite;
 import org.polymap.kaps.model.data.FlurstueckComposite;
+import org.polymap.kaps.model.data.GebaeudeArtComposite;
 import org.polymap.kaps.model.data.GemarkungComposite;
 import org.polymap.kaps.model.data.GemeindeComposite;
 import org.polymap.kaps.model.data.NutzungComposite;
 import org.polymap.kaps.model.data.VertragComposite;
-import org.polymap.kaps.model.data.VertragsdatenAgrarComposite;
+import org.polymap.kaps.model.data.WohnungComposite;
 import org.polymap.kaps.ui.NotNullValidator;
 
 /**
  * 
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
-public class VertragsdatenAgrarAgrarFilter
-        extends KapsEntityFilter<VertragsdatenAgrarComposite> {
+public class WohnungETWFilter
+        extends KapsEntityFilter<WohnungComposite> {
 
-    private static Log log = LogFactory.getLog( VertragsdatenAgrarAgrarFilter.class );
+    private static Log log = LogFactory.getLog( WohnungETWFilter.class );
 
 
-    public VertragsdatenAgrarAgrarFilter( ILayer layer ) {
-        super( "__kaps--", layer, "nach Nutzung, Datum, Gemeinde...", null, 10000, VertragsdatenAgrarComposite.class );
+    public WohnungETWFilter( ILayer layer ) {
+        super( "__kaps--", layer, "nach Nutzung, Datum, Gemeinde...", null, 10000, WohnungComposite.class );
     }
 
 
@@ -91,10 +90,9 @@ public class VertragsdatenAgrarAgrarFilter
         ((FormData)formField.getLayoutData()).height = 200;
         ((FormData)formField.getLayoutData()).width = 100;
 
-        field = new SelectlistFormField( KapsRepository.instance().entitiesWithNames( BodennutzungComposite.class ) );
+        field = new SelectlistFormField( KapsRepository.instance().entitiesWithNames( GebaeudeArtComposite.class ) );
         field.setIsMultiple( true );
-        formField = site
-                .newFormField( result, "bodennutzung", BodennutzungComposite.class, field, null, "Bodennutzung" );
+        formField = site.newFormField( result, "gebaeudeArt", BodennutzungComposite.class, field, null, "Gebäudeart" );
         site.addStandardLayout( formField );
         ((FormData)formField.getLayoutData()).height = 200;
         ((FormData)formField.getLayoutData()).width = 100;
@@ -104,10 +102,10 @@ public class VertragsdatenAgrarAgrarFilter
 
 
     @Override
-    protected Query<VertragsdatenAgrarComposite> createQuery( IFilterEditorSite site ) {
+    protected Query<WohnungComposite> createQuery( IFilterEditorSite site ) {
 
         List<NutzungComposite> nutzungen = (List<NutzungComposite>)site.getFieldValue( "nutzung" );
-        List<BodennutzungComposite> bodennutzungen = (List<BodennutzungComposite>)site.getFieldValue( "bodennutzung" );
+        List<GebaeudeArtComposite> gebaeudearten = (List<GebaeudeArtComposite>)site.getFieldValue( "gebaeudeArt" );
         GemeindeComposite gemeinde = (GemeindeComposite)site.getFieldValue( "gemeinde" );
 
         Object[] vertragsDatum = (Object[])site.getFieldValue( "datum" );
@@ -129,7 +127,7 @@ public class VertragsdatenAgrarAgrarFilter
         }
 
         BooleanExpression fExpr = null;
-        VertragsdatenAgrarComposite template = QueryExpressions.templateFor( VertragsdatenAgrarComposite.class );
+        WohnungComposite template = QueryExpressions.templateFor( WohnungComposite.class );
 
         // if (nutzungen != null || gemeinde != null) {
         FlurstueckComposite flurTemplate = QueryExpressions.templateFor( FlurstueckComposite.class );
@@ -153,7 +151,6 @@ public class VertragsdatenAgrarAgrarFilter
             if (vExpr == null) {
                 vExpr = QueryExpressions.eq( flurTemplate.identity(), "unknown" );
             }
-
         }
 
         // gemeinde
@@ -191,6 +188,28 @@ public class VertragsdatenAgrarAgrarFilter
             }
         }
 
+        BooleanExpression gaExpr = null;
+        if (gebaeudearten != null) {
+            for (GebaeudeArtComposite art : gebaeudearten) {
+                BooleanExpression newExpr = QueryExpressions.eq( flurTemplate.gebaeudeArt(), art );
+                if (gaExpr == null) {
+                    gaExpr = newExpr;
+                }
+                else {
+                    gaExpr = QueryExpressions.or( gaExpr, newExpr );
+                }
+            }
+        }
+
+        if (nExpr != null) {
+            if (gaExpr != null) {
+                nExpr = QueryExpressions.and( nExpr, gaExpr );
+            }
+        }
+        else {
+            nExpr = gaExpr;
+        }
+
         if (nExpr != null) {
             if (vExpr != null) {
                 nExpr = QueryExpressions.and( nExpr, vExpr );
@@ -218,25 +237,17 @@ public class VertragsdatenAgrarAgrarFilter
                             "Es wurden zu viele Ergebnisse gefunden. Bitte schränken Sie die Suche weiter ein." );
                 }
             } );
-            return KapsRepository.instance().findEntities( VertragsdatenAgrarComposite.class,
+            return KapsRepository.instance().findEntities( WohnungComposite.class,
                     QueryExpressions.eq( template.identity(), "unknown" ), 0, -1 );
         }
-        Set<Integer> eingangsNummern = new HashSet<Integer>();
         for (FlurstueckComposite fc : flurstuecke) {
             // mehrere Flurstücke können einem Vertrag angehören
-            VertragComposite vertrag = fc.vertrag().get();
-            if (vertrag != null) {
-                Integer eingangsNummer = vertrag.eingangsNr().get();
-                if (!eingangsNummern.contains( eingangsNummer )) {
-                    BooleanExpression newExpr = QueryExpressions.eq( template.vertrag(), vertrag );
-                    if (fExpr == null) {
-                        fExpr = newExpr;
-                    }
-                    else {
-                        fExpr = QueryExpressions.or( fExpr, newExpr );
-                    }
-                    eingangsNummern.add( eingangsNummer );
-                }
+            BooleanExpression newExpr = QueryExpressions.eq( template.flurstueck(), fc );
+            if (fExpr == null) {
+                fExpr = newExpr;
+            }
+            else {
+                fExpr = QueryExpressions.or( fExpr, newExpr );
             }
         }
         // wenn keine verträge gefunden, ungültige Query erzeugen, damit auch keine
@@ -245,28 +256,7 @@ public class VertragsdatenAgrarAgrarFilter
             fExpr = QueryExpressions.eq( template.identity(), "unknown" );
         }
         // }
-        BooleanExpression bExpr = null;
-        if (bodennutzungen != null) {
-            for (BodennutzungComposite nutzung : bodennutzungen) {
-                BooleanExpression newExpr = QueryExpressions.or(
-                        QueryExpressions.eq( template.bodennutzung1(), nutzung ),
-                        QueryExpressions.eq( template.bodennutzung2(), nutzung ),
-                        QueryExpressions.eq( template.bodennutzung3(), nutzung ),
-                        QueryExpressions.eq( template.bodennutzung4(), nutzung ),
-                        QueryExpressions.eq( template.bodennutzung5(), nutzung ),
-                        QueryExpressions.eq( template.bodennutzung6(), nutzung ) );
-                if (bExpr == null) {
-                    bExpr = newExpr;
-                }
-                else {
-                    bExpr = QueryExpressions.or( bExpr, newExpr );
-                }
-            }
-        }
-        if (bExpr != null) {
-            fExpr = QueryExpressions.and( bExpr, fExpr );
-        }
 
-        return KapsRepository.instance().findEntities( VertragsdatenAgrarComposite.class, fExpr, 0, getMaxResults() );
+        return KapsRepository.instance().findEntities( WohnungComposite.class, fExpr, 0, getMaxResults() );
     }
 }

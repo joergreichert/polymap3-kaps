@@ -160,7 +160,7 @@ public class WohnungGrunddatenFormEditorPage
 
 
     private void updateKaufpreis() {
-        VertragComposite vertrag = WohnungComposite.Mixin.vertragFor( wohnung );
+        VertragComposite vertrag = wohnung.vertrag().get();
         Double kaufpreis = null;
         if (vertrag != null) {
             if (vertrag.erweiterteVertragsdaten().get() != null) {

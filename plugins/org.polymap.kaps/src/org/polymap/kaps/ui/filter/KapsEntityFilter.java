@@ -17,22 +17,25 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Set;
 
+import org.qi4j.api.query.Query;
+
 import org.polymap.core.model.Entity;
 import org.polymap.core.project.ILayer;
 
 import org.polymap.rhei.data.entityfeature.AbstractEntityFilter;
+import org.polymap.rhei.filter.IFilterEditorSite;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
-public abstract class KapsEntityFilter
+public abstract class KapsEntityFilter<T extends Entity>
         extends AbstractEntityFilter {
 
     private Calendar cal = new GregorianCalendar();
 
 
     public KapsEntityFilter( String id, ILayer layer, String label, Set<String> keywords, int maxResults,
-            Class<? extends Entity> entityClass ) {
+            Class<T> entityClass ) {
         super( id, layer, label, keywords, maxResults, entityClass );
     }
 
@@ -62,4 +65,7 @@ public abstract class KapsEntityFilter
         return date;
     }
 
+
+    @Override
+    protected abstract Query<T> createQuery( IFilterEditorSite site );
 }

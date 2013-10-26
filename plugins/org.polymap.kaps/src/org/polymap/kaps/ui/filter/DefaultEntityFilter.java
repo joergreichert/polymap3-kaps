@@ -54,8 +54,14 @@ import org.polymap.kaps.ui.MyNumberValidator;
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
-public class DefaultEntityFilter
+public class DefaultEntityFilter<T extends Entity>
         extends AbstractEntityFilter {
+
+    public static abstract class PropertyFilter<T> {
+
+        @SuppressWarnings("rawtypes")
+        public abstract Iterable<org.qi4j.api.property.Property> getVisibleProperties( T template );
+    }
 
     private static Log         log = LogFactory.getLog( DefaultEntityFilter.class );
 
@@ -63,28 +69,30 @@ public class DefaultEntityFilter
 
     private final List<String> propertyNames;
 
-
-//    public <T extends Entity> DefaultEntityFilter( ILayer layer, Class<T> type, QiModule module ) {
-//        super( "__kaps--", layer, "Standard...", null, 10000, type );
-//        this.module = module;
-//        this.propertyNames = new ArrayList();
-//        EntityType<?> entityType = module.entityType( entityClass );
-//        for (Property property : entityType.getProperties()) {
-//            propertyNames.add( property.getName() );
-//        }
-//        // Collections.sort( this.propertyNames );
-//    }
+    private final Class<T>     type;
 
 
-    public <T extends Entity> DefaultEntityFilter( ILayer layer, Class<T> type, QiModule module,
-            String... properties ) {
+    // public <T extends Entity> DefaultEntityFilter( ILayer layer, Class<T> type,
+    // QiModule module ) {
+    // super( "__kaps--", layer, "Standard...", null, 10000, type );
+    // this.module = module;
+    // this.propertyNames = new ArrayList();
+    // EntityType<?> entityType = module.entityType( entityClass );
+    // for (Property property : entityType.getProperties()) {
+    // propertyNames.add( property.getName() );
+    // }
+    // // Collections.sort( this.propertyNames );
+    // }
+
+    public DefaultEntityFilter( ILayer layer, Class<T> type, QiModule module, String... properties ) {
         super( "__kaps--", layer, "Standard...", null, 10000, type );
+        this.type = type;
         this.module = module;
 
         this.propertyNames = new ArrayList<String>();
 
         if (properties.length == 0) {
-            EntityType<?> entityType = module.entityType( entityClass );
+            EntityType<?> entityType = module.entityType( type );
             for (Property property : entityType.getProperties()) {
                 propertyNames.add( property.getName() );
             }
@@ -92,6 +100,29 @@ public class DefaultEntityFilter
         else {
             for (String name : properties) {
                 this.propertyNames.add( name );
+            }
+        }
+    }
+
+
+    public DefaultEntityFilter( ILayer layer, Class<T> type, QiModule module, PropertyFilter filter ) {
+        super( "__kaps--", layer, "Standard...", null, 10000, type );
+        this.type = type;
+        this.module = module;
+
+        this.propertyNames = new ArrayList<String>();
+
+        if (filter == null) {
+            EntityType<?> entityType = module.entityType( type );
+            for (Property property : entityType.getProperties()) {
+                propertyNames.add( property.getName() );
+            }
+        }
+        else {
+            ;
+            for (org.qi4j.api.property.Property prop : (Iterable<org.qi4j.api.property.Property>)filter
+                    .getVisibleProperties( QueryExpressions.templateFor( type ) )) {
+                this.propertyNames.add( prop.qualifiedName().name() );
             }
         }
     }
@@ -169,7 +200,7 @@ public class DefaultEntityFilter
 
 
     @Override
-    protected Query<? extends Entity> createQuery( IFilterEditorSite site ) {
+    protected Query<T> createQuery( IFilterEditorSite site ) {
         try {
 
             BooleanExpression expr = null;
@@ -206,7 +237,7 @@ public class DefaultEntityFilter
                     }
                 }
             }
-            return module.findEntities( entityClass, expr, 0, getMaxResults() );
+            return module.findEntities( type, expr, 0, getMaxResults() );
         }
         catch (Exception e) {
             throw new RuntimeException( e );

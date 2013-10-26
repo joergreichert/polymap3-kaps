@@ -35,6 +35,13 @@
    <extension
          point="org.polymap.core.data.featureOperations">
       <featureOperation
+            class="org.polymap.kaps.exporter.WohnungAlsETWExporter"
+            icon="icons/exportas.gif"
+            id="org.polymap.kaps.exporter.WohnungAlsETWExporter"
+            label="Export Statistik ETW"
+            tooltip="Export Statistik ETW">
+      </featureOperation>
+      <featureOperation
             class="org.polymap.kaps.exporter.VertragsdatenBaulandAlsBRLExporter"
             icon="icons/exportas.gif"
             id="org.polymap.kaps.exporter.VertragsdatenBaulandAlsBRLExporter"
