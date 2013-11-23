@@ -25,6 +25,8 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
@@ -86,9 +88,11 @@ public class VertragStaLaBaulandExporter
     // 61-62 Erwerber STALA 10
     // 63 Verwandschaftsverhältnis 1
     // 64-80 leer
-    private static Log          log       = LogFactory.getLog( VertragStaLaBaulandExporter.class );
+    private static Log          log        = LogFactory.getLog( VertragStaLaBaulandExporter.class );
 
-    private final static String DELIMITER = ";";
+    protected static DateFormat fileFormat = new SimpleDateFormat( "yyyy_MM_dd_HH_mm_ss" );
+
+    private final static String DELIMITER  = "";
 
 
     @Override
@@ -111,7 +115,7 @@ public class VertragStaLaBaulandExporter
 
         final Date now = new Date();
 
-        final File f = File.createTempFile( "StatLandesamt_Bauland", ".csv" );
+        final File f = File.createTempFile( "StatLandesamt_Bauland", ".txt" );
         f.deleteOnExit();
         BufferedWriter out = new BufferedWriter( new FileWriter( f ) );
 
@@ -178,12 +182,12 @@ public class VertragStaLaBaulandExporter
                     String url = DownloadServiceHandler.registerContent( new ContentProvider() {
 
                         public String getContentType() {
-                            return "text/csv; charset=ISO-8859-1";
+                            return "text/plain; charset=ISO-8859-1";
                         }
 
 
                         public String getFilename() {
-                            return "StatLandesamt_Bauland.csv";
+                            return "StatLandesamt_Bauland_" + fileFormat.format( new Date() ) + ".txt";
                         }
 
 

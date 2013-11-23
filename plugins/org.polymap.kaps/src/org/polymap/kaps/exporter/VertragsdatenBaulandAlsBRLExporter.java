@@ -34,7 +34,7 @@ public class VertragsdatenBaulandAlsBRLExporter
         extends AbstractExcelExporter<VertragsdatenBaulandComposite> {
 
     public VertragsdatenBaulandAlsBRLExporter() {
-        super( VertragsdatenBaulandComposite.class, VertragsdatenBaulandComposite.NAME, "statistik-brl", "Verträge" );
+        super( VertragsdatenBaulandComposite.class, VertragsdatenBaulandComposite.NAME, "statistik_brl", "Verträge" );
     }
 
 

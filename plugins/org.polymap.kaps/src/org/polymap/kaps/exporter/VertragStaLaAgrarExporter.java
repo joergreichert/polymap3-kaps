@@ -25,6 +25,8 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
@@ -97,9 +99,11 @@ public class VertragStaLaAgrarExporter
     // leer
     // Bemerkung StaLa siehe Reiter Weiteres
 
-    private static Log          log       = LogFactory.getLog( VertragStaLaAgrarExporter.class );
+    private static Log          log        = LogFactory.getLog( VertragStaLaAgrarExporter.class );
 
-    private final static String DELIMITER = ";";
+    protected static DateFormat fileFormat = new SimpleDateFormat( "yyyy_MM_dd_HH_mm_ss" );
+
+    private final static String DELIMITER  = ";";
 
 
     @Override
@@ -192,7 +196,7 @@ public class VertragStaLaAgrarExporter
 
 
                         public String getFilename() {
-                            return "StatLandesamt_Agrar.csv";
+                            return "StatLandesamt_Agrar_" + fileFormat.format( new Date() ) + ".csv";
                         }
 
 

@@ -92,6 +92,8 @@ public class RichtwertzoneAsBorisExporter
 
     private static DateFormat   dateFormat      = new SimpleDateFormat( "dd.MM.yyyy" );
 
+    protected static DateFormat fileFormat      = new SimpleDateFormat( "yyyy_MM_dd_HH_mm_ss" );
+
 
     @Override
     public boolean init( IFeatureOperationContext ctx ) {
@@ -141,7 +143,7 @@ public class RichtwertzoneAsBorisExporter
 
 
                     public String getFilename() {
-                        return "boris-export.csv";
+                        return "boris-export_" + fileFormat.format( new Date() ) + ".csv";
                     }
 
 

@@ -180,6 +180,8 @@ public abstract class AbstractExcelExporter<T extends Entity>
 
     protected static DateFormat   dateFormat      = new SimpleDateFormat( "dd.MM.yyyy" );
 
+    protected static DateFormat   fileFormat      = new SimpleDateFormat( "yyyy_MM_dd_HH_mm_ss" );
+
     private final String          typename;
 
     private final Class<T>        type;
@@ -192,7 +194,7 @@ public abstract class AbstractExcelExporter<T extends Entity>
     protected AbstractExcelExporter( Class<T> type, String typename, String filename, String messagename ) {
         this.type = type;
         this.typename = typename;
-        this.filename = filename;
+        this.filename = filename + "_" + fileFormat.format( new Date() );
         this.messagename = messagename;
     }
 
@@ -383,5 +385,10 @@ public abstract class AbstractExcelExporter<T extends Entity>
 
     protected String error( VertragComposite vertrag, String msg ) {
         return EingangsNummerFormatter.format( vertrag.eingangsNr().get() ) + ": " + msg;
+    }
+
+
+    public static void main( String[] args ) {
+        System.out.println( fileFormat.format( new Date() ) );
     }
 }

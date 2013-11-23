@@ -105,6 +105,8 @@ public class VertragStaBuExporter
 
     private static DateFormat   timeFormat      = new SimpleDateFormat( "h24ssmm" );
 
+    protected static DateFormat fileFormat      = new SimpleDateFormat( "yyyy_MM_dd_HH_mm_ss" );
+
 
     @Override
     public boolean init( IFeatureOperationContext ctx ) {
@@ -153,7 +155,7 @@ public class VertragStaBuExporter
 
 
                     public String getFilename() {
-                        return "StatBundesamt_PreisindizesWohnimmobilien.xml";
+                        return "StatBundesamt_PreisindizesWohnimmobilien_" + fileFormat.format( new Date() ) + ".xml";
                     }
 
 

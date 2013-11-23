@@ -32,7 +32,7 @@ public class VertragsdatenAgrarAlsAgrarExporter
         extends AbstractExcelExporter<VertragsdatenAgrarComposite> {
 
     public VertragsdatenAgrarAlsAgrarExporter() {
-        super( VertragsdatenAgrarComposite.class, VertragsdatenAgrarComposite.NAME, "statistik-agrar", "Verträge" );
+        super( VertragsdatenAgrarComposite.class, VertragsdatenAgrarComposite.NAME, "statistik_agrar", "Verträge" );
     }
 
 

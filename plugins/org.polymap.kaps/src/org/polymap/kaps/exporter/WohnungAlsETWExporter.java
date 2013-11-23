@@ -30,7 +30,7 @@ public class WohnungAlsETWExporter
         extends AbstractExcelExporter<WohnungComposite> {
 
     public WohnungAlsETWExporter() {
-        super( WohnungComposite.class, WohnungComposite.NAME, "statistik-etw", "Verträge" );
+        super( WohnungComposite.class, WohnungComposite.NAME, "statistik_etw", "Verträge" );
     }
 
 
