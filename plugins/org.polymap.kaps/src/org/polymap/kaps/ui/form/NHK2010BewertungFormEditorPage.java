@@ -18,6 +18,10 @@ import java.util.GregorianCalendar;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.text.DecimalFormat;
+
 import org.geotools.data.FeatureStore;
 import org.opengis.feature.Feature;
 import org.opengis.feature.type.PropertyDescriptor;
@@ -774,10 +778,12 @@ public class NHK2010BewertungFormEditorPage
                                 || (ev.getNewValue() != null && !ev.getNewValue().equals( selectedGebaeudeStandard ))) {
                             selectedGebaeudeStandard = ev.getNewValue();
                             if (selectedGebaeudeStandard != null) {
-                                pageSite.setFieldValue(
-                                        prefix + "nhk",
-                                        NumberFormatter.getFormatter( 2 ).format(
-                                                selectedGebaeudeArt.calculateNHKFor( selectedGebaeudeStandard ) ) );
+                                Double value = selectedGebaeudeArt.calculateNHKFor( selectedGebaeudeStandard );
+                                if (value != null) {
+                                    value = Math.floor( value + 0.55d );
+                                }
+                                pageSite.setFieldValue( prefix + "nhk", NumberFormatter.getFormatter( 2 )
+                                        .format( value ) );
                             }
                             else {
                                 pageSite.setFieldValue( prefix + "nhk", null );
@@ -865,6 +871,9 @@ public class NHK2010BewertungFormEditorPage
                 }
                 if (nhkKorrigiert != null && faktorZweifamilienhaus != null) {
                     nhkKorrigiert *= faktorZweifamilienhaus;
+                }
+                if (nhkKorrigiert != null) {
+                    nhkKorrigiert = Math.floor( nhkKorrigiert + 0.55d );
                 }
                 pageSite.setFieldValue( getPropertyName( nameTemplate.nhkKorrigiert() ),
                         nhkKorrigiert != null ? NumberFormatter.getFormatter( 2 ).format( nhkKorrigiert ) : null );
@@ -1692,5 +1701,22 @@ public class NHK2010BewertungFormEditorPage
 
     private String getPropertyName( Property<?> property ) {
         return prefix + nameTemplate.toString();
+    }
+
+
+    public static void main( String[] args ) {
+        System.out.println( Math.floor( 9.5d + 0.5d ) );
+        System.out.println( Math.floor( 9.4d + 0.55d ) );
+        System.out.println( Math.floor( 9.49d + 0.55d ) );
+        System.out.println( Math.floor( 9.8d + 0.5d ) );
+        System.out.println( Math.round( 9.5d ) );
+        System.out.println( Math.round( 9.4d ) );
+        System.out.println( Math.round( (9.49d * 100) / 100 ) );
+        System.out.println( Math.round( 9.8d ) );
+        System.out.println( new DecimalFormat( "###" ).format( 9.49d ) );
+        BigDecimal bd = new BigDecimal( 9.49d );
+        bd = bd.round( MathContext.UNLIMITED );
+        System.out.println( bd.toString() );
+
     }
 }
