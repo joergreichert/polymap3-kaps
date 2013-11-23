@@ -146,6 +146,8 @@ public class NHK2010BewertungFormEditorPage
 
     private final FormEditor            formEditor;
 
+    private IFormFieldListener          gebaeudeStandardGNDListener;
+
 
     public NHK2010BewertungFormEditorPage( final FormEditor formEditor, Feature feature, FeatureStore featureStore ) {
         super( NHK2010BewertungGebaeudeComposite.class, NHK2010BewertungFormEditorPage.class.getName(), "NHK 2010",
@@ -1151,6 +1153,36 @@ public class NHK2010BewertungFormEditorPage
                                 } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
                 .setValidator( new MyNumberValidator( Double.class ) ).setLayoutData( two().top( lastLine ).create() )
                 .create();
+
+        pageSite.addFieldListener( gebaeudeStandardGNDListener = new IFormFieldListener() {
+
+            @Override
+            public void fieldChange( FormFieldEvent ev ) {
+                if (ev.getEventCode() == VALUE_CHANGE
+                        && ev.getFieldName().equalsIgnoreCase( prefix + "gebaeudeStandard" )) {
+                    String value = ev.getNewValue();
+                    String faktor = null;
+                    if (value != null) {
+                        if (value.startsWith( "1" )) {
+                            faktor = "60";
+                        }
+                        else if (value.startsWith( "2" )) {
+                            faktor = "65";
+                        }
+                        else if (value.startsWith( "3" )) {
+                            faktor = "70";
+                        }
+                        else if (value.startsWith( "4" )) {
+                            faktor = "75";
+                        }
+                        else if (value.startsWith( "5" )) {
+                            faktor = "80";
+                        }
+                    }
+                    pageSite.setFieldValue( getPropertyName( nameTemplate.gesamtNutzungsDauer() ), faktor );
+                }
+            }
+        } );
 
         pageSite.addFieldListener( gndListener = new IFormFieldListener() {
 

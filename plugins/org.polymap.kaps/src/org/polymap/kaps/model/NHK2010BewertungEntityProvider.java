@@ -25,17 +25,18 @@ import org.polymap.core.qi4j.QiModule;
 
 import org.polymap.rhei.data.entityfeature.EntitySourceProcessor;
 
-import org.polymap.kaps.model.data.WohnungComposite;
+import org.polymap.kaps.model.data.NHK2010BewertungComposite;
 import org.polymap.kaps.ui.form.EingangsNummerFormatter;
 
-public class WohnungEntityProvider
-        extends KapsEntityProvider<WohnungComposite> {
+public class NHK2010BewertungEntityProvider
+        extends KapsEntityProvider<NHK2010BewertungComposite> {
 
     private static final Log log = LogFactory.getLog( EntitySourceProcessor.class );
 
 
-    public WohnungEntityProvider( QiModule repo ) {
-        super( repo, WohnungComposite.class, new NameImpl( KapsRepository.NAMESPACE, WohnungComposite.NAME ) );
+    public NHK2010BewertungEntityProvider( QiModule repo ) {
+        super( repo, NHK2010BewertungComposite.class, new NameImpl( KapsRepository.NAMESPACE,
+                NHK2010BewertungComposite.NAME ) );
     }
 
 
@@ -46,26 +47,19 @@ public class WohnungEntityProvider
         // Spaltentyp ändern
         SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
         builder.init( (SimpleFeatureType)type );
+        // builder.remove( "vertrag" );
         builder.add( "eingangsNr", String.class );
         type = builder.buildFeatureType();
 
-        // WohnungComposite template = QueryExpressions.templateFor(
-        // WohnungComposite.class );
         // aussortieren für die Tabelle
-        SimpleFeatureType filtered = SimpleFeatureTypeBuilder.retype( (SimpleFeatureType)type, new String[] {
-                "eingangsNr", "objektNummer", "gebaeudeNummer", "wohnungsNummer", "wohnungsFortfuehrung"
-
-        // template.objektNummer().qualifiedName().name(),
-        // template.gebaeudeNummer().qualifiedName().name(),
-        // template.wohnungsNummer().qualifiedName().name(),
-        // template.wohnungsFortfuehrung().qualifiedName().name()
-                } );
+        SimpleFeatureType filtered = SimpleFeatureTypeBuilder.retype( (SimpleFeatureType)type,
+                new String[] { "eingangsNr" } );
         return filtered;
     }
 
 
     @Override
-    public Feature buildFeature( WohnungComposite entity, Feature feature, FeatureType schema ) {
+    public Feature buildFeature( NHK2010BewertungComposite entity, Feature feature, FeatureType schema ) {
         super.buildFeature( entity, feature, schema );
 
         // formatieren

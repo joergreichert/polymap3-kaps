@@ -20,8 +20,6 @@ import net.refractions.udig.catalog.IGeoResource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.google.common.collect.Lists;
-
 import org.polymap.core.project.ILayer;
 
 import org.polymap.rhei.data.entityfeature.EntityProvider;
@@ -40,7 +38,6 @@ import org.polymap.kaps.model.data.VertragsdatenAgrarComposite;
 import org.polymap.kaps.model.data.VertragsdatenBaulandComposite;
 import org.polymap.kaps.model.data.WohnungComposite;
 import org.polymap.kaps.ui.filter.DefaultEntityFilter;
-import org.polymap.kaps.ui.filter.DefaultEntityFilter.PropertyFilter;
 import org.polymap.kaps.ui.filter.EinzelneVertragsdatenAgrarFilter;
 import org.polymap.kaps.ui.filter.EinzelneVertragsdatenBaulandFilter;
 import org.polymap.kaps.ui.filter.EinzelnerVertragFilter;
@@ -110,15 +107,18 @@ public class FilterProvider
                 }
                 else if (type.isAssignableFrom( WohnungComposite.class )) {
                     result.add( new DefaultEntityFilter<WohnungComposite>( layer, type, repo,
-                            new PropertyFilter<WohnungComposite>() {
-
-                                @SuppressWarnings("unchecked")
-                                @Override
-                                public Iterable getVisibleProperties( WohnungComposite template ) {
-                                    return Lists.newArrayList( template.objektNummer(), template.gebaeudeNummer(),
-                                            template.wohnungsNummer(), template.wohnungsFortfuehrung() );
-                                }
-                            } ) );
+                    // new PropertyFilter<WohnungComposite>() {
+                    //
+                    // @SuppressWarnings("unchecked")
+                    // @Override
+                    // public Iterable getVisibleProperties( WohnungComposite
+                    // template ) {
+                    // return Lists.newArrayList( template.objektNummer(),
+                    // template.gebaeudeNummer(),
+                    // template.wohnungsNummer(), template.wohnungsFortfuehrung() );
+                    // }
+                    // } ) );
+                            "objektNummer", "gebaeudeNummer", "wohnungsNummer", "wohnungsFortfuehrung" ) );
                     result.add( new WohnungETWFilter( layer ) );
                 }
                 else if (type.isAssignableFrom( NutzungComposite.class )) {
