@@ -38,6 +38,7 @@ import org.polymap.rhei.form.FormEditor;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
 import org.polymap.kaps.KapsPlugin;
+import org.polymap.kaps.MathUtil;
 import org.polymap.kaps.model.data.GebaeudeArtComposite;
 import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.ui.ActionButton;
@@ -224,7 +225,7 @@ public class WohnungVertragsdatenFormEditorPage
                         bereinigterVollpreis /= wfl;
                     }
                 }
-                return bereinigterVollpreis;
+                return MathUtil.round(bereinigterVollpreis);
             }
         } );
 

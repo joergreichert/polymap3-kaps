@@ -119,7 +119,6 @@ public class DefaultEntityFilter<T extends Entity>
             }
         }
         else {
-            ;
             for (org.qi4j.api.property.Property prop : (Iterable<org.qi4j.api.property.Property>)filter
                     .getVisibleProperties( QueryExpressions.templateFor( type ) )) {
                 this.propertyNames.add( prop.qualifiedName().name() );

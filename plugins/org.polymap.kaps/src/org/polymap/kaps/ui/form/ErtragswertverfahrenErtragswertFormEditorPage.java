@@ -41,6 +41,7 @@ import org.polymap.rhei.form.FormEditor;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
 import org.polymap.kaps.KapsPlugin;
+import org.polymap.kaps.MathUtil;
 import org.polymap.kaps.model.data.ErmittlungModernisierungsgradComposite;
 import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.VertragsdatenBaulandComposite;
@@ -199,7 +200,7 @@ public class ErtragswertverfahrenErtragswertFormEditorPage
                     }
                     result = anteil / 100 * zins;
                 }
-                return result;
+                return MathUtil.round(result);
             }
         } );
 
@@ -215,9 +216,9 @@ public class ErtragswertverfahrenErtragswertFormEditorPage
                 Double bwant = values.get( vb.bodenwertAnteilLiegenschaftsZinsBetrag() );
                 Double jahresReinErtrag = values.get( vb.jahresReinErtrag() );
                 if (jahresReinErtrag != null && bwant != null) {
-                    return jahresReinErtrag - bwant;
+                    jahresReinErtrag -= bwant;
                 }
-                return jahresReinErtrag;
+                return MathUtil.round(jahresReinErtrag);
             }
         } );
 
@@ -318,7 +319,7 @@ public class ErtragswertverfahrenErtragswertFormEditorPage
         lastLine = newLine;
         newLine = createLabel( client, "Ertragswert der baulichen Anlagen", one().top( lastLine, 30 ), SWT.RIGHT );
         createPreisField( vb.ertragswertDerBaulichenAnlagen(), three().top( lastLine, 30 ), client, false );
-        site.addFieldListener( ertragsWertBauListener = new FieldMultiplication( site, 2, vb.vervielvaeltiger(), vb
+        site.addFieldListener( ertragsWertBauListener = new FieldMultiplication( site, 2, true, vb.vervielvaeltiger(), vb
                 .anteilDerBaulichenAnlagenAmJahresreinertrag(), vb.ertragswertDerBaulichenAnlagen() ) );
 
         lastLine = newLine;

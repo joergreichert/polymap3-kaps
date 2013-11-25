@@ -23,6 +23,7 @@ import java.math.MathContext;
 import java.text.DecimalFormat;
 
 import org.geotools.data.FeatureStore;
+import org.h2.util.MathUtils;
 import org.opengis.feature.Feature;
 import org.opengis.feature.type.PropertyDescriptor;
 
@@ -66,6 +67,7 @@ import org.polymap.rhei.form.FormEditor;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
 import org.polymap.kaps.KapsPlugin;
+import org.polymap.kaps.MathUtil;
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.NHK2010GebaeudeArtProvider;
 import org.polymap.kaps.model.data.ErmittlungModernisierungsgradComposite;
@@ -694,7 +696,7 @@ public class NHK2010BewertungFormEditorPage
             private void calculateFaktor() {
                 Double faktor = null;
                 if (bruttoGrundFlaeche != null && anzahlWohnungen != null && anzahlWohnungen != 0.0d) {
-                    Double wohnungsflaeche = bruttoGrundFlaeche / anzahlWohnungen;
+                    Double wohnungsflaeche = MathUtil.round( bruttoGrundFlaeche / anzahlWohnungen );
                     if (wohnungsflaeche <= 35.0d) {
                         faktor = 1.1d;
                     }
@@ -778,10 +780,7 @@ public class NHK2010BewertungFormEditorPage
                                 || (ev.getNewValue() != null && !ev.getNewValue().equals( selectedGebaeudeStandard ))) {
                             selectedGebaeudeStandard = ev.getNewValue();
                             if (selectedGebaeudeStandard != null) {
-                                Double value = selectedGebaeudeArt.calculateNHKFor( selectedGebaeudeStandard );
-                                if (value != null) {
-                                    value = Math.floor( value + 0.55d );
-                                }
+                                Double value = MathUtil.round(selectedGebaeudeArt.calculateNHKFor( selectedGebaeudeStandard ));
                                 pageSite.setFieldValue( prefix + "nhk", NumberFormatter.getFormatter( 2 )
                                         .format( value ) );
                             }
@@ -872,11 +871,8 @@ public class NHK2010BewertungFormEditorPage
                 if (nhkKorrigiert != null && faktorZweifamilienhaus != null) {
                     nhkKorrigiert *= faktorZweifamilienhaus;
                 }
-                if (nhkKorrigiert != null) {
-                    nhkKorrigiert = Math.floor( nhkKorrigiert + 0.55d );
-                }
                 pageSite.setFieldValue( getPropertyName( nameTemplate.nhkKorrigiert() ),
-                        nhkKorrigiert != null ? NumberFormatter.getFormatter( 2 ).format( nhkKorrigiert ) : null );
+                        nhkKorrigiert != null ? NumberFormatter.getFormatter( 2 ).format( MathUtil.round( nhkKorrigiert) ) : null );
             }
         } );
 
@@ -1487,7 +1483,7 @@ public class NHK2010BewertungFormEditorPage
                     result = neuWert / 100 * (100 - altersWertMinderung);
                 }
                 pageSite.setFieldValue( getPropertyName( nameTemplate.zeitwertRnd() ), result != null ? NumberFormatter
-                        .getFormatter( 2 ).format( result ) : null );
+                        .getFormatter( 2 ).format( MathUtil.round( result) ) : null );
             }
 
         } );
@@ -1541,7 +1537,7 @@ public class NHK2010BewertungFormEditorPage
                 }
                 if (result != null) {
                     pageSite.setFieldValue( getPropertyName( nameTemplate.normalHerstellungsWert() ),
-                            result != null ? NumberFormatter.getFormatter( 2 ).format( result ) : null );
+                            result != null ? NumberFormatter.getFormatter( 2 ).format( MathUtil.round( result) ) : null );
                 }
             }
 
@@ -1628,7 +1624,7 @@ public class NHK2010BewertungFormEditorPage
                 }
                 if (result != null) {
                     pageSite.setFieldValue( getPropertyName( nameTemplate.gebaeudeZeitWert() ),
-                            result != null ? NumberFormatter.getFormatter( 2 ).format( result ) : null );
+                            result != null ? NumberFormatter.getFormatter( 2 ).format( MathUtil.round( result )) : null );
                 }
             }
 

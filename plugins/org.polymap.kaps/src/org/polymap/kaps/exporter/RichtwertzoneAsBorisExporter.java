@@ -116,7 +116,7 @@ public class RichtwertzoneAsBorisExporter
 
         final Date now = new Date();
 
-        final File f = File.createTempFile( "polymap-boris-export-", ".csv" );
+        final File f = File.createTempFile( "polymap_boris_export_", ".csv" );
         f.deleteOnExit();
 
         OutputStream out = new BufferedOutputStream( new FileOutputStream( f ) );
@@ -143,7 +143,7 @@ public class RichtwertzoneAsBorisExporter
 
 
                     public String getFilename() {
-                        return "boris-export_" + fileFormat.format( new Date() ) + ".csv";
+                        return "boris_export_" + fileFormat.format( new Date() ) + ".csv";
                     }
 
 

@@ -21,6 +21,8 @@ import org.polymap.rhei.field.FormFieldEvent;
 import org.polymap.rhei.field.IFormFieldListener;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
+import org.polymap.kaps.MathUtil;
+
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
@@ -43,11 +45,21 @@ public class FieldMultiplication
 
     private final int                 fractionDigits;
 
+    private final boolean             roundUp;
+
 
     public FieldMultiplication( IFormEditorPageSite site, int fractionDigits, final Property<Double> factor1,
             final Property<Double> factor2, Property<Double> result ) {
+        this( site, fractionDigits, false, factor1, factor2, result );
+
+    }
+
+
+    public FieldMultiplication( IFormEditorPageSite site, int fractionDigits, final boolean roundUp,
+            final Property<Double> factor1, final Property<Double> factor2, Property<Double> result ) {
         this.site = site;
         this.fractionDigits = fractionDigits;
+        this.roundUp = roundUp;
         this.factor1 = factor1;
         this.factor2 = factor2;
         this.result = result;
@@ -86,6 +98,9 @@ public class FieldMultiplication
         Double f2 = factor2Value == null ? factor2.get() : factor2Value;
 
         Double resultValue = (f1 == null ? 0 : f1) * (f2 == null ? 0 : f2);
+        if (roundUp) {
+            resultValue = MathUtil.round( resultValue );
+        }
         site.setFieldValue( result.qualifiedName().name(),
                 NumberFormatter.getFormatter( fractionDigits ).format( resultValue ) );
     }
