@@ -26,6 +26,7 @@ import org.polymap.core.qi4j.QiModule;
 import org.polymap.rhei.data.entityfeature.EntitySourceProcessor;
 
 import org.polymap.kaps.model.data.VertragsdatenBaulandComposite;
+import org.polymap.kaps.model.data.WohnungseigentumComposite;
 import org.polymap.kaps.ui.form.EingangsNummerFormatter;
 
 public class VertragsdatenBaulandEntityProvider
@@ -69,5 +70,18 @@ public class VertragsdatenBaulandEntityProvider
                     EingangsNummerFormatter.format( entity.vertrag().get().eingangsNr().get().toString() ) );
         }
         return feature;
+    }
+    
+    @Override
+    public boolean modifyFeature( VertragsdatenBaulandComposite entity, String propName, Object value )
+            throws Exception {
+        // set defaults
+        if (value == null) {
+            if (entity.verkehrswertFaktor().qualifiedName().name().equals( propName )) {
+                entity.verkehrswertFaktor().set( Double.valueOf( 1.0d ) );
+                return true;
+            }
+        }
+        return super.modifyFeature( entity, propName, value );
     }
 }

@@ -650,6 +650,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                             // bauland.flurstueck().set( flurstueck );
                             bauland.vertrag().set( kaufvertrag );
                             bauland.richtwertZone().set( richtwertZone );
+                            bauland.verkehrswertFaktor().set( Double.valueOf( 1.0d ) );
                             // richtwertzonezeitraum auch schon setzen nach
                             // vertragsdatum
                             bauland.richtwertZoneG().set(
@@ -876,8 +877,8 @@ public class KaufvertragFlurstueckeFormEditorPage
         pageSite.setFieldValue( prefix + "nutzung", toCopy.nutzung().get() );
         pageSite.setFieldValue( prefix + "gebaeudeArt", toCopy.gebaeudeArt().get() );
         pageSite.setFieldValue( prefix + "artDesBaugebiets", toCopy.artDesBaugebiets().get() );
-        pageSite.setFieldValue( prefix + "flaeche", toCopy.flaeche().get() != null ? NumberFormatter
-                .getFormatter( 2 ).format( toCopy.flaeche().get() ) : null );
+        pageSite.setFieldValue( prefix + "flaeche", toCopy.flaeche().get() != null ? NumberFormatter.getFormatter( 2 )
+                .format( toCopy.flaeche().get() ) : null );
         pageSite.setFieldValue(
                 prefix + "flaechenAnteilZaehler",
                 toCopy.flaechenAnteilZaehler().get() != null ? NumberFormatter.getFormatter( 1 ).format(
@@ -886,10 +887,8 @@ public class KaufvertragFlurstueckeFormEditorPage
                 prefix + "flaechenAnteilNenner",
                 toCopy.flaechenAnteilNenner().get() != null ? NumberFormatter.getFormatter( 1 ).format(
                         toCopy.flaechenAnteilNenner().get() ) : null );
-        pageSite.setFieldValue(
-                prefix + "verkaufteFlaeche",
-                toCopy.verkaufteFlaeche().get() != null ? NumberFormatter.getFormatter( 2 ).format(
-                        toCopy.verkaufteFlaeche().get() ) : null );
+        pageSite.setFieldValue( prefix + "verkaufteFlaeche", toCopy.verkaufteFlaeche().get() != null ? NumberFormatter
+                .getFormatter( 2 ).format( toCopy.verkaufteFlaeche().get() ) : null );
         pageSite.setFieldValue( prefix + "erbbaurecht", toCopy.erbbaurecht().get() );
         pageSite.setFieldValue( prefix + "belastung", toCopy.belastung().get() );
 
