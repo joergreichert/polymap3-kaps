@@ -368,6 +368,10 @@ public interface VertragComposite
                 VertragsdatenErweitertComposite vertragsdatenErweitertComposite = erweiterteVertragsdaten().get();
                 Double basisPreis = vertragsdatenErweitertComposite.basispreis().get();
                 Double kaufPreis = kaufpreis().get();
+                if (kaufPreis == null) {
+                    kaufPreis = new Double(0.0d);
+                    kaufpreis().set( kaufPreis );
+                }
                 if (basisPreis == null || basisPreis.doubleValue() == 0.0d
                         || basisPreis.doubleValue() != kaufPreis.doubleValue()) {
                     vertragsdatenErweitertComposite.basispreis().set( kaufPreis );
