@@ -152,7 +152,7 @@ public class KaufvertragFlurstueckeFormEditorPage
         site.setFormTitle( formattedTitle( "Vertrag", kaufvertrag.eingangsNr().get(), getTitle() ) );
 
         Section tableSection = newSection( null, "Auswahl" );
-        createTableForm( (Composite)tableSection.getClient(), null, true, false );
+        createTableForm( (Composite)tableSection.getClient(), null, true, false, true );
 
         Composite schildForm = createFlurstueckForm( tableSection );
 
@@ -260,48 +260,7 @@ public class KaufvertragFlurstueckeFormEditorPage
             protected void adopt( FlurstueckComposite toAdopt )
                     throws Exception {
                 assert toAdopt != null;
-                FlurstueckComposite current = selectedComposite.get();
-                // separate behandeln, da die 3 felder von zusätzlichen reloads von
-                // gemakrung und nutzung
-                // wieder zurückgesetzt werden
-                selectedStrasse = toAdopt.strasse().get();
-                selectedRichtwertzone = toAdopt.richtwertZone().get();
-                selectedArtDesBaugebietes = toAdopt.artDesBaugebiets().get();
-
-                pageSite.setFieldValue( prefix + "gemarkung", toAdopt.gemarkung().get() );
-                // current.gemarkung().set( toAdopt.gemarkung().get() );
-                pageSite.setFieldValue( prefix + "flur", toAdopt.flur().get() );
-                pageSite.setFieldValue( prefix + "hauptNummer", String.valueOf( toAdopt.hauptNummer().get() ) );
-                pageSite.setFieldValue( prefix + "unterNummer", toAdopt.unterNummer().get() );
-                pageSite.setFieldValue( prefix + "strasse", toAdopt.strasse().get() );
-                pageSite.setFieldValue( prefix + "hausnummer", toAdopt.hausnummer().get() );
-                pageSite.setFieldValue( prefix + "hausnummerZusatz", toAdopt.hausnummerZusatz().get() );
-                pageSite.setFieldValue( prefix + "richtwertZone", toAdopt.richtwertZone().get() );
-                // pageSite.setFieldValue( prefix + "kartenBlatt",
-                // toAdopt.kartenBlatt().get() );
-                // pageSite.setFieldValue( prefix + "baublock",
-                // toAdopt.baublock().get() );
-                pageSite.setFieldValue( prefix + "nutzung", toAdopt.nutzung().get() );
-                pageSite.setFieldValue( prefix + "gebaeudeArt", toAdopt.gebaeudeArt().get() );
-                pageSite.setFieldValue( prefix + "artDesBaugebiets", toAdopt.artDesBaugebiets().get() );
-                pageSite.setFieldValue( prefix + "flaeche", toAdopt.flaeche().get() != null ? NumberFormatter
-                        .getFormatter( 2 ).format( toAdopt.flaeche().get() ) : null );
-                pageSite.setFieldValue(
-                        prefix + "flaechenAnteilZaehler",
-                        toAdopt.flaechenAnteilZaehler().get() != null ? NumberFormatter.getFormatter( 1 ).format(
-                                toAdopt.flaechenAnteilZaehler().get() ) : null );
-                pageSite.setFieldValue(
-                        prefix + "flaechenAnteilNenner",
-                        toAdopt.flaechenAnteilNenner().get() != null ? NumberFormatter.getFormatter( 1 ).format(
-                                toAdopt.flaechenAnteilNenner().get() ) : null );
-                pageSite.setFieldValue(
-                        prefix + "verkaufteFlaeche",
-                        toAdopt.verkaufteFlaeche().get() != null ? NumberFormatter.getFormatter( 2 ).format(
-                                toAdopt.verkaufteFlaeche().get() ) : null );
-                pageSite.setFieldValue( prefix + "erbbaurecht", toAdopt.erbbaurecht().get() );
-                pageSite.setFieldValue( prefix + "belastung", toAdopt.belastung().get() );
-
-                // refreshReloadables();
+                copyCompositeData( toAdopt );
             }
 
 
@@ -889,5 +848,51 @@ public class KaufvertragFlurstueckeFormEditorPage
     public void doSubmit( IProgressMonitor monitor )
             throws Exception {
         super.doSubmit( monitor );
+    }
+
+
+    @Override
+    protected void copyCompositeData( FlurstueckComposite toCopy ) {
+        // separate behandeln, da die 3 felder von zusätzlichen reloads von
+        // gemakrung und nutzung
+        // wieder zurückgesetzt werden
+        selectedStrasse = toCopy.strasse().get();
+        selectedRichtwertzone = toCopy.richtwertZone().get();
+        selectedArtDesBaugebietes = toCopy.artDesBaugebiets().get();
+
+        pageSite.setFieldValue( prefix + "gemarkung", toCopy.gemarkung().get() );
+        // current.gemarkung().set( toAdopt.gemarkung().get() );
+        pageSite.setFieldValue( prefix + "flur", toCopy.flur().get() );
+        pageSite.setFieldValue( prefix + "hauptNummer", String.valueOf( toCopy.hauptNummer().get() ) );
+        pageSite.setFieldValue( prefix + "unterNummer", toCopy.unterNummer().get() );
+        pageSite.setFieldValue( prefix + "strasse", toCopy.strasse().get() );
+        pageSite.setFieldValue( prefix + "hausnummer", toCopy.hausnummer().get() );
+        pageSite.setFieldValue( prefix + "hausnummerZusatz", toCopy.hausnummerZusatz().get() );
+        pageSite.setFieldValue( prefix + "richtwertZone", toCopy.richtwertZone().get() );
+        // pageSite.setFieldValue( prefix + "kartenBlatt",
+        // toAdopt.kartenBlatt().get() );
+        // pageSite.setFieldValue( prefix + "baublock",
+        // toAdopt.baublock().get() );
+        pageSite.setFieldValue( prefix + "nutzung", toCopy.nutzung().get() );
+        pageSite.setFieldValue( prefix + "gebaeudeArt", toCopy.gebaeudeArt().get() );
+        pageSite.setFieldValue( prefix + "artDesBaugebiets", toCopy.artDesBaugebiets().get() );
+        pageSite.setFieldValue( prefix + "flaeche", toCopy.flaeche().get() != null ? NumberFormatter
+                .getFormatter( 2 ).format( toCopy.flaeche().get() ) : null );
+        pageSite.setFieldValue(
+                prefix + "flaechenAnteilZaehler",
+                toCopy.flaechenAnteilZaehler().get() != null ? NumberFormatter.getFormatter( 1 ).format(
+                        toCopy.flaechenAnteilZaehler().get() ) : null );
+        pageSite.setFieldValue(
+                prefix + "flaechenAnteilNenner",
+                toCopy.flaechenAnteilNenner().get() != null ? NumberFormatter.getFormatter( 1 ).format(
+                        toCopy.flaechenAnteilNenner().get() ) : null );
+        pageSite.setFieldValue(
+                prefix + "verkaufteFlaeche",
+                toCopy.verkaufteFlaeche().get() != null ? NumberFormatter.getFormatter( 2 ).format(
+                        toCopy.verkaufteFlaeche().get() ) : null );
+        pageSite.setFieldValue( prefix + "erbbaurecht", toCopy.erbbaurecht().get() );
+        pageSite.setFieldValue( prefix + "belastung", toCopy.belastung().get() );
+
+        // refreshReloadables();
     }
 }

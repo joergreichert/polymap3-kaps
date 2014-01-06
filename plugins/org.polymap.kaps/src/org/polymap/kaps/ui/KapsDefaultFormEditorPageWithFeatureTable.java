@@ -45,6 +45,7 @@ import org.polymap.rhei.field.IFormField;
 import org.polymap.rhei.field.IFormFieldListener;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
+import org.polymap.kaps.model.data.FlurstueckComposite;
 import org.polymap.kaps.ui.NamedCompositesFeatureContentProvider.FeatureTableElement;
 
 /**
@@ -138,6 +139,12 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
 
 
     protected Composite createTableForm( Composite parent, Control top, boolean addAllowed, boolean deleteAllowed ) {
+        return createTableForm( parent, top, addAllowed, deleteAllowed, false );
+    }
+
+
+    protected Composite createTableForm( Composite parent, Control top, boolean addAllowed, boolean deleteAllowed,
+            boolean copyAllowed ) {
         int TOPSPACING = 20;
         viewer = new FeatureTableViewer( parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL );
         viewer.getTable().setLayoutData(
@@ -182,6 +189,36 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
                     .height( 30 ).create() );
         }
 
+        ActionButton copyBtn = null;
+        if (copyAllowed) {
+            CopyCompositeAction<T> copyAction = new CopyCompositeAction<T>() {
+
+                protected void execute()
+                        throws Exception {
+
+                    if (selectedComposite.get() != null) {
+                        T toCopy = selectedComposite.get();
+                        dirty = true;
+                        T newComposite = createNewComposite();
+                        selectedComposite.set( newComposite );
+                        model.add( 0, newComposite );
+
+                        doLoad( new NullProgressMonitor() );
+                        viewer.getTable().deselectAll();
+                        viewer.getTable().select(
+                                ((NamedCompositesFeatureContentProvider)viewer.getContentProvider())
+                                        .getIndicesForElements( newComposite ) );
+
+                        copyCompositeData( toCopy );
+                    }
+                }
+            };
+            copyBtn = new ActionButton( parent, copyAction );
+            copyBtn.setLayoutData( new SimpleFormData().left( viewer.getTable(), 6 )
+                    .top( addBtn != null ? addBtn : top, addBtn != null ? SPACING : TOPSPACING ).right( 100 )
+                    .height( 30 ).create() );
+        }
+
         if (deleteAllowed) {
             DeleteCompositeAction<T> deleteAction = new DeleteCompositeAction<T>() {
 
@@ -212,10 +249,12 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
                 }
             };
             ActionButton delBtn = new ActionButton( parent, deleteAction );
+            Control topBtn = copyBtn != null ? copyBtn : addBtn;
             delBtn.setLayoutData( new SimpleFormData().left( viewer.getTable(), 6 )
-                    .top( addBtn != null ? addBtn : top, addBtn != null ? SPACING : TOPSPACING ).right( 100 )
+                    .top( topBtn != null ? topBtn : top, topBtn != null ? SPACING : TOPSPACING ).right( 100 )
                     .height( 30 ).create() );
         }
+
         parent.layout( true );
 
         viewer.addSelectionChangedListener( new ISelectionChangedListener() {
@@ -248,13 +287,15 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
     }
 
 
-    /**
-     * 
-     * @return
-     */
     protected T createNewComposite()
             throws Exception {
         // must only be implemented if add-action on table is enabled
+        throw new RuntimeException( "not yet implemented." );
+    }
+
+
+    protected void copyCompositeData( T toCopy ) {
+        // must only be implemented if copy-action on table is enabled
         throw new RuntimeException( "not yet implemented." );
     }
 
