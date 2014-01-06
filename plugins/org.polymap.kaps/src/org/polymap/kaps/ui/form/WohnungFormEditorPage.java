@@ -15,6 +15,8 @@ package org.polymap.kaps.ui.form;
 import org.geotools.data.FeatureStore;
 import org.opengis.feature.Feature;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+
 import org.polymap.rhei.form.IFormEditorPage;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
@@ -42,10 +44,25 @@ public abstract class WohnungFormEditorPage
     public void createFormContent( IFormEditorPageSite site ) {
         super.createFormContent( site );
 
-        String nummer = wohnung.objektNummer().get() != null ? wohnung.schl().get() : "neu";
-        site.setEditorTitle( formattedTitle( "Wohnung", nummer, null ) );
-        site.setFormTitle( formattedTitle( "Wohnung", nummer, getTitle() ) );
-
+        setTitle();
     }
 
+
+    private void setTitle() {
+        // bei noch nicht initialisierten tabs ist pageSite null
+        if (pageSite != null) {
+            String nummer = wohnung.objektNummer().get() != null ? wohnung.schl().get() : "neu";
+            pageSite.setEditorTitle( formattedTitle( "Wohnung", nummer, null ) );
+            pageSite.setFormTitle( formattedTitle( "Wohnung", nummer, getTitle() ) );
+        }
+    }
+
+
+    @Override
+    public void doSubmit( IProgressMonitor monitor )
+            throws Exception {
+        super.doSubmit( monitor );
+        // reset if necessary on save
+        setTitle();
+    }
 }

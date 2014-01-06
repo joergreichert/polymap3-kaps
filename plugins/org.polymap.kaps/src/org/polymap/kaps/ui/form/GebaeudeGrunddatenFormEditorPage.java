@@ -26,12 +26,25 @@ import org.apache.commons.logging.LogFactory;
 import org.eclipse.swt.widgets.Composite;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.dialogs.MessageDialog;
 
 import org.eclipse.ui.forms.widgets.Section;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+
+import org.polymap.core.qi4j.event.StoredPropertyChangeEvent;
+import org.polymap.core.runtime.Polymap;
+import org.polymap.core.runtime.event.EventFilter;
+import org.polymap.core.runtime.event.EventHandler;
+import org.polymap.core.runtime.event.EventManager;
+import org.polymap.core.workbench.PolymapWorkbench;
+
 import org.polymap.rhei.data.entityfeature.AssociationAdapter;
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
+import org.polymap.rhei.field.FormFieldEvent;
+import org.polymap.rhei.field.IFormField;
 import org.polymap.rhei.field.IFormFieldLabel;
+import org.polymap.rhei.field.IFormFieldListener;
 import org.polymap.rhei.field.PicklistFormField;
 import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.field.TextFormField;
@@ -47,6 +60,7 @@ import org.polymap.kaps.ui.KapsDefaultFormEditorPage;
 import org.polymap.kaps.ui.MyNumberValidator;
 import org.polymap.kaps.ui.NotNullMyNumberValidator;
 import org.polymap.kaps.ui.SimplePickList;
+import org.polymap.kaps.ui.form.GebaeudeGrunddatenFormEditorPage.WohnungUpdateHandler;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -61,6 +75,9 @@ public class GebaeudeGrunddatenFormEditorPage
     private SimplePickList<WohnungComposite> wohnungPicklist;
 
     private ActionButton                     createWohnung;
+
+    @SuppressWarnings("unused")
+    private WohnungUpdateHandler             wuh;
 
 
     // private FlurstueckSearcher sfAction;
@@ -86,16 +103,26 @@ public class GebaeudeGrunddatenFormEditorPage
     public void createFormContent( IFormEditorPageSite site ) {
         super.createFormContent( site );
 
-        String nummer = gebaeude.objektNummer().get() != null ? gebaeude.schl().get() : "neu";
-
-        site.setEditorTitle( formattedTitle( "Gebäude", nummer, null ) );
-        site.setFormTitle( formattedTitle( "Gebäude", nummer, getTitle() ) );
+        setTitle();
 
         Composite parent = site.getPageBody();
         Composite form = createEditorForm( parent );
         Composite extendedForm = createErweiterteDatenForm( form );
     }
 
+    private void setTitle() {
+        String nummer = gebaeude.objektNummer().get() != null ? gebaeude.schl().get() : "neu";
+        pageSite.setEditorTitle( formattedTitle( "Gebäude", nummer, null ) );
+        pageSite.setFormTitle( formattedTitle( "Gebäude", nummer, getTitle() ) );
+    }
+
+    @Override
+    public void doSubmit( IProgressMonitor monitor )
+            throws Exception {
+        super.doSubmit( monitor );
+        // update if necessary
+        setTitle();
+    }
 
     public Composite createEditorForm( Composite parent ) {
 
@@ -120,7 +147,8 @@ public class GebaeudeGrunddatenFormEditorPage
                 .setProperty( new PropertyAdapter( gebaeude.gebaeudeNummer() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setValidator( new NotNullMyNumberValidator( Integer.class ) )
-                .setEnabled( gebaeude.gebaeudeNummer().get() == null )
+                // nur editierbar wenn keine Wohnungen vorhanden
+                .setEnabled( WohnungComposite.Mixin.findWohnungenFor( gebaeude ).iterator().hasNext() == false )
                 .setLayoutData( left().left( 34 ).right( 49 ).create() ).create();
 
         newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Fortführung" )
@@ -247,6 +275,15 @@ public class GebaeudeGrunddatenFormEditorPage
         wohnungPicklist.setLayoutData( right().left( 10 ).right( 30 ).height( 25 ).top( null ).bottom( 100 ).create() );
         wohnungPicklist.setEnabled( true );
 
+        EventManager.instance().subscribe( wuh = new WohnungUpdateHandler(),
+                new EventFilter<StoredPropertyChangeEvent>() {
+
+                    @Override
+                    public boolean apply( StoredPropertyChangeEvent input ) {
+                        return input.getSource() instanceof WohnungComposite;
+                    }
+                } );
+
         createWohnung = new ActionButton( parent, new Action( "Wohnung anlegen" ) {
 
             @Override
@@ -255,6 +292,8 @@ public class GebaeudeGrunddatenFormEditorPage
 
                     // wohnung.vertrag().set( flurstueck.vertrag().get() );
                     KapsPlugin.openEditor( fs, WohnungComposite.NAME, WohnungComposite.Mixin.createFor( gebaeude ) );
+                    pageSite.setFieldEnabled( gebaeude.gebaeudeNummer().qualifiedName().name(), false );
+                    wohnungPicklist.setEnabled( true );
                 }
             }
 
@@ -263,5 +302,21 @@ public class GebaeudeGrunddatenFormEditorPage
         createWohnung.setEnabled( true );
 
         return formSection;
+    }
+
+
+    public final class WohnungUpdateHandler {
+
+        @EventHandler
+        public void handleEvent( StoredPropertyChangeEvent ev ) {
+            // immer reload, check ob wohnung wirklich zu gebäude gehört ist
+            // aufwendiger
+            Polymap.getSessionDisplay().asyncExec( new Runnable() {
+
+                public void run() {
+                    wohnungPicklist.setEnabled( true );
+                }
+            } );
+        }
     }
 }
