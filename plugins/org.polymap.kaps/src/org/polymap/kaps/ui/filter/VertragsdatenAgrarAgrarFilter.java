@@ -61,7 +61,7 @@ public class VertragsdatenAgrarAgrarFilter
 
 
     public VertragsdatenAgrarAgrarFilter( ILayer layer ) {
-        super( "__kaps--", layer, "nach Nutzung, Datum, Gemeinde...", null, 10000, VertragsdatenAgrarComposite.class );
+        super( VertragsdatenAgrarAgrarFilter.class.getName(), layer, "nach Nutzung, Datum, Gemeinde...", null, 10000, VertragsdatenAgrarComposite.class );
     }
 
 

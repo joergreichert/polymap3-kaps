@@ -45,7 +45,7 @@ public class RichtwertZoneZeitraumFilter
 
 
     public RichtwertZoneZeitraumFilter( ILayer layer ) {
-        super( "__kaps--", layer, "nach Zeitraum...", null, 15000, RichtwertzoneComposite.class );
+        super( RichtwertZoneZeitraumFilter.class.getName(), layer, "nach Zeitraum...", null, 15000, RichtwertzoneComposite.class );
     }
 
 

@@ -60,7 +60,7 @@ public class WohnungETWFilter
 
 
     public WohnungETWFilter( ILayer layer ) {
-        super( "__kaps--", layer, "nach Nutzung, Datum, Gemeinde...", null, 10000, WohnungComposite.class );
+        super( WohnungETWFilter.class.getName(), layer, "nach Nutzung, Datum, Gemeinde...", null, 10000, WohnungComposite.class );
     }
 
 

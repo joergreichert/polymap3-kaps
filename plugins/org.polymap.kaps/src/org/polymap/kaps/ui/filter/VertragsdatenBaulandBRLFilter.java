@@ -60,7 +60,7 @@ public class VertragsdatenBaulandBRLFilter
 
 
     public VertragsdatenBaulandBRLFilter( ILayer layer ) {
-        super( "__kaps--", layer, "nach Nutzung, Datum, Gemeinde...", null, 10000, VertragsdatenBaulandComposite.class );
+        super( VertragsdatenBaulandBRLFilter.class.getName(), layer, "nach Nutzung, Datum, Gemeinde...", null, 10000, VertragsdatenBaulandComposite.class );
     }
 
 

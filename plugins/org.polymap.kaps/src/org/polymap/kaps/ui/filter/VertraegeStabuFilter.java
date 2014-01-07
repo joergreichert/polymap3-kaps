@@ -52,7 +52,7 @@ public class VertraegeStabuFilter
 
 
     public VertraegeStabuFilter( ILayer layer ) {
-        super( "__kaps--", layer, "für StaBu...", null, 15000, VertragComposite.class );
+        super( VertraegeStabuFilter.class.getName(), layer, "für StaBu...", null, 15000, VertragComposite.class );
     }
 
 

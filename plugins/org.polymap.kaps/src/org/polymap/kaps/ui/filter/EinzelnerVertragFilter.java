@@ -42,7 +42,7 @@ public class EinzelnerVertragFilter
 
 
     public EinzelnerVertragFilter( ILayer layer ) {
-        super( "__kaps--", layer, "einzelner Vertrag...", null, 10000, VertragComposite.class );
+        super( EinzelnerVertragFilter.class.getName(), layer, "einzelner Vertrag...", null, 10000, VertragComposite.class );
     }
 
 

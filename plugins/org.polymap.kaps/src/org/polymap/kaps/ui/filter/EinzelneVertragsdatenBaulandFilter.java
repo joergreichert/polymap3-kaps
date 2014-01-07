@@ -43,7 +43,7 @@ public class EinzelneVertragsdatenBaulandFilter
 
 
     public EinzelneVertragsdatenBaulandFilter( ILayer layer ) {
-        super( "__kaps--", layer, "einzelner Vertrag...", null, 10000, VertragsdatenBaulandComposite.class );
+        super( EinzelneVertragsdatenBaulandFilter.class.getName(), layer, "einzelner Vertrag...", null, 10000, VertragsdatenBaulandComposite.class );
     }
 
 

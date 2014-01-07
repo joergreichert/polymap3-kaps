@@ -52,7 +52,7 @@ public class VertraegeStalaAgrarFilter
 
 
     public VertraegeStalaAgrarFilter( ILayer layer ) {
-        super( "__kaps--", layer, "für StaLa Agrar...", null, 15000, VertragComposite.class );
+        super( VertraegeStalaAgrarFilter.class.getName(), layer, "für StaLa Agrar...", null, 15000, VertragComposite.class );
     }
 
 

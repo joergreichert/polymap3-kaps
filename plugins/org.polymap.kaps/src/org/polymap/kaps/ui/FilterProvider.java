@@ -44,6 +44,7 @@ import org.polymap.kaps.ui.filter.EinzelnerVertragFilter;
 import org.polymap.kaps.ui.filter.RichtwertZoneFilter;
 import org.polymap.kaps.ui.filter.RichtwertZoneZeitraumFilter;
 import org.polymap.kaps.ui.filter.VertraegeFuerBaujahrUndGebaeudeartFilter;
+import org.polymap.kaps.ui.filter.VertraegeFuerFlurstueckeFilter;
 import org.polymap.kaps.ui.filter.VertraegeStabuFilter;
 import org.polymap.kaps.ui.filter.VertraegeStalaAgrarFilter;
 import org.polymap.kaps.ui.filter.VertraegeStalaBaulandFilter;
@@ -91,7 +92,8 @@ public class FilterProvider
                 else if (type.isAssignableFrom( VertragComposite.class )) {
                     result.add( new EinzelnerVertragFilter( layer ) );
                     result.add( new VertraegeFuerBaujahrUndGebaeudeartFilter( layer ) );
-                    result.add( new DefaultEntityFilter( layer, type, repo ) );
+                    result.add( new VertraegeFuerFlurstueckeFilter( layer ) );
+//                    result.add( new DefaultEntityFilter( layer, type, repo ) );
                     result.add( new VertraegeStabuFilter( layer ) );
                     result.add( new VertraegeStalaAgrarFilter( layer ) );
                     result.add( new VertraegeStalaBaulandFilter( layer ) );

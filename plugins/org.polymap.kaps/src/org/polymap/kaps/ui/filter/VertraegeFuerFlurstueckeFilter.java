@@ -54,14 +54,14 @@ import org.polymap.kaps.ui.MyNumberValidator;
  * 
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
-public class VertraegeFuerBaujahrUndGebaeudeartFilter
+public class VertraegeFuerFlurstueckeFilter
         extends AbstractEntityFilter {
 
-    private static Log log = LogFactory.getLog( VertraegeFuerBaujahrUndGebaeudeartFilter.class );
+    private static Log log = LogFactory.getLog( VertraegeFuerFlurstueckeFilter.class );
 
 
-    public VertraegeFuerBaujahrUndGebaeudeartFilter( ILayer layer ) {
-        super( VertraegeFuerBaujahrUndGebaeudeartFilter.class.getName(), layer, "nach Nutzung, Art, Gemeinde und Baujahr...", null, 10000,
+    public VertraegeFuerFlurstueckeFilter( ILayer layer ) {
+        super( VertraegeFuerFlurstueckeFilter.class.getName(), layer, "nach Flurstücken...", null, 10000,
                 VertragComposite.class );
     }
 
@@ -83,12 +83,11 @@ public class VertraegeFuerBaujahrUndGebaeudeartFilter
         site.addStandardLayout( site.newFormField( result, "nutzung", NutzungComposite.class, new PicklistFormField(
                 KapsRepository.instance().entitiesWithNames( NutzungComposite.class ) ), null, "Nutzung" ) );
 
-        site.addStandardLayout( site.newFormField( result, "gebart", GebaeudeArtComposite.class, new PicklistFormField(
-                KapsRepository.instance().entitiesWithNames( GebaeudeArtComposite.class ) ), null, "Gebäudeart" ) );
+        site.addStandardLayout( site.newFormField( result, "nummer", Integer.class, new StringFormField(),
+                new MyNumberValidator( Integer.class ), "Flurstücksnummer" ) );
 
-        site.addStandardLayout( site.newFormField( result, "baujahr", Integer.class, new BetweenFormField(
-                new StringFormField(), new StringFormField() ), new BetweenValidator( new MyNumberValidator(
-                Integer.class ) ), "Baujahr" ) );
+        site.addStandardLayout( site.newFormField( result, "unternummer", Integer.class, new StringFormField(), null,
+                "Unternummer" ) );
 
         return result;
     }
@@ -96,9 +95,10 @@ public class VertraegeFuerBaujahrUndGebaeudeartFilter
 
     protected Query<? extends Entity> createQuery( IFilterEditorSite site ) {
 
-        GebaeudeArtComposite gebaeude = (GebaeudeArtComposite)site.getFieldValue( "gebart" );
         GemeindeComposite gemeinde = (GemeindeComposite)site.getFieldValue( "gemeinde" );
         NutzungComposite nutzung = (NutzungComposite)site.getFieldValue( "nutzung" );
+        Integer nummer = (Integer)site.getFieldValue( "nummer" );
+        String unternummer = (String)site.getFieldValue( "unternummer" );
 
         Object[] vertragsDatum = (Object[])site.getFieldValue( "datum" );
         BooleanExpression vertragsDatumExpr = null;
@@ -121,7 +121,7 @@ public class VertraegeFuerBaujahrUndGebaeudeartFilter
         BooleanExpression fExpr = null;
         VertragComposite template = QueryExpressions.templateFor( VertragComposite.class );
 
-        if (gebaeude != null || nutzung != null || gemeinde != null) {
+        if (nutzung != null || gemeinde != null || nummer != null || (unternummer != null && !unternummer.isEmpty())) {
             FlurstueckComposite flurTemplate = QueryExpressions.templateFor( FlurstueckComposite.class );
 
             // nach Vertragsdatum vorsortieren
@@ -157,18 +157,14 @@ public class VertraegeFuerBaujahrUndGebaeudeartFilter
                 }
             }
 
-            BooleanExpression qExpr = gebaeude != null ? QueryExpressions.eq( flurTemplate.gebaeudeArt(), gebaeude )
-                    : null;
+            BooleanExpression hExpr = nummer != null ? QueryExpressions.eq( flurTemplate.hauptNummer(), nummer ) : null;
+            BooleanExpression uExpr = unternummer != null && !unternummer.isEmpty() ? QueryExpressions.eq( flurTemplate.unterNummer(),
+                    unternummer ) : null;
             BooleanExpression nExpr = nutzung != null ? QueryExpressions.eq( flurTemplate.nutzung(), nutzung ) : null;
 
-            if (qExpr != null) {
-                if (vExpr != null) {
-                    qExpr = QueryExpressions.and( qExpr, vExpr );
-                }
-            }
-            else {
-                qExpr = vExpr;
-            }
+            // expressions sammeln
+            BooleanExpression qExpr = vExpr;
+
             if (qExpr != null) {
                 if (gExpr != null) {
                     qExpr = QueryExpressions.and( qExpr, gExpr );
@@ -176,6 +172,22 @@ public class VertraegeFuerBaujahrUndGebaeudeartFilter
             }
             else {
                 qExpr = gExpr;
+            }
+            if (qExpr != null) {
+                if (hExpr != null) {
+                    qExpr = QueryExpressions.and( qExpr, hExpr );
+                }
+            }
+            else {
+                qExpr = hExpr;
+            }
+            if (qExpr != null) {
+                if (uExpr != null) {
+                    qExpr = QueryExpressions.and( qExpr, uExpr );
+                }
+            }
+            else {
+                qExpr = uExpr;
             }
             if (qExpr != null) {
                 if (nExpr != null) {
@@ -223,58 +235,7 @@ public class VertraegeFuerBaujahrUndGebaeudeartFilter
             }
         }
 
-        Object[] jahre = (Object[])site.getFieldValue( "baujahr" );
-        BooleanExpression baujahrExpr = null;
-        if (jahre != null) {
-            VertragsdatenBaulandComposite dateTemplate = QueryExpressions
-                    .templateFor( VertragsdatenBaulandComposite.class );
-            BooleanExpression expr2 = null;
-
-            BooleanExpression ge = jahre[0] != null ? QueryExpressions.ge( dateTemplate.baujahr(),
-                    Integer.parseInt( (String)jahre[0] ) ) : null;
-
-            BooleanExpression le = jahre[1] != null ? QueryExpressions.le( dateTemplate.baujahr(),
-                    Integer.parseInt( (String)jahre[1] ) ) : null;
-
-            if (ge != null) {
-                expr2 = ge;
-            }
-            if (le != null) {
-                expr2 = expr2 == null ? le : QueryExpressions.and( ge, le );
-            }
-            if (expr2 != null) {
-                Query<VertragsdatenBaulandComposite> daten = KapsRepository.instance().findEntities(
-                        VertragsdatenBaulandComposite.class, expr2, 0, -1 );
-                Set<Integer> eingangsNummern = new HashSet<Integer>();
-                for (VertragsdatenBaulandComposite kv : daten) {
-                    Integer eingangsNummer = kv.vertrag().get().eingangsNr().get();
-                    if (!eingangsNummern.contains( eingangsNummer )) {
-                        eingangsNummern.add( eingangsNummer );
-                        BooleanExpression newExpr = QueryExpressions.eq( template.eingangsNr(), eingangsNummer );
-                        if (baujahrExpr == null) {
-                            baujahrExpr = newExpr;
-                        }
-                        else {
-                            baujahrExpr = QueryExpressions.or( baujahrExpr, newExpr );
-                        }
-                    }
-                }
-                if (baujahrExpr == null) {
-                    baujahrExpr = QueryExpressions.eq( template.identity(), "unknown" );
-                }
-            }
-        }
-
         BooleanExpression allExpr = vertragsDatumExpr;
-        if (allExpr != null) {
-            if (baujahrExpr != null) {
-                allExpr = QueryExpressions.and( allExpr, baujahrExpr );
-            }
-        }
-        else {
-            allExpr = baujahrExpr;
-        }
-
         if (allExpr != null) {
             if (fExpr != null) {
                 allExpr = QueryExpressions.and( allExpr, fExpr );

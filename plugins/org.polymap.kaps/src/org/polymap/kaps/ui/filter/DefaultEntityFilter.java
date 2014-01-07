@@ -85,7 +85,7 @@ public class DefaultEntityFilter<T extends Entity>
     // }
 
     public DefaultEntityFilter( ILayer layer, Class<T> type, QiModule module, String... properties ) {
-        super( "__kaps--", layer, "Standard...", null, 10000, type );
+        super( DefaultEntityFilter.class.getName(), layer, "Standard...", null, 10000, type );
         this.type = type;
         this.module = module;
 

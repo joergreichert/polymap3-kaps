@@ -52,7 +52,7 @@ public class VertraegeStalaBaulandFilter
 
 
     public VertraegeStalaBaulandFilter( ILayer layer ) {
-        super( "__kaps--", layer, "für StaLa Bauland...", null, 15000, VertragComposite.class );
+        super( VertraegeStalaBaulandFilter.class.getName(), layer, "für StaLa Bauland...", null, 15000, VertragComposite.class );
     }
 
 

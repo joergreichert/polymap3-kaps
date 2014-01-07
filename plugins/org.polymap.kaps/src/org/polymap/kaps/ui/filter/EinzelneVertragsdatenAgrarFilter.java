@@ -43,7 +43,7 @@ public class EinzelneVertragsdatenAgrarFilter
 
 
     public EinzelneVertragsdatenAgrarFilter( ILayer layer ) {
-        super( "__kaps--", layer, "einzelner Vertrag...", null, 10000, VertragsdatenAgrarComposite.class );
+        super( EinzelneVertragsdatenAgrarFilter.class.getName(), layer, "einzelner Vertrag...", null, 10000, VertragsdatenAgrarComposite.class );
     }
 
 

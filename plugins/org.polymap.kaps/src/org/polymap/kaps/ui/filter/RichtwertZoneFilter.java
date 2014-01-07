@@ -44,7 +44,7 @@ public class RichtwertZoneFilter
 
 
     public RichtwertZoneFilter( ILayer layer ) {
-        super( "__kaps--", layer, "nach Gemeinde...", null, 15000, RichtwertzoneComposite.class );
+        super( RichtwertZoneFilter.class.getName(), layer, "nach Gemeinde...", null, 15000, RichtwertzoneComposite.class );
     }
 
 
