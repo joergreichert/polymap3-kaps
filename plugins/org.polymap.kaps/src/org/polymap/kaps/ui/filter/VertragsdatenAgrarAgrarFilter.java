@@ -12,6 +12,7 @@
  */
 package org.polymap.kaps.ui.filter;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -23,6 +24,9 @@ import org.apache.commons.logging.LogFactory;
 import org.qi4j.api.query.Query;
 import org.qi4j.api.query.QueryExpressions;
 import org.qi4j.api.query.grammar.BooleanExpression;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
@@ -61,7 +65,8 @@ public class VertragsdatenAgrarAgrarFilter
 
 
     public VertragsdatenAgrarAgrarFilter( ILayer layer ) {
-        super( VertragsdatenAgrarAgrarFilter.class.getName(), layer, "nach Nutzung, Datum, Gemeinde...", null, 10000, VertragsdatenAgrarComposite.class );
+        super( VertragsdatenAgrarAgrarFilter.class.getName(), layer, "nach Nutzung, Datum, Gemeinde...", null, 10000,
+                VertragsdatenAgrarComposite.class );
     }
 
 
@@ -116,10 +121,8 @@ public class VertragsdatenAgrarAgrarFilter
             VertragComposite dateTemplate = QueryExpressions.templateFor( VertragComposite.class );
             BooleanExpression ge = vertragsDatum[0] != null ? QueryExpressions.ge( dateTemplate.vertragsDatum(),
                     dayStart( (Date)vertragsDatum[0] ) ) : null;
-
             BooleanExpression le = vertragsDatum[1] != null ? QueryExpressions.le( dateTemplate.vertragsDatum(),
                     dayEnd( (Date)vertragsDatum[1] ) ) : null;
-
             if (ge != null) {
                 vertragsDatumExpr = ge;
             }
@@ -131,29 +134,17 @@ public class VertragsdatenAgrarAgrarFilter
         BooleanExpression fExpr = null;
         VertragsdatenAgrarComposite template = QueryExpressions.templateFor( VertragsdatenAgrarComposite.class );
 
-        // if (nutzungen != null || gemeinde != null) {
         FlurstueckComposite flurTemplate = QueryExpressions.templateFor( FlurstueckComposite.class );
 
-        // nach Vertragsdatum vorsortieren
-        BooleanExpression vExpr = null;
+        // nach Vertragsdatum vorsortieren führt zu StackOverflow
+        Set<VertragComposite> vertraegeNachDatum = null;
         if (vertragsDatumExpr != null) {
+            vertraegeNachDatum = Sets.newHashSet();
             Query<VertragComposite> vertraege = KapsRepository.instance().findEntities( VertragComposite.class,
                     vertragsDatumExpr, 0, -1 );
             for (VertragComposite vertrag : vertraege) {
-                BooleanExpression newExpr = QueryExpressions.eq( flurTemplate.vertrag(), vertrag );
-                if (vExpr == null) {
-                    vExpr = newExpr;
-                }
-                else {
-                    vExpr = QueryExpressions.or( vExpr, newExpr );
-                }
+                vertraegeNachDatum.add( vertrag );
             }
-            // vertragsdatum wurde gesetzt, aber keine Verträge gefunden, also auch
-            // keine Flurstücke finden
-            if (vExpr == null) {
-                vExpr = QueryExpressions.eq( flurTemplate.identity(), "unknown" );
-            }
-
         }
 
         // gemeinde
@@ -192,14 +183,6 @@ public class VertragsdatenAgrarAgrarFilter
         }
 
         if (nExpr != null) {
-            if (vExpr != null) {
-                nExpr = QueryExpressions.and( nExpr, vExpr );
-            }
-        }
-        else {
-            nExpr = vExpr;
-        }
-        if (nExpr != null) {
             if (gExpr != null) {
                 nExpr = QueryExpressions.and( nExpr, gExpr );
             }
@@ -210,33 +193,34 @@ public class VertragsdatenAgrarAgrarFilter
 
         Query<FlurstueckComposite> flurstuecke = KapsRepository.instance().findEntities( FlurstueckComposite.class,
                 nExpr, 0, -1 );
-        if (flurstuecke.count() > 5000) {
-            Polymap.getSessionDisplay().asyncExec( new Runnable() {
 
+        Set<VertragComposite> vertraegeNachDatumUndFlurstueck = new HashSet<VertragComposite>();
+        for (FlurstueckComposite fc : flurstuecke) {
+            // mehrere Flurstücke können einem Vertrag angehören
+            VertragComposite vertrag = fc.vertrag().get();
+            if (vertrag != null) {
+                if (vertraegeNachDatum == null || vertraegeNachDatum.contains( vertrag )) {
+                    vertraegeNachDatumUndFlurstueck.add( vertrag );
+                }
+            }
+        }
+        if (vertraegeNachDatumUndFlurstueck.size() > 5000) {
+            Polymap.getSessionDisplay().asyncExec( new Runnable() {
                 public void run() {
                     MessageDialog.openError( PolymapWorkbench.getShellToParentOn(), "Zu viele Ergebnisse",
-                            "Es wurden zu viele Ergebnisse gefunden. Bitte schränken Sie die Suche weiter ein." );
+                            "Es wurden über 5000 Ergebnisse gefunden. Bitte schränken Sie die Suche weiter ein." );
                 }
             } );
             return KapsRepository.instance().findEntities( VertragsdatenAgrarComposite.class,
                     QueryExpressions.eq( template.identity(), "unknown" ), 0, -1 );
         }
-        Set<Integer> eingangsNummern = new HashSet<Integer>();
-        for (FlurstueckComposite fc : flurstuecke) {
-            // mehrere Flurstücke können einem Vertrag angehören
-            VertragComposite vertrag = fc.vertrag().get();
-            if (vertrag != null) {
-                Integer eingangsNummer = vertrag.eingangsNr().get();
-                if (!eingangsNummern.contains( eingangsNummer )) {
-                    BooleanExpression newExpr = QueryExpressions.eq( template.vertrag(), vertrag );
-                    if (fExpr == null) {
-                        fExpr = newExpr;
-                    }
-                    else {
-                        fExpr = QueryExpressions.or( fExpr, newExpr );
-                    }
-                    eingangsNummern.add( eingangsNummer );
-                }
+        for (VertragComposite vertrag : vertraegeNachDatumUndFlurstueck) {
+            BooleanExpression newExpr = QueryExpressions.eq( template.vertrag(), vertrag );
+            if (fExpr == null) {
+                fExpr = newExpr;
+            }
+            else {
+                fExpr = QueryExpressions.or( fExpr, newExpr );
             }
         }
         // wenn keine verträge gefunden, ungültige Query erzeugen, damit auch keine
