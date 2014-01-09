@@ -204,7 +204,7 @@ public class VertragStaLaBaulandExporter
 
                     } );
 
-                    log.info( "CSV: download URL: " + url );
+                    log.info( "TXT: download URL: " + url );
 
                     ExternalBrowser.open( "download_window", url, ExternalBrowser.NAVIGATION_BAR
                             | ExternalBrowser.STATUS );

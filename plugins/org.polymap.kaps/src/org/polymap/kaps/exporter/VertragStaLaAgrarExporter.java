@@ -57,6 +57,7 @@ import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.ArtDesBaugebietsComposite;
 import org.polymap.kaps.model.data.FlurComposite;
 import org.polymap.kaps.model.data.FlurstueckComposite;
+import org.polymap.kaps.model.data.GemarkungComposite;
 import org.polymap.kaps.model.data.GemeindeComposite;
 import org.polymap.kaps.model.data.KaeuferKreisComposite;
 import org.polymap.kaps.model.data.NutzungComposite;
@@ -126,7 +127,7 @@ public class VertragStaLaAgrarExporter
 
         final Date now = new Date();
 
-        final File f = File.createTempFile( "StatLandesamt_Agrar", ".csv" );
+        final File f = File.createTempFile( "StatLandesamt_Agrar", ".txt" );
         f.deleteOnExit();
         BufferedWriter out = new BufferedWriter( new FileWriter( f ) );
 
@@ -191,12 +192,12 @@ public class VertragStaLaAgrarExporter
                     String url = DownloadServiceHandler.registerContent( new ContentProvider() {
 
                         public String getContentType() {
-                            return "text/csv; charset=ISO-8859-1";
+                            return "text/plain; charset=ISO-8859-1";
                         }
 
 
                         public String getFilename() {
-                            return "StatLandesamt_Agrar_" + fileFormat.format( new Date() ) + ".csv";
+                            return "StatLandesamt_Agrar_" + fileFormat.format( new Date() ) + ".txt";
                         }
 
 
@@ -213,7 +214,7 @@ public class VertragStaLaAgrarExporter
 
                     } );
 
-                    log.info( "CSV: download URL: " + url );
+                    log.info( "TXT: download URL: " + url );
 
                     ExternalBrowser.open( "download_window", url, ExternalBrowser.NAVIGATION_BAR
                             | ExternalBrowser.STATUS );
@@ -280,6 +281,11 @@ public class VertragStaLaAgrarExporter
             errors.add( error( vertrag, "Flurstück mit Nutzung Agrar nicht gefunden" ) );
             return;
         }
+        GemarkungComposite gemarkung = flurstueck.gemarkung().get();
+        if (gemarkung == null) {
+            errors.add( error( vertrag, "Gemarkung nicht gefunden" ) );
+            return;
+        }
         RichtwertzoneZeitraumComposite richtwertzoneZ = vdc.richtwertZone1().get();
         if (richtwertzoneZ == null) {
             errors.add( error( vertrag, "Richtwertzone nicht gefunden" ) );
@@ -308,9 +314,10 @@ public class VertragStaLaAgrarExporter
         contents.add( String.format( "%018d", vertrag.eingangsNr().get() ) );
 
         // String land =
-        contents.add( "14" );
+        contents.add( "Mittelsachsen" );
         // String kreisGemeinde =
-        contents.add( gemeinde.schl().get().substring( 0, 3 ) + DELIMITER + gemeinde.schl().get().substring( 3 ) );
+        contents.add( gemeinde.name().get() );
+        contents.add( gemarkung.schl().get() );
 
         FlurComposite flur = flurstueck.flur().get();
         // gibts in Sachsen nicht
@@ -326,11 +333,7 @@ public class VertragStaLaAgrarExporter
         cal.setTime( vertrag.vertragsDatum().get() );
 
         // String tag =
-        contents.add( String.format( "%02d", cal.get( Calendar.DAY_OF_MONTH ) ) );
-        // String monat =
-        contents.add( String.format( "%02d", cal.get( Calendar.MONTH ) + 1 ) );
-        // String jahr =
-        contents.add( String.format( "%04d", cal.get( Calendar.YEAR ) ) );
+        contents.add( String.format( "%02d", cal.get( Calendar.DAY_OF_MONTH ) ) + String.format( "%02d", cal.get( Calendar.MONTH ) + 1 ) + String.format( "%04d", cal.get( Calendar.YEAR ) ) );
 
         KaeuferKreisComposite verkaeuferKreisComposite = vertrag.verkaeuferKreis().get();
         if (verkaeuferKreisComposite == null) {
@@ -407,6 +410,11 @@ public class VertragStaLaAgrarExporter
         }
         contents.add( String.format( "%08d", h != null ? h.intValue() : 0 ) );
 
+        String b = vdc.bemerkungStala().get();
+        if (b != null) {
+            contents.add( b );
+        }
+        
         StringBuilder ret = new StringBuilder();
         for (String s : contents) {
             ret.append( s ).append( DELIMITER );
