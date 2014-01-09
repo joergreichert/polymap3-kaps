@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.qi4j.api.entity.association.Association;
+import org.qi4j.api.entity.association.ManyAssociation;
 import org.qi4j.api.property.Property;
 
 import org.eclipse.swt.widgets.Composite;
@@ -45,6 +46,7 @@ import org.polymap.core.workbench.PolymapWorkbench;
 import org.polymap.rhei.data.entityfeature.PropertyDescriptorAdapter;
 import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter;
 import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter.AssociationCallback;
+import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter.ManyAssociationCallback;
 import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter.PropertyCallback;
 import org.polymap.rhei.field.FormFieldEvent;
 import org.polymap.rhei.field.IFormFieldListener;
@@ -76,6 +78,7 @@ import org.polymap.kaps.ui.ActionButton;
 import org.polymap.kaps.ui.BooleanFormField;
 import org.polymap.kaps.ui.FieldListener;
 import org.polymap.kaps.ui.KapsDefaultFormEditorPageWithFeatureTable;
+import org.polymap.kaps.ui.ListNotNullValidator;
 import org.polymap.kaps.ui.MyNumberValidator;
 import org.polymap.kaps.ui.NotNullMyNumberValidator;
 import org.polymap.kaps.ui.NotNullValidator;
@@ -551,22 +554,22 @@ public class KaufvertragFlurstueckeFormEditorPage
                                         return entity.erbbaurecht();
                                     }
                                 } ) ).setField( reloadable( new BooleanFormField() ) )
-                .setValidator( new NotNullValidator() ).setLayoutData( left().top( line6 ).bottom( 100 ).create() )
+                .setValidator( new NotNullValidator() ).setLayoutData( left().top( line6 ).create() )
                 .create();
 
-        newFormField( "Belastung" )
+        newFormField( "Belastungen" )
                 // .setToolTipText(
                 // "Art des Grundstücks bei Agrarland, Art des Baugebietes sonst" )
                 .setParent( parent )
                 .setProperty(
-                        new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix + "belastung",
-                                new AssociationCallback<FlurstueckComposite>() {
+                        new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix + "belastungen",
+                                new ManyAssociationCallback<FlurstueckComposite>() {
 
-                                    public Association get( FlurstueckComposite entity ) {
-                                        return entity.belastung();
+                                    public ManyAssociation get( FlurstueckComposite entity ) {
+                                        return entity.belastungen();
                                     }
-                                } ) ).setField( namedAssocationsPicklist( BelastungComposite.class ) )
-                .setValidator( new NotNullValidator() ).setLayoutData( right().top( line6 ).create() ).create();
+                                } ) ).setField( reloadable(namedAssocationsSelectlist( BelastungComposite.class, true )) )
+                .setValidator( new ListNotNullValidator() ).setLayoutData( right().top( line6 ).height( 50 ).bottom( 100 ).create() ).create();
 
         // return the last line
         return formSection;
@@ -897,7 +900,7 @@ public class KaufvertragFlurstueckeFormEditorPage
         pageSite.setFieldValue( prefix + "verkaufteFlaeche", toCopy.verkaufteFlaeche().get() != null ? NumberFormatter
                 .getFormatter( 2 ).format( toCopy.verkaufteFlaeche().get() ) : null );
         pageSite.setFieldValue( prefix + "erbbaurecht", toCopy.erbbaurecht().get() );
-        pageSite.setFieldValue( prefix + "belastung", toCopy.belastung().get() );
+        pageSite.setFieldValue( prefix + "belastungen", toCopy.belastungen().toList() );
 
         // refreshReloadables();
     }

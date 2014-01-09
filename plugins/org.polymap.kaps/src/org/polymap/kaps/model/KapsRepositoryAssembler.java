@@ -12,7 +12,10 @@
  */
 package org.polymap.kaps.model;
 
+import java.util.Iterator;
+
 import java.io.File;
+import java.io.IOException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,6 +39,7 @@ import org.polymap.rhei.data.entitystore.lucene.LuceneEntityStoreInfo;
 import org.polymap.rhei.data.entitystore.lucene.LuceneEntityStoreQueryService;
 import org.polymap.rhei.data.entitystore.lucene.LuceneEntityStoreService;
 
+import org.polymap.kaps.KapsPlugin;
 import org.polymap.kaps.model.SchlNamedCreatorCallback.Impl;
 import org.polymap.kaps.model.data.*;
 
@@ -109,10 +113,7 @@ public class KapsRepositoryAssembler
                 WohnlageStaBuComposite.class );
 
         // persistence: workspace/Lucene
-        File root = new File( Polymap.getWorkspacePath().toFile(), "data" );
-
-        File moduleRoot = new File( root, "org.polymap.kaps" );
-        moduleRoot.mkdir();
+        File moduleRoot = createDataDir();
 
         domainModule.addServices( LuceneEntityStoreService.class )
                 .setMetaInfo( new LuceneEntityStoreInfo( moduleRoot ) ).instantiateOnStartup()
@@ -126,6 +127,15 @@ public class KapsRepositoryAssembler
         // additional services
         // domainModule.addServices( BiotopnummerGeneratorService.class )
         // .identifiedBy( "biotopnummer" );
+    }
+
+
+    private File createDataDir() {
+        File root = new File( Polymap.getWorkspacePath().toFile(), "data" );
+
+        File moduleRoot = new File( root, "org.polymap.kaps" );
+        moduleRoot.mkdir();
+        return moduleRoot;
     }
 
 
@@ -162,6 +172,7 @@ public class KapsRepositoryAssembler
             ImmobilienArtStaBuComposite.Mixin.createInitData( schlCreator );
             WohnlageStaBuComposite.Mixin.createInitData( schlCreator );
         }
+        migrateBelastung(uow);
         uow.complete();
         log.info( "Create Init Data Completed" );
     }
@@ -182,4 +193,25 @@ public class KapsRepositoryAssembler
         return query.iterator().hasNext();
     }
 
+    private void migrateBelastung( UnitOfWork uow ) throws IOException {
+        File file = new File(createDataDir(), "migration.manyBelastung");
+        if (!file.exists()) {
+            log.info("Migrating Belastungen");
+            QueryBuilder<FlurstueckComposite> builder = getModule().queryBuilderFactory().newQueryBuilder(
+                    FlurstueckComposite.class );
+            Query<FlurstueckComposite> query = builder.newQuery( uow ).maxResults( Integer.MAX_VALUE ).firstResult( 0 );
+            Iterator<FlurstueckComposite> it = query.iterator();
+            int count = 0;
+            while (it.hasNext()) {
+                FlurstueckComposite fs = it.next();
+                BelastungComposite b = fs.belastung().get();
+                if (b != null) {
+                    count++;
+                    fs.belastungen().add( b );
+                }
+            }
+            file.createNewFile();
+            log.info("Migration of " + count + " Belastungen Completed");
+        }
+    }
 }

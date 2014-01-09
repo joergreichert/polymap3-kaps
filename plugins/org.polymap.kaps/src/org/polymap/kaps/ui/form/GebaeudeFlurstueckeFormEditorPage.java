@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.qi4j.api.entity.association.Association;
+import org.qi4j.api.entity.association.ManyAssociation;
 import org.qi4j.api.property.Property;
 
 import org.eclipse.swt.widgets.Composite;
@@ -34,6 +35,7 @@ import org.polymap.core.model.EntityType;
 
 import org.polymap.rhei.data.entityfeature.PropertyDescriptorAdapter;
 import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter;
+import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter.ManyAssociationCallback;
 import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter.AssociationCallback;
 import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter.PropertyCallback;
 import org.polymap.rhei.field.FormFieldEvent;
@@ -55,6 +57,7 @@ import org.polymap.kaps.model.data.StrasseComposite;
 import org.polymap.kaps.ui.ActionButton;
 import org.polymap.kaps.ui.BooleanFormField;
 import org.polymap.kaps.ui.KapsDefaultFormEditorPageWithFeatureTable;
+import org.polymap.kaps.ui.ListNotNullValidator;
 import org.polymap.kaps.ui.MyNumberValidator;
 import org.polymap.kaps.ui.NotNullMyNumberValidator;
 import org.polymap.kaps.ui.NotNullValidator;
@@ -270,7 +273,7 @@ public class GebaeudeFlurstueckeFormEditorPage
                 // pageSite.setFieldValue( prefix + "verkaufteFlaeche",
                 // String.valueOf( toAdopt.verkaufteFlaeche().get() ) );
                 pageSite.setFieldValue( prefix + "erbbaurecht", toAdopt.erbbaurecht().get() );
-                pageSite.setFieldValue( prefix + "belastung", toAdopt.belastung().get() );
+                pageSite.setFieldValue( prefix + "belastungen", toAdopt.belastungen().toList() );
 
                 // refreshReloadables();
             }
@@ -401,17 +404,17 @@ public class GebaeudeFlurstueckeFormEditorPage
                                 } ) ).setField( reloadable( namedAssocationsPicklist( NutzungComposite.class ) ) )
                 .setValidator( new NotNullValidator() ).setLayoutData( left().top( lastLine ).create() ).create();
 
-        newFormField( "Belastung" )
+        newFormField( "Belastungen" )
                 .setParent( parent )
                 .setProperty(
-                        new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix + "belastung",
-                                new AssociationCallback<FlurstueckComposite>() {
+                        new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix + "belastungen",
+                                new ManyAssociationCallback<FlurstueckComposite>() {
 
-                                    public Association<BelastungComposite> get( FlurstueckComposite entity ) {
-                                        return entity.belastung();
+                                    public ManyAssociation<BelastungComposite> get( FlurstueckComposite entity ) {
+                                        return entity.belastungen();
                                     }
-                                } ) ).setField( reloadable( namedAssocationsPicklist( BelastungComposite.class ) ) )
-                .setValidator( new NotNullValidator() ).setLayoutData( right().top( lastLine ).create() ).create();
+                                } ) ).setField( reloadable( namedAssocationsSelectlist( BelastungComposite.class, true ) ) )
+                .setValidator( new ListNotNullValidator() ).setLayoutData( right().top( lastLine ).height( 50 ).create() ).create();
 
         lastLine = newLine;
         newLine = newFormField( "Fläche in m²" )
