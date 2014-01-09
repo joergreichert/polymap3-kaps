@@ -204,19 +204,21 @@ public class KaufvertragFlurstueckeFormEditorPage
                 .setField( reloadable( namedAssocationsPicklist( GemarkungComposite.class, true ) ) )
                 .setValidator( new NotNullValidator() ).setLayoutData( left().create() ).create();
 
-        newFormField( "Flur" )
-                .setParent( parent )
-                .setProperty(
-                        new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix + "flur",
-                                new AssociationCallback<FlurstueckComposite>() {
+        // newFormField( "Flur" )
+        // .setParent( parent )
+        // .setProperty(
+        // new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite,
+        // prefix + "flur",
+        // new AssociationCallback<FlurstueckComposite>() {
+        //
+        // public Association get( FlurstueckComposite entity ) {
+        // return entity.flur();
+        // }
+        // } ) ).setField( reloadable( namedAssocationsPicklist( FlurComposite.class,
+        // false ) ) )
+        // .setLayoutData( right().create() ).create();
 
-                                    public Association get( FlurstueckComposite entity ) {
-                                        return entity.flur();
-                                    }
-                                } ) ).setField( reloadable( namedAssocationsPicklist( FlurComposite.class, false ) ) )
-                .setLayoutData( right().create() ).create();
-
-        Control line1 = newFormField( "Flurstücksnummer" )
+        newFormField( "Flurstücksnummer" )
                 .setParent( parent )
                 .setProperty(
                         new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix + "hauptNummer",
@@ -226,10 +228,10 @@ public class KaufvertragFlurstueckeFormEditorPage
                                         return entity.hauptNummer();
                                     }
                                 } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setLayoutData( left().right( 30 ).top( line0 ).create() )
+                .setLayoutData( right().right( 75 ).create() )
                 .setValidator( new NotNullMyNumberValidator( Integer.class ) ).create();
 
-        newFormField( "/" )
+        newFormField( "Unternummer" )
                 .setParent( parent )
                 .setProperty(
                         new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix + "unterNummer",
@@ -238,8 +240,9 @@ public class KaufvertragFlurstueckeFormEditorPage
                                     public Property get( FlurstueckComposite entity ) {
                                         return entity.unterNummer();
                                     }
-                                } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setLayoutData( left().left( 30 ).right( 50 ).top( line0 ).create() ).create();
+                                } ) ).setValidator( new NotNullValidator() )
+                .setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
+                .setLayoutData( right().left( 75 ).create() ).create();
 
         // newFormField( "Hauptflurstück" )
         // .setParent( parent )
@@ -279,7 +282,7 @@ public class KaufvertragFlurstueckeFormEditorPage
         searchFlurstueckeButton = new ActionButton( parent, sfAction );
         searchFlurstueckeButton.setLayoutData( right().right( 70 ).height( 25 ).top( line0 ).create() );
         searchFlurstueckeButton.setEnabled( false );
-        line1 = searchFlurstueckeButton;
+        Control line1 = searchFlurstueckeButton;
         pageSite.addFieldListener( sfAction );
 
         final PicklistFormField strassePickList = new PicklistFormField( new PicklistFormField.ValueProvider() {
@@ -309,7 +312,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                                     public Association<StrasseComposite> get( FlurstueckComposite entity ) {
                                         return entity.strasse();
                                     }
-                                } ) ).setField( reloadable( strassePickList ) )
+                                } ) ).setField( reloadable( strassePickList ) ).setValidator( new NotNullValidator() )
                 .setLayoutData( left().top( line1 ).create() ).create();
 
         newFormField( "Hausnummer" )
@@ -322,7 +325,8 @@ public class KaufvertragFlurstueckeFormEditorPage
                                         return entity.hausnummer();
                                     }
                                 } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setLayoutData( right().right( 75 ).top( line1 ).create() ).create();
+                .setValidator( new NotNullValidator() ).setLayoutData( right().right( 75 ).top( line1 ).create() )
+                .create();
 
         newFormField( "Zusatz" )
                 .setToolTipText( "Hausnummernzusatz" )
@@ -435,7 +439,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                                         return entity.gebaeudeArt();
                                     }
                                 } ) ).setField( reloadable( namedAssocationsPicklist( GebaeudeArtComposite.class ) ) )
-                .setLayoutData( right().top( line3 ).create() ).create();
+                .setValidator( new NotNullValidator() ).setLayoutData( right().top( line3 ).create() ).create();
 
         final PicklistFormField artPicklist = new PicklistFormField( new PicklistFormField.ValueProvider() {
 
@@ -477,8 +481,8 @@ public class KaufvertragFlurstueckeFormEditorPage
                             public Association get( FlurstueckComposite entity ) {
                                 return entity.artDesBaugebiets();
                             }
-                        } ) ).setField( reloadable( artPicklist ) ).setLayoutData( left().top( line4 ).create() )
-                .create();
+                        } ) ).setField( reloadable( artPicklist ) ).setValidator( new NotNullValidator() )
+                .setLayoutData( left().top( line4 ).create() ).create();
 
         Composite line6 = newFormField( "Fläche in m²" )
                 .setParent( parent )
@@ -490,7 +494,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                                         return entity.flaeche();
                                     }
                                 } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setValidator( new MyNumberValidator( Double.class, 2 ) )
+                .setValidator( new NotNullMyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( left().right( 25 ).top( line5 ).create() ).create();
 
         newFormField( "Anteil" )
@@ -503,7 +507,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                                 return entity.flaechenAnteilZaehler();
                             }
                         } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setValidator( new MyNumberValidator( Double.class, 2 ) )
+                .setValidator( new NotNullMyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( left().left( 25 ).right( 50 ).top( line5 ).create() ).create();
 
         newFormField( "/" )
@@ -516,7 +520,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                                 return entity.flaechenAnteilNenner();
                             }
                         } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setValidator( new MyNumberValidator( Double.class, 2 ) )
+                .setValidator( new NotNullMyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( left().left( 50 ).right( 75 ).top( line5 ).create() ).create();
 
         newFormField( "verkaufte Fläche in m²" )
@@ -547,7 +551,8 @@ public class KaufvertragFlurstueckeFormEditorPage
                                         return entity.erbbaurecht();
                                     }
                                 } ) ).setField( reloadable( new BooleanFormField() ) )
-                .setLayoutData( left().top( line6 ).bottom( 100 ).create() ).create();
+                .setValidator( new NotNullValidator() ).setLayoutData( left().top( line6 ).bottom( 100 ).create() )
+                .create();
 
         newFormField( "Belastung" )
                 // .setToolTipText(
@@ -561,7 +566,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                                         return entity.belastung();
                                     }
                                 } ) ).setField( namedAssocationsPicklist( BelastungComposite.class ) )
-                .setLayoutData( right().top( line6 ).create() ).create();
+                .setValidator( new NotNullValidator() ).setLayoutData( right().top( line6 ).create() ).create();
 
         // return the last line
         return formSection;
@@ -795,8 +800,9 @@ public class KaufvertragFlurstueckeFormEditorPage
         PropertyDescriptor prop = null;
         prop = new PropertyDescriptorAdapter( type.getProperty( "gemarkung" ) );
         viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader( "Gemarkung" ) );
-        prop = new PropertyDescriptorAdapter( type.getProperty( "flur" ) );
-        viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader( "Flur" ) );
+        // prop = new PropertyDescriptorAdapter( type.getProperty( "flur" ) );
+        // viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader( "Flur"
+        // ) );
         prop = new PropertyDescriptorAdapter( type.getProperty( "hauptNummer" ) );
         viewer.addColumn( new DefaultFeatureTableColumn( prop ).setHeader( "Flurstück" ) );
         prop = new PropertyDescriptorAdapter( type.getProperty( "unterNummer" ) );
@@ -829,6 +835,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                 prototype.vertrag().set( kaufvertrag );
                 prototype.flaechenAnteilZaehler().set( 1.0d );
                 prototype.flaechenAnteilNenner().set( 1.0d );
+                prototype.flur().set( repository.findSchlNamed( FlurComposite.class, "000" ) );
             }
         } );
     }
@@ -863,7 +870,7 @@ public class KaufvertragFlurstueckeFormEditorPage
 
         pageSite.setFieldValue( prefix + "gemarkung", toCopy.gemarkung().get() );
         // current.gemarkung().set( toAdopt.gemarkung().get() );
-        pageSite.setFieldValue( prefix + "flur", toCopy.flur().get() );
+        // pageSite.setFieldValue( prefix + "flur", toCopy.flur().get() );
         pageSite.setFieldValue( prefix + "hauptNummer", String.valueOf( toCopy.hauptNummer().get() ) );
         pageSite.setFieldValue( prefix + "unterNummer", toCopy.unterNummer().get() );
         pageSite.setFieldValue( prefix + "strasse", toCopy.strasse().get() );

@@ -56,6 +56,8 @@ import org.polymap.kaps.ui.ActionButton;
 import org.polymap.kaps.ui.BooleanFormField;
 import org.polymap.kaps.ui.KapsDefaultFormEditorPageWithFeatureTable;
 import org.polymap.kaps.ui.MyNumberValidator;
+import org.polymap.kaps.ui.NotNullMyNumberValidator;
+import org.polymap.kaps.ui.NotNullValidator;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -186,22 +188,22 @@ public class GebaeudeFlurstueckeFormEditorPage
                                     }
                                 } ) )
                 .setField( reloadable( namedAssocationsPicklist( GemarkungComposite.class, true ) ) )
-                .setLayoutData( left().top( lastLine ).create() ).create();
+                .setValidator( new NotNullValidator() ).setLayoutData( left().top( lastLine ).create() ).create();
 
-        newFormField( "Flur" )
-                .setParent( parent )
-                .setProperty(
-                        new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix + "flur",
-                                new AssociationCallback<FlurstueckComposite>() {
-
-                                    public Association<FlurComposite> get( FlurstueckComposite entity ) {
-                                        return entity.flur();
-                                    }
-                                } ) ).setField( reloadable( namedAssocationsPicklist( FlurComposite.class, false ) ) )
-                .setLayoutData( right().top( lastLine ).create() ).create();
-
-        lastLine = newLine;
-        newLine = newFormField( "Flurstücksnummer" )
+        // newFormField( "Flur" )
+        // .setParent( parent )
+        // .setProperty(
+        // new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite,
+        // prefix + "flur",
+        // new AssociationCallback<FlurstueckComposite>() {
+        //
+        // public Association<FlurComposite> get( FlurstueckComposite entity ) {
+        // return entity.flur();
+        // }
+        // } ) ).setField( reloadable( namedAssocationsPicklist( FlurComposite.class,
+        // false ) ) )
+        // .setLayoutData( right().top( lastLine ).create() ).create();
+        newFormField( "Flurstücksnummer" )
                 .setParent( parent )
                 .setProperty(
                         new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix + "hauptNummer",
@@ -211,10 +213,10 @@ public class GebaeudeFlurstueckeFormEditorPage
                                         return entity.hauptNummer();
                                     }
                                 } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setLayoutData( left().right( 30 ).top( lastLine ).create() )
-                .setValidator( new MyNumberValidator( Integer.class ) ).create();
+                .setLayoutData( right().right( 75 ).top( lastLine ).create() )
+                .setValidator( new NotNullMyNumberValidator( Integer.class ) ).create();
 
-        newFormField( "/" )
+        newFormField( "Unternummer" )
                 .setParent( parent )
                 .setProperty(
                         new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix + "unterNummer",
@@ -224,7 +226,8 @@ public class GebaeudeFlurstueckeFormEditorPage
                                         return entity.unterNummer();
                                     }
                                 } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setLayoutData( left().left( 30 ).right( 50 ).top( lastLine ).create() ).create();
+                .setValidator( new NotNullValidator() )
+                .setLayoutData( right().left( 75 ).top( lastLine ).create() ).create();
 
         lastLine = newLine;
         // BUTTON zur Datenabfrage
@@ -243,7 +246,7 @@ public class GebaeudeFlurstueckeFormEditorPage
 
                 pageSite.setFieldValue( prefix + "gemarkung", toAdopt.gemarkung().get() );
                 // current.gemarkung().set( toAdopt.gemarkung().get() );
-                pageSite.setFieldValue( prefix + "flur", toAdopt.flur().get() );
+                // pageSite.setFieldValue( prefix + "flur", toAdopt.flur().get() );
                 pageSite.setFieldValue( prefix + "hauptNummer", String.valueOf( toAdopt.hauptNummer().get() ) );
                 pageSite.setFieldValue( prefix + "unterNummer", toAdopt.unterNummer().get() );
                 pageSite.setFieldValue( prefix + "strasse", toAdopt.strasse().get() );
@@ -274,7 +277,7 @@ public class GebaeudeFlurstueckeFormEditorPage
         };
         sfAction.setEnabled( false );
         searchFlurstueckeButton = new ActionButton( parent, sfAction );
-        searchFlurstueckeButton.setLayoutData( left().right( 20 ).height( 25 ).top( lastLine ).create() );
+        searchFlurstueckeButton.setLayoutData( right().right( 75 ).height( 25 ).top( lastLine ).create() );
         searchFlurstueckeButton.setEnabled( false );
         pageSite.addFieldListener( sfAction );
 
@@ -306,7 +309,7 @@ public class GebaeudeFlurstueckeFormEditorPage
                                     public Association<StrasseComposite> get( FlurstueckComposite entity ) {
                                         return entity.strasse();
                                     }
-                                } ) ).setField( reloadable( strassePickList ) )
+                                } ) ).setField( reloadable( strassePickList ) ).setValidator( new NotNullValidator() )
                 .setLayoutData( left().top( lastLine ).create() ).create();
 
         newFormField( "Hausnummer" )
@@ -319,7 +322,8 @@ public class GebaeudeFlurstueckeFormEditorPage
                                         return entity.hausnummer();
                                     }
                                 } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setLayoutData( right().right( 75 ).top( lastLine ).create() ).create();
+                .setValidator( new NotNullValidator() ).setLayoutData( right().right( 75 ).top( lastLine ).create() )
+                .create();
 
         newFormField( "Zusatz" )
                 .setToolTipText( "Hausnummernzusatz" )
@@ -365,7 +369,7 @@ public class GebaeudeFlurstueckeFormEditorPage
                                         return entity.richtwertZone();
                                     }
                                 } ) ).setField( reloadable( richtwertZonePickList ) )
-                .setLayoutData( left().top( lastLine ).create() ).create();
+                .setValidator( new NotNullValidator() ).setLayoutData( left().top( lastLine ).create() ).create();
 
         pageSite.addFieldListener( gemarkungListener = new IFormFieldListener() {
 
@@ -395,7 +399,7 @@ public class GebaeudeFlurstueckeFormEditorPage
                                         return entity.nutzung();
                                     }
                                 } ) ).setField( reloadable( namedAssocationsPicklist( NutzungComposite.class ) ) )
-                .setLayoutData( left().top( lastLine ).create() ).create();
+                .setValidator( new NotNullValidator() ).setLayoutData( left().top( lastLine ).create() ).create();
 
         newFormField( "Belastung" )
                 .setParent( parent )
@@ -407,7 +411,7 @@ public class GebaeudeFlurstueckeFormEditorPage
                                         return entity.belastung();
                                     }
                                 } ) ).setField( reloadable( namedAssocationsPicklist( BelastungComposite.class ) ) )
-                .setLayoutData( right().top( lastLine ).create() ).create();
+                .setValidator( new NotNullValidator() ).setLayoutData( right().top( lastLine ).create() ).create();
 
         lastLine = newLine;
         newLine = newFormField( "Fläche in m²" )
@@ -420,7 +424,7 @@ public class GebaeudeFlurstueckeFormEditorPage
                                         return entity.flaeche();
                                     }
                                 } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
-                .setValidator( new MyNumberValidator( Double.class, 2 ) )
+                .setValidator( new NotNullMyNumberValidator( Double.class, 2 ) )
                 .setLayoutData( left().top( lastLine ).create() ).create();
 
         newFormField( "Erbbaurecht" )
@@ -432,7 +436,8 @@ public class GebaeudeFlurstueckeFormEditorPage
                                         return entity.erbbaurecht();
                                     }
                                 } ) ).setField( reloadable( new BooleanFormField() ) )
-                .setLayoutData( right().top( lastLine ).create() ).setParent( parent ).create();
+                .setValidator( new NotNullValidator() ).setLayoutData( right().top( lastLine ).create() )
+                .setParent( parent ).create();
 
         // openErweiterteDaten = new ActionButton( parent, new Action(
         // "Flurstück bewerten" ) {
@@ -512,6 +517,8 @@ public class GebaeudeFlurstueckeFormEditorPage
             throws Exception {
 
         final FlurstueckComposite flurstueck = repository.newEntity( FlurstueckComposite.class, null );
+        flurstueck.flur().set( repository.findSchlNamed( FlurComposite.class, "000" ) );
+
         // queue( new UpdateCommand() {
         //
         // @Override
