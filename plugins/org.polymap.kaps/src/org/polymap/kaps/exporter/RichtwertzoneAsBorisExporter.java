@@ -448,7 +448,7 @@ public class RichtwertzoneAsBorisExporter
         // Georeferenz der Bodenrichtwertangabe
         // (Präsentationskoordinate)
         // freiwillig
-        result.add( geom != null ? Double.valueOf( geom.getInteriorPoint().getX() ).intValue() : "" );
+        result.add( geom != null ? Double.valueOf( geom.getCentroid().getX() ).intValue() : "" );
 
         // 17
         // Hochwert/Nordwert
@@ -460,7 +460,7 @@ public class RichtwertzoneAsBorisExporter
         // Georeferenz der Bodenrichtwertangabe
         // (Präsentationskoordinate)
         // freiwillig
-        result.add( geom != null ? Double.valueOf( geom.getInteriorPoint().getY() ).intValue() : "" );
+        result.add( geom != null ? Double.valueOf( geom.getCentroid().getY() ).intValue() : "" );
 
         // 18
         // Bezugssystem
@@ -702,7 +702,7 @@ public class RichtwertzoneAsBorisExporter
         // Georeferenz der Beschriftung zur städtebaulichen
         // Maßnahme (Präsentationskoordinate), historisch
         // freiwillig
-        result.add( entwicklungsZusatz != null && geom != null ? Double.valueOf( geom.getInteriorPoint().getX() )
+        result.add( entwicklungsZusatz != null && geom != null ? Double.valueOf( geom.getCentroid().getX() )
                 .intValue() : "" );
 
         // 35
@@ -718,7 +718,7 @@ public class RichtwertzoneAsBorisExporter
         // TODO ei jedem BRW im San- Gebiet sind zudem die Koordinaten (Feld 34/35)
         // für die Visualisierung der Beschriftung "San" anzugeben, möglichst nicht
         // im Mittelpunkt des Polygons, da dort der BRW platziert wird
-        result.add( entwicklungsZusatz != null && geom != null ? Double.valueOf( geom.getInteriorPoint().getY() )
+        result.add( entwicklungsZusatz != null && geom != null ? Double.valueOf( geom.getCentroid().getY() )
                 .intValue() : "" );
         // 36
         // Bodenart
