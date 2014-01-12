@@ -238,7 +238,7 @@ public class RichtwertzoneAsBorisExporter
         return new String[] { "GESL", "GENA", "GASL", "GABE", "GENU", "GEMA", "ORTST", "WNUM", "BRW", "STAG", "BRKE",
                 "BEDW", "PLZ", "BASBE", "BASMA", "YWERT", "XWERT", "BEZUG", "ENTW", "BEIT", "NUTA", "ERGNUTA", "BAUW",
                 "GEZ", "WGFZ", "GRZ", "BMZ", "FLAE", "GTIE", "GBREI", "ERVE", "VERG", "VERF", "YVERG", "XVERG", "BOD",
-                "ACZA", "GRZA", "AUFW", "WEER", "KOORWERT", "KOORVERF", "BEM", "FREI", "BRZNAME", "UMART", "LUMNUM" };
+                "ACZA", "GRZA", "AUFW", "WEER", "KOORWERT", "KOORVERF", "BEM", "FREI", "BRZNAME", "UMDAT", "LUMNUM" };
     }
 
 
@@ -715,7 +715,7 @@ public class RichtwertzoneAsBorisExporter
         // Georeferenz der Beschriftung zur städtebaulichen Maß-nahme
         // (Präsentationskoordinate), historisch
         // freiwillig
-        // TODO ei jedem BRW im San- Gebiet sind zudem die Koordinaten (Feld 34/35)
+        // TODO bei jedem BRW im San- Gebiet sind zudem die Koordinaten (Feld 34/35)
         // für die Visualisierung der Beschriftung "San" anzugeben, möglichst nicht
         // im Mittelpunkt des Polygons, da dort der BRW platziert wird
         result.add( entwicklungsZusatz != null && geom != null ? Double.valueOf( geom.getCentroid().getY() )
