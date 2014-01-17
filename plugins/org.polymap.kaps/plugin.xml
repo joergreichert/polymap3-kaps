@@ -91,5 +91,13 @@
             tooltip="Geometrie auslesen und in Richtwertzone importieren">
       </featureOperation>
    </extension>
+   <!--extension
+         point="org.polymap.core.operation.concerns">
+      <concern
+            class="org.polymap.kaps.ui.NewFeatureOperationConcern"
+            id="org.polymap.kaps.ui.NewFeatureOperationConcern"
+            name="org.polymap.kaps.ui.NewFeatureOperationConcern">
+      </concern>
+   </extension-->
 
 </plugin>

@@ -718,8 +718,8 @@ public class RichtwertzoneAsBorisExporter
         // TODO bei jedem BRW im San- Gebiet sind zudem die Koordinaten (Feld 34/35)
         // für die Visualisierung der Beschriftung "San" anzugeben, möglichst nicht
         // im Mittelpunkt des Polygons, da dort der BRW platziert wird
-        result.add( entwicklungsZusatz != null && geom != null ? Double.valueOf( geom.getCentroid().getY() )
-                .intValue() : "" );
+        result.add( entwicklungsZusatz != null && geom != null ? (Double.valueOf( geom.getCentroid().getY() )
+                .intValue() - 20) : "" );
         // 36
         // Bodenart
         // bodenart
@@ -788,7 +788,7 @@ public class RichtwertzoneAsBorisExporter
         // 8.3
         // Pflicht, falls
         // 11=1
-        result.add( geom != null ? new WKTWriter().writeFormatted( geom ) : null );
+        result.add( geom != null ? new WKTWriter().write( geom ) : null );
 
         // 42
         // Koordinatenliste
@@ -804,7 +804,7 @@ public class RichtwertzoneAsBorisExporter
         // freiwillig
         String row42 = "";
         if (entwicklungsZusatz != null && geom != null && entwicklungsZusatz.schl().get().startsWith( "S" )) {
-            row42 = new WKTWriter().writeFormatted( geom );
+            row42 = new WKTWriter().write( geom );
         }
         result.add( row42 );
 
