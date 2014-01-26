@@ -340,7 +340,7 @@ public class VertragsdatenBaulandGrunddatenFormEditorPage
 
         newFormField( "Bemerkung" ).setToolTipText( "Bemerkung gesamt" )
                 .setProperty( new PropertyAdapter( vb.bemerkungen() ) ).setField( new TextFormField() )
-                .setLayoutData( right().top( lastLine ).height( 50 ).create() ).setParent( client ).create();
+                .setLayoutData( right().top( lastLine ).height( 100 ).bottom( 100 ).create() ).setParent( client ).create();
         // lastLine = newLine;
         // newLine = newFormField( "Preis unbebaut in €/m²" ).setToolTipText(
         // "Bodenpreis unbebaut in €/m²" )

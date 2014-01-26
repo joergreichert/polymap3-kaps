@@ -23,6 +23,8 @@ import org.qi4j.api.query.Query;
 import org.qi4j.api.query.QueryExpressions;
 import org.qi4j.api.query.grammar.BooleanExpression;
 
+import com.google.common.collect.Sets;
+
 import org.eclipse.swt.widgets.Composite;
 
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -61,8 +63,8 @@ public class VertraegeFuerBaujahrUndGebaeudeartFilter
 
 
     public VertraegeFuerBaujahrUndGebaeudeartFilter( ILayer layer ) {
-        super( VertraegeFuerBaujahrUndGebaeudeartFilter.class.getName(), layer, "nach Nutzung, Art, Gemeinde und Baujahr...", null, 10000,
-                VertragComposite.class );
+        super( VertraegeFuerBaujahrUndGebaeudeartFilter.class.getName(), layer,
+                "nach Nutzung, Art, Gemeinde und Baujahr...", null, 10000, VertragComposite.class );
     }
 
 
@@ -118,114 +120,110 @@ public class VertraegeFuerBaujahrUndGebaeudeartFilter
             }
         }
 
-        BooleanExpression fExpr = null;
-        VertragComposite template = QueryExpressions.templateFor( VertragComposite.class );
-
-        if (gebaeude != null || nutzung != null || gemeinde != null) {
-            FlurstueckComposite flurTemplate = QueryExpressions.templateFor( FlurstueckComposite.class );
-
-            // nach Vertragsdatum vorsortieren
-            BooleanExpression vExpr = null;
-            if (vertragsDatumExpr != null) {
-                Query<VertragComposite> vertraege = KapsRepository.instance().findEntities( VertragComposite.class,
-                        vertragsDatumExpr, 0, -1 );
-                for (VertragComposite vertrag : vertraege) {
-                    BooleanExpression newExpr = QueryExpressions.eq( flurTemplate.vertrag(), vertrag );
-                    if (vExpr == null) {
-                        vExpr = newExpr;
-                    }
-                    else {
-                        vExpr = QueryExpressions.or( vExpr, newExpr );
-                    }
-                }
-            }
-
-            // gemeinde
-            BooleanExpression gExpr = null;
-            if (gemeinde != null) {
-                GemarkungComposite gemarkungTemplate = QueryExpressions.templateFor( GemarkungComposite.class );
-                Query<GemarkungComposite> gemarkungen = KapsRepository.instance().findEntities(
-                        GemarkungComposite.class, QueryExpressions.eq( gemarkungTemplate.gemeinde(), gemeinde ), 0, -1 );
-                for (GemarkungComposite gemarkung : gemarkungen) {
-                    BooleanExpression newExpr = QueryExpressions.eq( flurTemplate.gemarkung(), gemarkung );
-                    if (gExpr == null) {
-                        gExpr = newExpr;
-                    }
-                    else {
-                        gExpr = QueryExpressions.or( gExpr, newExpr );
-                    }
-                }
-            }
-
-            BooleanExpression qExpr = gebaeude != null ? QueryExpressions.eq( flurTemplate.gebaeudeArt(), gebaeude )
-                    : null;
-            BooleanExpression nExpr = nutzung != null ? QueryExpressions.eq( flurTemplate.nutzung(), nutzung ) : null;
-
-            if (qExpr != null) {
-                if (vExpr != null) {
-                    qExpr = QueryExpressions.and( qExpr, vExpr );
-                }
-            }
-            else {
-                qExpr = vExpr;
-            }
-            if (qExpr != null) {
-                if (gExpr != null) {
-                    qExpr = QueryExpressions.and( qExpr, gExpr );
-                }
-            }
-            else {
-                qExpr = gExpr;
-            }
-            if (qExpr != null) {
-                if (nExpr != null) {
-                    qExpr = QueryExpressions.and( qExpr, nExpr );
-                }
-            }
-            else {
-                qExpr = nExpr;
-            }
-
-            Query<FlurstueckComposite> flurstuecke = KapsRepository.instance().findEntities( FlurstueckComposite.class,
-                    qExpr, 0, -1 );
-            if (flurstuecke.count() > 5000) {
-                Polymap.getSessionDisplay().asyncExec( new Runnable() {
-
-                    public void run() {
-                        MessageDialog.openError( PolymapWorkbench.getShellToParentOn(), "Zu viele Ergebnisse",
-                                "Es wurden zu viele Ergebnisse gefunden. Bitte schränken Sie die Suche weiter ein." );
-                    }
-                } );
-                return KapsRepository.instance().findEntities( VertragComposite.class,
-                        QueryExpressions.eq( template.identity(), "unknown" ), 0, -1 );
-            }
-            Set<Integer> eingangsNummern = new HashSet<Integer>();
-            for (FlurstueckComposite fc : flurstuecke) {
-                // mehrere Flurstücke können einem Vertrag angehören
-                if (fc.vertrag().get() != null) {
-                    Integer eingangsNummer = fc.vertrag().get().eingangsNr().get();
-                    if (!eingangsNummern.contains( eingangsNummer )) {
-                        BooleanExpression newExpr = QueryExpressions.eq( template.eingangsNr(), eingangsNummer );
-                        if (fExpr == null) {
-                            fExpr = newExpr;
-                        }
-                        else {
-                            fExpr = QueryExpressions.or( fExpr, newExpr );
-                        }
-                        eingangsNummern.add( eingangsNummer );
-                    }
-                }
-            }
-            // wenn keine gefunden, ungültige Query erzeugen, damit auch keine
-            // Verträge gefunden werden
-            if (fExpr == null) {
-                fExpr = QueryExpressions.eq( template.identity(), "unknown" );
+        // nach Vertragsdatum vorsortieren führt zu StackOverflow
+        Set<VertragComposite> vertraegeNachDatum = null;
+        if (vertragsDatumExpr != null) {
+            vertraegeNachDatum = Sets.newHashSet();
+            Query<VertragComposite> vertraege = KapsRepository.instance().findEntities( VertragComposite.class,
+                    vertragsDatumExpr, 0, -1 );
+            for (VertragComposite vertrag : vertraege) {
+                vertraegeNachDatum.add( vertrag );
             }
         }
 
+        BooleanExpression fExpr = null;
+        VertragComposite template = QueryExpressions.templateFor( VertragComposite.class );
+
+        // if (gebaeude != null || nutzung != null || gemeinde != null) {
+        FlurstueckComposite flurTemplate = QueryExpressions.templateFor( FlurstueckComposite.class );
+        //
+        // // nach Vertragsdatum vorsortieren
+        // BooleanExpression vExpr = null;
+        // if (vertragsDatumExpr != null) {
+        // Query<VertragComposite> vertraege =
+        // KapsRepository.instance().findEntities( VertragComposite.class,
+        // vertragsDatumExpr, 0, -1 );
+        // for (VertragComposite vertrag : vertraege) {
+        // BooleanExpression newExpr = QueryExpressions.eq( flurTemplate.vertrag(),
+        // vertrag );
+        // if (vExpr == null) {
+        // vExpr = newExpr;
+        // }
+        // else {
+        // vExpr = QueryExpressions.or( vExpr, newExpr );
+        // }
+        // }
+        // }
+
+        // gemeinde
+        BooleanExpression gExpr = null;
+        if (gemeinde != null) {
+            GemarkungComposite gemarkungTemplate = QueryExpressions.templateFor( GemarkungComposite.class );
+            Query<GemarkungComposite> gemarkungen = KapsRepository.instance().findEntities( GemarkungComposite.class,
+                    QueryExpressions.eq( gemarkungTemplate.gemeinde(), gemeinde ), 0, -1 );
+            for (GemarkungComposite gemarkung : gemarkungen) {
+                BooleanExpression newExpr = QueryExpressions.eq( flurTemplate.gemarkung(), gemarkung );
+                if (gExpr == null) {
+                    gExpr = newExpr;
+                }
+                else {
+                    gExpr = QueryExpressions.or( gExpr, newExpr );
+                }
+            }
+        }
+
+        BooleanExpression qExpr = gebaeude != null ? QueryExpressions.eq( flurTemplate.gebaeudeArt(), gebaeude ) : null;
+        BooleanExpression nExpr = nutzung != null ? QueryExpressions.eq( flurTemplate.nutzung(), nutzung ) : null;
+
+        // if (qExpr != null) {
+        // if (vExpr != null) {
+        // qExpr = QueryExpressions.and( qExpr, vExpr );
+        // }
+        // }
+        // else {
+        // qExpr = vExpr;
+        // }
+        if (qExpr != null) {
+            if (gExpr != null) {
+                qExpr = QueryExpressions.and( qExpr, gExpr );
+            }
+        }
+        else {
+            qExpr = gExpr;
+        }
+        if (qExpr != null) {
+            if (nExpr != null) {
+                qExpr = QueryExpressions.and( qExpr, nExpr );
+            }
+        }
+        else {
+            qExpr = nExpr;
+        }
+
+        Set<VertragComposite> vertraegeNachDatumUndFlurstueck = null;
+        if (qExpr != null) {
+            // flurstücke eingeschränkt, falls keine gefunden werden ist das set leer
+            vertraegeNachDatumUndFlurstueck = new HashSet<VertragComposite>();            
+            Query<FlurstueckComposite> flurstuecke = KapsRepository.instance().findEntities( FlurstueckComposite.class,
+                    qExpr, 0, -1 );
+            for (FlurstueckComposite fc : flurstuecke) {
+                // mehrere Flurstücke können einem Vertrag angehören
+                VertragComposite vertrag = fc.vertrag().get();
+                if (vertrag != null) {
+                    if (vertraegeNachDatum == null || vertraegeNachDatum.contains( vertrag )) {
+                        vertraegeNachDatumUndFlurstueck.add( vertrag );
+                    }
+                }
+            }
+        } else {
+            // ansonsten flurstücke nicht weiter eingeschränkt, nimm alle nach Datum
+            vertraegeNachDatumUndFlurstueck = vertraegeNachDatum;
+        }
+
         Object[] jahre = (Object[])site.getFieldValue( "baujahr" );
-        BooleanExpression baujahrExpr = null;
+        Set<VertragComposite> vertraegeNachDatumUndFlurstueckUndBaujahr = null;
         if (jahre != null) {
+            vertraegeNachDatumUndFlurstueckUndBaujahr = new HashSet<VertragComposite>();
             VertragsdatenBaulandComposite dateTemplate = QueryExpressions
                     .templateFor( VertragsdatenBaulandComposite.class );
             BooleanExpression expr2 = null;
@@ -245,45 +243,44 @@ public class VertraegeFuerBaujahrUndGebaeudeartFilter
             if (expr2 != null) {
                 Query<VertragsdatenBaulandComposite> daten = KapsRepository.instance().findEntities(
                         VertragsdatenBaulandComposite.class, expr2, 0, -1 );
-                Set<Integer> eingangsNummern = new HashSet<Integer>();
                 for (VertragsdatenBaulandComposite kv : daten) {
-                    Integer eingangsNummer = kv.vertrag().get().eingangsNr().get();
-                    if (!eingangsNummern.contains( eingangsNummer )) {
-                        eingangsNummern.add( eingangsNummer );
-                        BooleanExpression newExpr = QueryExpressions.eq( template.eingangsNr(), eingangsNummer );
-                        if (baujahrExpr == null) {
-                            baujahrExpr = newExpr;
-                        }
-                        else {
-                            baujahrExpr = QueryExpressions.or( baujahrExpr, newExpr );
-                        }
+                    VertragComposite v = kv.vertrag().get();
+                    if (vertraegeNachDatumUndFlurstueck == null || vertraegeNachDatumUndFlurstueck.contains( v )) {
+                        // ist schon in Menge vorhanden, also auch hier rein
+                        vertraegeNachDatumUndFlurstueckUndBaujahr.add( v );
                     }
                 }
-                if (baujahrExpr == null) {
-                    baujahrExpr = QueryExpressions.eq( template.identity(), "unknown" );
+            }
+        } else {
+            vertraegeNachDatumUndFlurstueckUndBaujahr = vertraegeNachDatumUndFlurstueck;
+        }
+
+        if (vertraegeNachDatumUndFlurstueckUndBaujahr.size() > 5000) {
+            Polymap.getSessionDisplay().asyncExec( new Runnable() {
+
+                public void run() {
+                    MessageDialog.openError( PolymapWorkbench.getShellToParentOn(), "Zu viele Ergebnisse",
+                            "Es wurden über 5000 Ergebnisse gefunden. Bitte schränken Sie die Suche weiter ein." );
                 }
+            } );
+            return KapsRepository.instance().findEntities( VertragComposite.class,
+                    QueryExpressions.eq( template.identity(), "unknown" ), 0, -1 );
+        }
+        for (VertragComposite vertrag : vertraegeNachDatumUndFlurstueckUndBaujahr) {
+            BooleanExpression newExpr = QueryExpressions.eq( template.identity(), vertrag.id() );
+            if (fExpr == null) {
+                fExpr = newExpr;
+            }
+            else {
+                fExpr = QueryExpressions.or( fExpr, newExpr );
             }
         }
-
-        BooleanExpression allExpr = vertragsDatumExpr;
-        if (allExpr != null) {
-            if (baujahrExpr != null) {
-                allExpr = QueryExpressions.and( allExpr, baujahrExpr );
-            }
-        }
-        else {
-            allExpr = baujahrExpr;
+        // wenn keine gefunden, ungültige Query erzeugen, damit auch keine
+        // Verträge gefunden werden
+        if (fExpr == null) {
+            fExpr = QueryExpressions.eq( template.identity(), "unknown" );
         }
 
-        if (allExpr != null) {
-            if (fExpr != null) {
-                allExpr = QueryExpressions.and( allExpr, fExpr );
-            }
-        }
-        else {
-            allExpr = fExpr;
-        }
-
-        return KapsRepository.instance().findEntities( VertragComposite.class, allExpr, 0, getMaxResults() );
+        return KapsRepository.instance().findEntities( VertragComposite.class, fExpr, 0, getMaxResults() );
     }
 }
