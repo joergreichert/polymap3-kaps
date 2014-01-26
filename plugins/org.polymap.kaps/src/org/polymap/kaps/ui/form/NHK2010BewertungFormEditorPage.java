@@ -1070,8 +1070,8 @@ public class NHK2010BewertungFormEditorPage
                                 && !indexType.isEmpty()
                                 && (selectedComposite.get() != null && !indexType.equals( selectedComposite.get()
                                         .baukostenIndexTyp().get() ))) {
-                            // TODO Wertermittlungsstichtag festhalten?
-                            result = NHK2010BaupreisIndexComposite.Mixin.indexFor( indexType, new Date() );
+                            // Wertermittlungsstichtag = Vertragsdatum
+                            result = NHK2010BaupreisIndexComposite.Mixin.indexFor( indexType, bewertung.vertrag().get().vertragsDatum().get() );
 
                             pageSite.setFieldValue(
                                     getPropertyName( nameTemplate.baukostenIndexWert() ),
