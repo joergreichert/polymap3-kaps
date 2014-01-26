@@ -1012,7 +1012,7 @@ public interface WohnungComposite
 
 
         public static WohnungComposite createFor( GebaeudeComposite gebaeude ) {
-            Integer nummer = KapsRepository.instance().highestWohnungsNummer( gebaeude );
+            Integer nummer = KapsRepository.instance().wohnungsNummern.get().generate( gebaeude );
             WohnungComposite wohnung = KapsRepository.instance().newEntity( WohnungComposite.class, null );
             wohnung.objektNummer().set( gebaeude.objektNummer().get() );
             wohnung.objektFortfuehrung().set( gebaeude.objektFortfuehrung().get() );

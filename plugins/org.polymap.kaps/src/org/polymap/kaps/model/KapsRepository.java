@@ -12,15 +12,9 @@
  */
 package org.polymap.kaps.model;
 
-import static org.qi4j.api.query.QueryExpressions.orderBy;
 import static org.qi4j.api.query.QueryExpressions.templateFor;
 
-import java.util.Calendar;
 import java.util.Collection;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -35,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
 import org.qi4j.api.query.Query;
 import org.qi4j.api.query.QueryExpressions;
 import org.qi4j.api.query.grammar.BooleanExpression;
-import org.qi4j.api.query.grammar.OrderBy;
+import org.qi4j.api.service.ServiceReference;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 
@@ -51,7 +45,30 @@ import org.polymap.core.qi4j.QiModule;
 import org.polymap.core.qi4j.QiModuleAssembler;
 import org.polymap.core.runtime.Polymap;
 
-import org.polymap.kaps.model.data.*;
+import org.polymap.kaps.model.data.AusstattungBewertungComposite;
+import org.polymap.kaps.model.data.BodenRichtwertRichtlinieArtDerNutzungComposite;
+import org.polymap.kaps.model.data.BodenRichtwertRichtlinieErgaenzungComposite;
+import org.polymap.kaps.model.data.BodennutzungComposite;
+import org.polymap.kaps.model.data.ErmittlungModernisierungsgradComposite;
+import org.polymap.kaps.model.data.ErtragswertverfahrenComposite;
+import org.polymap.kaps.model.data.FlurComposite;
+import org.polymap.kaps.model.data.FlurstueckComposite;
+import org.polymap.kaps.model.data.GebaeudeArtComposite;
+import org.polymap.kaps.model.data.GebaeudeComposite;
+import org.polymap.kaps.model.data.GemarkungComposite;
+import org.polymap.kaps.model.data.GemeindeComposite;
+import org.polymap.kaps.model.data.KaeuferKreisComposite;
+import org.polymap.kaps.model.data.NHK2010AnbautenComposite;
+import org.polymap.kaps.model.data.NHK2010BaupreisIndexComposite;
+import org.polymap.kaps.model.data.NutzungComposite;
+import org.polymap.kaps.model.data.RichtwertzoneZeitraumComposite;
+import org.polymap.kaps.model.data.StrasseComposite;
+import org.polymap.kaps.model.data.VertragsArtComposite;
+import org.polymap.kaps.model.idgen.EingangsNummerGeneratorService;
+import org.polymap.kaps.model.idgen.GebaeudeNummerGeneratorService;
+import org.polymap.kaps.model.idgen.ObjektNummerGeneratorService;
+import org.polymap.kaps.model.idgen.SchlGeneratorService;
+import org.polymap.kaps.model.idgen.WohnungsNummerGeneratorService;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -75,19 +92,27 @@ public class KapsRepository
 
     // instance *******************************************
 
-    private IOperationSaveListener operationListener = new OperationSaveListener();
+    private IOperationSaveListener                          operationListener = new OperationSaveListener();
 
     // private Map<String,VertragsArtComposite> btNamen;
 
     // private Map<String,VertragsArtComposite> btNummern;
 
     /** Allow direct access for operations. */
-    protected KapsService          kapsService;
-
+    protected KapsService                                   kapsService;
 
     // private Map<String, VertragsArtComposite> vertragsArtNamen;
 
-    // public ServiceReference<BiotopnummerGeneratorService> biotopnummern;
+    public final  ServiceReference<EingangsNummerGeneratorService> eingangsNummern;
+
+    public final ServiceReference<ObjektNummerGeneratorService>   objektnummern;
+
+    public final ServiceReference<GebaeudeNummerGeneratorService>   gebaeudeNummern;
+
+    public final ServiceReference<WohnungsNummerGeneratorService>   wohnungsNummern;
+
+    private final ServiceReference<SchlGeneratorService>   schl;
+
 
     public static class SimpleEntityProvider<T extends Entity>
             extends KapsEntityProvider<T> {
@@ -101,11 +126,12 @@ public class KapsRepository
     public static class SchlEntityProvider<T extends SchlNamed>
             extends KapsEntityProvider<T> {
 
-        Integer highestSchl = null;
+        private ServiceReference<SchlGeneratorService> schl;
 
 
-        public SchlEntityProvider( QiModule repo, Class<T> entityClass, Name entityName ) {
+        public SchlEntityProvider( QiModule repo, Class<T> entityClass, Name entityName, ServiceReference<SchlGeneratorService> schl ) {
             super( repo, entityClass, entityName );
+            this.schl = schl;
         }
 
 
@@ -115,27 +141,11 @@ public class KapsRepository
             // set defaults
             if (value == null) {
                 if (entity.schl().qualifiedName().name().equals( propName )) {
-                    entity.schl().set( nextSchl().toString() );
+                    entity.schl().set( schl.get().generate(getEntityType().getType()).toString() );
                     return true;
                 }
             }
             return super.modifyFeature( entity, propName, value );
-        }
-
-
-        private synchronized Integer nextSchl() {
-            if (highestSchl == null) {
-                SchlNamed template = (SchlNamed)templateFor( getEntityType().getType() );
-
-                Query<SchlNamed> entities = KapsRepository.instance().findEntities( getEntityType().getType(), null, 0,
-                        -1 );
-                entities.orderBy( orderBy( template.schl(), OrderBy.Order.DESCENDING ) );
-
-                SchlNamed v = entities.iterator().next();
-                highestSchl = v != null ? Integer.parseInt( v.schl().get() ) : Integer.valueOf( 0 );
-            }
-            highestSchl += 1;
-            return highestSchl;
         }
     }
 
@@ -150,8 +160,11 @@ public class KapsRepository
         if (Polymap.getSessionDisplay() != null) {
             OperationSupport.instance().addOperationSaveListener( operationListener );
         }
-        // biotopnummern = assembler.getModule().serviceFinder().findService(
-        // BiotopnummerGeneratorService.class );
+        eingangsNummern = assembler.getModule().serviceFinder().findService( EingangsNummerGeneratorService.class );
+        objektnummern = assembler.getModule().serviceFinder().findService( ObjektNummerGeneratorService.class );
+        gebaeudeNummern = assembler.getModule().serviceFinder().findService( GebaeudeNummerGeneratorService.class );
+        wohnungsNummern = assembler.getModule().serviceFinder().findService( WohnungsNummerGeneratorService.class );
+        schl = assembler.getModule().serviceFinder().findService( SchlGeneratorService.class );
     }
 
 
@@ -196,7 +209,7 @@ public class KapsRepository
                     new SimpleEntityProvider<GemeindeComposite>( this, GemeindeComposite.class, new NameImpl(
                             KapsRepository.NAMESPACE, GemeindeComposite.NAME ) ),
                     new SchlEntityProvider<StrasseComposite>( this, StrasseComposite.class, new NameImpl(
-                            KapsRepository.NAMESPACE, StrasseComposite.NAME ) ),
+                            KapsRepository.NAMESPACE, StrasseComposite.NAME ), schl ),
 
                     new SimpleEntityProvider<GemarkungComposite>( this, GemarkungComposite.class, new NameImpl(
                             KapsRepository.NAMESPACE, GemarkungComposite.NAME ) ),
@@ -271,6 +284,7 @@ public class KapsRepository
         return super.findEntities( compositeType, expression, firstResult, maxResults );
     }
 
+
     //
     // @Override
     // public void commitChanges()
@@ -287,112 +301,6 @@ public class KapsRepository
     // throw new CompletionException( e );
     // }
     // }
-
-    private Map<Integer, Integer> highestNumbers = new HashMap<Integer, Integer>();
-
-
-    public synchronized int highestEingangsNummer( Date vertragsdatum ) {
-        Calendar cal = new GregorianCalendar();
-        cal.setTime( vertragsdatum );
-        cal.set( Calendar.DAY_OF_YEAR, 1 );
-        cal.set( Calendar.HOUR_OF_DAY, 0 );
-        cal.set( Calendar.MINUTE, 0 );
-        cal.set( Calendar.SECOND, 0 );
-        cal.set( Calendar.MILLISECOND, 0 );
-
-        Date lowerDate = cal.getTime();
-
-        // minimum aktuelles Jahr * 100000 + 1
-        int currentYear = cal.get( Calendar.YEAR );
-
-        Integer highest = highestNumbers.get( Integer.valueOf( currentYear ) );
-        if (highest == null) {
-
-            int currentMinimumNumber = currentYear * 100000;
-
-            cal.roll( Calendar.YEAR, true );
-            Date upperDate = cal.getTime();
-
-            VertragComposite template = templateFor( VertragComposite.class );
-            BooleanExpression exp = // QueryExpressions.and( QueryExpressions.ge(
-                                    // template.vertragsDatum(), lowerDate ),
-            QueryExpressions.lt( template.vertragsDatum(), upperDate );
-
-            Query<VertragComposite> entities = findEntities( VertragComposite.class, exp, 0, -1 );
-            entities.orderBy( orderBy( template.eingangsNr(), OrderBy.Order.DESCENDING ) );
-
-            VertragComposite v = entities.iterator().next();
-            int highestEingangsNr = v != null ? v.eingangsNr().get() : 0;
-
-            highest = Math.max( highestEingangsNr, currentMinimumNumber );
-        }
-        highest += 1;
-        highestNumbers.put( currentYear, highest );
-        return highest;
-
-    }
-
-    private Integer highestObjektNummer = null;
-
-
-    public synchronized int highestObjektNummer() {
-        if (highestObjektNummer == null) {
-            WohnungseigentumComposite template = templateFor( WohnungseigentumComposite.class );
-
-            Query<WohnungseigentumComposite> entities = findEntities( WohnungseigentumComposite.class, null, 0, -1 );
-            entities.orderBy( orderBy( template.objektNummer(), OrderBy.Order.DESCENDING ) );
-
-            WohnungseigentumComposite v = entities.iterator().next();
-            highestObjektNummer = v != null ? v.objektNummer().get() : Integer.valueOf( 0 );
-        }
-        highestObjektNummer += 1;
-        return highestObjektNummer;
-
-    }
-
-    private Integer highestGebaeudeNummer = null;
-
-
-    public synchronized int highestGebaeudeNummer( WohnungseigentumComposite parent ) {
-        if (highestGebaeudeNummer == null) {
-            GebaeudeComposite template = templateFor( GebaeudeComposite.class );
-
-            Query<GebaeudeComposite> entities = findEntities( GebaeudeComposite.class, QueryExpressions.and(
-                    QueryExpressions.eq( template.objektNummer(), parent.objektNummer().get() ),
-                    QueryExpressions.eq( template.objektFortfuehrung(), parent.objektFortfuehrung().get() ) ), 0, -1 );
-            entities.orderBy( orderBy( template.gebaeudeNummer(), OrderBy.Order.DESCENDING ) );
-
-            GebaeudeComposite v = entities.iterator().hasNext() ? entities.iterator().next() : null;
-            highestGebaeudeNummer = v != null ? v.gebaeudeNummer().get() : Integer.valueOf( 0 );
-        }
-        highestGebaeudeNummer += 1;
-        return highestGebaeudeNummer;
-
-    }
-
-    private Integer highestWohnungsNummer = null;
-
-
-    public synchronized int highestWohnungsNummer( GebaeudeComposite parent ) {
-        if (highestWohnungsNummer == null) {
-            WohnungComposite template = templateFor( WohnungComposite.class );
-
-            Query<WohnungComposite> entities = findEntities( WohnungComposite.class, QueryExpressions.and(
-                    QueryExpressions.eq( template.objektNummer(), parent.objektNummer().get() ),
-                    QueryExpressions.eq( template.objektFortfuehrung(), parent.objektFortfuehrung().get() ),
-                    QueryExpressions.eq( template.gebaeudeNummer(), parent.gebaeudeNummer().get() ),
-                    QueryExpressions.eq( template.gebaeudeFortfuehrung(), parent.gebaeudeFortfuehrung().get() ) ), 0,
-                    -1 );
-            entities.orderBy( orderBy( template.wohnungsNummer(), OrderBy.Order.DESCENDING ) );
-
-            WohnungComposite v = entities.iterator().hasNext() ? entities.iterator().next() : null;
-            highestWohnungsNummer = v != null ? v.wohnungsNummer().get() : Integer.valueOf( 0 );
-        }
-        highestWohnungsNummer += 1;
-        return highestWohnungsNummer;
-
-    }
-
 
     public <T extends SchlNamed> SortedMap<String, T> entitiesWithSchl( Class<T> entityClass ) {
         Query<T> entities = findEntities( entityClass, null, 0, 1000 );

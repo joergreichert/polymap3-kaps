@@ -37,6 +37,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.google.common.base.Charsets;
+
 import org.eclipse.rwt.widgets.ExternalBrowser;
 
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -138,8 +140,7 @@ public class VertragStaLaAgrarExporter
             export( context.features(), lines, monitor, errors );
             if (!lines.isEmpty()) {
                 for (String line : lines) {
-                    out.write( line );
-                    out.write( "\n" );
+                    out.write( new String( (line + "\n").getBytes(Charsets.UTF_8), Charsets.ISO_8859_1 ) );
                 }
                 out.flush();
             }
@@ -192,7 +193,7 @@ public class VertragStaLaAgrarExporter
                     String url = DownloadServiceHandler.registerContent( new ContentProvider() {
 
                         public String getContentType() {
-                            return "text/plain; charset=ISO-8859-1";
+                            return "text/plain; charset=" + Charsets.ISO_8859_1.name();
                         }
 
 
@@ -326,14 +327,17 @@ public class VertragStaLaAgrarExporter
         // flurstueck1
         contents.add( String.format( "%05d", flurstueck.hauptNummer().get() ) );
         // flurstueck2
-        contents.add( StringUtils.leftPad( flurstueck.unterNummer().get(), 5, "0" ) );
+        contents.add( flurstueck.unterNummer().get() != null ? StringUtils.leftPad( flurstueck.unterNummer().get(), 5,
+                "0" ) : "" );
 
         // Datum
         Calendar cal = new GregorianCalendar();
         cal.setTime( vertrag.vertragsDatum().get() );
 
         // String tag =
-        contents.add( String.format( "%02d", cal.get( Calendar.DAY_OF_MONTH ) ) + String.format( "%02d", cal.get( Calendar.MONTH ) + 1 ) + String.format( "%04d", cal.get( Calendar.YEAR ) ) );
+        contents.add( String.format( "%02d", cal.get( Calendar.DAY_OF_MONTH ) )
+                + String.format( "%02d", cal.get( Calendar.MONTH ) + 1 )
+                + String.format( "%04d", cal.get( Calendar.YEAR ) ) );
 
         KaeuferKreisComposite verkaeuferKreisComposite = vertrag.verkaeuferKreis().get();
         if (verkaeuferKreisComposite == null) {
@@ -414,7 +418,7 @@ public class VertragStaLaAgrarExporter
         if (b != null) {
             contents.add( b );
         }
-        
+
         StringBuilder ret = new StringBuilder();
         for (String s : contents) {
             ret.append( s ).append( DELIMITER );

@@ -36,6 +36,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.google.common.base.Charsets;
+
 import org.eclipse.rwt.widgets.ExternalBrowser;
 
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -128,7 +130,7 @@ public class VertragStaLaBaulandExporter
             // write to f
             if (!lines.isEmpty()) {
                 for (String line : lines) {
-                    out.write( line );
+                    out.write( new String(line.getBytes(), Charsets.ISO_8859_1 ) );
                     out.write( "\n" );
                 }
                 out.flush();
@@ -182,7 +184,7 @@ public class VertragStaLaBaulandExporter
                     String url = DownloadServiceHandler.registerContent( new ContentProvider() {
 
                         public String getContentType() {
-                            return "text/plain; charset=ISO-8859-1";
+                            return "text/plain; charset=" + Charsets.ISO_8859_1.name();
                         }
 
 

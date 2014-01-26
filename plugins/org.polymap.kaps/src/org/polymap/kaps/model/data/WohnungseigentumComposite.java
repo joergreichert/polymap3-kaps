@@ -105,7 +105,7 @@ public interface WohnungseigentumComposite
         public void beforeCompletion()
                 throws UnitOfWorkCompletionException {
             if (objektNummer().get() == null) {
-                objektNummer().set( KapsRepository.instance().highestObjektNummer() );
+                objektNummer().set( KapsRepository.instance().objektnummern.get().generate() );
                 objektFortfuehrung().set( 0 );
             }
         }

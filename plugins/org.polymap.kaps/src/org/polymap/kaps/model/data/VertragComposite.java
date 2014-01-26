@@ -360,7 +360,7 @@ public interface VertragComposite
         public void beforeCompletion()
                 throws UnitOfWorkCompletionException {
             if (eingangsNr().get() == null) {
-                eingangsNr().set( KapsRepository.instance().highestEingangsNummer( vertragsDatum().get() ) );
+                eingangsNr().set( KapsRepository.instance().eingangsNummern.get().generate( vertragsDatum().get() ) );
                 EventManager.instance().publish(
                         new PropertyChangeEvent( this, eingangsNr().qualifiedName().name(), null, eingangsNr().get() ) );
             }

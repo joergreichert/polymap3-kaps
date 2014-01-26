@@ -39,9 +39,13 @@ import org.polymap.rhei.data.entitystore.lucene.LuceneEntityStoreInfo;
 import org.polymap.rhei.data.entitystore.lucene.LuceneEntityStoreQueryService;
 import org.polymap.rhei.data.entitystore.lucene.LuceneEntityStoreService;
 
-import org.polymap.kaps.KapsPlugin;
 import org.polymap.kaps.model.SchlNamedCreatorCallback.Impl;
 import org.polymap.kaps.model.data.*;
+import org.polymap.kaps.model.idgen.EingangsNummerGeneratorService;
+import org.polymap.kaps.model.idgen.GebaeudeNummerGeneratorService;
+import org.polymap.kaps.model.idgen.ObjektNummerGeneratorService;
+import org.polymap.kaps.model.idgen.SchlGeneratorService;
+import org.polymap.kaps.model.idgen.WohnungsNummerGeneratorService;
 
 /**
  * 
@@ -107,10 +111,10 @@ public class KapsRepositoryAssembler
                 VeraeussererBaulandStalaComposite.class, VerwandschaftsVerhaeltnisStalaComposite.class,
                 BodenRichtwertRichtlinieErgaenzungComposite.class,
                 BodenRichtwertRichtlinieArtDerNutzungComposite.class, NHK2010AnbautenComposite.class,
-                NHK2010BaupreisIndexComposite.class, NHK2010BewertungComposite.class, NHK2010BewertungGebaeudeComposite.class,
-                ErmittlungModernisierungsgradComposite.class, ErtragswertverfahrenComposite.class,
-                GebaeudeTypStaBuComposite.class, StockwerkStaBuComposite.class, ImmobilienArtStaBuComposite.class,
-                WohnlageStaBuComposite.class );
+                NHK2010BaupreisIndexComposite.class, NHK2010BewertungComposite.class,
+                NHK2010BewertungGebaeudeComposite.class, ErmittlungModernisierungsgradComposite.class,
+                ErtragswertverfahrenComposite.class, GebaeudeTypStaBuComposite.class, StockwerkStaBuComposite.class,
+                ImmobilienArtStaBuComposite.class, WohnlageStaBuComposite.class );
 
         // persistence: workspace/Lucene
         File moduleRoot = createDataDir();
@@ -125,8 +129,12 @@ public class KapsRepositoryAssembler
         domainModule.addServices( HRIdentityGeneratorService.class );
 
         // additional services
-        // domainModule.addServices( BiotopnummerGeneratorService.class )
-        // .identifiedBy( "biotopnummer" );
+        domainModule.addServices( EingangsNummerGeneratorService.class ).identifiedBy( "eingangsnummer" );
+        domainModule.addServices( ObjektNummerGeneratorService.class ).identifiedBy( "objektnummer" );
+        domainModule.addServices( SchlGeneratorService.class ).identifiedBy( "schl" );
+        domainModule.addServices( GebaeudeNummerGeneratorService.class ).identifiedBy( "gebaeudenummer" );
+        domainModule.addServices( WohnungsNummerGeneratorService.class ).identifiedBy( "wohnungsnummer" );
+        
     }
 
 
@@ -172,7 +180,7 @@ public class KapsRepositoryAssembler
             ImmobilienArtStaBuComposite.Mixin.createInitData( schlCreator );
             WohnlageStaBuComposite.Mixin.createInitData( schlCreator );
         }
-        migrateBelastung(uow);
+        migrateBelastung( uow );
         uow.complete();
         log.info( "Create Init Data Completed" );
     }
@@ -193,10 +201,12 @@ public class KapsRepositoryAssembler
         return query.iterator().hasNext();
     }
 
-    private void migrateBelastung( UnitOfWork uow ) throws IOException {
-        File file = new File(createDataDir(), "migration.manyBelastung");
+
+    private void migrateBelastung( UnitOfWork uow )
+            throws IOException {
+        File file = new File( createDataDir(), "migration.manyBelastung" );
         if (!file.exists()) {
-            log.info("Migrating Belastungen");
+            log.info( "Migrating Belastungen" );
             QueryBuilder<FlurstueckComposite> builder = getModule().queryBuilderFactory().newQueryBuilder(
                     FlurstueckComposite.class );
             Query<FlurstueckComposite> query = builder.newQuery( uow ).maxResults( Integer.MAX_VALUE ).firstResult( 0 );
@@ -211,7 +221,7 @@ public class KapsRepositoryAssembler
                 }
             }
             file.createNewFile();
-            log.info("Migration of " + count + " Belastungen Completed");
+            log.info( "Migration of " + count + " Belastungen Completed" );
         }
     }
 }

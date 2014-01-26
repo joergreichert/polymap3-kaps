@@ -185,7 +185,7 @@ public class WohnungseigentumFormEditorPage
             @Override
             public void run() {
                 if (eigentum.objektNummer().get() != null) {
-                    Integer nummer = KapsRepository.instance().highestGebaeudeNummer( eigentum );
+                    Integer nummer = KapsRepository.instance().gebaeudeNummern.get().generate( eigentum );
 
                     GebaeudeComposite gebaeude = repository.newEntity( GebaeudeComposite.class, null );
                     gebaeude.objektNummer().set( eigentum.objektNummer().get() );
