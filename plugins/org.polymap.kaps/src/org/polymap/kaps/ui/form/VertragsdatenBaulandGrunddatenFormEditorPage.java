@@ -179,29 +179,21 @@ public class VertragsdatenBaulandGrunddatenFormEditorPage
         // FlurstueckComposite flurstueck = vb.flurstueck().get();
         RichtwertzoneComposite richtwertZone = vb.vertrag().get().richtwertZoneBauland().get();
         if (richtwertZone != null) {
-            // GemeindeComposite gemeinde = richtwertZone.gemeinde().get();
-            // Iterable<RichtwertzoneComposite> iterable =
-            // RichtwertzoneComposite.Mixin.findZoneIn( gemeinde );
-            // for (RichtwertzoneComposite zone : iterable) {
+
             String prefix = richtwertZone.schl().get();
             if (prefix.startsWith( "00" )) {
                 prefix = "*" + prefix;
             }
             zonen.put( prefix + " - " + richtwertZone.name().get(), richtwertZone );
-            // }
 
-            // richtwertZone = flurstueck.richtwertZone().get();
-            if (richtwertZone != null) {
-                for (RichtwertzoneZeitraumComposite zeitraum : RichtwertzoneZeitraumComposite.Mixin
-                        .forZone( richtwertZone )) {
-                    zeitraeume.put( KapsRepository.SHORT_DATE.format( zeitraum.gueltigAb().get() ), zeitraum );
-                }
+            for (RichtwertzoneZeitraumComposite zeitraum : RichtwertzoneZeitraumComposite.Mixin.forZone( richtwertZone )) {
+                zeitraeume.put( KapsRepository.SHORT_DATE.format( zeitraum.gueltigAb().get() ), zeitraum );
             }
         }
 
         newLine = newFormField( "Richtwertzone" ).setEnabled( false )
                 .setProperty( new AssociationAdapter<RichtwertzoneComposite>( vb.richtwertZone() ) )
-                .setField( new PicklistFormField( zonen.descendingMap() ) )
+                .setField( new PicklistFormField( zonen ) )
                 .setLayoutData( left().top( lastLine ).bottom( 100 ).create() ).setParent( client ).create();
 
         newFormField( "Gültig ab" )
@@ -340,7 +332,8 @@ public class VertragsdatenBaulandGrunddatenFormEditorPage
 
         newFormField( "Bemerkung" ).setToolTipText( "Bemerkung gesamt" )
                 .setProperty( new PropertyAdapter( vb.bemerkungen() ) ).setField( new TextFormField() )
-                .setLayoutData( right().top( lastLine ).height( 100 ).bottom( 100 ).create() ).setParent( client ).create();
+                .setLayoutData( right().top( lastLine ).height( 100 ).bottom( 100 ).create() ).setParent( client )
+                .create();
         // lastLine = newLine;
         // newLine = newFormField( "Preis unbebaut in €/m²" ).setToolTipText(
         // "Bodenpreis unbebaut in €/m²" )

@@ -12,8 +12,7 @@
  */
 package org.polymap.kaps.ui.form;
 
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.SortedMap;
 
 import org.geotools.data.FeatureStore;
 import org.opengis.feature.Feature;
@@ -43,10 +42,7 @@ import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.form.FormEditor;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
-import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.BodennutzungComposite;
-import org.polymap.kaps.model.data.GemeindeComposite;
-import org.polymap.kaps.model.data.RichtwertzoneComposite;
 import org.polymap.kaps.model.data.RichtwertzoneZeitraumComposite;
 import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.VertragsdatenErweitertComposite;
@@ -132,7 +128,7 @@ public class VertragsdatenAgrarBodenwertFormEditorPage
 
     private FieldMultiplication                       anteil6;
 
-    final Map<String, RichtwertzoneZeitraumComposite> zonen;
+    final PicklistFormField.ValueProvider zonen;
 
 
     // private IFormFieldListener gemeindeListener;
@@ -142,79 +138,17 @@ public class VertragsdatenAgrarBodenwertFormEditorPage
         super( VertragsdatenAgrarBodenwertFormEditorPage.class.getName(), "Bodenwertaufteilung", feature,
                 featureStore );
 
-        zonen = searchZonen();
+        // call only once for all 6 fields
+        final SortedMap<String, Object> searchZonen = searchZonen();
+        zonen = new PicklistFormField.ValueProvider(){
 
-        EventManager.instance().subscribe( fieldListener = new FieldListener( vb.gesamtBauWert() ) /*
-                                                                                                    * {
-                                                                                                    * 
-                                                                                                    * @
-                                                                                                    * Override
-                                                                                                    * protected
-                                                                                                    * void
-                                                                                                    * onChangedValue
-                                                                                                    * (
-                                                                                                    * IFormEditorPageSite
-                                                                                                    * site
-                                                                                                    * ,
-                                                                                                    * String
-                                                                                                    * fieldName
-                                                                                                    * ,
-                                                                                                    * Object
-                                                                                                    * value
-                                                                                                    * )
-                                                                                                    * {
-                                                                                                    * site
-                                                                                                    * .
-                                                                                                    * fireEvent
-                                                                                                    * (
-                                                                                                    * formEditor
-                                                                                                    * ,
-                                                                                                    * vb
-                                                                                                    * .
-                                                                                                    * gesamtBauWert
-                                                                                                    * (
-                                                                                                    * )
-                                                                                                    * .
-                                                                                                    * qualifiedName
-                                                                                                    * (
-                                                                                                    * )
-                                                                                                    * .
-                                                                                                    * name
-                                                                                                    * (
-                                                                                                    * )
-                                                                                                    * ,
-                                                                                                    * IFormFieldListener
-                                                                                                    * .
-                                                                                                    * VALUE_CHANGE
-                                                                                                    * ,
-                                                                                                    * fieldListener
-                                                                                                    * .
-                                                                                                    * get
-                                                                                                    * (
-                                                                                                    * vb
-                                                                                                    * .
-                                                                                                    * gesamtBauWert
-                                                                                                    * (
-                                                                                                    * )
-                                                                                                    * )
-                                                                                                    * )
-                                                                                                    * ;
-                                                                                                    * }
-                                                                                                    * }
-                                                                                                    */,
+            @Override
+            public SortedMap<String, Object> get() {
+               return searchZonen;
+            }};
+
+        EventManager.instance().subscribe( fieldListener = new FieldListener( vb.gesamtBauWert() ),
                 new FieldListener.EventFilter( formEditor ) );
-        // InterEditorListener( this, vb.gesamtBauWert() ) {
-        //
-        // @Override
-        // protected void onNewValue( IFormEditorPageSite site, String fieldName,
-        // Object value ) {
-        // if (fieldName.equals( vb.gesamtBauWert().qualifiedName().name() )) {
-        // pageSite.fireEvent( site, vb.gesamtBauWert().qualifiedName().name(),
-        // IFormFieldListener.VALUE_CHANGE, fieldListener.get( vb.gesamtBauWert() )
-        // );
-        // }
-        // }
-        // }, new InterEditorListener.EventFilter( vb ) );
     }
 
 
@@ -298,7 +232,7 @@ public class VertragsdatenAgrarBodenwertFormEditorPage
         lastLine = newLine;
         newLine = newFormField( IFormFieldLabel.NO_LABEL )
                 .setProperty( new AssociationAdapter<RichtwertzoneZeitraumComposite>( vb.richtwertZone1() ) )
-                .setField( new PicklistFormField( zonen ) ).setLayoutData( one().top( lastLine ).create() )
+                .setField( new PicklistFormField( zonen )).setLayoutData( one().top( lastLine ).create() )
                 .setParent( client ).create();
         newFormField( IFormFieldLabel.NO_LABEL )
                 .setProperty( new AssociationAdapter<BodennutzungComposite>( vb.bodennutzung1() ) )
@@ -611,25 +545,8 @@ public class VertragsdatenAgrarBodenwertFormEditorPage
     }
 
 
-    private Map<String, RichtwertzoneZeitraumComposite> searchZonen() {
-        TreeMap<String, RichtwertzoneZeitraumComposite> zonen = new TreeMap<String, RichtwertzoneZeitraumComposite>();
-        GemeindeComposite gemeinde = vb.vertrag().get().richtwertZoneAgrar().get().gemeinde().get();
-        Iterable<RichtwertzoneComposite> iterable = RichtwertzoneComposite.Mixin.findZoneIn( gemeinde );
-        for (RichtwertzoneComposite zone : iterable) {
-            String prefix = zone.schl().get();
-            if (prefix.startsWith( "00" )) {
-                prefix = "*" + prefix;
-            }
-            // find zeitraum
-            RichtwertzoneZeitraumComposite zeitraum = RichtwertzoneZeitraumComposite.Mixin.findZeitraumFor( zone, vb
-                    .vertrag().get().vertragsDatum().get() );
-            if (zeitraum != null) {
-                zonen.put(
-                        prefix + " - " + zone.name().get() + "("
-                                + KapsRepository.SHORT_DATE.format( zeitraum.gueltigAb().get() ) + ")", zeitraum );
-            }
-        }
-        return zonen.descendingMap();
+    private SortedMap<String, Object> searchZonen() {
+        return RichtwertzoneProvider.findFor(vb.vertrag().get().richtwertZoneAgrar().get().gemeinde().get(), vb.vertrag().get().vertragsDatum().get());
     }
 
 

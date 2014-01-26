@@ -26,6 +26,8 @@ import org.qi4j.api.entity.association.Association;
 import org.qi4j.api.entity.association.ManyAssociation;
 import org.qi4j.api.property.Property;
 
+import com.google.common.collect.Maps;
+
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
@@ -348,19 +350,11 @@ public class KaufvertragFlurstueckeFormEditorPage
 
             @Override
             public SortedMap<String, Object> get() {
-                TreeMap<String, Object> zonen = new TreeMap<String, Object>();
                 if (selectedGemarkung != null) {
                     GemeindeComposite gemeinde = selectedGemarkung.gemeinde().get();
-                    Iterable<RichtwertzoneComposite> iterable = RichtwertzoneComposite.Mixin.findZoneIn( gemeinde );
-                    for (RichtwertzoneComposite zone : iterable) {
-                        String prefix = zone.schl().get();
-                        if (prefix.startsWith( "00" )) {
-                            prefix = "*" + prefix;
-                        }
-                        zonen.put( prefix + " - " + zone.name().get(), zone );
-                    }
+                    return RichtwertzoneProvider.findFor( gemeinde );
                 }
-                return zonen.descendingMap();
+                return Maps.newTreeMap();
             }
         } );
         Composite line3 = newFormField( "Richtwertzone" )
