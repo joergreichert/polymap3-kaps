@@ -569,7 +569,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                                         return entity.belastungen();
                                     }
                                 } ) ).setField( reloadable(namedAssocationsSelectlist( BelastungComposite.class, true )) )
-                .setValidator( new ListNotNullValidator() ).setLayoutData( right().top( line6 ).height( 50 ).bottom( 100 ).create() ).create();
+                .setValidator( new ListNotNullValidator() ).setLayoutData( right().top( line6 ).height( 100 ).bottom( 100 ).create() ).create();
 
         // return the last line
         return formSection;
