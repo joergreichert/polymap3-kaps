@@ -32,8 +32,7 @@ public class Kaufvertrag2FormEditorPage
         extends KaufvertragFormEditorPage {
 
     public Kaufvertrag2FormEditorPage( Feature feature, FeatureStore featureStore ) {
-        super( Kaufvertrag2FormEditorPage.class.getName(), "Bearbeitungshinweise", feature,
-                featureStore );
+        super( Kaufvertrag2FormEditorPage.class.getName(), "Bearbeitungshinweise", feature, featureStore );
     }
 
 
@@ -41,35 +40,33 @@ public class Kaufvertrag2FormEditorPage
     public void createFormContent( final IFormEditorPageSite site ) {
         super.createFormContent( site );
 
-        final Composite line1 = newFormField( "Urkundennummer" )
-                .setProperty( new PropertyAdapter( kaufvertrag.urkundenNummer() ) )
-                .setField( new StringFormField() ).setLayoutData( left().create() ).create();
+        final Composite line0 = newFormField( "Urkundennummer" )
+                .setProperty( new PropertyAdapter( kaufvertrag.urkundenNummer() ) ).setField( new StringFormField() )
+                .setLayoutData( left().create() ).create();
 
-        newFormField( "Gutachtennummer" )
-                .setProperty( new PropertyAdapter( kaufvertrag.gutachtenNummer() ) )
+        newFormField( "Notariat" ).setProperty( new PropertyAdapter( kaufvertrag.notariat() ) )
                 .setField( new StringFormField() ).setLayoutData( right().create() ).create();
 
-        final Composite line2 = newFormField( "Anfragen" )
-                .setProperty( new PropertyAdapter( kaufvertrag.anfragen() ) )
+        final Composite line1 = newFormField( "Gutachtennummer" )
+                .setProperty( new PropertyAdapter( kaufvertrag.gutachtenNummer() ) ).setField( new StringFormField() )
+                .setLayoutData( left().top( line0 ).create() ).create();
+
+        final Composite line2 = newFormField( "Anfragen" ).setProperty( new PropertyAdapter( kaufvertrag.anfragen() ) )
                 .setField( new TextFormField() )
                 .setLayoutData( left().right( 100 ).top( line1 ).height( 100 ).create() ).create();
 
         Section section = newSection( line2, "Auskunft vom Verkäufer" );
         Composite verkaeufer = (Composite)section.getClient();
-        
+
         final Composite verkaeuferLine1 = newFormField( "Versendet am" )
                 .setProperty( new PropertyAdapter( kaufvertrag.anschreibenVerkaeuferErstelltAm() ) )
-                .setField( new DateTimeFormField() ).setLayoutData( left().create() )
-                .setParent( verkaeufer ).create();
+                .setField( new DateTimeFormField() ).setLayoutData( left().create() ).setParent( verkaeufer ).create();
 
         newFormField( "Antwort am" )
-                .setProperty(
-                        new PropertyAdapter( kaufvertrag.anschreibenVerkaeuferEingangAntwort() ) )
-                .setField( new DateTimeFormField() ).setLayoutData( right().create() )
-                .setParent( verkaeufer ).create();
+                .setProperty( new PropertyAdapter( kaufvertrag.anschreibenVerkaeuferEingangAntwort() ) )
+                .setField( new DateTimeFormField() ).setLayoutData( right().create() ).setParent( verkaeufer ).create();
 
-        newFormField( "Bemerkungen" )
-                .setProperty( new PropertyAdapter( kaufvertrag.bemerkungenVerkaeufer() ) )
+        newFormField( "Bemerkungen" ).setProperty( new PropertyAdapter( kaufvertrag.bemerkungenVerkaeufer() ) )
                 .setField( new TextFormField() )
                 .setLayoutData( left().right( 100 ).top( verkaeuferLine1 ).bottom( 100 ).height( 50 ).create() )
                 .setParent( verkaeufer ).create();
@@ -79,16 +76,13 @@ public class Kaufvertrag2FormEditorPage
 
         final Composite kaeuferLine1 = newFormField( "Versendet am" )
                 .setProperty( new PropertyAdapter( kaufvertrag.anschreibenKaeuferErstelltAm() ) )
-                .setField( new DateTimeFormField() ).setLayoutData( left().create() )
-                .setParent( kaeufer ).create();
+                .setField( new DateTimeFormField() ).setLayoutData( left().create() ).setParent( kaeufer ).create();
 
         newFormField( "Antwort am" )
                 .setProperty( new PropertyAdapter( kaufvertrag.anschreibenKaeuferEingangAntwort() ) )
-                .setField( new DateTimeFormField() ).setLayoutData( right().create() )
-                .setParent( kaeufer ).create();
+                .setField( new DateTimeFormField() ).setLayoutData( right().create() ).setParent( kaeufer ).create();
 
-        newFormField( "Bemerkungen" )
-                .setProperty( new PropertyAdapter( kaufvertrag.bemerkungenKaeufer() ) )
+        newFormField( "Bemerkungen" ).setProperty( new PropertyAdapter( kaufvertrag.bemerkungenKaeufer() ) )
                 .setField( new TextFormField() )
                 .setLayoutData( left().right( 100 ).top( kaeuferLine1 ).height( 50 ).bottom( 100 ).create() )
                 .setParent( kaeufer ).create();

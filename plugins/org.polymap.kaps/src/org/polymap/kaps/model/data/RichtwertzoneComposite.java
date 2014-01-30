@@ -235,8 +235,6 @@ public interface RichtwertzoneComposite
                         if (iterator != null && iterator.hasNext()) {
                             latest = iterator.next();
                         }
-                        log.info( "Zone " + zone.schl().get() + " euro " + latest.euroQm().get() + " hat gueltig ab "
-                                + KapsRepository.SHORT_DATE.format( latest.gueltigAb().get() ) );
                     }
                     return latest;
                 }

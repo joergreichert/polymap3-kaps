@@ -334,6 +334,8 @@ public interface VertragComposite
     @Optional
     Property<String> urkundenNummer();
 
+    @Optional
+    Property<String> notariat();
 
     @Optional
     Property<Boolean> fuerGewosGeeignet();

@@ -181,9 +181,6 @@ public class VertragsdatenBaulandGrunddatenFormEditorPage
         if (richtwertZone != null) {
 
             String prefix = richtwertZone.schl().get();
-            if (prefix.startsWith( "00" )) {
-                prefix = "*" + prefix;
-            }
             zonen.put( prefix + " - " + richtwertZone.name().get(), richtwertZone );
 
             for (RichtwertzoneZeitraumComposite zeitraum : RichtwertzoneZeitraumComposite.Mixin.forZone( richtwertZone )) {

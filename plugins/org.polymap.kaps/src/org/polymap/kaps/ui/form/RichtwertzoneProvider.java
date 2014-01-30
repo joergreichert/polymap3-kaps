@@ -126,9 +126,6 @@ public class RichtwertzoneProvider {
         Iterable<RichtwertzoneComposite> iterable = RichtwertzoneComposite.Mixin.findZoneIn( gemeinde );
         for (RichtwertzoneComposite zone : iterable) {
             String prefix = zone.schl().get();
-            if (prefix.startsWith( "00" )) {
-                prefix = "*" + prefix;
-            }
 
             // find zeitraum
             RichtwertzoneZeitraumComposite zeitraum = RichtwertzoneZeitraumComposite.Mixin.findZeitraumFor( zone, date );
@@ -171,9 +168,6 @@ public class RichtwertzoneProvider {
         Iterable<RichtwertzoneComposite> iterable = RichtwertzoneComposite.Mixin.findZoneIn( gemeinde );
         for (RichtwertzoneComposite zone : iterable) {
             String prefix = zone.schl().get();
-            if (prefix.startsWith( "00" )) {
-                prefix = "*" + prefix;
-            }
             zonen.put( prefix + " - " + zone.name().get(), zone );
         }
         TreeMap<String, Object> sorted = new TreeMap<String, Object>( new RWComparator( zonen ) );
