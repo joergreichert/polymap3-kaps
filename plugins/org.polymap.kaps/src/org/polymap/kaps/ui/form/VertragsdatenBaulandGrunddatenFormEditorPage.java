@@ -553,16 +553,13 @@ public class VertragsdatenBaulandGrunddatenFormEditorPage
             throws Exception {
         super.afterDoLoad( monitor );
 
-        if (vb.richtwertZoneG().get() == null) {
+        RichtwertzoneComposite zone = vb.vertrag().get().richtwertZoneBauland().get();
+        RichtwertzoneZeitraumComposite zeitraum = RichtwertzoneZeitraumComposite.Mixin.findZeitraumFor( zone, vb
+                .vertrag().get().vertragsDatum().get() );
+
+        if (vb.richtwertZone().get() == null || vb.richtwertZoneG().get() == null
+                || !vb.richtwertZone().get().equals( zone ) || !vb.richtwertZoneG().get().equals( zeitraum )) {
             // set the default zone from flurstueck
-            RichtwertzoneComposite zone = vb.vertrag().get().richtwertZoneBauland().get();
-            RichtwertzoneZeitraumComposite zeitraum = RichtwertzoneZeitraumComposite.Mixin.findZeitraumFor( zone, vb
-                    .vertrag().get().vertragsDatum().get() );
-            // vb.richtwertZone().set( zone );
-            // vb.richtwertZoneG().set( zeitraum );
-            // pageSite.fireEvent( this, vb.richtwertZoneG().qualifiedName().name(),
-            // IFormFieldListener.VALUE_CHANGE,
-            // zeitraum );
             pageSite.setFieldValue( vb.richtwertZone().qualifiedName().name(), zone );
             if (zeitraum != null) {
                 pageSite.setFieldValue( vb.richtwertZoneG().qualifiedName().name(), zeitraum );

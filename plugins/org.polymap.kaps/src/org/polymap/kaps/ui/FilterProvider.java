@@ -82,7 +82,7 @@ public class FilterProvider
                 if (type.isAssignableFrom( RichtwertzoneComposite.class )) {
                     result.add( new RichtwertZoneFilter( layer ) );
                     result.add( new RichtwertZoneZeitraumFilter( layer ) );
-                    result.add( new DefaultEntityFilter( layer, type, repo ) );
+                    result.add( new DefaultEntityFilter( layer, type, repo ).exclude( "latest" ) );
                     // }
                     // else if (type.isAssignableFrom( FlurstueckComposite.class )) {
                     // result.add( new FlurstueckeStabuFilter( layer ));
@@ -94,7 +94,7 @@ public class FilterProvider
                     result.add( new EinzelnerVertragFilter( layer ) );
                     result.add( new VertraegeFuerBaujahrUndGebaeudeartFilter( layer ) );
                     result.add( new VertraegeFuerFlurstueckeFilter( layer ) );
-//                    result.add( new DefaultEntityFilter( layer, type, repo ) );
+                    // result.add( new DefaultEntityFilter( layer, type, repo ) );
                     result.add( new VertraegeStabuFilter( layer ) );
                     result.add( new VertraegeStalaAgrarFilter( layer ) );
                     result.add( new VertraegeStalaBaulandFilter( layer ) );

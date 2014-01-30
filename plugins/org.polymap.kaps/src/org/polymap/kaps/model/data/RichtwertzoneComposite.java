@@ -12,6 +12,8 @@
  */
 package org.polymap.kaps.model.data;
 
+import java.util.Iterator;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -19,7 +21,10 @@ import org.qi4j.api.common.Optional;
 import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.entity.association.Association;
+import org.qi4j.api.entity.association.kaps.ComputedAssociationInstance;
+import org.qi4j.api.entity.association.kaps.GenericAssociationInfo;
 import org.qi4j.api.mixin.Mixins;
+import org.qi4j.api.property.Computed;
 import org.qi4j.api.property.Property;
 import org.qi4j.api.query.Query;
 import org.qi4j.api.query.QueryExpressions;
@@ -42,8 +47,8 @@ import org.polymap.kaps.model.SchlNamed;
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 @Concerns({ PropertyChangeSupport.Concern.class })
-@Mixins({ RichtwertzoneComposite.Mixin.class, PropertyChangeSupport.Mixin.class,
-        ModelChangeSupport.Mixin.class, QiEntity.Mixin.class
+@Mixins({ RichtwertzoneComposite.Mixin.class, PropertyChangeSupport.Mixin.class, ModelChangeSupport.Mixin.class,
+        QiEntity.Mixin.class
 // JsonState.Mixin.class
 })
 // nur Teile hiervon
@@ -53,9 +58,11 @@ public interface RichtwertzoneComposite
 
     public final static String NAME = "Richtwertzone";
 
+
     @Optional
     Property<Polygon> geom();
-    
+
+
     // GFZBER VARCHAR(20), leer
     // GFZ-Bereich
     @Optional
@@ -68,16 +75,19 @@ public interface RichtwertzoneComposite
     @Optional
     Association<RichtwertZoneLageComposite> lage();
 
+
     // RIZONE VARCHAR(7), Nummer PK, scheint keine Referenz zu sein
     @Optional
     @ImportColumn("RIZONE")
     Property<String> schl();
 
+
     // BEZ VARCHAR(40), Name
     @Optional
     @ImportColumn("BEZ")
     Property<String> name();
-    
+
+
     // NUTZUNG VARCHAR(2), NUTZUNG 01-60, Referenz auf K_BONUTZ
     @Optional
     Association<BodennutzungComposite> bodenNutzung();
@@ -86,14 +96,17 @@ public interface RichtwertzoneComposite
     // NUART VARCHAR(2), NUART 00,01,27,28,31,32 Referenz auf K_NUTZ
     @Optional
     Association<NutzungComposite> nutzung();
-    
+
+
     // NUTZUNG_ART
     @Optional
     Association<BodenRichtwertRichtlinieArtDerNutzungComposite> brwrlArt();
-    
+
+
     // NUTZUNG_ERGAENZ
     @Optional
     Association<BodenRichtwertRichtlinieErgaenzungComposite> brwrlErgaenzung();
+
 
     // GEMEINDE INTEGER DEFAULT 0, Referenz auf Gemeinde 522010 bspw
     @Optional
@@ -106,7 +119,7 @@ public interface RichtwertzoneComposite
     Property<String> basisKarte();
 
 
-    // ENTWZUSTAND VARCHAR(2), 
+    // ENTWZUSTAND VARCHAR(2),
     @Optional
     Association<EntwicklungsZustandComposite> entwicklungsZustand();
 
@@ -165,7 +178,7 @@ public interface RichtwertzoneComposite
     Property<Integer> gruenLandZahl();
 
 
-    // ENTWZUSATZ VARCHAR(2), 
+    // ENTWZUSATZ VARCHAR(2),
     @Optional
     Association<EntwicklungsZusatzComposite> entwicklungsZusatz();
 
@@ -180,6 +193,12 @@ public interface RichtwertzoneComposite
     @ImportColumn("WGFZ")
     Property<String> geschossFlaechenZahl();
 
+
+    @Optional
+    @Computed
+    Association<RichtwertzoneZeitraumComposite> latest();
+
+
     /**
      * Methods and transient fields.
      */
@@ -187,15 +206,48 @@ public interface RichtwertzoneComposite
             implements RichtwertzoneComposite {
 
         private static Log log = LogFactory.getLog( Mixin.class );
-        
+
+
         public static Iterable<RichtwertzoneComposite> findZoneIn( GemeindeComposite gemeinde ) {
-            RichtwertzoneComposite template = QueryExpressions
-                    .templateFor( RichtwertzoneComposite.class );
+            RichtwertzoneComposite template = QueryExpressions.templateFor( RichtwertzoneComposite.class );
             BooleanExpression expr = QueryExpressions.eq( template.gemeinde(), gemeinde );
             Query<RichtwertzoneComposite> matches = KapsRepository.instance().findEntities(
                     RichtwertzoneComposite.class, expr, 0, -1 );
-            // filter auf letzte aktuelle Zone, darf nicht da ja auch ältere Zonen auswählbar sind
+            // filter auf letzte aktuelle Zone, darf nicht da ja auch ältere Zonen
+            // auswählbar sind
             return matches;
+        }
+
+        private final RichtwertzoneComposite zone = this;
+
+        private RichtwertzoneZeitraumComposite latest = null;
+
+        @Override
+        public Association<RichtwertzoneZeitraumComposite> latest() {
+            return new ComputedAssociationInstance<RichtwertzoneZeitraumComposite>( new GenericAssociationInfo(
+                    RichtwertzoneComposite.class, "latest" ) ) {
+                
+                @Override
+                public RichtwertzoneZeitraumComposite get() {
+                    if (latest == null) {
+                        Iterator<RichtwertzoneZeitraumComposite> iterator = RichtwertzoneZeitraumComposite.Mixin
+                                .forZone( zone ).iterator();
+                        if (iterator != null && iterator.hasNext()) {
+                            latest = iterator.next();
+                        }
+                        log.info( "Zone " + zone.schl().get() + " euro " + latest.euroQm().get() + " hat gueltig ab "
+                                + KapsRepository.SHORT_DATE.format( latest.gueltigAb().get() ) );
+                    }
+                    return latest;
+                }
+
+
+                @Override
+                public void set( RichtwertzoneZeitraumComposite newValue )
+                        throws IllegalArgumentException, IllegalStateException {
+                    latest = newValue;
+                }
+            };
         }
     }
 }

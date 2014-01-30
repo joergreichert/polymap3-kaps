@@ -108,6 +108,10 @@ public interface RichtwertzoneZeitraumComposite
 
         private static Log log = LogFactory.getLog( Mixin.class );
 
+        @Override
+        public void afterCompletion( UnitOfWorkStatus status ) {
+            zone().get().latest().set( null );
+        }
 
         public static Iterable<RichtwertzoneZeitraumComposite> forZone( RichtwertzoneComposite zone ) {
             RichtwertzoneZeitraumComposite template = QueryExpressions
@@ -115,7 +119,7 @@ public interface RichtwertzoneZeitraumComposite
             BooleanExpression expr = QueryExpressions.eq( template.zone(), zone );
             Query<RichtwertzoneZeitraumComposite> matches = KapsRepository.instance().findEntities(
                     RichtwertzoneZeitraumComposite.class, expr, 0, -1 );
-            matches = matches.orderBy( orderBy( template.gueltigAb(), OrderBy.Order.DESCENDING ) );
+            matches.orderBy( orderBy( template.gueltigAb(), OrderBy.Order.DESCENDING ) );
             return matches;
         }
 

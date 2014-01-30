@@ -22,6 +22,13 @@ import org.qi4j.api.query.QueryExpressions;
 
 import org.eclipse.swt.widgets.Composite;
 
+import org.eclipse.jface.dialogs.MessageDialog;
+
+import org.eclipse.core.runtime.IProgressMonitor;
+
+import org.polymap.core.runtime.Polymap;
+import org.polymap.core.workbench.PolymapWorkbench;
+
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
 import org.polymap.rhei.field.FormFieldEvent;
 import org.polymap.rhei.field.IFormFieldListener;
@@ -54,6 +61,54 @@ public class BaupreisIndexFormEditorPage
         zeitraumValidator = new ZeitraumValidator( composite );
     }
 
+    //
+    // @Override
+    // public void doSubmit( IProgressMonitor monitor )
+    // throws Exception {
+    //
+    // super.doSubmit( monitor );
+    // }
+
+    private boolean valid = true;
+
+
+    @Override
+    public boolean isValid() {
+        if (zeitraumValidator.jahr != null && zeitraumValidator.monatVon != null && zeitraumValidator.monatBis != null) {
+            if (zeitraumValidator.monatBis <= zeitraumValidator.monatVon) {
+                // war true vorher also meldung anzeigen
+                if (valid == true) {
+                    Polymap.getSessionDisplay().asyncExec( new Runnable() {
+
+                        public void run() {
+                            MessageDialog.openError( PolymapWorkbench.getShellToParentOn(), "Fehler",
+                                    "Monat bis muss größer sein als Monat von!" );
+                        }
+                    } );
+                }
+                valid = false;
+            }
+            else if (!zeitraumValidator.revalidate()) {
+                // war true vorher also meldung anzeigen
+                if (valid == true) {
+                    Polymap.getSessionDisplay().asyncExec( new Runnable() {
+
+                        public void run() {
+                            MessageDialog.openError( PolymapWorkbench.getShellToParentOn(), "Fehler",
+                                    "In diesem Zeitraum liegen bereits Werte vor!" );
+                        }
+                    } );
+                }
+                valid = false;
+            } else {
+                valid = true;
+            }
+        } else {
+            valid = super.isValid();
+        }
+        return valid;
+    }
+
 
     @Override
     public void createFormContent( final IFormEditorPageSite site ) {
@@ -68,18 +123,22 @@ public class BaupreisIndexFormEditorPage
             @Override
             public String validate( Object fieldValue ) {
                 String ret = super.validate( fieldValue );
+
                 if (ret == null) {
-                    // kein Fehler
                     zeitraumValidator.monatVon = Integer.parseInt( (String)fieldValue );
-                    if (zeitraumValidator.monatVon >= zeitraumValidator.monatBis) {
-                        return "Monat von muss kleiner sein als Monat bis!";
-                    }
+                    // if (zeitraumValidator.monatBis == null) {
+                    // return ret;
+                    // }
+                    // if (zeitraumValidator.monatVon >= zeitraumValidator.monatBis)
+                    // {
+                    // return "Monat von muss kleiner sein als Monat bis!";
+                    // }
                     if (zeitraumValidator.monatVon < 1 || zeitraumValidator.monatVon > 11) {
                         return "Monat von muss zwischen 1 und 11 liegen!";
                     }
-                    if (!zeitraumValidator.revalidate()) {
-                        return "In diesem Zeitraum liegen bereits Werte vor!";
-                    }
+                    // if (!zeitraumValidator.revalidate()) {
+                    // return "In diesem Zeitraum liegen bereits Werte vor!";
+                    // }
                 }
                 return ret;
             }
@@ -90,17 +149,20 @@ public class BaupreisIndexFormEditorPage
             public String validate( Object fieldValue ) {
                 String ret = super.validate( fieldValue );
                 if (ret == null) {
-                    // kein Fehler
                     zeitraumValidator.monatBis = Integer.parseInt( (String)fieldValue );
-                    if (zeitraumValidator.monatBis <= zeitraumValidator.monatVon) {
-                        return "Monat bis muss größer sein als Monat von!";
-                    }
+                    // if (zeitraumValidator.monatVon == null) {
+                    // return ret;
+                    // }
+                    // if (zeitraumValidator.monatBis <= zeitraumValidator.monatVon)
+                    // {
+                    // return "Monat bis muss größer sein als Monat von!";
+                    // }
                     if (zeitraumValidator.monatBis < 2 || zeitraumValidator.monatBis > 12) {
                         return "Monat bis muss zwischen 2 und 12 liegen!";
                     }
-                    if (!zeitraumValidator.revalidate()) {
-                        return "In diesem Zeitraum liegen bereits Werte vor!";
-                    }
+                    // if (!zeitraumValidator.revalidate()) {
+                    // return "In diesem Zeitraum liegen bereits Werte vor!";
+                    // }
                 }
                 return ret;
             }
@@ -181,15 +243,15 @@ public class BaupreisIndexFormEditorPage
             if (ev.getEventCode() == IFormFieldListener.VALUE_CHANGE) {
                 if (ev.getFieldName().equals( composite.jahr().qualifiedName().name() )) {
                     jahr = (Integer)ev.getNewValue();
-                    revalidate();
+                    // revalidate();
                 }
                 else if (ev.getFieldName().equals( composite.monatVon().qualifiedName().name() )) {
-                    monatVon = (Integer)ev.getNewValue();
-                    revalidate();
+                    // monatVon = (Integer)ev.getNewValue();
+                    // revalidate();
                 }
                 else if (ev.getFieldName().equals( composite.monatBis().qualifiedName().name() )) {
-                    monatBis = (Integer)ev.getNewValue();
-                    revalidate();
+                    // monatBis = (Integer)ev.getNewValue();
+                    // revalidate();
                 }
             }
         }
@@ -206,7 +268,7 @@ public class BaupreisIndexFormEditorPage
 
                         Integer monatBisI = index.monatBis().get();
                         Integer monatVonI = index.monatVon().get();
-                        if (monatVon > monatBisI || monatBis < monatVonI) {
+                        if ((monatBisI != null && monatVon > monatBisI) || (monatVonI != null && monatBis < monatVonI)) {
                             // Zeitraum außerhalb, alles ok
                         }
                         else if (!index.equals( composite )) {

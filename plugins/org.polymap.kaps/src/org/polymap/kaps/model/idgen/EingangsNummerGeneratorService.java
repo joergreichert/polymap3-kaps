@@ -87,7 +87,7 @@ public interface EingangsNummerGeneratorService
                         0, -1 );
                 entities.orderBy( orderBy( template.eingangsNr(), OrderBy.Order.DESCENDING ) );
 
-                VertragComposite v = entities.iterator().next();
+                VertragComposite v = entities.iterator().hasNext() ? entities.iterator().next() : null;
                 int highestEingangsNr = v != null ? v.eingangsNr().get() : 0;
 
                 highest = Math.max( highestEingangsNr, currentMinimumNumber );
