@@ -476,7 +476,7 @@ public class VertragsdatenAgrarBodenwertFormEditorPage
         lastLine = newLine;
         newLine = createLabel( client, "Bodenwert", five().top( lastLine, 12 ), SWT.RIGHT );
         createPreisField( vb.bodenwertGesamt(), six().top( lastLine ), client, false );
-        site.addFieldListener( wertSummation = new FieldSummation( site, 0, vb.bodenwertGesamt(), vb.bodenwert1(), vb
+        site.addFieldListener( wertSummation = new FieldSummation( site, 2, vb.bodenwertGesamt(), vb.bodenwert1(), vb
                 .bodenwert2(), vb.bodenwert3(), vb.bodenwert4(), vb.bodenwert5(), vb.bodenwert6() ) );
 
         lastLine = newLine;
