@@ -273,7 +273,7 @@ public abstract class AbstractMdbImportOperation
             if ((++count % 200) == 0) {
                 monitor.worked( 200 );
                 monitor.setTaskName( "Objekte: " + count );
-                // repo.commitChanges();
+                repo.commitChanges();
             }
         }
         repo.commitChanges();
@@ -304,7 +304,6 @@ public abstract class AbstractMdbImportOperation
         }
         return row.get( col );
     }
-    
 
 
     protected Double asDouble( Integer value ) {
@@ -314,8 +313,9 @@ public abstract class AbstractMdbImportOperation
 
     protected Double asDouble( Integer value, Integer maxValue, Integer defaultValue ) {
         if (value != null) {
-            return (value < maxValue) ? value.doubleValue() : (defaultValue != null ? defaultValue.doubleValue() : null);
-        } 
+            return (value < maxValue) ? value.doubleValue()
+                    : (defaultValue != null ? defaultValue.doubleValue() : null);
+        }
         return (defaultValue != null) ? defaultValue.doubleValue() : null;
     }
 }

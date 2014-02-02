@@ -334,8 +334,10 @@ public interface VertragComposite
     @Optional
     Property<String> urkundenNummer();
 
+
     @Optional
     Property<String> notariat();
+
 
     @Optional
     Property<Boolean> fuerGewosGeeignet();
@@ -358,6 +360,7 @@ public interface VertragComposite
         private static Log log = LogFactory.getLog( Mixin.class );
 
 
+        // FIXME uncomment after import
         @Override
         public void beforeCompletion()
                 throws UnitOfWorkCompletionException {
@@ -371,7 +374,7 @@ public interface VertragComposite
                 Double basisPreis = vertragsdatenErweitertComposite.basispreis().get();
                 Double kaufPreis = kaufpreis().get();
                 if (kaufPreis == null) {
-                    kaufPreis = new Double(0.0d);
+                    kaufPreis = new Double( 0.0d );
                     kaufpreis().set( kaufPreis );
                 }
                 if (basisPreis == null || basisPreis.doubleValue() == 0.0d

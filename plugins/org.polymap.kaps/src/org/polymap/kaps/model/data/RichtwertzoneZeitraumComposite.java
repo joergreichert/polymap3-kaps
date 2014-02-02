@@ -112,6 +112,7 @@ public interface RichtwertzoneZeitraumComposite
         private static Log log = LogFactory.getLog( Mixin.class );
 
 
+        // FIXME uncomment on import
         @Override
         public void afterCompletion( UnitOfWorkStatus status ) {
             RichtwertzoneComposite zone = zone().get();

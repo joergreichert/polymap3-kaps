@@ -661,7 +661,7 @@ public class MdbImportBewertungenOperation
                     }
                 }
                 else {
-                    throw new IllegalStateException( "unbekannte MASKE " + maske );
+                    wmvaopfW.write( "ignoring " + maske +" for " + eingangsnummer + "\n" );
                 }
             }
             count++;
