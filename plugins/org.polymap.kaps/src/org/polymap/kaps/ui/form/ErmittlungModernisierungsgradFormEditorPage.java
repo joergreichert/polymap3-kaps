@@ -141,6 +141,7 @@ public class ErmittlungModernisierungsgradFormEditorPage
                 }, new InterEditorListener.EventFilter( em ) );
 
         final Calendar cal = new GregorianCalendar();
+        cal.setTime( em.vertrag().get().vertragsDatum().get() );
         heute = new Integer( cal.get( Calendar.YEAR ) ).doubleValue();
     }
 

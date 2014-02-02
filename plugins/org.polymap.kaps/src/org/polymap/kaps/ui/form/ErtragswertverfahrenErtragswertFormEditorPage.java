@@ -281,7 +281,7 @@ public class ErtragswertverfahrenErtragswertFormEditorPage
 
         lastLine = newLine;
         newLine = createLabel( client, "Restnutzungsdauer", one().top( lastLine ), SWT.RIGHT );
-        createGrouplessField( vb.restnutzungsDauer(), three().top( lastLine ), client, false );
+        createGrouplessField( vb.restnutzungsDauer(), three().top( lastLine ), client, true );
         site.addFieldListener( rndListener = new FieldCalculation( site, 0, vb.restnutzungsDauer(), vb
                 .bereinigtesBaujahr(), vb.gesamtNutzungsDauer() ) {
 
@@ -291,6 +291,7 @@ public class ErtragswertverfahrenErtragswertFormEditorPage
                 Double baujahr = values.get( vb.bereinigtesBaujahr() );
                 if (gnd != null && baujahr != null) {
                     final Calendar cal = new GregorianCalendar();
+                    cal.setTime( vb.vertrag().get().vertragsDatum().get() );
                     Double heute = new Integer( cal.get( Calendar.YEAR ) ).doubleValue();
                     return Math.max( 0.0d, gnd - (heute - baujahr) );
                 }

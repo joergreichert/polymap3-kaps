@@ -1371,6 +1371,7 @@ public class NHK2010BewertungFormEditorPage
                 if (result != null && gesamtNutzungsDauer != null) {
                     // alter berechnen
                     Calendar cal = new GregorianCalendar();
+                    cal.setTime( bewertung.vertrag().get().vertragsDatum().get());
                     Double alter = cal.get( Calendar.YEAR ) - result;
                     // rnd = gnd - alter
                     result = Math.max( gesamtNutzungsDauer - alter, 0 );
