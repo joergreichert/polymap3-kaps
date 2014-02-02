@@ -892,7 +892,7 @@ public interface WohnungComposite
 
                 @Override
                 public String get() {
-                    return objektNummer().get() + "/" + gebaeudeNummer().get() + "/" + "/" + wohnungsNummer().get()
+                    return objektNummer().get() + "/" + gebaeudeNummer().get() + "/" + wohnungsNummer().get()
                             + "/" + wohnungsFortfuehrung().get();
                 }
 
