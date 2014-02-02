@@ -420,7 +420,7 @@ public class VertragStaBuExporter
         // }
         // else {
         Element grundstuecke = addElement( mmgrOuter, "Grundstuecke" );
-        if (grundstuecksflaeche != 0.0d) {
+        if (grundstuecksflaeche != null && grundstuecksflaeche != 0.0d) {
             addMM( grundstuecke, "Grundstuecksflaeche", String.valueOf( new Double( grundstuecksflaeche ).intValue() ) );
         }
 
