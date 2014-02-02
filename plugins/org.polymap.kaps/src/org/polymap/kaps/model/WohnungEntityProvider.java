@@ -53,13 +53,7 @@ public class WohnungEntityProvider
         // WohnungComposite.class );
         // aussortieren für die Tabelle
         SimpleFeatureType filtered = SimpleFeatureTypeBuilder.retype( (SimpleFeatureType)type, new String[] {
-                "eingangsNr", "objektNummer", "gebaeudeNummer", "wohnungsNummer", "wohnungsFortfuehrung"
-
-        // template.objektNummer().qualifiedName().name(),
-        // template.gebaeudeNummer().qualifiedName().name(),
-        // template.wohnungsNummer().qualifiedName().name(),
-        // template.wohnungsFortfuehrung().qualifiedName().name()
-                } );
+                "eingangsNr", "objektNummer", "gebaeudeNummer", "wohnungsNummer", "wohnungsFortfuehrung" } );
         return filtered;
     }
 

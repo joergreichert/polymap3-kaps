@@ -177,16 +177,19 @@ public class MdbImportWohneigentumOperation
 
                     Object bewschl = builderRow.get( "BEWSCHL" );
                     if (bewschl != null) {
-//                        System.out.println( "BEWSCHL '" + schl + "'" );
-                        AusstattungComposite findSchlNamed = findSchlNamed( AusstattungComposite.class, builderRow, "BEWSCHL" );
+                        // System.out.println( "BEWSCHL '" + schl + "'" );
+                        AusstattungComposite findSchlNamed = findSchlNamed( AusstattungComposite.class, builderRow,
+                                "BEWSCHL" );
                         entity.ausstattungSchluessel().set( findSchlNamed );
                     }
-                    
+
                     entity.eigentumsArt().set( findSchlNamed( EigentumsartComposite.class, builderRow, "EIGENTART" ) );
                     entity.etage().set( findSchlNamed( EtageComposite.class, builderRow, "GESCHOSS" ) );
-                    entity.stockwerkStaBu().set( findSchlNamed( StockwerkStaBuComposite.class, builderRow, "STOCKWERK" ) );
-                    entity.immobilienArtStaBu().set( findSchlNamed( ImmobilienArtStaBuComposite.class, builderRow, "STAT_BUND" ) );
-                    
+                    entity.stockwerkStaBu()
+                            .set( findSchlNamed( StockwerkStaBuComposite.class, builderRow, "STOCKWERK" ) );
+                    entity.immobilienArtStaBu().set(
+                            findSchlNamed( ImmobilienArtStaBuComposite.class, builderRow, "STAT_BUND" ) );
+
                     entity.himmelsrichtung().set(
                             findSchlNamed( HimmelsrichtungComposite.class, builderRow, "HIMMELSRI" ) );
                     entity.gebaeudeArtGarage().set( findSchlNamed( GebaeudeArtComposite.class, builderRow, "GEBARTG" ) );
@@ -209,9 +212,9 @@ public class MdbImportWohneigentumOperation
                     if (bem2 != null) {
                         bem.append( bem2 );
                     }
-                    if (bewschl != null) {
-                        bem.append( "\nAusstattung: " + bewschl );
-                    }
+//                    if (bewschl != null) {
+//                        bem.append( "\nAusstattung: " + bewschl );
+//                    }
                     entity.bemerkung().set( bem.toString() );
 
                     String gemarkungSchl = (String)builderRow.get( "GEM" );
@@ -220,8 +223,7 @@ public class MdbImportWohneigentumOperation
                     String flurstueckUnternummer = (String)builderRow.get( "FLSTNRU" );
 
                     GebaeudeComposite gebaeude = GebaeudeComposite.Mixin.forKeys( entity.objektNummer().get(), entity
-                            .objektFortfuehrung().get(), entity.gebaeudeNummer().get(), entity.gebaeudeFortfuehrung()
-                            .get() );
+                            .gebaeudeNummer().get() );
                     if (gebaeude == null) {
                         throw new IllegalStateException( String.format( "Kein Gebäude gefunden für %s mit Nummer %s",
                                 WohnungComposite.class, entity.schl().get() ) );
@@ -385,8 +387,7 @@ public class MdbImportWohneigentumOperation
 
                             entity.gesamtSumme().set( summe );
                             WohnungComposite wohnung = WohnungComposite.Mixin.forKeys( entity.objektNummer().get(),
-                                    entity.objektFortfuehrung().get(), entity.gebaeudeNummer().get(), entity
-                                            .gebaeudeFortfuehrung().get(), entity.wohnungsNummer().get(), entity
+                                    entity.gebaeudeNummer().get(), entity.wohnungsNummer().get(), entity
                                             .wohnungsFortfuehrung().get() );
                             if (wohnung != null) {
                                 entity.wohnung().set( wohnung );
@@ -445,13 +446,10 @@ public class MdbImportWohneigentumOperation
 
             // gebäude suchen und flurstück daran setzen
             Integer objektNr = (Integer)builderRow.get( "OBJEKTNR" );
-            Integer objektFort = (Integer)builderRow.get( "FORTF" );
             Integer gebNr = (Integer)builderRow.get( "GEBNR" );
-            Integer gebFort = (Integer)builderRow.get( "GEBNRFORTF" );
-            GebaeudeComposite gebaeude = GebaeudeComposite.Mixin.forKeys( objektNr, objektFort, gebNr, gebFort );
+            GebaeudeComposite gebaeude = GebaeudeComposite.Mixin.forKeys( objektNr, gebNr );
             if (gebaeude == null) {
-                wmvaopfW.write( "Kein Gebäude gefunden für " + objektNr + "/" + objektFort + "/" + gebNr + "/"
-                        + gebFort + "\n" );
+                wmvaopfW.write( "Kein Gebäude gefunden für " + objektNr + "/" + gebNr + "\n" );
             }
             else {
                 // if (!gebaeude.flurstuecke().contains( flurstueck )) {

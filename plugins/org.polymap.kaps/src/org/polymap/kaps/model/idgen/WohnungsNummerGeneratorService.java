@@ -55,15 +55,12 @@ public interface WohnungsNummerGeneratorService
             if (schl == null) {
                 WohnungComposite template = templateFor( WohnungComposite.class );
 
-                Query<WohnungComposite> entities = KapsRepository.instance()
-                        .findEntities(
-                                WohnungComposite.class,
-                                QueryExpressions.and( QueryExpressions.eq( template.objektNummer(), parent
-                                        .objektNummer().get() ), QueryExpressions.eq( template.objektFortfuehrung(),
-                                        parent.objektFortfuehrung().get() ), QueryExpressions.eq(
-                                        template.gebaeudeNummer(), parent.gebaeudeNummer().get() ), QueryExpressions
-                                        .eq( template.gebaeudeFortfuehrung(), parent.gebaeudeFortfuehrung().get() ) ),
-                                0, -1 );
+                Query<WohnungComposite> entities = KapsRepository.instance().findEntities(
+                        WohnungComposite.class,
+                        QueryExpressions.and(
+                                QueryExpressions.eq( template.objektNummer(), parent.objektNummer().get() ),
+                                QueryExpressions.eq( template.gebaeudeNummer(), parent.gebaeudeNummer().get() ) ), 0,
+                        -1 );
                 entities.orderBy( orderBy( template.wohnungsNummer(), OrderBy.Order.DESCENDING ) );
 
                 WohnungComposite v = entities.iterator().hasNext() ? entities.iterator().next() : null;

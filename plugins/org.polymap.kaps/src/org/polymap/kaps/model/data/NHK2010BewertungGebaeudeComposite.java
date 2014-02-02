@@ -61,22 +61,10 @@ public interface NHK2010BewertungGebaeudeComposite
     Property<Integer> objektNummer();
 
 
-    // OBJEKTNRFORTF - Long
-    @Optional
-    @ImportColumn("OBJEKTNRFORTF")
-    Property<Integer> objektFortfuehrung();
-
-
     // GEBNR - Long
     @Optional
     @ImportColumn("GEBNR")
     Property<Integer> gebaeudeNummer();
-
-
-    // GEBFORTF - Long
-    @Optional
-    @ImportColumn("GEBFORTF")
-    Property<Integer> gebaeudeFortfuehrung();
 
 
     // WOHNUNGSNR - Long
@@ -251,19 +239,19 @@ public interface NHK2010BewertungGebaeudeComposite
 
     // GND - Long
     @Optional
-//    @ImportColumn("GND")
+    // @ImportColumn("GND")
     Property<Double> gesamtNutzungsDauer();
 
 
     // RND - Long
     @Optional
-//    @ImportColumn("RND")
+    // @ImportColumn("RND")
     Property<Double> restNutzungsDauer();
 
 
     // ALTER1 - Long
     @Optional
-//    @ImportColumn("ALTER1")
+    // @ImportColumn("ALTER1")
     Property<Double> alter();
 
 
@@ -414,7 +402,6 @@ public interface NHK2010BewertungGebaeudeComposite
     @Optional
     @ImportColumn("AUSSTATT2")
     Property<String> gebaeudeStandard();
-
 
 
     @Optional

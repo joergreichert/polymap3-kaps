@@ -71,22 +71,10 @@ public interface ErmittlungModernisierungsgradComposite
     Property<Integer> objektNummer();
 
 
-    // OBJEKTNRFORTF - Long
-    @Optional
-    @ImportColumn("OBJEKTNRFORTF")
-    Property<Integer> objektFortfuehrung();
-
-
     // GEBNR - Long
     @Optional
     @ImportColumn("GEBNR")
     Property<Integer> gebaeudeNummer();
-
-
-    // GEBFORTF - Long
-    @Optional
-    @ImportColumn("GEBFORTF")
-    Property<Integer> gebaeudeFortfuehrung();
 
 
     // WOHNUNGSNR - Long
@@ -483,19 +471,6 @@ public interface ErmittlungModernisierungsgradComposite
             ErmittlungModernisierungsgradComposite template = QueryExpressions
                     .templateFor( ErmittlungModernisierungsgradComposite.class );
             BooleanExpression expr = QueryExpressions.eq( template.wohnung(), wohnung );
-            // BooleanExpression expr = QueryExpressions.and(
-            // QueryExpressions.eq( template.objektNummer(),
-            // wohnung.objektNummer().get() ),
-            // QueryExpressions.eq( template.objektFortfuehrung(),
-            // wohnung.objektFortfuehrung().get() ),
-            // QueryExpressions.eq( template.gebaeudeNummer(),
-            // wohnung.gebaeudeNummer().get() ),
-            // QueryExpressions.eq( template.gebaeudeFortfuehrung(),
-            // wohnung.gebaeudeFortfuehrung().get() ),
-            // QueryExpressions.eq( template.wohnungsNummer(),
-            // wohnung.wohnungsNummer().get() ),
-            // QueryExpressions.eq( template.wohnungsFortfuehrung(),
-            // wohnung.wohnungsFortfuehrung().get() ) );
             Query<ErmittlungModernisierungsgradComposite> matches = KapsRepository.instance().findEntities(
                     ErmittlungModernisierungsgradComposite.class, expr, 0, 1 );
             return matches.find();

@@ -134,14 +134,7 @@ public class GebaeudeGrunddatenFormEditorPage
                 .setValidator( new NotNullMyNumberValidator( Integer.class ) )
                 .setEnabled( gebaeude.objektNummer().get() == null )
                 .setLayoutData( left().left( 0 ).right( 15 ).create() ).create();
-
-        newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Fortführung" )
-                .setProperty( new PropertyAdapter( gebaeude.objektFortfuehrung() ) )
-                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NotNullMyNumberValidator( Integer.class ) )
-                .setEnabled( gebaeude.objektFortfuehrung().get() == null )
-                .setLayoutData( left().left( 16 ).right( 31 ).create() ).create();
-
+        
         lastLine = newLine;
         newLine = newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Gebäudenummer" )
                 .setProperty( new PropertyAdapter( gebaeude.gebaeudeNummer() ) )
@@ -149,14 +142,7 @@ public class GebaeudeGrunddatenFormEditorPage
                 .setValidator( new NotNullMyNumberValidator( Integer.class ) )
                 // nur editierbar wenn keine Wohnungen vorhanden
                 .setEnabled( WohnungComposite.Mixin.findWohnungenFor( gebaeude ).iterator().hasNext() == false )
-                .setLayoutData( left().left( 34 ).right( 49 ).create() ).create();
-
-        newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Fortführung" )
-                .setProperty( new PropertyAdapter( gebaeude.gebaeudeFortfuehrung() ) )
-                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NotNullMyNumberValidator( Integer.class ) )
-                .setEnabled( gebaeude.gebaeudeFortfuehrung().get() == null )
-                .setLayoutData( left().left( 50 ).right( 65 ).create() ).create();
+                .setLayoutData( left().left( 16 ).right( 31 ).create() ).create();
 
         lastLine = newLine;
         newLine = newFormField( "Gebäudeart" ).setParent( parent )

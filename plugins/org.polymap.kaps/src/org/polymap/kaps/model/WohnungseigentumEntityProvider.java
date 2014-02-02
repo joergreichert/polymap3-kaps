@@ -58,7 +58,6 @@ public class WohnungseigentumEntityProvider
     // throws Exception {
     // prototype.objektNummer().set( KapsRepository.instance().highestObjektNummer()
     // );
-    // prototype.objektFortfuehrung().set( Integer.valueOf( 0 ) );
     //
     // if (creator != null) {
     // creator.create( prototype );
@@ -110,10 +109,6 @@ public class WohnungseigentumEntityProvider
         if (value == null) {
             if (entity.objektNummer().qualifiedName().name().equals( propName )) {
                 entity.objektNummer().set( KapsRepository.instance().objektnummern.get().generate() );
-                return true;
-            }
-            if (entity.objektFortfuehrung().qualifiedName().name().equals( propName )) {
-                entity.objektFortfuehrung().set( Integer.valueOf( 0 ) );
                 return true;
             }
         }

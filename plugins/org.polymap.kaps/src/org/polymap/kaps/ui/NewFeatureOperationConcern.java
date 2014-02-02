@@ -35,6 +35,7 @@ import org.polymap.rhei.filter.IFilter;
 
 import org.polymap.kaps.model.KapsEntityProvider;
 import org.polymap.kaps.model.KapsRepository;
+import org.polymap.kaps.model.data.FlurstueckComposite;
 import org.polymap.kaps.model.data.GebaeudeComposite;
 import org.polymap.kaps.model.data.RichtwertzoneComposite;
 import org.polymap.kaps.model.data.WohnungComposite;
@@ -71,6 +72,8 @@ public class NewFeatureOperationConcern
                                     message = "Legen Sie neue Gebäude bitte im Formular für Wohneigentum an.";
                                 } else if (type.isAssignableFrom( WohnungComposite.class )) {
                                     message = "Legen Sie neue Wohnungen bitte im Formular für Gebäude an.";
+                                } else if (type.isAssignableFrom( FlurstueckComposite.class )) {
+                                    message = "Legen Sie neue Flurstücken bitte im Formular für Verträge an.";
                                 }
                             }
                         }

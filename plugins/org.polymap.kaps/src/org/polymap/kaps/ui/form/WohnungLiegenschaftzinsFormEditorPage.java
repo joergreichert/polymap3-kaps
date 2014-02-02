@@ -324,7 +324,7 @@ public class WohnungLiegenschaftzinsFormEditorPage
                         else {
                             flaeche = Double.valueOf( 0.0d );
                         }
-                        return MathUtil.round( flaeche);
+                        return MathUtil.round( flaeche );
                     }
                 }
                 return null;
@@ -353,7 +353,7 @@ public class WohnungLiegenschaftzinsFormEditorPage
                     Double preis = this.triggerValue() != null && this.triggerValue().booleanValue() ? values
                             .get( wohnung.bereinigterVollpreis() ) : values.get( wohnung.kaufpreis() );
                     if (preis != null) {
-                        return MathUtil.round( preis - bodenwert);
+                        return MathUtil.round( preis - bodenwert );
                     }
                 }
                 return null;
@@ -368,7 +368,8 @@ public class WohnungLiegenschaftzinsFormEditorPage
 
         lastLine = newLine;
         newLine = createLabel( parent, "Jahresreinertrag/Kaufpreis", three().top( lastLine ), SWT.RIGHT );
-        createNumberField( IFormFieldLabel.NO_LABEL, null, wohnung.jahresReinErtragZuKaufpreis(), five().top( lastLine ), parent, false, 4 );
+        createNumberField( IFormFieldLabel.NO_LABEL, null, wohnung.jahresReinErtragZuKaufpreis(),
+                five().top( lastLine ), parent, false, 4 );
         site.addFieldListener( jahresReinErtragZuKaufpreis = new FieldCalculationWithTrigger( site, 4, wohnung
                 .jahresReinErtragZuKaufpreis(), wohnung.garagenBeiLiegenschaftszinsBeruecksichtigen(), wohnung
                 .jahresReinertrag(), wohnung.bereinigterVollpreis(), wohnung.kaufpreis() ) {
@@ -389,7 +390,8 @@ public class WohnungLiegenschaftzinsFormEditorPage
 
         lastLine = newLine;
         newLine = createLabel( parent, "Gebäudewertanteil/Kaufpreis", three().top( lastLine ), SWT.RIGHT );
-        createNumberField( IFormFieldLabel.NO_LABEL, null, wohnung.gebaeudewertAnteilZuKaufpreis(), five().top( lastLine ), parent, false, 4 );
+        createNumberField( IFormFieldLabel.NO_LABEL, null, wohnung.gebaeudewertAnteilZuKaufpreis(),
+                five().top( lastLine ), parent, false, 4 );
         site.addFieldListener( gebaeudewertAnteilZuKaufpreis = new FieldCalculationWithTrigger( site, 4, wohnung
                 .gebaeudewertAnteilZuKaufpreis(), wohnung.garagenBeiLiegenschaftszinsBeruecksichtigen(), wohnung
                 .gebaeudewertAnteilDerWohnung(), wohnung.bereinigterVollpreis(), wohnung.kaufpreis() ) {
@@ -442,5 +444,14 @@ public class WohnungLiegenschaftzinsFormEditorPage
                 return null;
             }
         } );
+
+        lastLine = newLine;
+        newLine = createLabel( parent, "Zur Auswertung geeignet?",
+                "Ist der Liegenschaftszins geeignet für Auswertungen?", three().top( lastLine ), SWT.RIGHT );
+        newFormField( IFormFieldLabel.NO_LABEL )
+                .setToolTipText( "Ist der Liegenschaftszins geeignet für Auswertungen?" )
+                .setProperty( new PropertyAdapter( wohnung.geeignet() ) ).setField( new CheckboxFormField() )
+                .setLayoutData( five().top( lastLine ).create() ).create();
+
     }
 }

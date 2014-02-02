@@ -529,12 +529,10 @@ public class MdbImportBewertungenOperation
                     else if ("frm_wwohnneu".equals( type )) {
                         // suche wohnung
                         WohnungComposite wohnung = WohnungComposite.Mixin.forKeys( b.objektNummer().get(), b
-                                .objektFortfuehrung().get(), b.gebaeudeNummer().get(), b.gebaeudeFortfuehrung().get(),
-                                b.wohnungsNummer().get(), b.wohnungsFortfuehrung().get() );
+                                .gebaeudeNummer().get(), b.wohnungsNummer().get(), b.wohnungsFortfuehrung().get() );
                         if (wohnung == null) {
                             wmvaopfW.write( "keine wohnung gefunden fuer " + b.objektNummer().get() + ", "
-                                    + b.objektFortfuehrung().get() + ", " + b.gebaeudeNummer().get() + ", "
-                                    + b.gebaeudeFortfuehrung().get() + ", " + b.wohnungsNummer().get() + ", "
+                                    + b.gebaeudeNummer().get() + ", " + b.wohnungsNummer().get() + ", "
                                     + b.wohnungsFortfuehrung().get() + "\n" );
                         }
                         else {

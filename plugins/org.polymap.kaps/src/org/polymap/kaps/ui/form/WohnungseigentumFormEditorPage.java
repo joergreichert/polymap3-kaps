@@ -97,13 +97,6 @@ public class WohnungseigentumFormEditorPage
                 .setEnabled( eigentum.objektNummer().get() == null )
                 .setLayoutData( left().left( 0 ).right( 15 ).create() ).create();
 
-        newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Fortführung" )
-                .setProperty( new PropertyAdapter( eigentum.objektFortfuehrung() ) )
-                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NotNullMyNumberValidator( Integer.class ) )
-                .setEnabled( eigentum.objektNummer().get() == null )
-                .setLayoutData( left().left( 16 ).right( 31 ).create() ).create();
-
         lastLine = newLine;
         newLine = createFlaecheField( "Gesamtfläche in m²", eigentum.gesamtFlaeche(), left().top( lastLine ), parent,
                 false );
@@ -189,10 +182,8 @@ public class WohnungseigentumFormEditorPage
 
                     GebaeudeComposite gebaeude = repository.newEntity( GebaeudeComposite.class, null );
                     gebaeude.objektNummer().set( eigentum.objektNummer().get() );
-                    gebaeude.objektFortfuehrung().set( eigentum.objektFortfuehrung().get() );
                     // suche nach höchster Gebäudenummer
                     gebaeude.gebaeudeNummer().set( nummer );
-                    gebaeude.gebaeudeFortfuehrung().set( Integer.valueOf( 0 ) );
                     // wohnung.vertrag().set( flurstueck.vertrag().get() );
                     KapsPlugin.openEditor( fs, GebaeudeComposite.NAME, gebaeude );
                     gebaudePicklist.setEnabled( true );

@@ -217,27 +217,13 @@ public class WohnungGrunddatenFormEditorPage
                 .setEnabled( wohnung.objektNummer().get() == null )
                 .setLayoutData( left().left( 0 ).right( 15 ).create() ).create();
 
-        newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Fortführung" )
-                .setProperty( new PropertyAdapter( wohnung.objektFortfuehrung() ) )
-                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NotNullMyNumberValidator( Integer.class ) )
-                .setEnabled( wohnung.objektNummer().get() == null )
-                .setLayoutData( left().left( 16 ).right( 31 ).create() ).create();
-
         lastLine = newLine;
         newLine = newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Gebäudenummer" )
                 .setProperty( new PropertyAdapter( wohnung.gebaeudeNummer() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setValidator( new NotNullMyNumberValidator( Integer.class ) )
                 .setEnabled( wohnung.objektNummer().get() == null )
-                .setLayoutData( left().left( 34 ).right( 49 ).create() ).create();
-
-        newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Fortführung" )
-                .setProperty( new PropertyAdapter( wohnung.gebaeudeFortfuehrung() ) )
-                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NotNullMyNumberValidator( Integer.class ) )
-                .setEnabled( wohnung.objektNummer().get() == null )
-                .setLayoutData( left().left( 50 ).right( 65 ).create() ).create();
+                .setLayoutData( left().left( 16 ).right( 31 ).create() ).create();
 
         lastLine = newLine;
         newLine = newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Wohnungsnummer" )
@@ -245,14 +231,14 @@ public class WohnungGrunddatenFormEditorPage
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setValidator( new NotNullMyNumberValidator( Integer.class ) )
                 // .setEnabled( wohnung.wohnungsNummer().get() == null )
-                .setLayoutData( left().left( 69 ).right( 83 ).create() ).create();
+                .setLayoutData( left().left( 32 ).right( 47 ).create() ).create();
 
         newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Fortführung" )
                 .setProperty( new PropertyAdapter( wohnung.wohnungsFortfuehrung() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setValidator( new NotNullMyNumberValidator( Integer.class ) )
                 .setEnabled( wohnung.wohnungsNummer().get() == null )
-                .setLayoutData( left().left( 84 ).right( 100 ).create() ).create();
+                .setLayoutData( left().left( 48 ).right( 63 ).create() ).create();
 
         // flurstücke
         lastLine = newLine;
@@ -333,9 +319,7 @@ public class WohnungGrunddatenFormEditorPage
                         ermittlung.wohnung().set( wohnung );
                         // ermittlung.vertrag().set( bewertung.vertrag().get() );
                         ermittlung.objektNummer().set( wohnung.objektNummer().get() );
-                        ermittlung.objektFortfuehrung().set( wohnung.objektFortfuehrung().get() );
                         ermittlung.gebaeudeNummer().set( wohnung.gebaeudeNummer().get() );
-                        ermittlung.gebaeudeFortfuehrung().set( wohnung.gebaeudeFortfuehrung().get() );
                         ermittlung.wohnungsNummer().set( wohnung.wohnungsNummer().get() );
                         ermittlung.wohnungsFortfuehrung().set( wohnung.wohnungsFortfuehrung().get() );
                         ermittlung.alterObergrenzeZeile1().set( 20.0d );

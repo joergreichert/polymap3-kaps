@@ -548,8 +548,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                                         return entity.erbbaurecht();
                                     }
                                 } ) ).setField( reloadable( new BooleanFormField() ) )
-                .setValidator( new NotNullValidator() ).setLayoutData( left().top( line6 ).create() )
-                .create();
+                .setValidator( new NotNullValidator() ).setLayoutData( left().top( line6 ).create() ).create();
 
         newFormField( "Belastungen" )
                 // .setToolTipText(
@@ -562,8 +561,10 @@ public class KaufvertragFlurstueckeFormEditorPage
                                     public ManyAssociation get( FlurstueckComposite entity ) {
                                         return entity.belastungen();
                                     }
-                                } ) ).setField( reloadable(namedAssocationsSelectlist( BelastungComposite.class, true )) )
-                .setValidator( new ListNotNullValidator() ).setLayoutData( right().top( line6 ).height( 100 ).bottom( 100 ).create() ).create();
+                                } ) )
+                .setField( reloadable( namedAssocationsSelectlist( BelastungComposite.class, true ) ) )
+                .setValidator( new ListNotNullValidator() )
+                .setLayoutData( right().top( line6 ).height( 100 ).bottom( 100 ).create() ).create();
 
         // return the last line
         return formSection;
@@ -765,8 +766,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                     wohnung.flurstueck().set( flurstueckComposite );
                     if (wohnung.gebaeudeNummer().get() != null) {
                         GebaeudeComposite gebaeude = GebaeudeComposite.Mixin.forKeys( wohnung.objektNummer().get(),
-                                wohnung.objektFortfuehrung().get(), wohnung.gebaeudeNummer().get(), wohnung
-                                        .gebaeudeFortfuehrung().get() );
+                                wohnung.gebaeudeNummer().get() );
                         if (gebaeude != null && !gebaeude.flurstuecke().contains( flurstueckComposite )) {
                             gebaeude.flurstuecke().add( flurstueckComposite );
                         }

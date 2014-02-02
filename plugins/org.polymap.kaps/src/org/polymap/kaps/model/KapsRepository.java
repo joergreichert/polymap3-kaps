@@ -341,49 +341,4 @@ public class KapsRepository
         }
         return namen;
     }
-
-
-    public Iterable<FlurstueckComposite> findFlurstuecke( GemarkungComposite gemarkung, FlurComposite flur,
-            Integer flurstuecksNummer, String unternummer ) {
-        FlurstueckComposite template = templateFor( FlurstueckComposite.class );
-        BooleanExpression expr = null;// QueryExpressions.not( QueryExpressions.eq(
-                                      // template.vertrag(), null ));
-        if (gemarkung != null) {
-            expr = QueryExpressions.eq( template.gemarkung(), gemarkung );
-        }
-        if (flur != null) {
-            BooleanExpression in = QueryExpressions.eq( template.flur(), flur );
-            expr = (expr == null) ? in : QueryExpressions.and( expr, in );
-        }
-        if (flurstuecksNummer != null) {
-            BooleanExpression in = QueryExpressions.eq( template.hauptNummer(), flurstuecksNummer );
-            expr = (expr == null) ? in : QueryExpressions.and( expr, in );
-        }
-        if (unternummer != null && !unternummer.isEmpty()) {
-            BooleanExpression in = QueryExpressions.eq( template.unterNummer(), unternummer );
-            expr = (expr == null) ? in : QueryExpressions.and( expr, in );
-        }
-        Query<FlurstueckComposite> matches = KapsRepository.instance().findEntities( FlurstueckComposite.class, expr,
-                0, 100 );
-
-        // alle FlurstueckComposite finden für die Flurstücke
-        //
-        // FlurstueckComposite verkaufTemplate = QueryExpressions.templateFor(
-        // FlurstueckComposite.class );
-        // BooleanExpression dExpr = null;
-        // for (FlurstueckComposite flurstueck : matches) {
-        // BooleanExpression newExpr = QueryExpressions.eq(
-        // verkaufTemplate.flurstueck(), flurstueck );
-        // if (dExpr == null) {
-        // dExpr = newExpr;
-        // }
-        // else {
-        // dExpr = QueryExpressions.or( dExpr, newExpr );
-        // }
-        // }
-        // Query<FlurstueckComposite> matches2 =
-        // KapsRepository.instance().findEntities( FlurstueckComposite.class, dExpr,
-        // 0, 100 );
-        return matches;
-    }
 }

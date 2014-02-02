@@ -12,6 +12,8 @@
  */
 package org.polymap.kaps.ui.form;
 
+import static org.qi4j.api.query.QueryExpressions.templateFor;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +21,10 @@ import org.opengis.feature.type.PropertyDescriptor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import org.qi4j.api.query.Query;
+import org.qi4j.api.query.QueryExpressions;
+import org.qi4j.api.query.grammar.BooleanExpression;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
@@ -115,7 +121,7 @@ public abstract class FlurstueckSearcher
             // }
             // }
             content = new ArrayList();
-            for (FlurstueckComposite fc : KapsRepository.instance().findFlurstuecke( gemarkung, flur, hauptNummer,
+            for (FlurstueckComposite fc : findFlurstuecke( gemarkung, flur, hauptNummer,
                     unterNummer )) {
                 content.add( fc );
             }
@@ -139,6 +145,49 @@ public abstract class FlurstueckSearcher
         }
     }
 
+    private Iterable<FlurstueckComposite> findFlurstuecke( GemarkungComposite gemarkung, FlurComposite flur,
+            Integer flurstuecksNummer, String unternummer ) {
+        FlurstueckComposite template = templateFor( FlurstueckComposite.class );
+        BooleanExpression expr = null;// QueryExpressions.not( QueryExpressions.eq(
+                                      // template.vertrag(), null ));
+        if (gemarkung != null) {
+            expr = QueryExpressions.eq( template.gemarkung(), gemarkung );
+        }
+        if (flur != null) {
+            BooleanExpression in = QueryExpressions.eq( template.flur(), flur );
+            expr = (expr == null) ? in : QueryExpressions.and( expr, in );
+        }
+        if (flurstuecksNummer != null) {
+            BooleanExpression in = QueryExpressions.eq( template.hauptNummer(), flurstuecksNummer );
+            expr = (expr == null) ? in : QueryExpressions.and( expr, in );
+        }
+        if (unternummer != null && !unternummer.isEmpty()) {
+            BooleanExpression in = QueryExpressions.eq( template.unterNummer(), unternummer );
+            expr = (expr == null) ? in : QueryExpressions.and( expr, in );
+        }
+        Query<FlurstueckComposite> matches = KapsRepository.instance().findEntities( FlurstueckComposite.class, expr,
+                0, 100 );
+
+        // alle FlurstueckComposite finden für die Flurstücke
+        //
+        // FlurstueckComposite verkaufTemplate = QueryExpressions.templateFor(
+        // FlurstueckComposite.class );
+        // BooleanExpression dExpr = null;
+        // for (FlurstueckComposite flurstueck : matches) {
+        // BooleanExpression newExpr = QueryExpressions.eq(
+        // verkaufTemplate.flurstueck(), flurstueck );
+        // if (dExpr == null) {
+        // dExpr = newExpr;
+        // }
+        // else {
+        // dExpr = QueryExpressions.or( dExpr, newExpr );
+        // }
+        // }
+        // Query<FlurstueckComposite> matches2 =
+        // KapsRepository.instance().findEntities( FlurstueckComposite.class, dExpr,
+        // 0, 100 );
+        return matches;
+    }
 
     /**
      * 

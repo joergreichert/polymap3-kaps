@@ -54,22 +54,10 @@ public interface AusstattungBewertungComposite
     Property<Integer> objektNummer();
 
 
-    // OBJEKTNRFORTF - Integer
-    @Optional
-    @ImportColumn("OBJEKTNRFORTF")
-    Property<Integer> objektFortfuehrung();
-
-
     // GEBNR - Long
     @Optional
     @ImportColumn("GEBNR")
     Property<Integer> gebaeudeNummer();
-
-
-    // GEBFORTF - Long
-    @Optional
-    @ImportColumn("GEBFORTF")
-    Property<Integer> gebaeudeFortfuehrung();
 
 
     // WOHNUNGSNR - Long

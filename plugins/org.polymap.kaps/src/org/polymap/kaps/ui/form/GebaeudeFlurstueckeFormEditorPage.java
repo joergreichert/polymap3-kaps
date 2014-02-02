@@ -123,23 +123,8 @@ public class GebaeudeFlurstueckeFormEditorPage
         selectedGemarkung = compositeSelected ? composite.gemarkung().get() : null;
         selectedStrasse = composite != null ? composite.strasse().get() : null;
         selectedRichtwertzone = composite != null ? composite.richtwertZone().get() : null;
-        // selectedNutzung = composite != null ? composite.nutzung().get() : null;
-        // selectedArtDesBaugebietes = composite != null ?
-        // composite.artDesBaugebiets().get() : null;
 
         super.refreshReloadables();
-        // if (openErweiterteDaten != null) {
-        // sfAction.refresh();
-        // searchFlurstueckeButton.setEnabled( compositeSelected );
-        // openErweiterteDaten.setEnabled( compositeSelected );
-        // }
-        // das muss disabled bleiben
-        // // pageSite.setFieldEnabled( prefix + "verkaufteFlaeche", false );
-        // if (selectedComposite.get() != null &&
-        // selectedComposite.get().gebaeudeNummer().get() != null) {
-        // pageSite.setFieldEnabled( prefix + "gebaeudeNummer", false );
-        // pageSite.setFieldEnabled( prefix + "gebaeudeFortfuehrung", false );
-        // }
     }
 
 

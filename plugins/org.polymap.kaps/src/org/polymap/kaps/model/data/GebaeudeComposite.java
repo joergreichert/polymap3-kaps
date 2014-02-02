@@ -59,22 +59,10 @@ public interface GebaeudeComposite
     Property<Integer> objektNummer();
 
 
-    // OBJEKTNRFORTF - Long
-    @Optional
-    @ImportColumn("OBJEKTNRFORTF")
-    Property<Integer> objektFortfuehrung();
-
-
     // GEBNR - Long
     @Optional
     @ImportColumn("GEBNR")
     Property<Integer> gebaeudeNummer();
-
-
-    // FORTF - Long
-    @Optional
-    @ImportColumn("FORTF")
-    Property<Integer> gebaeudeFortfuehrung();
 
 
     // GEBART - String
@@ -169,8 +157,7 @@ public interface GebaeudeComposite
 
                 @Override
                 public String get() {
-                    return objektNummer().get() + "/" + objektFortfuehrung().get() + "/" + gebaeudeNummer().get() + "/"
-                            + gebaeudeFortfuehrung().get();
+                    return objektNummer().get() + "/" + gebaeudeNummer().get();
                 }
 
 
@@ -184,23 +171,18 @@ public interface GebaeudeComposite
 
         public static Iterable<GebaeudeComposite> forEntity( WohnungseigentumComposite eigentum ) {
             GebaeudeComposite template = QueryExpressions.templateFor( GebaeudeComposite.class );
-            BooleanExpression expr = QueryExpressions.and(
-                    QueryExpressions.eq( template.objektNummer(), eigentum.objektNummer().get() ),
-                    QueryExpressions.eq( template.objektFortfuehrung(), eigentum.objektFortfuehrung().get() ) );
+            BooleanExpression expr = QueryExpressions.eq( template.objektNummer(), eigentum.objektNummer().get() );
             Query<GebaeudeComposite> matches = KapsRepository.instance().findEntities( GebaeudeComposite.class, expr,
                     0, -1 );
             return matches;
         }
 
 
-        public static GebaeudeComposite forKeys( final Integer objektNummer, final Integer objektFortfuehrung,
-                final Integer gebaeudeNummer, final Integer gebaeudeFortfuehrung ) {
+        public static GebaeudeComposite forKeys( final Integer objektNummer, final Integer gebaeudeNummer ) {
             GebaeudeComposite template = QueryExpressions.templateFor( GebaeudeComposite.class );
             BooleanExpression expr = QueryExpressions.and(
                     QueryExpressions.eq( template.objektNummer(), objektNummer ),
-                    QueryExpressions.eq( template.objektFortfuehrung(), objektFortfuehrung ),
-                    QueryExpressions.eq( template.gebaeudeNummer(), gebaeudeNummer ),
-                    QueryExpressions.eq( template.gebaeudeFortfuehrung(), gebaeudeFortfuehrung ) );
+                    QueryExpressions.eq( template.gebaeudeNummer(), gebaeudeNummer ) );
             Query<GebaeudeComposite> matches = KapsRepository.instance().findEntities( GebaeudeComposite.class, expr,
                     0, 1 );
             return matches.find();

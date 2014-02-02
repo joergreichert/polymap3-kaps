@@ -39,24 +39,24 @@ import org.polymap.kaps.model.data.WohnungseigentumComposite;
 public interface GebaeudeNummerGeneratorService
         extends ServiceComposite {
 
-    Integer generate(WohnungseigentumComposite parent);
+    Integer generate( WohnungseigentumComposite parent );
+
 
     public abstract class Mixin
             implements GebaeudeNummerGeneratorService {
 
-        private static final Log      log            = LogFactory.getLog( GebaeudeNummerGeneratorService.class );
+        private static final Log     log     = LogFactory.getLog( GebaeudeNummerGeneratorService.class );
 
         private Map<String, Integer> highest = new HashMap<String, Integer>();
 
 
-        public synchronized Integer generate(WohnungseigentumComposite parent) {
+        public synchronized Integer generate( WohnungseigentumComposite parent ) {
             Integer schl = highest.get( parent.schl().get() );
             if (schl == null) {
                 GebaeudeComposite template = templateFor( GebaeudeComposite.class );
 
-                Query<GebaeudeComposite> entities = KapsRepository.instance().findEntities( GebaeudeComposite.class, QueryExpressions.and(
-                        QueryExpressions.eq( template.objektNummer(), parent.objektNummer().get() ),
-                        QueryExpressions.eq( template.objektFortfuehrung(), parent.objektFortfuehrung().get() ) ), 0, -1 );
+                Query<GebaeudeComposite> entities = KapsRepository.instance().findEntities( GebaeudeComposite.class,
+                        QueryExpressions.eq( template.objektNummer(), parent.objektNummer().get() ), 0, -1 );
                 entities.orderBy( orderBy( template.gebaeudeNummer(), OrderBy.Order.DESCENDING ) );
 
                 GebaeudeComposite v = entities.iterator().hasNext() ? entities.iterator().next() : null;
@@ -67,6 +67,7 @@ public interface GebaeudeNummerGeneratorService
 
             return schl;
         }
+
 
         public Mixin() {
         }

@@ -57,12 +57,6 @@ public interface WohnungseigentumComposite
     Property<Integer> objektNummer();
 
 
-    // FORTF - Long
-    @Optional
-    @ImportColumn("FORTF")
-    Property<Integer> objektFortfuehrung();
-
-
     // TEDATUM - SHORT_DATE_TIME
     @Optional
     @ImportColumn("TEDATUM")
@@ -106,7 +100,6 @@ public interface WohnungseigentumComposite
                 throws UnitOfWorkCompletionException {
             if (objektNummer().get() == null) {
                 objektNummer().set( KapsRepository.instance().objektnummern.get().generate() );
-                objektFortfuehrung().set( 0 );
             }
         }
 
@@ -118,7 +111,7 @@ public interface WohnungseigentumComposite
 
                 @Override
                 public String get() {
-                    return objektNummer().get() + "/" + objektFortfuehrung().get();
+                    return String.valueOf( objektNummer().get() );
                 }
 
 

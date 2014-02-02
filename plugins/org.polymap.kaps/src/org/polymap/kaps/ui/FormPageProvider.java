@@ -13,9 +13,22 @@
 package org.polymap.kaps.ui;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import org.geotools.data.FeatureStore;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.filter.identity.FeatureIdImpl;
 import org.opengis.feature.Feature;
+import org.opengis.filter.identity.FeatureId;
+
+import com.google.common.collect.Iterables;
+
+import org.polymap.core.data.DataPlugin;
+import org.polymap.core.data.PipelineFeatureSource;
+import org.polymap.core.project.ILayer;
+import org.polymap.core.project.IMap;
+import org.polymap.core.project.Layers;
 
 import org.polymap.rhei.form.FormEditor;
 import org.polymap.rhei.form.IFormEditorPage;
@@ -35,25 +48,64 @@ public class FormPageProvider
     public List<IFormEditorPage> addPages( FormEditor formEditor, Feature feature ) {
         List<IFormEditorPage> result = new ArrayList<IFormEditorPage>();
         String name = feature.getType().getName().getLocalPart();
+        final FeatureStore fs = formEditor.getFeatureStore();
 
         if (name.equalsIgnoreCase( VertragComposite.NAME )) {
-            result.add( new Kaufvertrag1FormEditorPage( feature, formEditor.getFeatureStore() ) );
-            result.add( new Kaufvertrag2FormEditorPage( feature, formEditor.getFeatureStore() ) );
-            result.add( new KaufvertragFlurstueckeFormEditorPage( formEditor, feature, formEditor.getFeatureStore() ) );
-            result.add( new KaufvertragErweitertFormEditorPage( formEditor, feature, formEditor.getFeatureStore() ) );
+            result.add( new Kaufvertrag1FormEditorPage( feature, fs ) );
+            result.add( new Kaufvertrag2FormEditorPage( feature, fs ) );
+            result.add( new KaufvertragFlurstueckeFormEditorPage( formEditor, feature, fs ) );
+            result.add( new KaufvertragErweitertFormEditorPage( formEditor, feature, fs ) );
         }
         else if (name.equalsIgnoreCase( FlurstueckComposite.NAME )) {
-            result.add( new DontUseThisFormEditorPage(
-                    "Bitte benutzen Sie zum Anlegen und Bearbeiten von Flurstücken das Formular in Verträge.", feature,
-                    formEditor.getFeatureStore() ) );
+            // flurstueck laden, vertrag dazu laden
+            FlurstueckComposite flurstueck = KapsRepository.instance().findEntity( FlurstueckComposite.class,
+                    feature.getIdentifier().getID() );
+            // vertrag oeffnen
+            VertragComposite vertrag = flurstueck.vertrag().get();
+            if (vertrag != null) {
+                try {
+                    IMap map = ((PipelineFeatureSource)fs).getLayer().getMap();
+                    ILayer layer = Iterables.getOnlyElement( Iterables.filter( map.getLayers(),
+                            Layers.hasLabel( VertragComposite.NAME ) ) );
+                    FeatureStore store = PipelineFeatureSource.forLayer( layer, false );
+
+                    String id = vertrag.id();
+                    FeatureId featureId = new FeatureIdImpl( id );
+
+                    FeatureCollection features = store
+                            .getFeatures( DataPlugin.ff.id( Collections.singleton( featureId ) ) );
+                    // .features().next();
+                    Feature vFeature = features.features().next();
+
+                    // vertraege anzeigen
+                    result.add( new Kaufvertrag1FormEditorPage( vFeature, fs ) );
+                    result.add( new Kaufvertrag2FormEditorPage( vFeature, fs ) );
+                    KaufvertragFlurstueckeFormEditorPage flurstueckEditorPage = new KaufvertragFlurstueckeFormEditorPage(
+                            formEditor, vFeature, fs );
+                    result.add( flurstueckEditorPage );
+                    result.add( new KaufvertragErweitertFormEditorPage( formEditor, vFeature, fs ) );
+
+                    formEditor.setActivePage( KaufvertragFlurstueckeFormEditorPage.class.getName() );
+                    flurstueckEditorPage.selectedComposite.set( flurstueck);
+                }
+                catch (Exception e) {
+                    throw new RuntimeException( e );
+                }
+            }
+            else {
+                 result.add( new DontUseThisFormEditorPage(
+                 "Flurstück wurde nur während des Datenimports als Hilfestellung angelegt und darf nicht weiter bearbeitet werden.",
+                 feature,
+                 fs ) );
+            }
         }
         else if (name.equalsIgnoreCase( RichtwertzoneComposite.NAME )) {
-            result.add( new RichtwertzoneGrunddatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
-            result.add( new RichtwertzoneWeitereDatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
+            result.add( new RichtwertzoneGrunddatenFormEditorPage( feature, fs ) );
+            result.add( new RichtwertzoneWeitereDatenFormEditorPage( feature, fs ) );
         }
         else if (name.equalsIgnoreCase( RichtwertzoneZeitraumComposite.NAME )) {
-            result.add( new RichtwertzoneZeitraumGrunddatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
-            result.add( new RichtwertzoneZeitraumWeitereDatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
+            result.add( new RichtwertzoneZeitraumGrunddatenFormEditorPage( feature, fs ) );
+            result.add( new RichtwertzoneZeitraumWeitereDatenFormEditorPage( feature, fs ) );
         }
         else if (name.equalsIgnoreCase( VertragsdatenBaulandComposite.NAME )) {
             result.add( new VertragsdatenBaulandGrunddatenFormEditorPage( formEditor, feature, formEditor
@@ -62,18 +114,18 @@ public class FormPageProvider
                     .getFeatureStore() ) );
             result.add( new VertragsdatenBaulandRichtwertFormEditorPage( formEditor, feature, formEditor
                     .getFeatureStore() ) );
-            result.add( new VertragsdatenBaulandSonstigesFormEditorPage( feature, formEditor.getFeatureStore() ) );
-            result.add( new VertragsdatenBaulandStaBuFormEditorPage( feature, formEditor.getFeatureStore() ) );
+            result.add( new VertragsdatenBaulandSonstigesFormEditorPage( feature, fs ) );
+            result.add( new VertragsdatenBaulandStaBuFormEditorPage( feature, fs ) );
         }
         else if (name.equalsIgnoreCase( VertragsdatenAgrarComposite.NAME )) {
             result.add( new VertragsdatenAgrarGrunddatenFormEditorPage( formEditor, feature, formEditor
                     .getFeatureStore() ) );
             result.add( new VertragsdatenAgrarBodenwertFormEditorPage( formEditor, feature, formEditor
                     .getFeatureStore() ) );
-            result.add( new VertragsdatenAgrarStaLaFormEditorPage( formEditor, feature, formEditor.getFeatureStore() ) );
+            result.add( new VertragsdatenAgrarStaLaFormEditorPage( formEditor, feature, fs ) );
         }
         else if (name.equalsIgnoreCase( WohnungseigentumComposite.NAME )) {
-            result.add( new WohnungseigentumFormEditorPage( feature, formEditor.getFeatureStore() ) );
+            result.add( new WohnungseigentumFormEditorPage( feature, fs ) );
         }
         else if (name.equalsIgnoreCase( AusstattungBewertungComposite.NAME )) {
             result.add( new BewertungAnhandVonAustattungsmerkmalenFormEditorPage( formEditor, feature, formEditor
@@ -84,10 +136,10 @@ public class FormPageProvider
                     .getFeatureStore() ) );
         }
         else if (name.equalsIgnoreCase( NHK2010BaupreisIndexComposite.NAME )) {
-            result.add( new BaupreisIndexFormEditorPage( feature, formEditor.getFeatureStore() ) );
+            result.add( new BaupreisIndexFormEditorPage( feature, fs ) );
         }
         else if (name.equalsIgnoreCase( ErtragswertverfahrenComposite.NAME )) {
-            result.add( new ErtragswertverfahrenBetriebskostenFormEditorPage( feature, formEditor.getFeatureStore() ) );
+            result.add( new ErtragswertverfahrenBetriebskostenFormEditorPage( feature, fs ) );
             result.add( new ErtragswertverfahrenErtraegeFormEditorPage( formEditor, feature, formEditor
                     .getFeatureStore() ) );
             result.add( new ErtragswertverfahrenBewirtschaftungskostenFormEditorPage( formEditor, feature, formEditor
@@ -98,17 +150,17 @@ public class FormPageProvider
                     .getFeatureStore() ) );
         }
         else if (name.equalsIgnoreCase( GebaeudeComposite.NAME )) {
-            result.add( new GebaeudeGrunddatenFormEditorPage( feature, formEditor.getFeatureStore() ) );
-            result.add( new GebaeudeFlurstueckeFormEditorPage( feature, formEditor.getFeatureStore() ) );
+            result.add( new GebaeudeGrunddatenFormEditorPage( feature, fs ) );
+            result.add( new GebaeudeFlurstueckeFormEditorPage( feature, fs ) );
         }
         else if (name.equalsIgnoreCase( WohnungComposite.NAME )) {
-            result.add( new WohnungGrunddatenFormEditorPage( formEditor, feature, formEditor.getFeatureStore() ) );
-            result.add( new WohnungVertragsdatenFormEditorPage( formEditor, feature, formEditor.getFeatureStore() ) );
-            result.add( new WohnungLiegenschaftzinsFormEditorPage( formEditor, feature, formEditor.getFeatureStore() ) );
+            result.add( new WohnungGrunddatenFormEditorPage( formEditor, feature, fs ) );
+            result.add( new WohnungVertragsdatenFormEditorPage( formEditor, feature, fs ) );
+            result.add( new WohnungLiegenschaftzinsFormEditorPage( formEditor, feature, fs ) );
         }
         else if (name.equalsIgnoreCase( GebaeudeArtComposite.NAME )) {
-            result.add( new DefaultEntityFormEditorPage( feature, formEditor.getFeatureStore(),
-                    GebaeudeArtComposite.class, KapsRepository.instance(), GebaeudeArtComposite.NAME ) {
+            result.add( new DefaultEntityFormEditorPage( feature, fs, GebaeudeArtComposite.class, KapsRepository
+                    .instance(), GebaeudeArtComposite.NAME ) {
 
                 @Override
                 protected String labelFor( String name ) {
@@ -129,18 +181,18 @@ public class FormPageProvider
             } );
         }
         else if (name.equalsIgnoreCase( GemarkungComposite.NAME )) {
-            result.add( new DefaultEntityFormEditorPage( feature, formEditor.getFeatureStore(),
-                    GemarkungComposite.class, KapsRepository.instance(), GemarkungComposite.NAME ) );
+            result.add( new DefaultEntityFormEditorPage( feature, fs, GemarkungComposite.class, KapsRepository
+                    .instance(), GemarkungComposite.NAME ) );
         }
         else if (name.equalsIgnoreCase( GemeindeComposite.NAME )) {
-            result.add( new GemeindeFormEditorPage( feature, formEditor.getFeatureStore() ) );
+            result.add( new GemeindeFormEditorPage( feature, fs ) );
         }
         else if (name.equalsIgnoreCase( BodennutzungComposite.NAME )) {
-            result.add( new DefaultEntityFormEditorPage( feature, formEditor.getFeatureStore(),
-                    BodennutzungComposite.class, KapsRepository.instance(), BodennutzungComposite.NAME ) );
+            result.add( new DefaultEntityFormEditorPage( feature, fs, BodennutzungComposite.class, KapsRepository
+                    .instance(), BodennutzungComposite.NAME ) );
         }
         else if (name.equalsIgnoreCase( NutzungComposite.NAME )) {
-            result.add( new DefaultEntityFormEditorPage( feature, formEditor.getFeatureStore(), NutzungComposite.class,
+            result.add( new DefaultEntityFormEditorPage( feature, fs, NutzungComposite.class,
                     KapsRepository.instance(), NutzungComposite.NAME ) {
 
                 @Override
@@ -177,8 +229,8 @@ public class FormPageProvider
             } );
         }
         else if (name.equalsIgnoreCase( VertragsArtComposite.NAME )) {
-            result.add( new DefaultEntityFormEditorPage( feature, formEditor.getFeatureStore(),
-                    VertragsArtComposite.class, KapsRepository.instance(), VertragsArtComposite.NAME ) {
+            result.add( new DefaultEntityFormEditorPage( feature, fs, VertragsArtComposite.class, KapsRepository
+                    .instance(), VertragsArtComposite.NAME ) {
 
                 @Override
                 protected String labelFor( String name ) {
@@ -202,8 +254,8 @@ public class FormPageProvider
             } );
         }
         else if (name.equalsIgnoreCase( KaeuferKreisComposite.NAME )) {
-            result.add( new DefaultEntityFormEditorPage( feature, formEditor.getFeatureStore(),
-                    KaeuferKreisComposite.class, KapsRepository.instance(), KaeuferKreisComposite.NAME ) {
+            result.add( new DefaultEntityFormEditorPage( feature, fs, KaeuferKreisComposite.class, KapsRepository
+                    .instance(), KaeuferKreisComposite.NAME ) {
 
                 @Override
                 protected String labelFor( String name ) {
@@ -239,15 +291,15 @@ public class FormPageProvider
             } );
         }
         else if (name.equalsIgnoreCase( StrasseComposite.NAME )) {
-            result.add( new DefaultEntityFormEditorPage( feature, formEditor.getFeatureStore(), StrasseComposite.class,
+            result.add( new DefaultEntityFormEditorPage( feature, fs, StrasseComposite.class,
                     KapsRepository.instance(), StrasseComposite.NAME ) );
         }
         else if (name.equalsIgnoreCase( FlurComposite.NAME )) {
-            result.add( new DefaultEntityFormEditorPage( feature, formEditor.getFeatureStore(), FlurComposite.class,
-                    KapsRepository.instance(), FlurComposite.NAME ) );
+            result.add( new DefaultEntityFormEditorPage( feature, fs, FlurComposite.class, KapsRepository.instance(),
+                    FlurComposite.NAME ) );
         }
         else if (name.equalsIgnoreCase( NHK2010BewertungComposite.NAME )) {
-            result.add( new NHK2010BewertungFormEditorPage( formEditor, feature, formEditor.getFeatureStore() ) );
+            result.add( new NHK2010BewertungFormEditorPage( formEditor, feature, fs ) );
         }
         return result;
     }
