@@ -12,6 +12,8 @@
  */
 package org.polymap.kaps.model;
 
+import static org.qi4j.api.query.QueryExpressions.orderBy;
+
 import java.util.Iterator;
 
 import java.io.File;
@@ -22,6 +24,9 @@ import org.apache.commons.logging.LogFactory;
 
 import org.qi4j.api.query.Query;
 import org.qi4j.api.query.QueryBuilder;
+import org.qi4j.api.query.QueryExpressions;
+import org.qi4j.api.query.grammar.BooleanExpression;
+import org.qi4j.api.query.grammar.OrderBy;
 import org.qi4j.api.structure.Application;
 import org.qi4j.api.structure.Module;
 import org.qi4j.api.unitofwork.UnitOfWork;
@@ -134,7 +139,7 @@ public class KapsRepositoryAssembler
         domainModule.addServices( SchlGeneratorService.class ).identifiedBy( "schl" );
         domainModule.addServices( GebaeudeNummerGeneratorService.class ).identifiedBy( "gebaeudenummer" );
         domainModule.addServices( WohnungsNummerGeneratorService.class ).identifiedBy( "wohnungsnummer" );
-        
+
     }
 
 
@@ -181,6 +186,7 @@ public class KapsRepositoryAssembler
             WohnlageStaBuComposite.Mixin.createInitData( schlCreator );
         }
         migrateBelastung( uow );
+        migrateRichtwertzone( uow );
         uow.complete();
         log.info( "Create Init Data Completed" );
     }
@@ -222,6 +228,37 @@ public class KapsRepositoryAssembler
             }
             file.createNewFile();
             log.info( "Migration of " + count + " Belastungen Completed" );
+        }
+    }
+
+
+    private void migrateRichtwertzone( UnitOfWork uow )
+            throws IOException {
+        File file = new File( createDataDir(), "migration.richtwertZoneLatest" );
+        if (!file.exists()) {
+            log.info( "Migrating Richtwertzone" );
+            QueryBuilder<RichtwertzoneComposite> builder = getModule().queryBuilderFactory().newQueryBuilder(
+                    RichtwertzoneComposite.class );
+            QueryBuilder<RichtwertzoneZeitraumComposite> builderZ = getModule().queryBuilderFactory().newQueryBuilder(
+                    RichtwertzoneZeitraumComposite.class );
+            RichtwertzoneZeitraumComposite template = QueryExpressions
+                    .templateFor( RichtwertzoneZeitraumComposite.class );
+            Query<RichtwertzoneComposite> query = builder.newQuery( uow ).maxResults( Integer.MAX_VALUE )
+                    .firstResult( 0 );
+            Iterator<RichtwertzoneComposite> it = query.iterator();
+            int count = 0;
+            while (it.hasNext()) {
+                RichtwertzoneComposite zone = it.next();
+                BooleanExpression expr = QueryExpressions.eq( template.zone(), zone );
+                RichtwertzoneZeitraumComposite zeitraum = builderZ.where( expr ).newQuery( uow )
+                        .maxResults( Integer.MAX_VALUE )
+                        .orderBy( orderBy( template.gueltigAb(), OrderBy.Order.DESCENDING ) ).maxResults( 1 ).find();
+
+                zone.latestZone().set( zeitraum );
+                count++;
+            }
+            file.createNewFile();
+            log.info( "Migration of " + count + " Richtwertzone Completed" );
         }
     }
 }

@@ -87,8 +87,8 @@ public class RichtwertzoneProvider {
                 // o2 scheint nicht leer zu sein
                 return -1;
             }
-            RichtwertzoneZeitraumComposite zz1 = base.get( o1 ).latest().get();
-            RichtwertzoneZeitraumComposite zz2 = base.get( o2 ).latest().get();
+            RichtwertzoneZeitraumComposite zz1 = base.get( o1 ).latestZone().get();
+            RichtwertzoneZeitraumComposite zz2 = base.get( o2 ).latestZone().get();
             if (zz1 == null) {
                 if (zz2 == null) {
                     return o1.compareTo( o2 );

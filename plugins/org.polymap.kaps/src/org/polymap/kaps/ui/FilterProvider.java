@@ -82,7 +82,7 @@ public class FilterProvider
                 if (type.isAssignableFrom( RichtwertzoneComposite.class )) {
                     result.add( new RichtwertZoneFilter( layer ) );
                     result.add( new RichtwertZoneZeitraumFilter( layer ) );
-                    result.add( new DefaultEntityFilter( layer, type, repo ).exclude( "latest" ) );
+                    result.add( new DefaultEntityFilter( layer, type, repo ).exclude( "latestZone" ) );
                     // }
                     // else if (type.isAssignableFrom( FlurstueckComposite.class )) {
                     // result.add( new FlurstueckeStabuFilter( layer ));

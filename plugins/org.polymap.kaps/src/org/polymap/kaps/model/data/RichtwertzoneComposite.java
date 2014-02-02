@@ -195,9 +195,7 @@ public interface RichtwertzoneComposite
 
 
     @Optional
-    @Computed
-    Association<RichtwertzoneZeitraumComposite> latest();
-
+    Association<RichtwertzoneZeitraumComposite> latestZone();
 
     /**
      * Methods and transient fields.
@@ -216,36 +214,6 @@ public interface RichtwertzoneComposite
             // filter auf letzte aktuelle Zone, darf nicht da ja auch ältere Zonen
             // auswählbar sind
             return matches;
-        }
-
-        private final RichtwertzoneComposite zone = this;
-
-        private RichtwertzoneZeitraumComposite latest = null;
-
-        @Override
-        public Association<RichtwertzoneZeitraumComposite> latest() {
-            return new ComputedAssociationInstance<RichtwertzoneZeitraumComposite>( new GenericAssociationInfo(
-                    RichtwertzoneComposite.class, "latest" ) ) {
-                
-                @Override
-                public RichtwertzoneZeitraumComposite get() {
-                    if (latest == null) {
-                        Iterator<RichtwertzoneZeitraumComposite> iterator = RichtwertzoneZeitraumComposite.Mixin
-                                .forZone( zone ).iterator();
-                        if (iterator != null && iterator.hasNext()) {
-                            latest = iterator.next();
-                        }
-                    }
-                    return latest;
-                }
-
-
-                @Override
-                public void set( RichtwertzoneZeitraumComposite newValue )
-                        throws IllegalArgumentException, IllegalStateException {
-                    latest = newValue;
-                }
-            };
         }
     }
 }
