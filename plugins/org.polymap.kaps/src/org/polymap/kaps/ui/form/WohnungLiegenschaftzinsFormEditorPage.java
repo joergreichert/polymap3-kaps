@@ -37,6 +37,8 @@ import org.polymap.rhei.field.IFormFieldListener;
 import org.polymap.rhei.form.FormEditor;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
+import org.polymap.kaps.MathUtil;
+import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.ui.FieldCalculation;
 import org.polymap.kaps.ui.FieldCalculationWithTrigger;
 import org.polymap.kaps.ui.FieldListener;
@@ -288,7 +290,7 @@ public class WohnungLiegenschaftzinsFormEditorPage
                         return ertrag;
                     }
                     else {
-                        return ertrag - kosten;
+                        return MathUtil.round( ertrag - kosten );
                     }
                 }
                 return null;
@@ -322,7 +324,7 @@ public class WohnungLiegenschaftzinsFormEditorPage
                         else {
                             flaeche = Double.valueOf( 0.0d );
                         }
-                        return flaeche;
+                        return MathUtil.round( flaeche);
                     }
                 }
                 return null;
@@ -351,7 +353,7 @@ public class WohnungLiegenschaftzinsFormEditorPage
                     Double preis = this.triggerValue() != null && this.triggerValue().booleanValue() ? values
                             .get( wohnung.bereinigterVollpreis() ) : values.get( wohnung.kaufpreis() );
                     if (preis != null) {
-                        return preis - bodenwert;
+                        return MathUtil.round( preis - bodenwert);
                     }
                 }
                 return null;
@@ -366,8 +368,8 @@ public class WohnungLiegenschaftzinsFormEditorPage
 
         lastLine = newLine;
         newLine = createLabel( parent, "Jahresreinertrag/Kaufpreis", three().top( lastLine ), SWT.RIGHT );
-        createPreisField( wohnung.jahresReinErtragZuKaufpreis(), five().top( lastLine ), parent, false );
-        site.addFieldListener( jahresReinErtragZuKaufpreis = new FieldCalculationWithTrigger( site, 2, wohnung
+        createNumberField( IFormFieldLabel.NO_LABEL, null, wohnung.jahresReinErtragZuKaufpreis(), five().top( lastLine ), parent, false, 4 );
+        site.addFieldListener( jahresReinErtragZuKaufpreis = new FieldCalculationWithTrigger( site, 4, wohnung
                 .jahresReinErtragZuKaufpreis(), wohnung.garagenBeiLiegenschaftszinsBeruecksichtigen(), wohnung
                 .jahresReinertrag(), wohnung.bereinigterVollpreis(), wohnung.kaufpreis() ) {
 
@@ -387,8 +389,8 @@ public class WohnungLiegenschaftzinsFormEditorPage
 
         lastLine = newLine;
         newLine = createLabel( parent, "Gebäudewertanteil/Kaufpreis", three().top( lastLine ), SWT.RIGHT );
-        createPreisField( wohnung.gebaeudewertAnteilZuKaufpreis(), five().top( lastLine ), parent, false );
-        site.addFieldListener( gebaeudewertAnteilZuKaufpreis = new FieldCalculationWithTrigger( site, 2, wohnung
+        createNumberField( IFormFieldLabel.NO_LABEL, null, wohnung.gebaeudewertAnteilZuKaufpreis(), five().top( lastLine ), parent, false, 4 );
+        site.addFieldListener( gebaeudewertAnteilZuKaufpreis = new FieldCalculationWithTrigger( site, 4, wohnung
                 .gebaeudewertAnteilZuKaufpreis(), wohnung.garagenBeiLiegenschaftszinsBeruecksichtigen(), wohnung
                 .gebaeudewertAnteilDerWohnung(), wohnung.bereinigterVollpreis(), wohnung.kaufpreis() ) {
 
@@ -421,7 +423,8 @@ public class WohnungLiegenschaftzinsFormEditorPage
                 Double GND = values.get( wohnung.gesamtNutzungsDauer() );
                 Double baujahr = values.get( wohnung.bereinigtesBaujahr() );
 
-                int currentYear = new Date().getYear() + 1900;
+                VertragComposite vertrag = wohnung.vertrag().get();
+                int currentYear = (vertrag != null ? vertrag.vertragsDatum().get().getYear() : new Date().getYear()) + 1900;
                 Double RND = (GND != null && baujahr != null) ? baujahr + GND - currentYear : null;
                 if (RND != null && faktor1 != null && faktor2 != null) {
                     Double liziV = faktor1;
