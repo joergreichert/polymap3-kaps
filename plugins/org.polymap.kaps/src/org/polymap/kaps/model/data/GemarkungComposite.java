@@ -12,6 +12,8 @@
  */
 package org.polymap.kaps.model.data;
 
+import static org.qi4j.api.query.QueryExpressions.orderBy;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -21,6 +23,10 @@ import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.entity.association.Association;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.property.Property;
+import org.qi4j.api.query.Query;
+import org.qi4j.api.query.QueryExpressions;
+import org.qi4j.api.query.grammar.BooleanExpression;
+import org.qi4j.api.query.grammar.OrderBy;
 
 import org.polymap.core.qi4j.QiEntity;
 import org.polymap.core.qi4j.event.ModelChangeSupport;
@@ -28,6 +34,7 @@ import org.polymap.core.qi4j.event.PropertyChangeSupport;
 
 import org.polymap.kaps.importer.ImportColumn;
 import org.polymap.kaps.importer.ImportTable;
+import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.SchlNamed;
 
 /**
@@ -35,8 +42,8 @@ import org.polymap.kaps.model.SchlNamed;
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 @Concerns({ PropertyChangeSupport.Concern.class })
-@Mixins({ GemarkungComposite.Mixin.class, PropertyChangeSupport.Mixin.class,
-        ModelChangeSupport.Mixin.class, QiEntity.Mixin.class
+@Mixins({ GemarkungComposite.Mixin.class, PropertyChangeSupport.Mixin.class, ModelChangeSupport.Mixin.class,
+        QiEntity.Mixin.class
 // JsonState.Mixin.class
 })
 @ImportTable("K_GEMFLU")
@@ -50,18 +57,21 @@ public interface GemarkungComposite
     @ImportColumn("SCHL")
     Property<String> schl();
 
+
     @Optional
     @ImportColumn("TEXT")
     Property<String> name();
 
+
     @Optional
     // FLURSCHL
     Association<FlurComposite> flur();
-    
+
+
     @Optional
     // GEMEINDE
     Association<GemeindeComposite> gemeinde();
-    
+
 
     /**
      * Methods and transient fields.
@@ -71,6 +81,14 @@ public interface GemarkungComposite
 
         private static Log log = LogFactory.getLog( Mixin.class );
 
+
+        public static Iterable<GemarkungComposite> forGemeinde( GemeindeComposite gemeinde ) {
+            GemarkungComposite template = QueryExpressions.templateFor( GemarkungComposite.class );
+            BooleanExpression expr = QueryExpressions.eq( template.gemeinde(), gemeinde );
+            Query<GemarkungComposite> matches = KapsRepository.instance().findEntities( GemarkungComposite.class, expr,
+                    0, -1 );
+            return matches;
+        }
     }
 
 }

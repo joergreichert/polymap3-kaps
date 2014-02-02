@@ -15,6 +15,8 @@ package org.polymap.kaps.ui.filter;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,8 +40,11 @@ import org.polymap.rhei.data.entityfeature.AbstractEntityFilter;
 import org.polymap.rhei.field.BetweenFormField;
 import org.polymap.rhei.field.BetweenValidator;
 import org.polymap.rhei.field.DateTimeFormField;
+import org.polymap.rhei.field.FormFieldEvent;
+import org.polymap.rhei.field.IFormFieldListener;
 import org.polymap.rhei.field.PicklistFormField;
 import org.polymap.rhei.field.StringFormField;
+import org.polymap.rhei.filter.FilterEditor;
 import org.polymap.rhei.filter.IFilterEditorSite;
 
 import org.polymap.kaps.model.KapsRepository;
@@ -48,6 +53,7 @@ import org.polymap.kaps.model.data.GebaeudeArtComposite;
 import org.polymap.kaps.model.data.GemarkungComposite;
 import org.polymap.kaps.model.data.GemeindeComposite;
 import org.polymap.kaps.model.data.NutzungComposite;
+import org.polymap.kaps.model.data.StrasseComposite;
 import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.VertragsdatenBaulandComposite;
 import org.polymap.kaps.ui.MyNumberValidator;
@@ -59,7 +65,9 @@ import org.polymap.kaps.ui.MyNumberValidator;
 public class VertraegeFuerBaujahrUndGebaeudeartFilter
         extends AbstractEntityFilter {
 
-    private static Log log = LogFactory.getLog( VertraegeFuerBaujahrUndGebaeudeartFilter.class );
+    private static Log         log = LogFactory.getLog( VertraegeFuerBaujahrUndGebaeudeartFilter.class );
+
+    private IFormFieldListener gemeindeListener;
 
 
     public VertraegeFuerBaujahrUndGebaeudeartFilter( ILayer layer ) {
@@ -73,7 +81,7 @@ public class VertraegeFuerBaujahrUndGebaeudeartFilter
     }
 
 
-    public Composite createControl( Composite parent, IFilterEditorSite site ) {
+    public Composite createControl( Composite parent, final IFilterEditorSite site ) {
         Composite result = site.createStandardLayout( parent );
 
         site.addStandardLayout( site.newFormField( result, "datum", Date.class, new BetweenFormField(
@@ -81,6 +89,36 @@ public class VertraegeFuerBaujahrUndGebaeudeartFilter
 
         site.addStandardLayout( site.newFormField( result, "gemeinde", GemeindeComposite.class, new PicklistFormField(
                 KapsRepository.instance().entitiesWithNames( GemeindeComposite.class ) ), null, "Gemeinde" ) );
+
+        FilterEditor editor = (FilterEditor)site;
+
+        final PicklistFormField gemarkungen = new PicklistFormField( new PicklistFormField.ValueProvider() {
+
+            @Override
+            public SortedMap<String, Object> get() {
+                SortedMap<String, Object> gemarkungen = new TreeMap<String, Object>();
+                GemeindeComposite gemeinde = (GemeindeComposite)site.getFieldValue( "gemeinde" );
+                if (gemeinde != null) {
+                    for (GemarkungComposite gemarkung : GemarkungComposite.Mixin.forGemeinde( gemeinde )) {
+                        gemarkungen.put( gemarkung.schl().get() + "  -  " + gemarkung.name().get(), gemarkung );
+                    }
+                }
+                return gemarkungen;
+            }
+        } );
+
+        editor.addFieldListener( gemeindeListener = new IFormFieldListener() {
+
+            @Override
+            public void fieldChange( FormFieldEvent ev ) {
+                if ("gemeinde".equals( ev.getFieldName() )) {
+                    gemarkungen.reloadValues();
+                }
+            }
+        } );
+
+        site.addStandardLayout( site.newFormField( result, "gemarkung", GemarkungComposite.class, gemarkungen, null,
+                "Gemarkung" ) );
 
         site.addStandardLayout( site.newFormField( result, "nutzung", NutzungComposite.class, new PicklistFormField(
                 KapsRepository.instance().entitiesWithNames( NutzungComposite.class ) ), null, "Nutzung" ) );
@@ -99,7 +137,6 @@ public class VertraegeFuerBaujahrUndGebaeudeartFilter
     protected Query<? extends Entity> createQuery( IFilterEditorSite site ) {
 
         GebaeudeArtComposite gebaeude = (GebaeudeArtComposite)site.getFieldValue( "gebart" );
-        GemeindeComposite gemeinde = (GemeindeComposite)site.getFieldValue( "gemeinde" );
         NutzungComposite nutzung = (NutzungComposite)site.getFieldValue( "nutzung" );
 
         Object[] vertragsDatum = (Object[])site.getFieldValue( "datum" );
@@ -136,33 +173,20 @@ public class VertraegeFuerBaujahrUndGebaeudeartFilter
 
         // if (gebaeude != null || nutzung != null || gemeinde != null) {
         FlurstueckComposite flurTemplate = QueryExpressions.templateFor( FlurstueckComposite.class );
-        //
-        // // nach Vertragsdatum vorsortieren
-        // BooleanExpression vExpr = null;
-        // if (vertragsDatumExpr != null) {
-        // Query<VertragComposite> vertraege =
-        // KapsRepository.instance().findEntities( VertragComposite.class,
-        // vertragsDatumExpr, 0, -1 );
-        // for (VertragComposite vertrag : vertraege) {
-        // BooleanExpression newExpr = QueryExpressions.eq( flurTemplate.vertrag(),
-        // vertrag );
-        // if (vExpr == null) {
-        // vExpr = newExpr;
-        // }
-        // else {
-        // vExpr = QueryExpressions.or( vExpr, newExpr );
-        // }
-        // }
-        // }
 
         // gemeinde
         BooleanExpression gExpr = null;
-        if (gemeinde != null) {
+        GemeindeComposite gemeinde = (GemeindeComposite)site.getFieldValue( "gemeinde" );
+        GemarkungComposite gemarkung = (GemarkungComposite)site.getFieldValue( "gemarkung" );
+        if (gemarkung != null) {
+            gExpr = QueryExpressions.eq( flurTemplate.gemarkung(), gemarkung );
+        }
+        else if (gemeinde != null) {
             GemarkungComposite gemarkungTemplate = QueryExpressions.templateFor( GemarkungComposite.class );
             Query<GemarkungComposite> gemarkungen = KapsRepository.instance().findEntities( GemarkungComposite.class,
                     QueryExpressions.eq( gemarkungTemplate.gemeinde(), gemeinde ), 0, -1 );
-            for (GemarkungComposite gemarkung : gemarkungen) {
-                BooleanExpression newExpr = QueryExpressions.eq( flurTemplate.gemarkung(), gemarkung );
+            for (GemarkungComposite gemarkungg : gemarkungen) {
+                BooleanExpression newExpr = QueryExpressions.eq( flurTemplate.gemarkung(), gemarkungg );
                 if (gExpr == null) {
                     gExpr = newExpr;
                 }
@@ -175,14 +199,6 @@ public class VertraegeFuerBaujahrUndGebaeudeartFilter
         BooleanExpression qExpr = gebaeude != null ? QueryExpressions.eq( flurTemplate.gebaeudeArt(), gebaeude ) : null;
         BooleanExpression nExpr = nutzung != null ? QueryExpressions.eq( flurTemplate.nutzung(), nutzung ) : null;
 
-        // if (qExpr != null) {
-        // if (vExpr != null) {
-        // qExpr = QueryExpressions.and( qExpr, vExpr );
-        // }
-        // }
-        // else {
-        // qExpr = vExpr;
-        // }
         if (qExpr != null) {
             if (gExpr != null) {
                 qExpr = QueryExpressions.and( qExpr, gExpr );
@@ -203,7 +219,7 @@ public class VertraegeFuerBaujahrUndGebaeudeartFilter
         Set<VertragComposite> vertraegeNachDatumUndFlurstueck = null;
         if (qExpr != null) {
             // flurstücke eingeschränkt, falls keine gefunden werden ist das set leer
-            vertraegeNachDatumUndFlurstueck = new HashSet<VertragComposite>();            
+            vertraegeNachDatumUndFlurstueck = new HashSet<VertragComposite>();
             Query<FlurstueckComposite> flurstuecke = KapsRepository.instance().findEntities( FlurstueckComposite.class,
                     qExpr, 0, -1 );
             for (FlurstueckComposite fc : flurstuecke) {
@@ -215,7 +231,8 @@ public class VertraegeFuerBaujahrUndGebaeudeartFilter
                     }
                 }
             }
-        } else {
+        }
+        else {
             // ansonsten flurstücke nicht weiter eingeschränkt, nimm alle nach Datum
             vertraegeNachDatumUndFlurstueck = vertraegeNachDatum;
         }
@@ -251,7 +268,8 @@ public class VertraegeFuerBaujahrUndGebaeudeartFilter
                     }
                 }
             }
-        } else {
+        }
+        else {
             vertraegeNachDatumUndFlurstueckUndBaujahr = vertraegeNachDatumUndFlurstueck;
         }
 

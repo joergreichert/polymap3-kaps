@@ -17,6 +17,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -40,8 +42,11 @@ import org.polymap.core.workbench.PolymapWorkbench;
 import org.polymap.rhei.field.BetweenFormField;
 import org.polymap.rhei.field.BetweenValidator;
 import org.polymap.rhei.field.DateTimeFormField;
+import org.polymap.rhei.field.FormFieldEvent;
+import org.polymap.rhei.field.IFormFieldListener;
 import org.polymap.rhei.field.PicklistFormField;
 import org.polymap.rhei.field.SelectlistFormField;
+import org.polymap.rhei.filter.FilterEditor;
 import org.polymap.rhei.filter.IFilterEditorSite;
 
 import org.polymap.kaps.model.KapsRepository;
@@ -62,6 +67,7 @@ public class VertragsdatenAgrarAgrarFilter
         extends KapsEntityFilter<VertragsdatenAgrarComposite> {
 
     private static Log log = LogFactory.getLog( VertragsdatenAgrarAgrarFilter.class );
+    private IFormFieldListener gemeindeListener;
 
 
     public VertragsdatenAgrarAgrarFilter( ILayer layer ) {
@@ -77,7 +83,7 @@ public class VertragsdatenAgrarAgrarFilter
 
 
     @Override
-    public Composite createControl( Composite parent, IFilterEditorSite site ) {
+    public Composite createControl( Composite parent, final IFilterEditorSite site ) {
         Composite result = site.createStandardLayout( parent );
 
         site.addStandardLayout( site.newFormField( result, "datum", Date.class, new BetweenFormField(
@@ -86,7 +92,35 @@ public class VertragsdatenAgrarAgrarFilter
 
         site.addStandardLayout( site.newFormField( result, "gemeinde", GemeindeComposite.class, new PicklistFormField(
                 KapsRepository.instance().entitiesWithNames( GemeindeComposite.class ) ), null, "Gemeinde" ) );
+        FilterEditor editor = (FilterEditor)site;
 
+        final PicklistFormField gemarkungen = new PicklistFormField( new PicklistFormField.ValueProvider() {
+
+            @Override
+            public SortedMap<String, Object> get() {
+                SortedMap<String, Object> gemarkungen = new TreeMap<String, Object>();
+                GemeindeComposite gemeinde = (GemeindeComposite)site.getFieldValue( "gemeinde" );
+                if (gemeinde != null) {
+                    for (GemarkungComposite gemarkung : GemarkungComposite.Mixin.forGemeinde( gemeinde )) {
+                        gemarkungen.put( gemarkung.schl().get() + "  -  " + gemarkung.name().get(), gemarkung );
+                    }
+                }
+                return gemarkungen;
+            }
+        } );
+
+        editor.addFieldListener( gemeindeListener = new IFormFieldListener() {
+
+            @Override
+            public void fieldChange( FormFieldEvent ev ) {
+                if ("gemeinde".equals( ev.getFieldName() )) {
+                    gemarkungen.reloadValues();
+                }
+            }
+        } );
+
+        site.addStandardLayout( site.newFormField( result, "gemarkung", GemarkungComposite.class, gemarkungen, null,
+                "Gemarkung" ) );
         SelectlistFormField field = new SelectlistFormField( KapsRepository.instance().entitiesWithNames(
                 NutzungComposite.class ) );
         field.setIsMultiple( true );
@@ -149,12 +183,16 @@ public class VertragsdatenAgrarAgrarFilter
 
         // gemeinde
         BooleanExpression gExpr = null;
-        if (gemeinde != null) {
+        GemarkungComposite gemarkung = (GemarkungComposite)site.getFieldValue( "gemarkung" );
+        if (gemarkung != null) {
+            gExpr = QueryExpressions.eq( flurTemplate.gemarkung(), gemarkung );
+        }
+        else if (gemeinde != null) {
             GemarkungComposite gemarkungTemplate = QueryExpressions.templateFor( GemarkungComposite.class );
             Query<GemarkungComposite> gemarkungen = KapsRepository.instance().findEntities( GemarkungComposite.class,
                     QueryExpressions.eq( gemarkungTemplate.gemeinde(), gemeinde ), 0, -1 );
-            for (GemarkungComposite gemarkung : gemarkungen) {
-                BooleanExpression newExpr = QueryExpressions.eq( flurTemplate.gemarkung(), gemarkung );
+            for (GemarkungComposite gemarkungg : gemarkungen) {
+                BooleanExpression newExpr = QueryExpressions.eq( flurTemplate.gemarkung(), gemarkungg );
                 if (gExpr == null) {
                     gExpr = newExpr;
                 }
@@ -206,6 +244,7 @@ public class VertragsdatenAgrarAgrarFilter
         }
         if (vertraegeNachDatumUndFlurstueck.size() > 5000) {
             Polymap.getSessionDisplay().asyncExec( new Runnable() {
+
                 public void run() {
                     MessageDialog.openError( PolymapWorkbench.getShellToParentOn(), "Zu viele Ergebnisse",
                             "Es wurden über 5000 Ergebnisse gefunden. Bitte schränken Sie die Suche weiter ein." );
