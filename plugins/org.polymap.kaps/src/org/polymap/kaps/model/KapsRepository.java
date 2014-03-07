@@ -31,6 +31,8 @@ import org.qi4j.api.query.QueryExpressions;
 import org.qi4j.api.query.grammar.BooleanExpression;
 import org.qi4j.api.service.ServiceReference;
 
+import org.eclipse.jface.dialogs.MessageDialog;
+
 import org.eclipse.core.runtime.NullProgressMonitor;
 
 import org.polymap.core.catalog.model.CatalogRepository;
@@ -44,6 +46,7 @@ import org.polymap.core.qi4j.Qi4jPlugin.Session;
 import org.polymap.core.qi4j.QiModule;
 import org.polymap.core.qi4j.QiModuleAssembler;
 import org.polymap.core.runtime.Polymap;
+import org.polymap.core.workbench.PolymapWorkbench;
 
 import org.polymap.kaps.model.data.AusstattungBewertungComposite;
 import org.polymap.kaps.model.data.BodenRichtwertRichtlinieArtDerNutzungComposite;
@@ -52,7 +55,6 @@ import org.polymap.kaps.model.data.BodennutzungComposite;
 import org.polymap.kaps.model.data.ErmittlungModernisierungsgradComposite;
 import org.polymap.kaps.model.data.ErtragswertverfahrenComposite;
 import org.polymap.kaps.model.data.FlurComposite;
-import org.polymap.kaps.model.data.FlurstueckComposite;
 import org.polymap.kaps.model.data.GebaeudeArtComposite;
 import org.polymap.kaps.model.data.GebaeudeComposite;
 import org.polymap.kaps.model.data.GemarkungComposite;
@@ -64,11 +66,13 @@ import org.polymap.kaps.model.data.NutzungComposite;
 import org.polymap.kaps.model.data.RichtwertzoneZeitraumComposite;
 import org.polymap.kaps.model.data.StrasseComposite;
 import org.polymap.kaps.model.data.VertragsArtComposite;
+import org.polymap.kaps.model.data.WohnungComposite;
 import org.polymap.kaps.model.idgen.EingangsNummerGeneratorService;
 import org.polymap.kaps.model.idgen.GebaeudeNummerGeneratorService;
 import org.polymap.kaps.model.idgen.ObjektNummerGeneratorService;
 import org.polymap.kaps.model.idgen.SchlGeneratorService;
 import org.polymap.kaps.model.idgen.WohnungsNummerGeneratorService;
+import org.polymap.kaps.ui.form.BewertungAnhandVonAustattungsmerkmalenFormEditorPage;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -340,5 +344,42 @@ public class KapsRepository
             }
         }
         return namen;
+    }
+    
+    @Override
+    public void removeEntity( Entity entity ) {
+        if (entity instanceof WohnungComposite) {
+            removeWohnung((WohnungComposite)entity);
+        }
+        else if (entity instanceof AusstattungBewertungComposite || entity instanceof ErmittlungModernisierungsgradComposite) {
+            // nichts weiter zu löschen hier
+            super.removeEntity( entity );
+        }
+        else {
+            Polymap.getSessionDisplay().asyncExec( new Runnable() {
+
+                public void run() {
+                    MessageDialog.openError( PolymapWorkbench.getShellToParentOn(), "Fehler beim Löschen",
+                            "Das Löschen dieses Objektes ist noch nicht implementiert.\n Bitte legen Sie ein entsprechendes Ticket im trac an.\n\n http://polymap.org/kaps/newticket" );
+                }
+            } );
+        }
+    }
+
+
+    /**
+     *
+     * @param entity
+     */
+    private void removeWohnung( WohnungComposite wohnung ) {
+        AusstattungBewertungComposite ausstattungBewertungComposite = AusstattungBewertungComposite.Mixin.forWohnung( wohnung );
+        if (ausstattungBewertungComposite != null) {
+            removeEntity( ausstattungBewertungComposite );
+        }
+        ErmittlungModernisierungsgradComposite ermittlungModernisierungsgradComposite = ErmittlungModernisierungsgradComposite.Mixin.forWohnung( wohnung );
+        if (ermittlungModernisierungsgradComposite != null) {
+            removeEntity( ermittlungModernisierungsgradComposite );
+        }
+        super.removeEntity( wohnung );
     }
 }
