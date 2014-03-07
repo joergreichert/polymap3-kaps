@@ -125,7 +125,7 @@ public class ErmittlungModernisierungsgradFormEditorPage
 
         em = repository.findEntity( ErmittlungModernisierungsgradComposite.class, feature.getIdentifier().getID() );
 
-        if (em.vertrag().get() == null || em.objektNummer().get() == null) {
+        if (em.vertrag().get() == null && em.objektNummer().get() == null) {
             throw new IllegalStateException(
                     "Zum Ermitteln von Modernisierungsgraden nutzen Sie bitte immer die 'Berechnen' Funktionen aus den Formularen." );
         }
