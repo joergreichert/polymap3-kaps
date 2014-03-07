@@ -311,13 +311,17 @@ public class WohnungGrunddatenFormEditorPage
                     MessageDialog.openError( PolymapWorkbench.getShellToParentOn(), "Fehlende Daten",
                             "Bitte geben Sie Gesamtnutzungsdauer und das tatsächliche Baujahr ein, bevor Sie diese Berechnung starten." );
                 }
+                if (wohnung.vertrag().get() == null) {
+                    MessageDialog.openError( PolymapWorkbench.getShellToParentOn(), "Fehlende Daten",
+                            "Zu dieser Wohnung wurde kein Vertrag gefunden." );
+                }
                 else {
                     ErmittlungModernisierungsgradComposite ermittlung = ErmittlungModernisierungsgradComposite.Mixin
                             .forWohnung( wohnung );
                     if (ermittlung == null) {
                         ermittlung = repository.newEntity( ErmittlungModernisierungsgradComposite.class, null );
                         ermittlung.wohnung().set( wohnung );
-                        // ermittlung.vertrag().set( bewertung.vertrag().get() );
+                        ermittlung.vertrag().set( wohnung.vertrag().get() );
                         ermittlung.objektNummer().set( wohnung.objektNummer().get() );
                         ermittlung.gebaeudeNummer().set( wohnung.gebaeudeNummer().get() );
                         ermittlung.wohnungsNummer().set( wohnung.wohnungsNummer().get() );
