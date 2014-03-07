@@ -57,47 +57,7 @@ public class FormPageProvider
             result.add( new KaufvertragErweitertFormEditorPage( formEditor, feature, fs ) );
         }
         else if (name.equalsIgnoreCase( FlurstueckComposite.NAME )) {
-            // flurstueck laden, vertrag dazu laden
-            FlurstueckComposite flurstueck = KapsRepository.instance().findEntity( FlurstueckComposite.class,
-                    feature.getIdentifier().getID() );
-            // vertrag oeffnen
-            VertragComposite vertrag = flurstueck.vertrag().get();
-            if (vertrag != null) {
-                try {
-                    IMap map = ((PipelineFeatureSource)fs).getLayer().getMap();
-                    ILayer layer = Iterables.getOnlyElement( Iterables.filter( map.getLayers(),
-                            Layers.hasLabel( VertragComposite.NAME ) ) );
-                    FeatureStore store = PipelineFeatureSource.forLayer( layer, false );
-
-                    String id = vertrag.id();
-                    FeatureId featureId = new FeatureIdImpl( id );
-
-                    FeatureCollection features = store
-                            .getFeatures( DataPlugin.ff.id( Collections.singleton( featureId ) ) );
-                    // .features().next();
-                    Feature vFeature = features.features().next();
-
-                    // vertraege anzeigen
-                    result.add( new Kaufvertrag1FormEditorPage( vFeature, fs ) );
-                    result.add( new Kaufvertrag2FormEditorPage( vFeature, fs ) );
-                    KaufvertragFlurstueckeFormEditorPage flurstueckEditorPage = new KaufvertragFlurstueckeFormEditorPage(
-                            formEditor, vFeature, fs );
-                    result.add( flurstueckEditorPage );
-                    result.add( new KaufvertragErweitertFormEditorPage( formEditor, vFeature, fs ) );
-
-                    formEditor.setActivePage( KaufvertragFlurstueckeFormEditorPage.class.getName() );
-                    flurstueckEditorPage.selectedComposite.set( flurstueck);
-                }
-                catch (Exception e) {
-                    throw new RuntimeException( e );
-                }
-            }
-            else {
-                 result.add( new DontUseThisFormEditorPage(
-                 "Flurstück wurde nur während des Datenimports als Hilfestellung angelegt und darf nicht weiter bearbeitet werden.",
-                 feature,
-                 fs ) );
-            }
+            result.add( new FlurstueckeFormEditorPage( feature, fs ) );
         }
         else if (name.equalsIgnoreCase( RichtwertzoneComposite.NAME )) {
             result.add( new RichtwertzoneGrunddatenFormEditorPage( feature, fs ) );

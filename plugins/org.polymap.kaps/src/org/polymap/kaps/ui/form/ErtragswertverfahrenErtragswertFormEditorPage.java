@@ -322,42 +322,7 @@ public class ErtragswertverfahrenErtragswertFormEditorPage
         createPreisField( vb.ertragswertDerBaulichenAnlagen(), three().top( lastLine, 30 ), client, false );
         site.addFieldListener( ertragsWertBauListener = new FieldMultiplication( site, 2, true, vb.vervielvaeltiger(), vb
                 .anteilDerBaulichenAnlagenAmJahresreinertrag(), vb.ertragswertDerBaulichenAnlagen() ) );
-
-        lastLine = newLine;
-        newLine = createLabel( client, "sonstige wertbeeinflussende Umstände", one().top( lastLine ), SWT.RIGHT );
-        createTextField( vb.wertbeeinflussendeUmstaendeText(), two().top( lastLine ), client );
-        createPreisField( vb.wertbeeinflussendeUmstaende(), three().top( lastLine ), client, true );
-
-        lastLine = newLine;
-        newLine = createLabel( client, "Zwischensumme", one().top( lastLine ), SWT.RIGHT );
-        createPreisField( vb.ertragswertDerBaulichenAnlagenZwischensumme(), three().top( lastLine ), client, false );
-        site.addFieldListener( ewbazListener = new FieldSummation( site, 2, vb
-                .ertragswertDerBaulichenAnlagenZwischensumme(), vb.ertragswertDerBaulichenAnlagen(), vb
-                .wertbeeinflussendeUmstaende() ) );
-
-        lastLine = newLine;
-        newLine = createLabel( client, "Bodenwert abzüglich Freilegung", one().top( lastLine ), SWT.RIGHT );
-        createPreisField( vb.bodenwertAbzglFreilegung(), three().top( lastLine ), client, false );
-        site.addFieldListener( bwAbzglFreilegung = new FieldCalculation( site, 2, vb.bodenwertAbzglFreilegung(), vb
-                .bodenwertAnteil(), vb.freilegung() ) {
-
-            @Override
-            protected Double calculate( ValueProvider values ) {
-                Double bw = values.get( vb.bodenwertAnteil() );
-                Double freilegung = values.get( vb.freilegung() );
-                return bw != null ? (freilegung != null ? bw - freilegung : bw) : null;
-            }
-        } );
-
-        lastLine = newLine;
-        newLine = createLabel( client, "Ertragswert", one().top( lastLine, 30 ), SWT.RIGHT );
-        createPreisField( vb.ertragswert(), three().top( lastLine, 30 ).bottom( 100 ), client, false );
-        site.addFieldListener( ertragsWert = new FieldSummation( site, 2, vb.ertragswert(), vb
-                .bodenwertAbzglFreilegung(), vb.ertragswertDerBaulichenAnlagenZwischensumme() ) );
-
-        site.addFieldListener( ertragsWertListener = new NonFiringFieldListener( vb.ertragswert(), vb
-                .wertbeeinflussendeUmstaende() ) );
-
+        
         final VertragComposite vertrag = vb.vertrag().get();
         String label = vertrag == null ? "kein Vertrag" : "Übernehmen";
         ActionButton openErweiterteDaten = new ActionButton( parent, new Action( label ) {
@@ -371,7 +336,7 @@ public class ErtragswertverfahrenErtragswertFormEditorPage
                 VertragsdatenBaulandComposite erweitert = VertragsdatenBaulandComposite.Mixin.forVertrag( vertrag );
                 StringBuffer message = new StringBuffer();
                 if (erweitert != null) {
-                    Double newValue = ertragsWertListener.get( vb.ertragswert() );
+                    Double newValue = ertragsWertListener.get( vb.ertragswertDerBaulichenAnlagen() );
                     if (newValue != null) { // && !newValue.equals(
                                             // erweitert.wertDerBaulichenAnlagen() ))
                                             // {
@@ -417,6 +382,41 @@ public class ErtragswertverfahrenErtragswertFormEditorPage
                 + EingangsNummerFormatter.format( vertrag.eingangsNr().get() ) + " übernehmen" );
         openErweiterteDaten.setLayoutData( four().height( 25 ).width( 40 ).top( lastLine, 30 ).create() );
         openErweiterteDaten.setEnabled( vertrag != null );
+        
+        lastLine = newLine;
+        newLine = createLabel( client, "sonstige wertbeeinflussende Umstände", one().top( lastLine ), SWT.RIGHT );
+        createTextField( vb.wertbeeinflussendeUmstaendeText(), two().top( lastLine ), client );
+        createPreisField( vb.wertbeeinflussendeUmstaende(), three().top( lastLine ), client, true );
+
+        lastLine = newLine;
+        newLine = createLabel( client, "Zwischensumme", one().top( lastLine ), SWT.RIGHT );
+        createPreisField( vb.ertragswertDerBaulichenAnlagenZwischensumme(), three().top( lastLine ), client, false );
+        site.addFieldListener( ewbazListener = new FieldSummation( site, 2, vb
+                .ertragswertDerBaulichenAnlagenZwischensumme(), vb.ertragswertDerBaulichenAnlagen(), vb
+                .wertbeeinflussendeUmstaende() ) );
+
+        lastLine = newLine;
+        newLine = createLabel( client, "Bodenwert abzüglich Freilegung", one().top( lastLine ), SWT.RIGHT );
+        createPreisField( vb.bodenwertAbzglFreilegung(), three().top( lastLine ), client, false );
+        site.addFieldListener( bwAbzglFreilegung = new FieldCalculation( site, 2, vb.bodenwertAbzglFreilegung(), vb
+                .bodenwertAnteil(), vb.freilegung() ) {
+
+            @Override
+            protected Double calculate( ValueProvider values ) {
+                Double bw = values.get( vb.bodenwertAnteil() );
+                Double freilegung = values.get( vb.freilegung() );
+                return bw != null ? (freilegung != null ? bw - freilegung : bw) : null;
+            }
+        } );
+
+        lastLine = newLine;
+        newLine = createLabel( client, "Ertragswert", one().top( lastLine, 30 ), SWT.RIGHT );
+        createPreisField( vb.ertragswert(), three().top( lastLine, 30 ).bottom( 100 ), client, false );
+        site.addFieldListener( ertragsWert = new FieldSummation( site, 2, vb.ertragswert(), vb
+                .bodenwertAbzglFreilegung(), vb.ertragswertDerBaulichenAnlagenZwischensumme() ) );
+
+        site.addFieldListener( ertragsWertListener = new NonFiringFieldListener( vb.ertragswert(), vb
+                .wertbeeinflussendeUmstaende(), vb.ertragswertDerBaulichenAnlagen() ) );
     }
 
 

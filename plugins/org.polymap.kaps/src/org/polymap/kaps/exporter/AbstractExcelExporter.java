@@ -203,7 +203,7 @@ public abstract class AbstractExcelExporter<T extends Entity>
     public boolean init( IFeatureOperationContext ctx ) {
         super.init( ctx );
         try {
-            return context.featureSource().getSchema().getName().getLocalPart().equals( typename );
+            return ctx.featureSource().getSchema().getName().getLocalPart().equals( typename );
         }
         catch (Exception e) {
             log.warn( "", e );

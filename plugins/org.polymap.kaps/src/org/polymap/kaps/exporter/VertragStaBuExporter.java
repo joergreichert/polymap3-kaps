@@ -112,7 +112,7 @@ public class VertragStaBuExporter
     public boolean init( IFeatureOperationContext ctx ) {
         super.init( ctx );
         try {
-            return context.featureSource().getSchema().getName().getLocalPart().equals( VertragComposite.NAME );
+            return ctx.featureSource().getSchema().getName().getLocalPart().equals( VertragComposite.NAME );
         }
         catch (Exception e) {
             log.warn( "", e );

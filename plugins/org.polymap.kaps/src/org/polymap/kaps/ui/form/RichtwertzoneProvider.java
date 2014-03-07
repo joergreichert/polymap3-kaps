@@ -94,6 +94,8 @@ public class RichtwertzoneProvider {
                     return o1.compareTo( o2 );
                 }
                 return -1;
+            } else if (zz2 == null) {
+                return 1;
             }
 
             Date g1= zz1.gueltigAb().get();
