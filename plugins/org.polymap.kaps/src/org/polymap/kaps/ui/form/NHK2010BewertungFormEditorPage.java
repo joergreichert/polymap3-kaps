@@ -244,6 +244,7 @@ public class NHK2010BewertungFormEditorPage
             pageSite.setFieldEnabled( getPropertyName( nameTemplate.restNutzungsDauer() ), false );
             pageSite.setFieldEnabled( getPropertyName( nameTemplate.altersWertMinderung() ), false );
             pageSite.setFieldEnabled( getPropertyName( nameTemplate.zeitwertRnd() ), false );
+
             // if (composite != null) {
             // // NHK2010GebaeudeArtComposite art =
             // NHK2010GebaeudeArtProvider.instance().gebaeudeForId(
@@ -257,6 +258,16 @@ public class NHK2010BewertungFormEditorPage
             // }
             // gebaeudeStandardField.setEnabled( selectedGebaeudeArt != null );
             postProcessGebaeudeArtSelection();
+            if (composite != null) {
+                // if (composite.zweifamilienHaus().get()) {
+                pageSite.setFieldValue( prefix + "zweifamilienHaus", composite.zweifamilienHaus().get() );
+                // called by listenerpageSite.setFieldValue( prefix +
+                // "faktorZweifamilienhaus", null );
+            }
+            else {
+                pageSite.setFieldValue( prefix + "zweifamilienHaus", Boolean.FALSE );
+                pageSite.setFieldValue( prefix + "faktorZweifamilienhaus", null );
+            }
         }
     }
 
@@ -727,6 +738,11 @@ public class NHK2010BewertungFormEditorPage
 
                             @Override
                             public Property<Double> get( NHK2010BewertungGebaeudeComposite entity ) {
+                                // nur berechnet, gibts in WinAKPS nicht
+                                if (entity.zweifamilienHaus().get() != null
+                                        && entity.zweifamilienHaus().get().booleanValue()) {
+                                    entity.faktorZweifamilienhaus().set( new Double( 1.05d ) );
+                                }
                                 return entity.faktorZweifamilienhaus();
                             }
                         } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
@@ -780,7 +796,8 @@ public class NHK2010BewertungFormEditorPage
                                 || (ev.getNewValue() != null && !ev.getNewValue().equals( selectedGebaeudeStandard ))) {
                             selectedGebaeudeStandard = ev.getNewValue();
                             if (selectedGebaeudeStandard != null) {
-                                Double value = MathUtil.round(selectedGebaeudeArt.calculateNHKFor( selectedGebaeudeStandard ));
+                                Double value = MathUtil.round( selectedGebaeudeArt
+                                        .calculateNHKFor( selectedGebaeudeStandard ) );
                                 pageSite.setFieldValue( prefix + "nhk", NumberFormatter.getFormatter( 2 )
                                         .format( value ) );
                             }
@@ -871,8 +888,10 @@ public class NHK2010BewertungFormEditorPage
                 if (nhkKorrigiert != null && faktorZweifamilienhaus != null) {
                     nhkKorrigiert *= faktorZweifamilienhaus;
                 }
-                pageSite.setFieldValue( getPropertyName( nameTemplate.nhkKorrigiert() ),
-                        nhkKorrigiert != null ? NumberFormatter.getFormatter( 2 ).format( MathUtil.round( nhkKorrigiert) ) : null );
+                pageSite.setFieldValue(
+                        getPropertyName( nameTemplate.nhkKorrigiert() ),
+                        nhkKorrigiert != null ? NumberFormatter.getFormatter( 2 ).format(
+                                MathUtil.round( nhkKorrigiert ) ) : null );
             }
         } );
 
@@ -1068,10 +1087,12 @@ public class NHK2010BewertungFormEditorPage
                         // durchschnitt berechnen, nur wenn verändert
                         if (indexType != null
                                 && !indexType.isEmpty()
-                                && (selectedComposite.get() != null && !indexType.equals( selectedComposite.get()
-                                        .baukostenIndexTyp().get() ))) {
+                                && (selectedComposite.get() != null && (!indexType.equals( selectedComposite.get()
+                                        .baukostenIndexTyp().get() ) || selectedComposite.get().baukostenIndexWert()
+                                        .get() == null))) {
                             // Wertermittlungsstichtag = Vertragsdatum
-                            result = NHK2010BaupreisIndexComposite.Mixin.indexFor( indexType, bewertung.vertrag().get().vertragsDatum().get() );
+                            result = NHK2010BaupreisIndexComposite.Mixin.indexFor( indexType, bewertung.vertrag().get()
+                                    .vertragsDatum().get() );
 
                             pageSite.setFieldValue(
                                     getPropertyName( nameTemplate.baukostenIndexWert() ),
@@ -1371,7 +1392,7 @@ public class NHK2010BewertungFormEditorPage
                 if (result != null && gesamtNutzungsDauer != null) {
                     // alter berechnen
                     Calendar cal = new GregorianCalendar();
-                    cal.setTime( bewertung.vertrag().get().vertragsDatum().get());
+                    cal.setTime( bewertung.vertrag().get().vertragsDatum().get() );
                     Double alter = cal.get( Calendar.YEAR ) - result;
                     // rnd = gnd - alter
                     result = Math.max( gesamtNutzungsDauer - alter, 0 );
@@ -1484,7 +1505,7 @@ public class NHK2010BewertungFormEditorPage
                     result = neuWert / 100 * (100 - altersWertMinderung);
                 }
                 pageSite.setFieldValue( getPropertyName( nameTemplate.zeitwertRnd() ), result != null ? NumberFormatter
-                        .getFormatter( 2 ).format( MathUtil.round( result) ) : null );
+                        .getFormatter( 2 ).format( MathUtil.round( result ) ) : null );
             }
 
         } );
@@ -1538,7 +1559,8 @@ public class NHK2010BewertungFormEditorPage
                 }
                 if (result != null) {
                     pageSite.setFieldValue( getPropertyName( nameTemplate.normalHerstellungsWert() ),
-                            result != null ? NumberFormatter.getFormatter( 2 ).format( MathUtil.round( result) ) : null );
+                            result != null ? NumberFormatter.getFormatter( 2 ).format( MathUtil.round( result ) )
+                                    : null );
                 }
             }
 
@@ -1625,7 +1647,8 @@ public class NHK2010BewertungFormEditorPage
                 }
                 if (result != null) {
                     pageSite.setFieldValue( getPropertyName( nameTemplate.gebaeudeZeitWert() ),
-                            result != null ? NumberFormatter.getFormatter( 2 ).format( MathUtil.round( result )) : null );
+                            result != null ? NumberFormatter.getFormatter( 2 ).format( MathUtil.round( result ) )
+                                    : null );
                 }
             }
 
@@ -1648,8 +1671,6 @@ public class NHK2010BewertungFormEditorPage
         // korrfaktoren
         pageSite.setFieldValue( prefix + "grundrissArt", null );
         pageSite.setFieldValue( prefix + "anzahlWohnungen", null );
-        pageSite.setFieldValue( prefix + "zweifamilienHaus", Boolean.FALSE );
-        pageSite.setFieldValue( prefix + "faktorZweifamilienhaus", null );
     }
 
 
