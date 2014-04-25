@@ -443,6 +443,8 @@ public class KaufvertragFlurstueckeFormEditorPage
             @Override
             public SortedMap<String, Object> get() {
                 SortedMap<String, Object> values = new TreeMap<String, Object>();
+                // #281
+                values.put( "", null );
                 if (selectedNutzung != null) {
                     Iterable<ArtDesBaugebietsComposite> iterable = ArtDesBaugebietsComposite.Mixin
                             .findByAgrar( selectedNutzung.isAgrar().get() );
@@ -478,7 +480,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                             public Association get( FlurstueckComposite entity ) {
                                 return entity.artDesBaugebiets();
                             }
-                        } ) ).setField( reloadable( artPicklist ) ).setValidator( new NotNullValidator() )
+                        } ) ).setField( reloadable( artPicklist ) )
                 .setLayoutData( left().top( line4 ).create() ).create();
 
         Composite line6 = newFormField( "Fläche in m²" )
