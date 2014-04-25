@@ -99,9 +99,36 @@ public interface VertragsdatenErweitertComposite
                     1 );
             return matches.find();
         }
+        
+        @Override
+        public void updateBasisPreis( Double kaufPreis ) {
+            if (kaufPreis == null) {
+                kaufPreis = new Double(0.0d);
+            }
+            Double basisPreis = basispreis().get();
+            if (basisPreis == null || basisPreis.doubleValue() != kaufPreis.doubleValue()) {
+                basispreis().set( kaufPreis );
+                Double zuschlag = zuschlag().get();
+                if (zuschlag != null) {
+                    kaufPreis = Double.valueOf( kaufPreis.doubleValue() + zuschlag.doubleValue() );
+                }
+                Double abschlag = abschlag().get();
+                if (abschlag != null) {
+                    kaufPreis = Double.valueOf( kaufPreis.doubleValue() - abschlag.doubleValue() );
+                }
+                bereinigterVollpreis().set( kaufPreis );
+            }
+        }
     }
 
 
     @Optional
     Property<Double> wertbeeinflussendeUmstaende();
+
+
+    /**
+     *
+     * @param double1
+     */
+    void updateBasisPreis( Double double1 );
 }

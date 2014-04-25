@@ -47,8 +47,7 @@ import org.polymap.kaps.ui.NumberFormatter;
 public class KaufvertragErweitertFormEditorPage
         extends KaufvertragFormEditorPage {
 
-    private final VertragsdatenErweitertComposite erweiterteVertragsdaten;
-
+   
     private FieldCalculation                      refresher;
 
     private FieldListener                         fieldListener;
@@ -60,10 +59,9 @@ public class KaufvertragErweitertFormEditorPage
 
     public KaufvertragErweitertFormEditorPage( FormEditor formEditor, Feature feature, FeatureStore featureStore ) {
         super( KaufvertragErweitertFormEditorPage.class.getName(), "Zu-/Abschlag", feature, featureStore );
-
-        erweiterteVertragsdaten = getOrCreateErweiterteVertragsdaten( kaufvertrag );
         EventManager.instance().subscribe( fieldListener = new FieldListener( kaufvertrag.vollpreis() ),
                 new FieldListener.EventFilter( formEditor ) );
+        
         EventManager.instance().subscribe(
                 editorListener = new InterEditorListener( erweiterteVertragsdaten.wertbeeinflussendeUmstaende() ) {
 
@@ -174,16 +172,5 @@ public class KaufvertragErweitertFormEditorPage
             }
 
         } );
-    }
-
-
-    private VertragsdatenErweitertComposite getOrCreateErweiterteVertragsdaten( VertragComposite kaufvertrag ) {
-        VertragsdatenErweitertComposite vdec = kaufvertrag.erweiterteVertragsdaten().get();
-        if (vdec == null) {
-            vdec = repository.newEntity( VertragsdatenErweitertComposite.class, null );
-            kaufvertrag.erweiterteVertragsdaten().set( vdec );
-            vdec.basispreis().set( kaufvertrag.kaufpreis().get() );
-        }
-        return vdec;
     }
 }

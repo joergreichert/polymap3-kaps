@@ -27,6 +27,7 @@ import org.polymap.rhei.form.IFormEditorPage;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
 import org.polymap.kaps.model.data.VertragComposite;
+import org.polymap.kaps.model.data.VertragsdatenErweitertComposite;
 import org.polymap.kaps.ui.KapsDefaultFormEditorPage;
 
 /**
@@ -37,12 +38,15 @@ public abstract class KaufvertragFormEditorPage
         implements IFormEditorPage {
 
     protected VertragComposite kaufvertrag;
+    protected final VertragsdatenErweitertComposite erweiterteVertragsdaten;
 
 
     public KaufvertragFormEditorPage( String id, String title, Feature feature, FeatureStore featureStore ) {
         super( id, title, feature, featureStore );
 
         kaufvertrag = repository.findEntity( VertragComposite.class, feature.getIdentifier().getID() );
+
+        erweiterteVertragsdaten = getOrCreateErweiterteVertragsdaten( kaufvertrag );
 
         EventManager.instance().subscribe( this, new EventFilter<PropertyChangeEvent>() {
 
@@ -89,5 +93,18 @@ public abstract class KaufvertragFormEditorPage
         String nummerF = EingangsNummerFormatter.format( kaufvertrag.eingangsNr().get() );
         pageSite.setEditorTitle( formattedTitle( "Vertrag", nummerF, null ) );
         pageSite.setFormTitle( formattedTitle( "Vertrag", nummerF, getTitle() ) );
+    }
+    
+
+    private VertragsdatenErweitertComposite getOrCreateErweiterteVertragsdaten( VertragComposite kaufvertrag ) {
+        VertragsdatenErweitertComposite vdec = kaufvertrag.erweiterteVertragsdaten().get();
+        if (vdec == null) {
+            vdec = repository.newEntity( VertragsdatenErweitertComposite.class, null );
+            kaufvertrag.erweiterteVertragsdaten().set( vdec );
+        }
+        if (vdec.basispreis().get() == null || (kaufvertrag.vollpreis().get() != null && vdec.basispreis().get().doubleValue() != kaufvertrag.vollpreis().get().doubleValue())) {
+            vdec.updateBasisPreis( kaufvertrag.vollpreis().get() );
+        }
+        return vdec;
     }
 }

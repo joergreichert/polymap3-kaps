@@ -845,7 +845,9 @@ public class KaufvertragFlurstueckeFormEditorPage
         if (vdec == null) {
             vdec = repository.newEntity( VertragsdatenErweitertComposite.class, null );
             kaufvertrag.erweiterteVertragsdaten().set( vdec );
-            vdec.basispreis().set( kaufvertrag.kaufpreis().get() );
+        }
+        if (vdec.basispreis().get() == null || (kaufvertrag.vollpreis().get() != null && vdec.basispreis().get().doubleValue() != kaufvertrag.vollpreis().get().doubleValue())) {
+            vdec.updateBasisPreis( kaufvertrag.vollpreis().get() );
         }
         return vdec;
     }
