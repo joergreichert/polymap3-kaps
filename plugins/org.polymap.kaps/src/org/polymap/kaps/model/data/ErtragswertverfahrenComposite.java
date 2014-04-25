@@ -187,19 +187,19 @@ public interface ErtragswertverfahrenComposite
     // S1 - Double
     @Optional
     @ImportColumn("S1")
-    Property<Double> miete8();
+    Property<Double> miete16();
 
 
     // S2 - Double
     @Optional
     @ImportColumn("S2")
-    Property<Double> miete9();
+    Property<Double> miete17();
 
 
     // S3 - Double
     @Optional
     @ImportColumn("S3")
-    Property<Double> miete10();
+    Property<Double> miete18();
 
 
     //
@@ -250,6 +250,7 @@ public interface ErtragswertverfahrenComposite
     // betriebskosten nochmal in Bewirtschaftungskosten
     @ImportColumn("JB")
     Property<Double> anteiligeBetriebskosten();
+
 
     // JV - Double
     @Optional
@@ -384,19 +385,19 @@ public interface ErtragswertverfahrenComposite
     // JT1 - String
     @Optional
     @ImportColumn("JT1")
-    Property<String> ertraegeZeile8();
+    Property<String> ertraegeZeile16();
 
 
     // JT2 - String
     @Optional
     @ImportColumn("JT2")
-    Property<String> ertraegeZeile9();
+    Property<String> ertraegeZeile17();
 
 
     // JT3 - String
     @Optional
     @ImportColumn("JT3")
-    Property<String> ertraegeZeile10();
+    Property<String> ertraegeZeile18();
 
 
     // G4 - String
@@ -490,7 +491,126 @@ public interface ErtragswertverfahrenComposite
     @ImportColumn("N7")
     Property<Double> miete7();
 
+    @Optional
+    Association<EtageComposite> etageZeile8();
 
+    @Optional
+    Property<Double> flaecheZeile8();
+
+    @Optional
+    Property<Boolean> wohnflaecheZeile8();
+
+    @Optional
+    Property<Double> mieteQmZeile8();
+
+    @Optional
+    Property<Double> miete8();
+
+    @Optional
+    Association<EtageComposite> etageZeile9();
+
+    @Optional
+    Property<Double> flaecheZeile9();
+
+    @Optional
+    Property<Boolean> wohnflaecheZeile9();
+
+    @Optional
+    Property<Double> mieteQmZeile9();
+
+    @Optional
+    Property<Double> miete9();
+
+    @Optional
+    Association<EtageComposite> etageZeile10();
+
+    @Optional
+    Property<Double> flaecheZeile10();
+
+    @Optional
+    Property<Boolean> wohnflaecheZeile10();
+
+    @Optional
+    Property<Double> mieteQmZeile10();
+
+    @Optional
+    Property<Double> miete10();
+
+    @Optional
+    Association<EtageComposite> etageZeile11();
+
+    @Optional
+    Property<Double> flaecheZeile11();
+
+    @Optional
+    Property<Boolean> wohnflaecheZeile11();
+
+    @Optional
+    Property<Double> mieteQmZeile11();
+
+    @Optional
+    Property<Double> miete11();
+
+    @Optional
+    Association<EtageComposite> etageZeile12();
+
+    @Optional
+    Property<Double> flaecheZeile12();
+
+    @Optional
+    Property<Boolean> wohnflaecheZeile12();
+
+    @Optional
+    Property<Double> mieteQmZeile12();
+
+    @Optional
+    Property<Double> miete12();
+    
+    @Optional
+    Association<EtageComposite> etageZeile13();
+
+    @Optional
+    Property<Double> flaecheZeile13();
+
+    @Optional
+    Property<Boolean> wohnflaecheZeile13();
+
+    @Optional
+    Property<Double> mieteQmZeile13();
+
+    @Optional
+    Property<Double> miete13();
+    
+    @Optional
+    Association<EtageComposite> etageZeile14();
+
+    @Optional
+    Property<Double> flaecheZeile14();
+
+    @Optional
+    Property<Boolean> wohnflaecheZeile14();
+
+    @Optional
+    Property<Double> mieteQmZeile14();
+
+    @Optional
+    Property<Double> miete14();
+    
+    @Optional
+    Association<EtageComposite> etageZeile15();
+
+    @Optional
+    Property<Double> flaecheZeile15();
+
+    @Optional
+    Property<Boolean> wohnflaecheZeile15();
+
+    @Optional
+    Property<Double> mieteQmZeile15();
+
+    @Optional
+    Property<Double> miete15();
+    
     // // TODO BMG - Double
     // @Optional
     // @ImportColumn("BMG")
@@ -534,7 +654,7 @@ public interface ErtragswertverfahrenComposite
     // Prozentertrag - Double
     @Optional
     @ImportColumn("Prozentertrag")
-    Property<Double> jahresRohErtragProzent();
+    Property<Double> betriebskostenInProzentDesJahresRohertrags();
 
 
     // LIEZINS - Double
@@ -585,10 +705,16 @@ public interface ErtragswertverfahrenComposite
     Property<Boolean> bewirtschaftskostenInProzent();
 
 
+    @Optional
+    @ImportColumn("JBP")
+    Property<Double> bewirtschaftskostenInProzentDesJahresRohertrages();
+
+
     // GEWICHT - Long
     @Optional
     // @ImportColumn("GEWICHT")
     Property<Double> gewichtungLiegenschaftszins();
+
 
     // BAUJAHR - Long
     @Optional
@@ -652,8 +778,10 @@ public interface ErtragswertverfahrenComposite
     @Optional
     Property<Boolean> wohnflaecheZeile7();
 
+
     @Optional
     Property<Double> bereinigterKaufpreis();
+
 
     public static abstract class Mixin
             implements ErtragswertverfahrenComposite {
@@ -667,6 +795,7 @@ public interface ErtragswertverfahrenComposite
             return KapsRepository.instance().findEntities( ErtragswertverfahrenComposite.class, expr, 0, 1 ).find();
         }
     }
+
 
     @Optional
     Property<String> bemerkungen();

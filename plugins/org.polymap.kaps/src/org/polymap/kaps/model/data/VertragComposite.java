@@ -377,8 +377,7 @@ public interface VertragComposite
                     kaufPreis = new Double( 0.0d );
                     kaufpreis().set( kaufPreis );
                 }
-                if (basisPreis == null || basisPreis.doubleValue() == 0.0d
-                        || basisPreis.doubleValue() != kaufPreis.doubleValue()) {
+                if (basisPreis == null || basisPreis.doubleValue() != kaufPreis.doubleValue()) {
                     vertragsdatenErweitertComposite.basispreis().set( kaufPreis );
                     Double zuschlag = vertragsdatenErweitertComposite.zuschlag().get();
                     if (zuschlag != null) {

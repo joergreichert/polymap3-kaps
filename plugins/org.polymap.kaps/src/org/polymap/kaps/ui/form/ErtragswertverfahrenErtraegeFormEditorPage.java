@@ -52,33 +52,63 @@ public class ErtragswertverfahrenErtraegeFormEditorPage
     private static Log          log = LogFactory.getLog( ErtragswertverfahrenErtraegeFormEditorPage.class );
 
     @SuppressWarnings("unused")
-    private IFormFieldListener  line1multiplicator;
+    private FieldMultiplication line1multiplicator;
 
     @SuppressWarnings("unused")
-    private IFormFieldListener  line2multiplicator;
+    private FieldMultiplication line2multiplicator;
 
     @SuppressWarnings("unused")
-    private IFormFieldListener  line3multiplicator;
+    private FieldMultiplication line3multiplicator;
 
     @SuppressWarnings("unused")
-    private IFormFieldListener  line4multiplicator;
+    private FieldMultiplication line4multiplicator;
 
     @SuppressWarnings("unused")
-    private IFormFieldListener  line5multiplicator;
+    private FieldMultiplication line5multiplicator;
 
     @SuppressWarnings("unused")
-    private IFormFieldListener  line6multiplicator;
+    private FieldMultiplication line6multiplicator;
 
+    @SuppressWarnings("unused")
     private FieldMultiplication line7multiplicator;
 
+    @SuppressWarnings("unused")
+    private FieldMultiplication line8multiplicator;
+
+    @SuppressWarnings("unused")
+    private FieldMultiplication line9multiplicator;
+
+    @SuppressWarnings("unused")
+    private FieldMultiplication line10multiplicator;
+
+    @SuppressWarnings("unused")
+    private FieldMultiplication line11multiplicator;
+
+    @SuppressWarnings("unused")
+    private FieldMultiplication line12multiplicator;
+
+    @SuppressWarnings("unused")
+    private FieldMultiplication line13multiplicator;
+
+    @SuppressWarnings("unused")
+    private FieldMultiplication line14multiplicator;
+
+    @SuppressWarnings("unused")
+    private FieldMultiplication line15multiplicator;
+
+    @SuppressWarnings("unused")
     private FieldSummation      rohertragMonatSummation;
 
+    @SuppressWarnings("unused")
     private FieldCalculation    rohertragJahrCalculation;
 
+    @SuppressWarnings("unused")
     private FieldSummation      rohertragBruttoJahrCalculation;
 
+    @SuppressWarnings("unused")
     private FieldCalculation    rohertragMonatCalculation;
 
+    @SuppressWarnings("unused")
     private FieldListener       fieldListener;
 
 
@@ -199,16 +229,88 @@ public class ErtragswertverfahrenErtraegeFormEditorPage
                 .mieteQmZeile7(), vb.miete7() ) );
 
         lastLine = newLine;
-        newLine = createTextField( vb.ertraegeZeile8(), one().top( lastLine ), client );
-        createPreisField( vb.miete8(), five().top( lastLine ), client, true );
+        newLine = createEtageField( vb.etageZeile8(), one().top( lastLine ), client );
+        createFlaecheField( vb.flaecheZeile8(), two().top( lastLine ), client, true );
+        createBooleanField( vb.wohnflaecheZeile8(), three().top( lastLine ), client );
+        createPreisField( vb.mieteQmZeile8(), four().top( lastLine ), client, true );
+        createPreisField( vb.miete8(), five().top( lastLine ), client, false );
+        site.addFieldListener( line8multiplicator = new FieldMultiplication( site, 2, vb.flaecheZeile8(), vb
+                .mieteQmZeile8(), vb.miete8() ) );
 
         lastLine = newLine;
-        newLine = createTextField( vb.ertraegeZeile9(), one().top( lastLine ), client );
-        createPreisField( vb.miete9(), five().top( lastLine ), client, true );
+        newLine = createEtageField( vb.etageZeile9(), one().top( lastLine ), client );
+        createFlaecheField( vb.flaecheZeile9(), two().top( lastLine ), client, true );
+        createBooleanField( vb.wohnflaecheZeile9(), three().top( lastLine ), client );
+        createPreisField( vb.mieteQmZeile9(), four().top( lastLine ), client, true );
+        createPreisField( vb.miete9(), five().top( lastLine ), client, false );
+        site.addFieldListener( line9multiplicator = new FieldMultiplication( site, 2, vb.flaecheZeile9(), vb
+                .mieteQmZeile9(), vb.miete9() ) );
 
         lastLine = newLine;
-        newLine = createTextField( vb.ertraegeZeile10(), one().top( lastLine ), client );
-        createPreisField( vb.miete10(), five().top( lastLine ), client, true );
+        newLine = createEtageField( vb.etageZeile10(), one().top( lastLine ), client );
+        createFlaecheField( vb.flaecheZeile10(), two().top( lastLine ), client, true );
+        createBooleanField( vb.wohnflaecheZeile10(), three().top( lastLine ), client );
+        createPreisField( vb.mieteQmZeile10(), four().top( lastLine ), client, true );
+        createPreisField( vb.miete10(), five().top( lastLine ), client, false );
+        site.addFieldListener( line10multiplicator = new FieldMultiplication( site, 2, vb.flaecheZeile10(), vb
+                .mieteQmZeile10(), vb.miete10() ) );
+
+        lastLine = newLine;
+        newLine = createEtageField( vb.etageZeile11(), one().top( lastLine ), client );
+        createFlaecheField( vb.flaecheZeile11(), two().top( lastLine ), client, true );
+        createBooleanField( vb.wohnflaecheZeile11(), three().top( lastLine ), client );
+        createPreisField( vb.mieteQmZeile11(), four().top( lastLine ), client, true );
+        createPreisField( vb.miete11(), five().top( lastLine ), client, false );
+        site.addFieldListener( line11multiplicator = new FieldMultiplication( site, 2, vb.flaecheZeile11(), vb
+                .mieteQmZeile11(), vb.miete11() ) );
+
+        lastLine = newLine;
+        newLine = createEtageField( vb.etageZeile12(), one().top( lastLine ), client );
+        createFlaecheField( vb.flaecheZeile12(), two().top( lastLine ), client, true );
+        createBooleanField( vb.wohnflaecheZeile12(), three().top( lastLine ), client );
+        createPreisField( vb.mieteQmZeile12(), four().top( lastLine ), client, true );
+        createPreisField( vb.miete12(), five().top( lastLine ), client, false );
+        site.addFieldListener( line12multiplicator = new FieldMultiplication( site, 2, vb.flaecheZeile12(), vb
+                .mieteQmZeile12(), vb.miete12() ) );
+
+        lastLine = newLine;
+        newLine = createEtageField( vb.etageZeile13(), one().top( lastLine ), client );
+        createFlaecheField( vb.flaecheZeile13(), two().top( lastLine ), client, true );
+        createBooleanField( vb.wohnflaecheZeile13(), three().top( lastLine ), client );
+        createPreisField( vb.mieteQmZeile13(), four().top( lastLine ), client, true );
+        createPreisField( vb.miete13(), five().top( lastLine ), client, false );
+        site.addFieldListener( line13multiplicator = new FieldMultiplication( site, 2, vb.flaecheZeile13(), vb
+                .mieteQmZeile13(), vb.miete13() ) );
+
+        lastLine = newLine;
+        newLine = createEtageField( vb.etageZeile14(), one().top( lastLine ), client );
+        createFlaecheField( vb.flaecheZeile14(), two().top( lastLine ), client, true );
+        createBooleanField( vb.wohnflaecheZeile14(), three().top( lastLine ), client );
+        createPreisField( vb.mieteQmZeile14(), four().top( lastLine ), client, true );
+        createPreisField( vb.miete14(), five().top( lastLine ), client, false );
+        site.addFieldListener( line14multiplicator = new FieldMultiplication( site, 2, vb.flaecheZeile14(), vb
+                .mieteQmZeile14(), vb.miete14() ) );
+
+        lastLine = newLine;
+        newLine = createEtageField( vb.etageZeile15(), one().top( lastLine ), client );
+        createFlaecheField( vb.flaecheZeile15(), two().top( lastLine ), client, true );
+        createBooleanField( vb.wohnflaecheZeile15(), three().top( lastLine ), client );
+        createPreisField( vb.mieteQmZeile15(), four().top( lastLine ), client, true );
+        createPreisField( vb.miete15(), five().top( lastLine ), client, false );
+        site.addFieldListener( line15multiplicator = new FieldMultiplication( site, 2, vb.flaecheZeile15(), vb
+                .mieteQmZeile15(), vb.miete15() ) );
+        
+        lastLine = newLine;
+        newLine = createTextField( vb.ertraegeZeile16(), one().top( lastLine ), client );
+        createPreisField( vb.miete16(), five().top( lastLine ), client, true );
+
+        lastLine = newLine;
+        newLine = createTextField( vb.ertraegeZeile17(), one().top( lastLine ), client );
+        createPreisField( vb.miete17(), five().top( lastLine ), client, true );
+
+        lastLine = newLine;
+        newLine = createTextField( vb.ertraegeZeile18(), one().top( lastLine ), client );
+        createPreisField( vb.miete18(), five().top( lastLine ), client, true );
 
         lastLine = newLine;
         newLine = createLabel( client, "monatlicher Rohertrag (netto) in €", one().right( 83 ).top( lastLine, 30 ),
@@ -216,7 +318,8 @@ public class ErtragswertverfahrenErtraegeFormEditorPage
         createPreisField( vb.nettoRohertragProMonat(), five().top( lastLine, 30 ), client, false );
         site.addFieldListener( rohertragMonatSummation = new FieldSummation( site, 2, vb.nettoRohertragProMonat(), vb
                 .miete1(), vb.miete2(), vb.miete3(), vb.miete4(), vb.miete5(), vb.miete6(), vb.miete7(), vb.miete8(),
-                vb.miete9(), vb.miete10() ) );
+                vb.miete9(), vb.miete10(), vb.miete11(), vb.miete12(), vb.miete13(), vb.miete14(), vb.miete15(), vb
+                        .miete16(), vb.miete17(), vb.miete18() ) );
 
         lastLine = newLine;
         newLine = createLabel( client, "jährlicher Rohertrag (netto) in €", one().right( 83 ).top( lastLine ),
