@@ -78,7 +78,6 @@ public abstract class InterEditorListener {
             if (terms.isEmpty() || terms.keySet().contains( fieldName )) {
                 values.put( fieldName, ev );
             }
-            System.out.println( ev );
         }
         if (site != null) {
             flush( site );

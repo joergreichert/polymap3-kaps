@@ -106,7 +106,7 @@ public class WohnungLiegenschaftzinsFormEditorPage
         super( WohnungLiegenschaftzinsFormEditorPage.class.getName(), "Liegenschaftszins", feature, featureStore );
         EventManager.instance().subscribe(
                 fieldListener = new FieldListener( wohnung.wohnflaeche(), wohnung.bereinigterVollpreis(),
-                        wohnung.kaufpreis(), wohnung.bereinigtesBaujahr(), wohnung.gesamtNutzungsDauer(),
+                        wohnung.kaufpreis(), wohnung.bereinigtesBaujahr(), wohnung.baujahr(), wohnung.gesamtNutzungsDauer(),
                         wohnung.bodenpreis(), wohnung.bodenrichtwert() ) {
 
                     @Override
@@ -416,7 +416,7 @@ public class WohnungLiegenschaftzinsFormEditorPage
         site.addFieldListener( liegenschaftsZins = new FieldCalculationWithTrigger( site, 2, wohnung
                 .liegenschaftsZins(), wohnung.garagenBeiLiegenschaftszinsBeruecksichtigen(), wohnung
                 .gebaeudewertAnteilZuKaufpreis(), wohnung.jahresReinErtragZuKaufpreis(), wohnung.gesamtNutzungsDauer(),
-                wohnung.bereinigtesBaujahr() ) {
+                wohnung.bereinigtesBaujahr(), wohnung.baujahr() ) {
 
             @Override
             protected Double calculate( ValueProvider values ) {
@@ -424,6 +424,9 @@ public class WohnungLiegenschaftzinsFormEditorPage
                 Double faktor2 = values.get( wohnung.gebaeudewertAnteilZuKaufpreis() );
                 Double GND = values.get( wohnung.gesamtNutzungsDauer() );
                 Double baujahr = values.get( wohnung.bereinigtesBaujahr() );
+                if (baujahr == null || baujahr.doubleValue() == 0.0d) {
+                    baujahr = values.get( wohnung.baujahr() );
+                }
 
                 VertragComposite vertrag = wohnung.vertrag().get();
                 int currentYear = (vertrag != null ? vertrag.vertragsDatum().get().getYear() : new Date().getYear()) + 1900;
