@@ -91,7 +91,7 @@ public interface NHK2010BewertungComposite
 
     // PROZAUSSEN - String
     @Optional
-    @ImportColumn("PROZAUSSEN")
+//    @ImportColumn("PROZAUSSEN")
     Property<Boolean> aussenAnlagenInProzent();
 
 

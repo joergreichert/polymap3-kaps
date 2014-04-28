@@ -80,6 +80,7 @@ import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.VertragsdatenBaulandComposite;
 import org.polymap.kaps.ui.ActionButton;
 import org.polymap.kaps.ui.FieldSummation;
+import org.polymap.kaps.ui.FieldCalculation;
 import org.polymap.kaps.ui.InterEditorListener;
 import org.polymap.kaps.ui.InterEditorPropertyChangeEvent;
 import org.polymap.kaps.ui.KapsDefaultFormEditorPageWithFeatureTable;
@@ -98,7 +99,7 @@ public class NHK2010BewertungFormEditorPage
 
     protected NHK2010BewertungComposite bewertung;
 
-    private FieldSummation              gesamtWert;
+    private FieldCalculation            gesamtWert;
 
     private boolean                     formCreated = false;
 
@@ -153,6 +154,10 @@ public class NHK2010BewertungFormEditorPage
     private final FormEditor            formEditor;
 
     private IFormFieldListener          gebaeudeStandardGNDListener;
+
+    private IFormFieldListener          aussenAnlagenListener;
+
+    private boolean                     aussenanlageProzent;
 
 
     public NHK2010BewertungFormEditorPage( final FormEditor formEditor, Feature feature, FeatureStore featureStore ) {
@@ -313,12 +318,17 @@ public class NHK2010BewertungFormEditorPage
     }
 
 
+    @SuppressWarnings("unchecked")
     private Composite createSumForm( final IFormEditorPageSite site, final Section section ) {
         Composite parent = (Composite)section.getClient();
 
+        int col1 = 45;
+        int col2 = 65;
+
         Control newLine, lastLine = null;
-        newLine = createPreisField( "Zeitwerte", "Summe der Gebäudezeitwerte", bewertung.summeZeitwerte(), left()
-                .right( 100 ).top( lastLine ), parent, false );
+        newLine = createLabel( parent, "Zeitwerte", "Summe der Gebäudezeitwerte", left().right( col1 ).top( lastLine ),
+                SWT.RIGHT );
+        createPreisField( bewertung.summeZeitwerte(), left().left( col2 ).right( 100 ).top( lastLine ), parent, false );
         site.addFieldListener( gesamtSumme = new IFormFieldListener() {
 
             @Override
@@ -350,18 +360,69 @@ public class NHK2010BewertungFormEditorPage
         } );
 
         lastLine = newLine;
-        newLine = createPreisField( "Bauteile", "+/- nicht erfasste Bauteile", bewertung.nichtErfassteBauteile(),
-                left().right( 100 ).top( lastLine ), parent, true );
+        newLine = createLabel( parent, "Bauteile", "+/- nicht erfasste Bauteile", left().right( col1 ).top( lastLine ),
+                SWT.RIGHT );
+        createPreisField( bewertung.nichtErfassteBauteile(), left().left( col2 ).right( 100 ).top( lastLine ), parent,
+                true );
 
         lastLine = newLine;
-        newLine = createPreisField( "Außenanlagen", "Wert der Außenanlagen", bewertung.wertDerAussenanlagen(), left()
-                .right( 100 ).top( lastLine ), parent, true );
+        newLine = createLabel( parent, "Außenanlagen", "Wert der Außenanlagen", left().right( col1 ).top( lastLine ),
+                SWT.RIGHT );
+        createPreisField( bewertung.wertDerAussenanlagen(), left().left( col2 ).right( 100 ).top( lastLine ), parent,
+                true );
 
         lastLine = newLine;
-        newLine = createPreisField( "Gesamtwert", "Gesamtwert der baulichen und sonstigen Anlagen",
-                bewertung.gesamtWert(), left().right( 100 ).top( lastLine ), parent, false );
-        site.addFieldListener( gesamtWert = new FieldSummation( site, 2, bewertung.gesamtWert(), bewertung
-                .summeZeitwerte(), bewertung.nichtErfassteBauteile(), bewertung.wertDerAussenanlagen() ) );
+        newLine = createLabel( parent, "Außenanlagen in %", "Wert der Außenanlagen in % vom Gebäudezeitwert", left()
+                .right( col1 ).top( lastLine ), SWT.RIGHT );
+        createBooleanField( bewertung.aussenAnlagenInProzent(), left().left( col1 ).right( col2 ).top( lastLine ),
+                parent );
+        createFlaecheField( bewertung.prozentwertDerAussenanlagen(), left().left( col2 ).right( 100 ).top( lastLine ),
+                parent, true );
+        site.addFieldListener( aussenAnlagenListener = new IFormFieldListener() {
+
+            @Override
+            public void fieldChange( FormFieldEvent ev ) {
+                if (ev.getEventCode() == IFormFieldListener.VALUE_CHANGE) {
+                    if (ev.getFieldName().equals( bewertung.aussenAnlagenInProzent().qualifiedName().name() )) {
+                        Boolean value = (Boolean)ev.getNewValue();
+                        enableAussenanlageProzent( site, value );
+                    }
+                }
+            }
+        } );
+
+        lastLine = newLine;
+        newLine = createLabel( parent, "Gesamtwert", "Gesamtwert der baulichen und sonstigen Anlagen",
+                left().right( col1 ).top( lastLine ), SWT.RIGHT );
+        createPreisField( bewertung.gesamtWert(), left().left( col2 ).right( 100 ).top( lastLine ), parent, false );
+        site.addFieldListener( gesamtWert = new FieldCalculation( site, 2, bewertung.gesamtWert(), bewertung
+                .summeZeitwerte(), bewertung.nichtErfassteBauteile(), bewertung.wertDerAussenanlagen(), bewertung
+                .prozentwertDerAussenanlagen() ) {
+
+            @Override
+            protected Double calculate( ValueProvider values ) {
+                // summe über alles
+                Double result = new Double( 0.0d );
+                if (values.get( bewertung.summeZeitwerte() ) != null) {
+                    result += values.get( bewertung.summeZeitwerte() );
+                }
+                if (values.get( bewertung.nichtErfassteBauteile() ) != null) {
+                    result += values.get( bewertung.nichtErfassteBauteile() );
+                }
+                if (aussenanlageProzent) {
+                    if (values.get( bewertung.prozentwertDerAussenanlagen() ) != null) {
+                        Double prozent = values.get( bewertung.prozentwertDerAussenanlagen() );
+                        result += result / 100 * prozent;
+                    }                  
+                }
+                else {
+                    if (values.get( bewertung.wertDerAussenanlagen() ) != null) {
+                        result += values.get( bewertung.wertDerAussenanlagen() );
+                    }
+                }
+                return result;
+            }
+        } );
 
         lastLine = newLine;
         final VertragComposite vertrag = bewertung.vertrag().get();
@@ -401,7 +462,16 @@ public class NHK2010BewertungFormEditorPage
         openErweiterteDaten.setEnabled( vertrag != null );
         newLine = openErweiterteDaten;
 
+        enableAussenanlageProzent( site, bewertung.aussenAnlagenInProzent().get() );
         return section;
+    }
+
+
+    private void enableAussenanlageProzent( IFormEditorPageSite site, Boolean prozent ) {
+        aussenanlageProzent = prozent == null ? false : prozent.booleanValue();
+        site.setFieldEnabled( bewertung.prozentwertDerAussenanlagen().qualifiedName().name(), aussenanlageProzent );
+        site.setFieldEnabled( bewertung.wertDerAussenanlagen().qualifiedName().name(), !aussenanlageProzent );
+        gesamtWert.refreshResult();
     }
 
 

@@ -221,6 +221,8 @@ public class MdbImportBewertungenOperation
                     allBewertungen.put( eingangsnummer, bewertung );
                     bewertungImporter.fillEntity( bewertung, builderRow );
 
+                    bewertung.aussenAnlagenInProzent().set( getBooleanValue( builderRow, "PROZAUSSEN" ) );
+
                     // anbauten
                     String anbauten = (String)builderRow.get( "ANBAUTEN" );
                     if (anbauten != null && !anbauten.isEmpty()) {

@@ -55,6 +55,8 @@ public abstract class FieldCalculation
 
     private final ValueProvider                 values;
 
+    private Double lastResultValue;
+
 
     public FieldCalculation( IFormEditorPageSite site, int fractionDigits, Property<Double> result,
             Property<Double>... operators ) {
@@ -100,5 +102,15 @@ public abstract class FieldCalculation
             site.setFieldValue( result.qualifiedName().name(),
                     NumberFormatter.getFormatter( fractionDigits ).format( resultValue ) );
         }
+        lastResultValue = resultValue;
+    }
+
+
+    /**
+     *
+     * @return
+     */
+    public Double getLastResultValue() {
+        return lastResultValue;
     }
 }
