@@ -69,12 +69,6 @@ public interface VertragsdatenBaulandComposite
     Property<Double> gfz();
 
 
-    // TODO VERARBKZ VARCHAR(1),
-    @Optional
-    @ImportColumn("VERARBKZ")
-    Property<String> VERARBKZ();
-
-
     // RIZUSCHL DOUBLE,
     @Optional
     @ImportColumn("RIZUSCHL")

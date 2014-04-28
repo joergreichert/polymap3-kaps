@@ -55,6 +55,7 @@ import org.polymap.kaps.model.data.BodennutzungComposite;
 import org.polymap.kaps.model.data.ErmittlungModernisierungsgradComposite;
 import org.polymap.kaps.model.data.ErtragswertverfahrenComposite;
 import org.polymap.kaps.model.data.FlurComposite;
+import org.polymap.kaps.model.data.FlurstueckComposite;
 import org.polymap.kaps.model.data.GebaeudeArtComposite;
 import org.polymap.kaps.model.data.GebaeudeComposite;
 import org.polymap.kaps.model.data.GemarkungComposite;
@@ -353,6 +354,10 @@ public class KapsRepository
         }
         else if (entity instanceof AusstattungBewertungComposite || entity instanceof ErmittlungModernisierungsgradComposite) {
             // nichts weiter zu löschen hier
+            super.removeEntity( entity );
+        } 
+        else if (entity instanceof FlurstueckComposite) {
+            // FIXME disable after import
             super.removeEntity( entity );
         }
         else {

@@ -66,7 +66,7 @@ public class ErtragswertverfahrenBewirtschaftungskostenFormEditorPage
 
     private FieldMultiplication line7multiplicator;
 
-    private FieldSummation      bewKostenJahrSummation;
+    private FieldCalculation    bewKostenJahrSummation;
 
     private FieldCalculation    reinertragCalculation;
 
@@ -84,13 +84,15 @@ public class ErtragswertverfahrenBewirtschaftungskostenFormEditorPage
 
     private FieldSummation      jahresBetriebskostenListener;
 
+    private boolean             summeProzent;
+
 
     public ErtragswertverfahrenBewirtschaftungskostenFormEditorPage( FormEditor formEditor, Feature feature,
             FeatureStore featureStore ) {
         super( ErtragswertverfahrenBewirtschaftungskostenFormEditorPage.class.getName(), "Bewirtschaftungskosten",
                 feature, featureStore );
 
-        summePauschal = vb.pauschalBewirtschaftungskosten().get();
+        // summePauschal = vb.pauschalBewirtschaftungskosten().get();
 
         EventManager.instance().subscribe(
                 fieldListener = new FieldListener( vb.jahresBetriebskosten(), vb.bruttoRohertragProJahr() ),
@@ -126,72 +128,113 @@ public class ErtragswertverfahrenBewirtschaftungskostenFormEditorPage
         // Composite client = (Composite)section.getClient();
         Composite client = parent;
 
-        newLine = createLabel( client, "Bewirtschaftungskosten pauschal eingeben?", one().top( lastLine, 20 ),
+        newLine = createLabel( client, "Bewirtschaftungskosten pauschal?", one().top( lastLine, 20 ),
                 SWT.RIGHT );
         createBooleanField( vb.pauschalBewirtschaftungskosten(), two().top( lastLine, 20 ), client );
+        createPreisField( vb.bewirtschaftungskostenPauschal(), three().top( lastLine, 20 ), client, false );
+
         site.addFieldListener( pauschalListener = new IFormFieldListener() {
 
             @Override
             public void fieldChange( FormFieldEvent ev ) {
-                if (ev.getEventCode() == IFormFieldListener.VALUE_CHANGE
-                        && ev.getFieldName().equals( vb.pauschalBewirtschaftungskosten().qualifiedName().name() )) {
-                    Boolean value = (Boolean)ev.getNewValue();
-                    enablePauschal( site, value );
+                if (ev.getEventCode() == IFormFieldListener.VALUE_CHANGE) {
+                    if (ev.getFieldName().equals( vb.pauschalBewirtschaftungskosten().qualifiedName().name() )) {
+                        Boolean value = (Boolean)ev.getNewValue();
+                        enablePauschal( site, value );
+                    }
+                    else if (ev.getFieldName().equals(
+                            vb.bewirtschaftungskostenInProzentDesJahresRohertragsErfassen().qualifiedName().name() )) {
+                        Boolean value = (Boolean)ev.getNewValue();
+                        enablePauschalInProzent( site, value );
+                    }
                 }
             }
         } );
 
         lastLine = newLine;
+        newLine = createLabel( client, "Bewirtschaftungskosten in % vom Rohertrag(brutto)?",
+                one().top( lastLine ), SWT.RIGHT );
+        createBooleanField( vb.bewirtschaftungskostenInProzentDesJahresRohertragsErfassen(), two().top( lastLine ),
+                client );
+        createFlaecheField( vb.bewirtschaftungskostenInProzentDesJahresRohertrags(), three().top( lastLine ), client,
+                false );
+
+        lastLine = newLine;
         newLine = createLabel( client, "anteilige Betriebskosten", one().top( lastLine, 20 ), SWT.RIGHT );
-        createPreisField( vb.anteiligeBetriebskosten(), two().top( lastLine, 20 ), client, false );
+        createPreisField( vb.anteiligeBetriebskosten(), three().top( lastLine, 20 ), client, false );
         site.addFieldListener( jahresBetriebskostenListener = new FieldSummation( site, 2,
                 vb.anteiligeBetriebskosten(), vb.jahresBetriebskosten() ) );
 
         lastLine = newLine;
         newLine = createLabel( client, "Verwaltungskosten", one().top( lastLine ), SWT.RIGHT );
-        createPreisField( vb.verwaltungskosten(), two().top( lastLine ), client, true );
+        createPreisField( vb.verwaltungskosten(), three().top( lastLine ), client, true );
 
         lastLine = newLine;
         newLine = createLabel( client, "Instandhaltungskosten", one().top( lastLine ), SWT.RIGHT );
-        createPreisField( vb.instandhaltungskosten(), two().top( lastLine ), client, true );
+        createPreisField( vb.instandhaltungskosten(), three().top( lastLine ), client, true );
 
         lastLine = newLine;
         newLine = createLabel( client, "Mietausfallwagnis", one().top( lastLine ), SWT.RIGHT );
-        createPreisField( vb.mietausfallWagnis(), two().top( lastLine ), client, true );
+        createPreisField( vb.mietausfallWagnis(), three().top( lastLine ), client, true );
 
         lastLine = newLine;
-        newLine = createTextField( vb.bewirtschaftskostenZeile5Text(), one().top( lastLine ), client );
-        createPreisField( vb.bewirtschaftskostenZeile5(), two().top( lastLine ), client, true );
+        newLine = createTextField( vb.bewirtschaftungskostenZeile5Text(), one().top( lastLine ), client );
+        createPreisField( vb.bewirtschaftungskostenZeile5(), three().top( lastLine ), client, true );
 
         lastLine = newLine;
         newLine = createLabel( client, "jährliche Bewirtschaftungskosten in €", one().top( lastLine, 30 ), SWT.RIGHT );
-        createPreisField( vb.summeBewirtschaftskosten(), two().top( lastLine, 30 ), client, false );
-        site.addFieldListener( bewKostenJahrSummation = new FieldSummation( site, 2, vb.summeBewirtschaftskosten(), vb
-                .anteiligeBetriebskosten(), vb.verwaltungskosten(), vb.instandhaltungskosten(), vb.mietausfallWagnis(),
-                vb.bewirtschaftskostenZeile5() ) {
+        createPreisField( vb.summeBewirtschaftungskosten(), three().top( lastLine, 30 ), client, false );
+        site.addFieldListener( bewKostenJahrSummation = new FieldCalculation( site, 2, vb.summeBewirtschaftungskosten(),
+                vb.anteiligeBetriebskosten(), vb.verwaltungskosten(), vb.instandhaltungskosten(), vb
+                        .mietausfallWagnis(), vb.bewirtschaftungskostenZeile5(), vb.bewirtschaftungskostenPauschal(), vb
+                        .bruttoRohertragProJahr(), vb.bewirtschaftungskostenInProzentDesJahresRohertrags() ) {
 
             @Override
-            public void refreshResult() {
-                if (!summePauschal) {
-                    super.refreshResult();
+            protected Double calculate( ValueProvider values ) {
+                if (summePauschal) {
+                    return values.get( vb.bewirtschaftungskostenPauschal() );
                 }
+                if (summeProzent) {
+                    Double result = values.get( vb.bruttoRohertragProJahr() );
+                    Double prozent = values.get( vb.bewirtschaftungskostenInProzentDesJahresRohertrags() );
+                    if (result != null && prozent != null) {
+                        return result / 100 * prozent;
+                    }
+                    return null;
+                }
+                // summe über alles
+                Double result = new Double( 0.0d );
+                if (values.get( vb.anteiligeBetriebskosten() ) != null) {
+                    result += values.get( vb.anteiligeBetriebskosten() );
+                }
+                if (values.get( vb.verwaltungskosten() ) != null) {
+                    result += values.get( vb.verwaltungskosten() );
+                }
+                if (values.get( vb.instandhaltungskosten() ) != null) {
+                    result += values.get( vb.instandhaltungskosten() );
+                }
+                if (values.get( vb.mietausfallWagnis() ) != null) {
+                    result += values.get( vb.mietausfallWagnis() );
+                }
+                if (values.get( vb.bewirtschaftungskostenZeile5() ) != null) {
+                    result += values.get( vb.bewirtschaftungskostenZeile5() );
+                }
+                return result;
             }
         } );
 
         lastLine = newLine;
         newLine = createLabel( client, "jährlicher Reinertrag in €",
                 "jährlicher Rohertrag (brutto) - jährliche Bewirtschaftungskosten", one().top( lastLine ), SWT.RIGHT );
-        createPreisField( vb.jahresReinErtrag(), two().top( lastLine ), client, false );
+        createPreisField( vb.jahresReinErtrag(), three().top( lastLine ), client, false );
         site.addFieldListener( reinertragCalculation = new FieldCalculation( site, 2, vb.jahresReinErtrag(), vb
-                .summeBewirtschaftskosten(), vb.bruttoRohertragProJahr() ) {
+                .summeBewirtschaftungskosten(), vb.bruttoRohertragProJahr() ) {
 
             @Override
             protected Double calculate( ValueProvider values ) {
-                Double ertrag = values.get( vb.bruttoRohertragProJahr() );
-                Double kosten = values.get( vb.summeBewirtschaftskosten() );
-                // FIXME
+                Double reinertrag = values.get( vb.bruttoRohertragProJahr() );
+                Double kosten = values.get( vb.summeBewirtschaftungskosten() );
 
-                Double reinertrag = ertrag;
                 if (reinertrag != null && kosten != null) {
                     reinertrag = reinertrag - kosten;
                 }
@@ -201,17 +244,44 @@ public class ErtragswertverfahrenBewirtschaftungskostenFormEditorPage
         } );
 
         enablePauschal( site, vb.pauschalBewirtschaftungskosten().get() );
+        enablePauschalInProzent( site, vb.bewirtschaftungskostenInProzentDesJahresRohertragsErfassen().get() );
     }
 
 
     private void enablePauschal( IFormEditorPageSite site, Boolean pauschal ) {
         summePauschal = pauschal == null ? false : pauschal.booleanValue();
-        site.setFieldEnabled( vb.verwaltungskosten().qualifiedName().name(), !summePauschal );
-        site.setFieldEnabled( vb.instandhaltungskosten().qualifiedName().name(), !summePauschal );
-        site.setFieldEnabled( vb.mietausfallWagnis().qualifiedName().name(), !summePauschal );
-        site.setFieldEnabled( vb.bewirtschaftskostenZeile5().qualifiedName().name(), !summePauschal );
-        site.setFieldEnabled( vb.bewirtschaftskostenZeile5Text().qualifiedName().name(), !summePauschal );
-        site.setFieldEnabled( vb.summeBewirtschaftskosten().qualifiedName().name(), summePauschal );
+        if (summeProzent && summePauschal) {
+            // disable summeProzent
+            site.setFieldValue( vb.bewirtschaftungskostenInProzentDesJahresRohertragsErfassen().qualifiedName().name(),
+                    Boolean.FALSE );
+            enablePauschalInProzent( site, Boolean.FALSE );
+        }
+        site.setFieldEnabled( vb.bewirtschaftungskostenPauschal().qualifiedName().name(), summePauschal );
+        enableDetails( site, !summePauschal && !summeProzent );
+        bewKostenJahrSummation.refreshResult();
+    }
+
+
+    private void enablePauschalInProzent( IFormEditorPageSite site, Boolean prozent ) {
+        summeProzent = prozent == null ? false : prozent.booleanValue();
+        if (summeProzent && summePauschal) {
+            // disable summePauschal
+            site.setFieldValue( vb.pauschalBewirtschaftungskosten().qualifiedName().name(), Boolean.FALSE );
+            enablePauschal( site, Boolean.FALSE );
+        }
+        site.setFieldEnabled( vb.bewirtschaftungskostenInProzentDesJahresRohertrags().qualifiedName().name(),
+                summeProzent );
+        enableDetails( site, !summePauschal && !summeProzent );
+        bewKostenJahrSummation.refreshResult();
+    }
+
+
+    private void enableDetails( IFormEditorPageSite site, Boolean enable ) {
+        site.setFieldEnabled( vb.verwaltungskosten().qualifiedName().name(), enable );
+        site.setFieldEnabled( vb.instandhaltungskosten().qualifiedName().name(), enable );
+        site.setFieldEnabled( vb.mietausfallWagnis().qualifiedName().name(), enable );
+        site.setFieldEnabled( vb.bewirtschaftungskostenZeile5().qualifiedName().name(), enable );
+        site.setFieldEnabled( vb.bewirtschaftungskostenZeile5Text().qualifiedName().name(), enable );
     }
 
 
@@ -223,7 +293,13 @@ public class ErtragswertverfahrenBewirtschaftungskostenFormEditorPage
 
     @Override
     protected SimpleFormData two() {
-        return new SimpleFormData( SPACING ).left( 45 ).right( 60 );
+        return new SimpleFormData( SPACING ).left( 45 ).right( 55 );
+    }
+
+
+    @Override
+    protected SimpleFormData three() {
+        return new SimpleFormData( SPACING ).left( 55 ).right( 75 );
     }
 
 }

@@ -68,6 +68,7 @@ public class MdbImportWizard
 
     public boolean performFinish() {
         try {
+            long start = System.currentTimeMillis();
             // MdbImportVertraegeOperation op =
             AbstractModelChangeOperation op = new AbstractModelChangeOperation( "WinAKPS importieren" ) {
 
@@ -91,7 +92,7 @@ public class MdbImportWizard
                 }
             };
             OperationSupport.instance().execute( op, true, true );
-
+            System.out.println("IMPORT needs " + ((System.currentTimeMillis() - start) / 1000) + "s");
             return true;
         }
         catch (Exception e) {

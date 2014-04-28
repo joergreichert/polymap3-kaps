@@ -128,11 +128,18 @@ public class MdbImportBewertungenOperation
                             }
                             entity.vertrag().set( vertrag );
 
-                            entity.pauschalBetriebskosten().set( getBooleanValue( builderRow, "pauschal" ) );
+                            entity.pauschalBetriebskosten().set( Boolean.FALSE );
+                            entity.betriebskostenInProzentDesJahresRohertragsErfassen().set( getBooleanValue( builderRow, "pauschal" ) );
+                            
                             entity.pauschalBewirtschaftungskosten().set( getBooleanValue( builderRow, "pauschalbew" ) );
+                            entity.bewirtschaftungskostenInProzentDesJahresRohertragsErfassen().set( getBooleanValue( builderRow, "ANGABEPROZ" ) );
+
+                            if (entity.pauschalBewirtschaftungskosten().get() && entity.bewirtschaftungskostenInProzentDesJahresRohertragsErfassen().get()) {
+                                entity.pauschalBewirtschaftungskosten().set(Boolean.FALSE);
+                            }
+                            
                             entity.liziVerwenden().set( getBooleanValue( builderRow, "LIZI" ) );
                             entity.innenBereich().set( getBooleanValue( builderRow, "INNEN" ) );
-                            entity.bewirtschaftskostenInProzent().set( getBooleanValue( builderRow, "ANGABEPROZ" ) );
                             entity.bodenwertAnteilIndividuell().set( getBooleanValue( builderRow, "BWANT_IND" ) );
                             entity.eingabeGesamtMiete().set( getBooleanValue( builderRow, "GESMIETE_EING" ) );
                             entity.wohnflaecheZeile1().set( getBooleanValue( builderRow, "WOHNFL1" ) );
@@ -149,8 +156,10 @@ public class MdbImportBewertungenOperation
                             if (entity.bruttoRohertragProMonat().get() != null) {
                                 entity.bruttoRohertragProJahr().set( 12 * entity.bruttoRohertragProMonat().get() );
                             }
+                            entity.jahresBetriebskostenPauschal().set( entity.jahresBetriebskosten().get() );
                             entity.jahresBetriebskostenE().set( entity.jahresBetriebskosten().get() );
                             entity.anteiligeBetriebskosten().set( entity.jahresBetriebskosten().get() );
+                            entity.bewirtschaftungskostenPauschal().set( entity.summeBewirtschaftungskosten().get() );
 
                             VertragsdatenErweitertComposite ev = vertrag.erweiterteVertragsdaten().get();
                             if (ev != null) {
@@ -372,7 +381,6 @@ public class MdbImportBewertungenOperation
 
                     if (b.alterObergrenzeZeile1().get() != null && b.alterObergrenzeZeile1().get() > 100) {
                         Object v = builderRow.get( "ALTER_OBERGRENZE2" );
-                        System.out.println( "gefunden" );
                     }
                     if ("frm_wwohnneu".equals( type )) {
                         // 6 und 7 mergen

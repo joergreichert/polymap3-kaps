@@ -42,33 +42,35 @@ import org.polymap.kaps.ui.FieldSummation;
 public class ErtragswertverfahrenBetriebskostenFormEditorPage
         extends ErtragswertverfahrenFormEditorPage {
 
-    private static Log          log = LogFactory.getLog( ErtragswertverfahrenBetriebskostenFormEditorPage.class );
+    private static Log         log = LogFactory.getLog( ErtragswertverfahrenBetriebskostenFormEditorPage.class );
 
     @SuppressWarnings("unused")
-    private IFormFieldListener  line1multiplicator;
+    private IFormFieldListener line1multiplicator;
 
     @SuppressWarnings("unused")
-    private IFormFieldListener  line2multiplicator;
+    private IFormFieldListener line2multiplicator;
 
     @SuppressWarnings("unused")
-    private IFormFieldListener  line3multiplicator;
+    private IFormFieldListener line3multiplicator;
 
     @SuppressWarnings("unused")
-    private IFormFieldListener  line4multiplicator;
+    private IFormFieldListener line4multiplicator;
 
     @SuppressWarnings("unused")
-    private IFormFieldListener  line5multiplicator;
+    private IFormFieldListener line5multiplicator;
 
     @SuppressWarnings("unused")
-    private IFormFieldListener  line6multiplicator;
+    private IFormFieldListener line6multiplicator;
 
-    private FieldSummation      betriebsKostenJahrSummation;
+    private FieldCalculation   betriebsKostenJahrSummation;
 
-    private FieldCalculation    betriebskostenSummeMonatlichCalculation;
+    private FieldCalculation   betriebskostenSummeMonatlichCalculation;
 
-    private IFormFieldListener  pauschalListener;
+    private IFormFieldListener pauschalListener;
 
-    private boolean summePauschal;
+    private boolean            summePauschal;
+
+    private boolean            summeProzent;
 
 
     public ErtragswertverfahrenBetriebskostenFormEditorPage( Feature feature, FeatureStore featureStore ) {
@@ -103,87 +105,145 @@ public class ErtragswertverfahrenBetriebskostenFormEditorPage
         Composite client = parent;
 
         lastLine = openVertrag;
-        newLine = createLabel( client, "Betriebskosten pauschal eingeben?", one().top( lastLine, 20 ), SWT.RIGHT );
+        newLine = createLabel( client, "Betriebskosten pauschal?", one().top( lastLine, 20 ), SWT.RIGHT );
         createBooleanField( vb.pauschalBetriebskosten(), two().top( lastLine, 20 ), client );
         site.addFieldListener( pauschalListener = new IFormFieldListener() {
 
             @Override
             public void fieldChange( FormFieldEvent ev ) {
-                if (ev.getEventCode() == IFormFieldListener.VALUE_CHANGE
-                        && ev.getFieldName().equals( vb.pauschalBetriebskosten().qualifiedName().name() )) {
-                    Boolean value = (Boolean)ev.getNewValue();
-                    enablePauschal( site, value );
+                if (ev.getEventCode() == IFormFieldListener.VALUE_CHANGE) {
+                    if (ev.getFieldName().equals( vb.pauschalBetriebskosten().qualifiedName().name() )) {
+                        Boolean value = (Boolean)ev.getNewValue();
+                        enablePauschal( site, value );
+                    }
+                    else if (ev.getFieldName().equals(
+                            vb.betriebskostenInProzentDesJahresRohertragsErfassen().qualifiedName().name() )) {
+                        Boolean value = (Boolean)ev.getNewValue();
+                        enablePauschalInProzent( site, value );
+                    }
                 }
             }
         } );
+        createPreisField( vb.jahresBetriebskostenPauschal(), three().top( lastLine, 20 ), client, false );
+
+        lastLine = newLine;
+        newLine = createLabel( client, "Betriebskosten in % vom Rohertrag?", one().top( lastLine ),
+                SWT.RIGHT );
+        createBooleanField( vb.betriebskostenInProzentDesJahresRohertragsErfassen(), two().top( lastLine ), client );
+        createFlaecheField( vb.betriebskostenInProzentDesJahresRohertrags(), three().top( lastLine ), client, false );
 
         lastLine = newLine;
         newLine = createLabel( client, "Grundsteuer", one().top( lastLine, 20 ), SWT.RIGHT );
-        createPreisField( vb.betriebskostenZeile1(), two().top( lastLine, 20 ), client, true );
+        createPreisField( vb.betriebskostenZeile1(), three().top( lastLine, 20 ), client, true );
 
         lastLine = newLine;
         newLine = createLabel( client, "Gebäudebrand und Elementarschadenversicherung", one().top( lastLine ),
                 SWT.RIGHT );
-        createPreisField( vb.betriebskostenZeile2(), two().top( lastLine ), client, true );
+        createPreisField( vb.betriebskostenZeile2(), three().top( lastLine ), client, true );
 
         lastLine = newLine;
         newLine = createLabel( client, "Sach-/Haftpflichtversicherung", one().top( lastLine ), SWT.RIGHT );
-        createPreisField( vb.betriebskostenZeile3(), two().top( lastLine ), client, true );
+        createPreisField( vb.betriebskostenZeile3(), three().top( lastLine ), client, true );
 
         lastLine = newLine;
         newLine = createLabel( client, "Schornsteinreinigung/Emmissionsmessung", one().top( lastLine ), SWT.RIGHT );
-        createPreisField( vb.betriebskostenZeile4(), two().top( lastLine ), client, true );
+        createPreisField( vb.betriebskostenZeile4(), three().top( lastLine ), client, true );
 
         lastLine = newLine;
         newLine = createLabel( client, "Betrieb der Aufzugsanlage", one().top( lastLine ), SWT.RIGHT );
-        createPreisField( vb.betriebskostenZeile5(), two().top( lastLine ), client, true );
+        createPreisField( vb.betriebskostenZeile5(), three().top( lastLine ), client, true );
 
         lastLine = newLine;
         newLine = createLabel( client, "Beleuchtung (Treppenhaus und gem. Räume)", one().top( lastLine ), SWT.RIGHT );
-        createPreisField( vb.betriebskostenZeile6(), two().top( lastLine ), client, true );
+        createPreisField( vb.betriebskostenZeile6(), three().top( lastLine ), client, true );
 
         lastLine = newLine;
         newLine = createLabel( client, "Betrieb der Heizungsanlage", one().top( lastLine ), SWT.RIGHT );
-        createPreisField( vb.betriebskostenZeile7(), two().top( lastLine ), client, true );
+        createPreisField( vb.betriebskostenZeile7(), three().top( lastLine ), client, true );
 
         lastLine = newLine;
         newLine = createLabel( client, "Hausmeister/Gartenpflege", one().top( lastLine ), SWT.RIGHT );
-        createPreisField( vb.betriebskostenZeile8(), two().top( lastLine ), client, true );
+        createPreisField( vb.betriebskostenZeile8(), three().top( lastLine ), client, true );
 
         lastLine = newLine;
         newLine = createTextField( vb.betriebskostenTextZeile9(), one().top( lastLine ), client );
-        createPreisField( vb.betriebskostenZeile9(), two().top( lastLine ), client, true );
+        createPreisField( vb.betriebskostenZeile9(), three().top( lastLine ), client, true );
 
         lastLine = newLine;
         newLine = createTextField( vb.betriebskostenTextZeile10(), one().top( lastLine ), client );
-        createPreisField( vb.betriebskostenZeile10(), two().top( lastLine ), client, true );
+        createPreisField( vb.betriebskostenZeile10(), three().top( lastLine ), client, true );
 
         lastLine = newLine;
         newLine = createTextField( vb.betriebskostenTextZeile11(), one().top( lastLine ), client );
-        createPreisField( vb.betriebskostenZeile11(), two().top( lastLine ), client, true );
+        createPreisField( vb.betriebskostenZeile11(), three().top( lastLine ), client, true );
 
         lastLine = newLine;
-        newLine = createLabel( client, "jährliche anteilige Betriebskosten in €", one().top( lastLine , 30), SWT.RIGHT );
-        createPreisField( vb.jahresBetriebskosten(), two().top( lastLine, 30 ), client, false );
-        site.addFieldListener( betriebsKostenJahrSummation = new FieldSummation( site, 2, vb.jahresBetriebskosten(), vb
-                .betriebskostenZeile1(), vb.betriebskostenZeile2(), vb.betriebskostenZeile3(), vb
-                .betriebskostenZeile4(), vb.betriebskostenZeile5(), vb.betriebskostenZeile6(), vb
-                .betriebskostenZeile7(), vb.betriebskostenZeile8(), vb.betriebskostenZeile9(), vb
-                .betriebskostenZeile10(), vb.betriebskostenZeile11() ) {
+        newLine = createLabel( client, "jährliche anteilige Betriebskosten in €", one().top( lastLine, 30 ), SWT.RIGHT );
+        createPreisField( vb.jahresBetriebskosten(), three().top( lastLine, 30 ), client, false );
+        site.addFieldListener( betriebsKostenJahrSummation = new FieldCalculation( site, 2, vb.jahresBetriebskosten(),
+                vb.betriebskostenZeile1(), vb.betriebskostenZeile2(), vb.betriebskostenZeile3(), vb
+                        .betriebskostenZeile4(), vb.betriebskostenZeile5(), vb.betriebskostenZeile6(), vb
+                        .betriebskostenZeile7(), vb.betriebskostenZeile8(), vb.betriebskostenZeile9(), vb
+                        .betriebskostenZeile10(), vb.betriebskostenZeile11(), vb
+                        .betriebskostenInProzentDesJahresRohertrags(), vb.jahresBetriebskostenPauschal(), vb
+                        .nettoRohertragProJahr() ) {
 
             @Override
-            public void refreshResult() {
-                if (!summePauschal) {
-                    // ansonsten pauschale Eingabe und keine Berechnung
-                    super.refreshResult();                    
-                }    
-            } 
+            protected Double calculate( ValueProvider values ) {
+                if (summePauschal) {
+                    return values.get( vb.jahresBetriebskostenPauschal() );
+                }
+                if (summeProzent) {
+                    Double result = values.get( vb.nettoRohertragProJahr() );
+                    Double prozent = values.get( vb.betriebskostenInProzentDesJahresRohertrags() );
+                    if (result != null && prozent != null) {
+                        return result / 100 * prozent;
+                    }
+                    return null;
+                }
+                // summe über alles
+                Double result = new Double( 0.0d );
+                if (values.get( vb.betriebskostenZeile1() ) != null) {
+                    result += values.get( vb.betriebskostenZeile1() );
+                }
+                if (values.get( vb.betriebskostenZeile2() ) != null) {
+                    result += values.get( vb.betriebskostenZeile2() );
+                }
+                if (values.get( vb.betriebskostenZeile3() ) != null) {
+                    result += values.get( vb.betriebskostenZeile3() );
+                }
+                if (values.get( vb.betriebskostenZeile4() ) != null) {
+                    result += values.get( vb.betriebskostenZeile4() );
+                }
+                if (values.get( vb.betriebskostenZeile5() ) != null) {
+                    result += values.get( vb.betriebskostenZeile5() );
+                }
+                if (values.get( vb.betriebskostenZeile6() ) != null) {
+                    result += values.get( vb.betriebskostenZeile6() );
+                }
+                if (values.get( vb.betriebskostenZeile7() ) != null) {
+                    result += values.get( vb.betriebskostenZeile7() );
+                }
+                if (values.get( vb.betriebskostenZeile8() ) != null) {
+                    result += values.get( vb.betriebskostenZeile8() );
+                }
+                if (values.get( vb.betriebskostenZeile9() ) != null) {
+                    result += values.get( vb.betriebskostenZeile9() );
+                }
+                if (values.get( vb.betriebskostenZeile10() ) != null) {
+                    result += values.get( vb.betriebskostenZeile10() );
+                }
+                if (values.get( vb.betriebskostenZeile11() ) != null) {
+                    result += values.get( vb.betriebskostenZeile11() );
+                }
+                return result;
+            }
         } );
 
         lastLine = newLine;
         newLine = createLabel( client, "monatliche anteilige Betriebskosten in € in €", one().top( lastLine ),
                 SWT.RIGHT );
-        createPreisField( vb.betriebskostenSummeMonatlich(), two().top( lastLine ), client, false );
+        createPreisField( vb.betriebskostenSummeMonatlich(), three().top( lastLine ), client, false );
         site.addFieldListener( betriebskostenSummeMonatlichCalculation = new FieldCalculation( site, 2, vb
                 .betriebskostenSummeMonatlich(), vb.jahresBetriebskosten() ) {
 
@@ -193,28 +253,58 @@ public class ErtragswertverfahrenBetriebskostenFormEditorPage
                 return v != null ? v / 12 : null;
             }
         } );
-        
+
         enablePauschal( site, vb.pauschalBetriebskosten().get() );
+        enablePauschalInProzent( site, vb.betriebskostenInProzentDesJahresRohertragsErfassen().get() );
     }
+
 
     private void enablePauschal( IFormEditorPageSite site, Boolean pauschal ) {
         summePauschal = pauschal == null ? false : pauschal.booleanValue();
-        site.setFieldEnabled( vb.betriebskostenZeile1().qualifiedName().name(), !summePauschal );
-        site.setFieldEnabled( vb.betriebskostenZeile2().qualifiedName().name(), !summePauschal );
-        site.setFieldEnabled( vb.betriebskostenZeile3().qualifiedName().name(), !summePauschal );
-        site.setFieldEnabled( vb.betriebskostenZeile4().qualifiedName().name(), !summePauschal );
-        site.setFieldEnabled( vb.betriebskostenZeile5().qualifiedName().name(), !summePauschal );
-        site.setFieldEnabled( vb.betriebskostenZeile6().qualifiedName().name(), !summePauschal );
-        site.setFieldEnabled( vb.betriebskostenZeile7().qualifiedName().name(), !summePauschal );
-        site.setFieldEnabled( vb.betriebskostenZeile8().qualifiedName().name(), !summePauschal );
-        site.setFieldEnabled( vb.betriebskostenZeile9().qualifiedName().name(), !summePauschal );
-        site.setFieldEnabled( vb.betriebskostenZeile10().qualifiedName().name(), !summePauschal );
-        site.setFieldEnabled( vb.betriebskostenZeile11().qualifiedName().name(), !summePauschal );
-        site.setFieldEnabled( vb.betriebskostenTextZeile9().qualifiedName().name(), !summePauschal );
-        site.setFieldEnabled( vb.betriebskostenTextZeile10().qualifiedName().name(), !summePauschal );
-        site.setFieldEnabled( vb.betriebskostenTextZeile11().qualifiedName().name(), !summePauschal );
-        site.setFieldEnabled( vb.jahresBetriebskosten().qualifiedName().name(), summePauschal );
+        if (summeProzent && summePauschal) {
+            // disable summeProzent
+            site.setFieldValue( vb.betriebskostenInProzentDesJahresRohertragsErfassen().qualifiedName().name(),
+                    Boolean.FALSE );
+            enablePauschalInProzent( site, Boolean.FALSE);
+        }
+        site.setFieldEnabled( vb.jahresBetriebskostenPauschal().qualifiedName().name(), summePauschal );
+        enableDetails( site, !summePauschal && !summeProzent );
+        betriebsKostenJahrSummation.refreshResult();
     }
+
+
+    private void enablePauschalInProzent( IFormEditorPageSite site, Boolean prozent ) {
+        summeProzent = prozent == null ? false : prozent.booleanValue();
+        if (summeProzent && summePauschal) {
+            // disable summePauschal
+            site.setFieldValue( vb.pauschalBetriebskosten().qualifiedName().name(), Boolean.FALSE );
+            enablePauschal(site, Boolean.FALSE);
+        }
+        site.setFieldEnabled( vb.betriebskostenInProzentDesJahresRohertrags().qualifiedName().name(), summeProzent );
+        enableDetails( site, !summePauschal && !summeProzent );
+        betriebsKostenJahrSummation.refreshResult();
+    }
+
+
+    private void enableDetails( IFormEditorPageSite site, Boolean enable ) {
+        site.setFieldEnabled( vb.betriebskostenZeile1().qualifiedName().name(), enable );
+        site.setFieldEnabled( vb.betriebskostenZeile2().qualifiedName().name(), enable );
+        site.setFieldEnabled( vb.betriebskostenZeile3().qualifiedName().name(), enable );
+        site.setFieldEnabled( vb.betriebskostenZeile4().qualifiedName().name(), enable );
+        site.setFieldEnabled( vb.betriebskostenZeile5().qualifiedName().name(), enable );
+        site.setFieldEnabled( vb.betriebskostenZeile6().qualifiedName().name(), enable );
+        site.setFieldEnabled( vb.betriebskostenZeile7().qualifiedName().name(), enable );
+        site.setFieldEnabled( vb.betriebskostenZeile8().qualifiedName().name(), enable );
+        site.setFieldEnabled( vb.betriebskostenZeile9().qualifiedName().name(), enable );
+        site.setFieldEnabled( vb.betriebskostenZeile10().qualifiedName().name(), enable );
+        site.setFieldEnabled( vb.betriebskostenZeile11().qualifiedName().name(), enable );
+        site.setFieldEnabled( vb.betriebskostenTextZeile9().qualifiedName().name(), enable );
+        site.setFieldEnabled( vb.betriebskostenTextZeile10().qualifiedName().name(), enable );
+        site.setFieldEnabled( vb.betriebskostenTextZeile11().qualifiedName().name(), enable );
+        // site.setFieldEnabled( vb.jahresBetriebskosten().qualifiedName().name(),
+        // summePauschal );
+    }
+
 
     @Override
     protected SimpleFormData one() {
@@ -224,7 +314,11 @@ public class ErtragswertverfahrenBetriebskostenFormEditorPage
 
     @Override
     protected SimpleFormData two() {
-        return new SimpleFormData( SPACING ).left( 45 ).right( 60 );
+        return new SimpleFormData( SPACING ).left( 45 ).right( 55 );
     }
 
+    @Override
+    protected SimpleFormData three() {
+        return new SimpleFormData( SPACING ).left( 55 ).right( 75 );
+    }
 }

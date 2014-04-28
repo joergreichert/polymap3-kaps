@@ -177,7 +177,6 @@ public class MdbImportWohneigentumOperation
 
                     Object bewschl = builderRow.get( "BEWSCHL" );
                     if (bewschl != null) {
-                        // System.out.println( "BEWSCHL '" + schl + "'" );
                         AusstattungComposite findSchlNamed = findSchlNamed( AusstattungComposite.class, builderRow,
                                 "BEWSCHL" );
                         entity.ausstattungSchluessel().set( findSchlNamed );

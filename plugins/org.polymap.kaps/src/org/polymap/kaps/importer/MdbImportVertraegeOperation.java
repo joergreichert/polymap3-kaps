@@ -539,6 +539,9 @@ public class MdbImportVertraegeOperation
                             entity.fuerBodenwertaufteilungNichtGeeignet().set(
                                     getBooleanValue( builderRow, "BODWNICHT" ) );
 
+                            entity.zurRichtwertermittlungGeeignet().set(
+                                    getBooleanValue( builderRow, "VERARBKZ" ) );
+                            
                             // entity.sanierung().set( (String)builderRow.get( "SAN"
                             // ) );
                             entity.bereinigterBodenpreisMitNachkommastellen().set(

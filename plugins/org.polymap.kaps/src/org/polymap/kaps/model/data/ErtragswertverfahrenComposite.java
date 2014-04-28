@@ -237,9 +237,11 @@ public interface ErtragswertverfahrenComposite
 
     // JB - Double
     @Optional
-    @ImportColumn("JB")
+    @ImportColumn("JBetriebskosten")
     Property<Double> jahresBetriebskosten();
 
+    @Optional
+    Property<Double> jahresBetriebskostenPauschal();
 
     @Optional
     @ImportColumn("JB")
@@ -273,13 +275,15 @@ public interface ErtragswertverfahrenComposite
     // JSB - Double
     @Optional
     @ImportColumn("JSB")
-    Property<Double> summeBewirtschaftskosten();
-
+    Property<Double> summeBewirtschaftungskosten();
+    
+    @Optional
+    Property<Double> bewirtschaftungskostenPauschal();
 
     // JSP - Double
     @Optional
     @ImportColumn("JSP")
-    Property<Double> summeBewirtschaftskostenInProzent();
+    Property<Double> bewirtschaftungskostenInProzentDesJahresRohertrags();
 
 
     // JRE - Double
@@ -619,13 +623,13 @@ public interface ErtragswertverfahrenComposite
     // JXT - String
     @Optional
     @ImportColumn("JXT")
-    Property<String> bewirtschaftskostenZeile5Text();
+    Property<String> bewirtschaftungskostenZeile5Text();
 
 
     // JX - Double
     @Optional
     @ImportColumn("JX")
-    Property<Double> bewirtschaftskostenZeile5();
+    Property<Double> bewirtschaftungskostenZeile5();
 
 
     // EINGANGSNR - Double
@@ -644,6 +648,9 @@ public interface ErtragswertverfahrenComposite
     // @ImportColumn("pauschal")
     Property<Boolean> pauschalBetriebskosten();
 
+    @Optional
+    Property<Boolean> betriebskostenInProzentDesJahresRohertragsErfassen();
+    
 
     // pauschalbew - String
     @Optional
@@ -702,12 +709,12 @@ public interface ErtragswertverfahrenComposite
     // ANGABEPROZ - String
     @Optional
     // @ImportColumn("ANGABEPROZ")
-    Property<Boolean> bewirtschaftskostenInProzent();
+    Property<Boolean> bewirtschaftungskostenInProzentDesJahresRohertragsErfassen();
 
 
     @Optional
     @ImportColumn("JBP")
-    Property<Double> bewirtschaftskostenInProzentDesJahresRohertrages();
+    Property<Double> bewirtschaftungskostenInProzentDesJahresRohertrages();
 
 
     // GEWICHT - Long
