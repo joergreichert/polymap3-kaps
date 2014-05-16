@@ -15,7 +15,6 @@ package org.polymap.kaps.model.data;
 import static org.qi4j.api.query.QueryExpressions.orderBy;
 
 import java.util.Date;
-import java.util.Iterator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,8 +23,6 @@ import org.qi4j.api.common.Optional;
 import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.entity.association.Association;
-import org.qi4j.api.entity.association.kaps.ComputedAssociationInstance;
-import org.qi4j.api.entity.association.kaps.GenericAssociationInfo;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.property.Property;
 import org.qi4j.api.query.Query;
@@ -113,14 +110,14 @@ public interface RichtwertzoneZeitraumComposite
 
 
         // FIXME uncomment on import
-        @Override
-        public void afterCompletion( UnitOfWorkStatus status ) {
-            RichtwertzoneComposite zone = zone().get();
-            Iterator<RichtwertzoneZeitraumComposite> iterator = forZone( zone ).iterator();
-            if (iterator != null && iterator.hasNext()) {
-                zone.latestZone().set( iterator.next() );
-            }
-        }
+//        @Override
+//        public void afterCompletion( UnitOfWorkStatus status ) {
+//            RichtwertzoneComposite zone = zone().get();
+//            Iterator<RichtwertzoneZeitraumComposite> iterator = forZone( zone ).iterator();
+//            if (iterator != null && iterator.hasNext()) {
+//                zone.latestZone().set( iterator.next() );
+//            }
+//        }
 
 
         public static Iterable<RichtwertzoneZeitraumComposite> forZone( RichtwertzoneComposite zone ) {

@@ -70,33 +70,33 @@ public interface NHK2010BaupreisIndexComposite
     Property<Integer> monatBis();
 
 
-    // INDEX_WG - Double
-    @Optional
-    @ImportColumn("INDEX_WG")
-    Property<Double> wohneigentum();
+//    // INDEX_WG - Double
+//    @Optional
+//    @ImportColumn("INDEX_WG")
+//    Property<Double> wohneigentum();
 
 
     // INDEX_EG - Double
     @Optional
-    @ImportColumn("INDEX_EG")
-    Property<Double> einfamilienGebaeude();
-
-
-    // INDEX_MG - Double
-    @Optional
-    @ImportColumn("INDEX_MG")
-    Property<Double> mehrfamilienGebaeude();
+    @ImportColumn("INDEX0")
+    Property<Double> wohnGebaeude();
+//
+//
+//    // INDEX_MG - Double
+//    @Optional
+//    @ImportColumn("INDEX_MG")
+//    Property<Double> mehrfamilienGebaeude();
 
 
     // INDEX_BG - Double
     @Optional
-    @ImportColumn("INDEX_BG")
+    @ImportColumn("INDEX1")
     Property<Double> bueroGebaeude();
 
 
     // INDEX_GW - Double
     @Optional
-    @ImportColumn("INDEX_GW")
+    @ImportColumn("INDEX2")
     Property<Double> gewerbeBetrieb();
 
 
@@ -177,10 +177,13 @@ public interface NHK2010BaupreisIndexComposite
 
         public final static Double indexFor( String indexType, NHK2010BaupreisIndexComposite index ) {
             if ("E".equals( indexType )) {
-                return index.einfamilienGebaeude().get();
+                return index.wohnGebaeude().get();
             }
             else if ("M".equals( indexType )) {
-                return index.mehrfamilienGebaeude().get();
+                return index.wohnGebaeude().get();
+            }
+            else if ("W".equals( indexType )) {
+                return index.wohnGebaeude().get();
             }
             else if ("B".equals( indexType )) {
                 return index.bueroGebaeude().get();

@@ -77,72 +77,72 @@ public class MdbImportWohneigentumOperation
             /**
              * WOHNUNGEN
              */
-            sub = new SubMonitor( monitor, 10 );
-            importEntity( db, sub, BelastungComposite.class, null );
-
-            sub = new SubMonitor( monitor, 10 );
-            importEntity( db, sub, EtageComposite.class, null );
-
-            sub = new SubMonitor( monitor, 10 );
-            importEntity( db, sub, AusstattungComposite.class, new EntityCallback<AusstattungComposite>() {
-
-                @Override
-                public void fillEntity( AusstattungComposite entity, Map<String, Object> builderRow ) {
-
-                    entity.schl().set( entity.schl().get().trim() );
-                }
-            } );
-
-            sub = new SubMonitor( monitor, 10 );
-            importEntity( db, sub, EigentumsartComposite.class, null );
-
-            sub = new SubMonitor( monitor, 10 );
-            importEntity( db, sub, HimmelsrichtungComposite.class, null );
-
-            sub = new SubMonitor( monitor, 10 );
-            importEntity( db, sub, WohnungseigentumComposite.class, new EntityCallback<WohnungseigentumComposite>() {
-
-                @Override
-                public void fillEntity( WohnungseigentumComposite entity, Map<String, Object> builderRow ) {
-
-                    // LONG to Double
-
-                    Integer flaeche = (Integer)builderRow.get( "GFLAECHE_AKT" );
-                    if (flaeche != null) {
-                        entity.gesamtFlaeche().set( Double.valueOf( flaeche.doubleValue() ) );
-                    }
-                    String separator = System.getProperty( "line.separator" );
-                    // BEM1 und BEM2 zusammenfassen
-                    String bem1 = (String)builderRow.get( "BEMERKUNG" );
-                    String bem2 = (String)builderRow.get( "BEMERKUNG1" );
-                    StringBuilder bem = new StringBuilder();
-                    if (bem1 != null) {
-                        bem.append( bem1 );
-                        if (bem2 != null) {
-                            bem.append( separator );
-                        }
-                    }
-                    if (bem2 != null) {
-                        bem.append( bem2 );
-                    }
-                    entity.bemerkungen().set( bem.toString() );
-                }
-            } );
-
-            sub = new SubMonitor( monitor, 10 );
-            importEntity( db, sub, GebaeudeComposite.class, new EntityCallback<GebaeudeComposite>() {
-
-                @Override
-                public void fillEntity( GebaeudeComposite entity, Map<String, Object> builderRow ) {
-                    if (entity.sanierungswert().get() == null) {
-                        entity.sanierungswert().set( "U" );
-                    }
-                    entity.gebaeudeArt().set( findSchlNamed( GebaeudeArtComposite.class, builderRow, "GEBART" ) );
-                }
-            } );
-
-            sub = new SubMonitor( monitor, 10 );
-            importK_EOBJF( db, sub, parentFolder );
+//            sub = new SubMonitor( monitor, 10 );
+//            importEntity( db, sub, BelastungComposite.class, null );
+//
+//            sub = new SubMonitor( monitor, 10 );
+//            importEntity( db, sub, EtageComposite.class, null );
+//
+//            sub = new SubMonitor( monitor, 10 );
+//            importEntity( db, sub, AusstattungComposite.class, new EntityCallback<AusstattungComposite>() {
+//
+//                @Override
+//                public void fillEntity( AusstattungComposite entity, Map<String, Object> builderRow ) {
+//
+//                    entity.schl().set( entity.schl().get().trim() );
+//                }
+//            } );
+//
+//            sub = new SubMonitor( monitor, 10 );
+//            importEntity( db, sub, EigentumsartComposite.class, null );
+//
+//            sub = new SubMonitor( monitor, 10 );
+//            importEntity( db, sub, HimmelsrichtungComposite.class, null );
+//
+//            sub = new SubMonitor( monitor, 10 );
+//            importEntity( db, sub, WohnungseigentumComposite.class, new EntityCallback<WohnungseigentumComposite>() {
+//
+//                @Override
+//                public void fillEntity( WohnungseigentumComposite entity, Map<String, Object> builderRow ) {
+//
+//                    // LONG to Double
+//
+//                    Integer flaeche = (Integer)builderRow.get( "GFLAECHE_AKT" );
+//                    if (flaeche != null) {
+//                        entity.gesamtFlaeche().set( Double.valueOf( flaeche.doubleValue() ) );
+//                    }
+//                    String separator = System.getProperty( "line.separator" );
+//                    // BEM1 und BEM2 zusammenfassen
+//                    String bem1 = (String)builderRow.get( "BEMERKUNG" );
+//                    String bem2 = (String)builderRow.get( "BEMERKUNG1" );
+//                    StringBuilder bem = new StringBuilder();
+//                    if (bem1 != null) {
+//                        bem.append( bem1 );
+//                        if (bem2 != null) {
+//                            bem.append( separator );
+//                        }
+//                    }
+//                    if (bem2 != null) {
+//                        bem.append( bem2 );
+//                    }
+//                    entity.bemerkungen().set( bem.toString() );
+//                }
+//            } );
+//
+//            sub = new SubMonitor( monitor, 10 );
+//            importEntity( db, sub, GebaeudeComposite.class, new EntityCallback<GebaeudeComposite>() {
+//
+//                @Override
+//                public void fillEntity( GebaeudeComposite entity, Map<String, Object> builderRow ) {
+//                    if (entity.sanierungswert().get() == null) {
+//                        entity.sanierungswert().set( "U" );
+//                    }
+//                    entity.gebaeudeArt().set( findSchlNamed( GebaeudeArtComposite.class, builderRow, "GEBART" ) );
+//                }
+//            } );
+//
+//            sub = new SubMonitor( monitor, 10 );
+//            importK_EOBJF( db, sub, parentFolder );
 
             sub = new SubMonitor( monitor, 10 );
             File wmvaopf = new File( parentFolder, "wohnungen_mit_vertrag_aber_ohne_passendes_flurstueck.txt" );

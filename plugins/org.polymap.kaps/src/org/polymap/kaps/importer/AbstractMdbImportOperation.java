@@ -1,9 +1,9 @@
 package org.polymap.kaps.importer;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.WeakHashMap;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -56,7 +56,7 @@ public abstract class AbstractMdbImportOperation
         this.dbFile = dbFile;
         this.tableNames = tableNames;
         this.repo = KapsRepository.instance();
-        this.schlCache = new WeakHashMap<Class<?>, Map<String, SchlNamed>>();
+        this.schlCache = new HashMap<Class<?>, Map<String, SchlNamed>>();
     }
 
 
@@ -217,7 +217,7 @@ public abstract class AbstractMdbImportOperation
     protected final <T extends SchlNamed> T findSchlNamed( Class<T> type, String schl ) {
         Map<String, SchlNamed> instances = (Map<String, SchlNamed>)schlCache.get( type );
         if (instances == null) {
-            instances = new WeakHashMap<String, SchlNamed>();
+            instances = new HashMap<String, SchlNamed>();
             schlCache.put( type, instances );
         }
         SchlNamed instance = instances.get( schl );

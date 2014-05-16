@@ -173,7 +173,6 @@ public class NHK2010BewertungFormEditorPage
             protected void onChangedValue( IFormEditorPageSite site, Entity entity, String fieldName, Object value ) {
                 NHK2010BewertungGebaeudeComposite gebaeude = (NHK2010BewertungGebaeudeComposite)entity;
                 if (selectedComposite.get() == null || !selectedComposite.get().equals( gebaeude )) {
-                    // neu setzen
                     selectedComposite.set( gebaeude );
                     try {
                         refreshReloadables();
@@ -1106,8 +1105,7 @@ public class NHK2010BewertungFormEditorPage
             public SortedMap<String, Object> get() {
                 if (zonen == null) {
                     zonen = new TreeMap<String, Object>();
-                    zonen.put( "Einfamiliengebäude", "E" );
-                    zonen.put( "Mehrfamiliengebäude", "M" );
+                    zonen.put( "Wohngebäude", "W" );
                     zonen.put( "Bürogebäude", "B" );
                     zonen.put( "Gewerblicher Betrieb", "G" );
                 }

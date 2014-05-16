@@ -336,8 +336,7 @@ public class MdbImportVertraegeOperation
                                                 if (NUTZUNG_ART != null) {
                                                     prototype
                                                             .brwrlArt()
-                                                            .set( repo
-                                                                    .findSchlNamed(
+                                                            .set( findSchlNamed(
                                                                             BodenRichtwertRichtlinieArtDerNutzungComposite.class,
                                                                             NUTZUNG_ART.trim() ) );
                                                 }

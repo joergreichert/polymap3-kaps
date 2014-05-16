@@ -12,6 +12,7 @@
  */
 package org.polymap.kaps.ui.form;
 
+import java.util.Collection;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -61,6 +62,7 @@ import org.polymap.rhei.field.FormFieldEvent;
 import org.polymap.rhei.field.IFormFieldListener;
 import org.polymap.rhei.field.PicklistFormField;
 import org.polymap.rhei.field.StringFormField;
+import org.polymap.rhei.form.IFormEditorPage2;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
 import org.polymap.kaps.KapsPlugin;
@@ -83,7 +85,8 @@ import org.polymap.kaps.ui.NotNullValidator;
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 public class RichtwertzoneGrunddatenFormEditorPage
-        extends KapsDefaultFormEditorPageWithFeatureTable<RichtwertzoneZeitraumComposite> {
+        extends KapsDefaultFormEditorPageWithFeatureTable<RichtwertzoneZeitraumComposite>
+        implements IFormEditorPage2 {
 
     private static Log                                     log    = LogFactory
                                                                           .getLog( RichtwertzoneGrunddatenFormEditorPage.class );
@@ -101,7 +104,8 @@ public class RichtwertzoneGrunddatenFormEditorPage
 
 
     public RichtwertzoneGrunddatenFormEditorPage( Feature feature, FeatureStore featureStore ) {
-        super( RichtwertzoneZeitraumComposite.class, RichtwertzoneGrunddatenFormEditorPage.class.getName(), "Grunddaten", feature, featureStore );
+        super( RichtwertzoneZeitraumComposite.class, RichtwertzoneGrunddatenFormEditorPage.class.getName(),
+                "Grunddaten", feature, featureStore );
 
         richtwertzone = lookupRichtwertzoneComposite();
     }
@@ -459,4 +463,27 @@ public class RichtwertzoneGrunddatenFormEditorPage
                     }
                 } );
     }
+
+
+    @Override
+    public void updateElements( Collection<RichtwertzoneZeitraumComposite> coll ) {
+        super.updateElements( coll );
+
+        RichtwertzoneZeitraumComposite latest = null;
+        for (RichtwertzoneZeitraumComposite current : coll) {
+            if (latest == null) {
+                latest = current;
+            }
+            else if (latest.gueltigAb().get() == null && current.gueltigAb().get() == null) {
+                // do nothing
+            }
+            else if ((latest.gueltigAb().get() == null && current.gueltigAb().get() != null)
+                    || (current.gueltigAb().get() != null && latest.gueltigAb().get()
+                            .before( current.gueltigAb().get() ))) {
+                latest = current;
+            }
+            richtwertzone.latestZone().set( latest );
+        }
+    }
+
 }

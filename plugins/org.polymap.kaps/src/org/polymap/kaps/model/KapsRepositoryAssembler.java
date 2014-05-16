@@ -187,6 +187,7 @@ public class KapsRepositoryAssembler
         }
         migrateBelastung( uow );
         migrateRichtwertzone( uow );
+        migrateBaukosten( uow );
         uow.complete();
         log.info( "Create Init Data Completed" );
     }
@@ -207,6 +208,29 @@ public class KapsRepositoryAssembler
         return query.iterator().hasNext();
     }
 
+    private void migrateBaukosten( UnitOfWork uow )
+            throws IOException {
+        File file = new File( createDataDir(), "migration.baukostenindex" );
+        if (!file.exists()) {
+            log.info( "Migrating Baukostenindex" );
+            QueryBuilder<NHK2010BewertungGebaeudeComposite> builder = getModule().queryBuilderFactory().newQueryBuilder(
+                    NHK2010BewertungGebaeudeComposite.class );
+            Query<NHK2010BewertungGebaeudeComposite> query = builder.newQuery( uow ).maxResults( Integer.MAX_VALUE ).firstResult( 0 );
+            Iterator<NHK2010BewertungGebaeudeComposite> it = query.iterator();
+            int count = 0;
+            while (it.hasNext()) {
+                // neu setzen
+                NHK2010BewertungGebaeudeComposite gebaeude = it.next();
+                String indexTyp = gebaeude.baukostenIndexTyp().get();
+                if (indexTyp != null && ("E".equals( indexTyp ) || "M".equals( indexTyp ))) {
+                    count++;
+                    gebaeude.baukostenIndexTyp().set( "W" );
+                }
+            }
+            file.createNewFile();
+            log.info( "Migration of " + count + " Baukostenindex Completed" );
+        }
+    }
 
     private void migrateBelastung( UnitOfWork uow )
             throws IOException {

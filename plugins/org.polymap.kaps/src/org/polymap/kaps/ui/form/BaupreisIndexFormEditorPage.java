@@ -182,24 +182,11 @@ public class BaupreisIndexFormEditorPage
                 .setLayoutData( right().top( lastLine ).create() ).create();
 
         lastLine = newLine;
-        newLine = newFormField( "Gesamt" ).setToolTipText( "Index Insgesamt" )
-                .setProperty( new PropertyAdapter( composite.wohneigentum() ) )
+        newLine = newFormField( "Wohngebäude" ).setToolTipText( "Index Wohngebäude (ehemals Einfamiliengebäude und Mehrfamiliengebäude)" )
+                .setProperty( new PropertyAdapter( composite.wohnGebaeude() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setValidator( new NotNullMyNumberValidator( Double.class, 1 ) )
                 .setLayoutData( left().top( lastLine ).create() ).create();
-
-        lastLine = newLine;
-        newLine = newFormField( "Einfamiliengebäude" ).setToolTipText( "Index Einfamiliengebäude" )
-                .setProperty( new PropertyAdapter( composite.einfamilienGebaeude() ) )
-                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NotNullMyNumberValidator( Double.class, 1 ) )
-                .setLayoutData( left().top( lastLine ).create() ).create();
-
-        newLine = newFormField( "Mehrfamiliengebäude" ).setToolTipText( "Index Mehrfamiliengebäude" )
-                .setProperty( new PropertyAdapter( composite.mehrfamilienGebaeude() ) )
-                .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
-                .setValidator( new NotNullMyNumberValidator( Double.class, 1 ) )
-                .setLayoutData( right().top( lastLine ).create() ).create();
 
         lastLine = newLine;
         newLine = newFormField( "Bürogebäude" ).setToolTipText( "Index Bürogebäude" )
