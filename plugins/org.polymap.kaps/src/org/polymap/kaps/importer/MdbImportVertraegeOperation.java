@@ -741,7 +741,7 @@ public class MdbImportVertraegeOperation
                                 //
                                 if (// flurstueck.nutzung().get().isAgrar().get()
                                     // ||
-                                vertrag.erweiterteVertragsdaten().get().bereinigterVollpreis().get() == null) {
+                                vertrag.erweiterteVertragsdaten().get().zuschlag().get() == null && vertrag.erweiterteVertragsdaten().get().abschlag().get() == null ) {
                                     // subcreate VertragsdatenErweitert
                                     // in der Tabelle K_BEVERW sind Vertrags- und
                                     // Vertragsdaten, letztere werden hier separate
