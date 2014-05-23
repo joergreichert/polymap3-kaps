@@ -140,7 +140,10 @@ public class MyNumberValidator
 
     public Object transform2Field( Object modelValue )
             throws Exception {
-        return modelValue == null ? null : nf.format( targetClass.cast( modelValue ) );
+        if (modelValue == null ||  modelValue instanceof String) {
+            return modelValue;
+        }
+        return nf.format( targetClass.cast( modelValue ) );
     }
 
 }
