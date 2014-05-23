@@ -13,7 +13,6 @@
 package org.polymap.kaps.ui.form;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -23,7 +22,6 @@ import java.math.MathContext;
 import java.text.DecimalFormat;
 
 import org.geotools.data.FeatureStore;
-import org.h2.util.MathUtils;
 import org.opengis.feature.Feature;
 import org.opengis.feature.type.PropertyDescriptor;
 
@@ -79,7 +77,6 @@ import org.polymap.kaps.model.data.NHK2010GebaeudeArtComposite;
 import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.VertragsdatenBaulandComposite;
 import org.polymap.kaps.ui.ActionButton;
-import org.polymap.kaps.ui.FieldSummation;
 import org.polymap.kaps.ui.FieldCalculation;
 import org.polymap.kaps.ui.InterEditorListener;
 import org.polymap.kaps.ui.InterEditorPropertyChangeEvent;
@@ -264,7 +261,7 @@ public class NHK2010BewertungFormEditorPage
             postProcessGebaeudeArtSelection();
             if (composite != null) {
                 // if (composite.zweifamilienHaus().get()) {
-                pageSite.setFieldValue( prefix + "zweifamilienHaus", composite.zweifamilienHaus().get() );
+                pageSite.setFieldValue( prefix + "zweifamilienHaus", composite.zweifamilienHaus().get() != null ? composite.zweifamilienHaus().get() : Boolean.FALSE );
                 // called by listenerpageSite.setFieldValue( prefix +
                 // "faktorZweifamilienhaus", null );
             }
