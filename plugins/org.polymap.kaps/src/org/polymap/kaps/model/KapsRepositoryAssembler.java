@@ -188,6 +188,7 @@ public class KapsRepositoryAssembler
         migrateBelastung( uow );
         migrateRichtwertzone( uow );
         migrateBaukosten( uow );
+        migrateEingangsnummern( uow );
         uow.complete();
         log.info( "Create Init Data Completed" );
     }
@@ -285,4 +286,39 @@ public class KapsRepositoryAssembler
             log.info( "Migration of " + count + " Richtwertzone Completed" );
         }
     }
+
+
+    private void migrateEingangsnummern( UnitOfWork uow )
+            throws IOException {
+        File file = new File( createDataDir(), "migration.Eingangsnummern" );
+//        if (!file.exists()) {
+            log.info( "Migrating Eingangsnummern" );
+            // find höchsten aus 2013
+            QueryBuilder<VertragComposite> builder = getModule().queryBuilderFactory().newQueryBuilder(
+                    VertragComposite.class );
+            VertragComposite template = QueryExpressions.templateFor( VertragComposite.class );
+            BooleanExpression expr = QueryExpressions.lt( template.eingangsNr(), 2014 * 10000 );
+            VertragComposite latest = builder.where( expr ).newQuery( uow )
+                    .orderBy( orderBy( template.eingangsNr(), OrderBy.Order.DESCENDING ) ).maxResults( 1 ).find();
+            int latestNumber = latest.eingangsNr().get();
+            log.info( "Migrating Eingangsnummern, latest number was " + latestNumber );
+            
+            // update alle > 201400000
+            expr = QueryExpressions.ge( template.eingangsNr(), 2014 * 10000 );
+            Query<VertragComposite> query = builder.where( expr ).newQuery( uow ).maxResults( Integer.MAX_VALUE )
+                    .firstResult( 0 );
+            log.info( "Migrating Eingangsnummern, found " + query.count() + " wrong numbers" );
+            Iterator<VertragComposite> it = query.iterator();
+            int count = 0;
+            while (it.hasNext()) {
+                latestNumber = latestNumber + 1;
+                VertragComposite vertrag = it.next();
+                vertrag.eingangsNr().set( latestNumber );
+                count++;
+            }
+            file.createNewFile();
+            log.info( "Migration of " + count + " Eingangsnummern Completed, latest number is " + latestNumber );
+//        }
+    }
+
 }

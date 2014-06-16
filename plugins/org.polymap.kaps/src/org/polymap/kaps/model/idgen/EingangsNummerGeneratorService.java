@@ -55,33 +55,21 @@ public interface EingangsNummerGeneratorService
         public Mixin() {
         }
 
-
         public synchronized int generate( Date vertragsDatum ) {
             Calendar cal = new GregorianCalendar();
             cal.setTime( vertragsDatum );
-            cal.set( Calendar.DAY_OF_YEAR, 1 );
-            cal.set( Calendar.HOUR_OF_DAY, 0 );
-            cal.set( Calendar.MINUTE, 0 );
-            cal.set( Calendar.SECOND, 0 );
-            cal.set( Calendar.MILLISECOND, 0 );
-
-            Date lowerDate = cal.getTime();
-
-            // minimum aktuelles Jahr * 100000 + 1
             int currentYear = cal.get( Calendar.YEAR );
 
             Integer highest = highestNumbers.get( Integer.valueOf( currentYear ) );
             if (highest == null) {
 
                 int currentMinimumNumber = currentYear * 100000;
-
-                cal.roll( Calendar.YEAR, true );
-                Date upperDate = cal.getTime();
+                int currentMaximumNumber = (currentYear + 1) * 100000;
 
                 VertragComposite template = templateFor( VertragComposite.class );
-                BooleanExpression exp = // QueryExpressions.and( QueryExpressions.ge(
-                                        // template.vertragsDatum(), lowerDate ),
-                QueryExpressions.lt( template.vertragsDatum(), upperDate );
+                BooleanExpression exp = QueryExpressions.and(
+                        QueryExpressions.ge( template.eingangsNr(), currentMinimumNumber ),
+                        QueryExpressions.lt( template.eingangsNr(), currentMaximumNumber ) );
 
                 Query<VertragComposite> entities = KapsRepository.instance().findEntities( VertragComposite.class, exp,
                         0, -1 );
