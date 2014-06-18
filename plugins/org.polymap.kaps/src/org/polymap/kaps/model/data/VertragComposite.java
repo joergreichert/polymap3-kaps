@@ -29,6 +29,7 @@ import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.property.Computed;
 import org.qi4j.api.property.Property;
 import org.qi4j.api.query.QueryExpressions;
+import org.qi4j.api.query.grammar.BooleanExpression;
 import org.qi4j.api.unitofwork.UnitOfWorkCompletionException;
 
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -369,27 +370,6 @@ public interface VertragComposite
                 EventManager.instance().publish(
                         new PropertyChangeEvent( this, eingangsNr().qualifiedName().name(), null, eingangsNr().get() ) );
             }
-//            if (erweiterteVertragsdaten().get() != null) {
-//                VertragsdatenErweitertComposite vertragsdatenErweitertComposite = erweiterteVertragsdaten().get();
-//                Double basisPreis = vertragsdatenErweitertComposite.basispreis().get();
-//                Double kaufPreis = vollpreis().get();
-//                if (kaufPreis == null) {
-//                    kaufPreis = new Double( 0.0d );
-//                    kaufpreis().set( kaufPreis );
-//                }
-//                if (basisPreis == null || basisPreis.doubleValue() != kaufPreis.doubleValue()) {
-//                    vertragsdatenErweitertComposite.basispreis().set( kaufPreis );
-//                    Double zuschlag = vertragsdatenErweitertComposite.zuschlag().get();
-//                    if (zuschlag != null) {
-//                        kaufPreis = Double.valueOf( kaufPreis.doubleValue() + zuschlag.doubleValue() );
-//                    }
-//                    Double abschlag = vertragsdatenErweitertComposite.abschlag().get();
-//                    if (abschlag != null) {
-//                        kaufPreis = Double.valueOf( kaufPreis.doubleValue() - abschlag.doubleValue() );
-//                    }
-//                    vertragsdatenErweitertComposite.bereinigterVollpreis().set( kaufPreis );
-//                }
-//            }
         }
 
         private AssociationInfo vertragCompositeAss = new GenericAssociationInfo( VertragComposite.class,
@@ -482,6 +462,13 @@ public interface VertragComposite
                     // ignore
                 }
             };
+        }
+
+
+        public static VertragComposite forErweiterteDaten( VertragsdatenErweitertComposite entity ) {
+            VertragComposite template = QueryExpressions.templateFor( VertragComposite.class );
+            BooleanExpression expr = QueryExpressions.eq( template.erweiterteVertragsdaten(), entity );
+            return KapsRepository.instance().findEntities( VertragComposite.class, expr, 0, -1 ).find();
         }
     }
 

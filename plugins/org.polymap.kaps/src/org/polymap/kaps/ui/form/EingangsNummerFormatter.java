@@ -63,7 +63,7 @@ public class EingangsNummerFormatter
     }
     
     public final static String format( String in ) {
-        if (in != null && in.length() > 4) {
+        if (in != null && in.length() > 4 && in.indexOf( "/" ) == -1) {
             return in.substring( 0, 4 ) + "/" + in.substring( 4 );
         }
         return in;

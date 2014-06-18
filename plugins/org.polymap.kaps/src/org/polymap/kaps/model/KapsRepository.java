@@ -48,32 +48,12 @@ import org.polymap.core.qi4j.QiModuleAssembler;
 import org.polymap.core.runtime.Polymap;
 import org.polymap.core.workbench.PolymapWorkbench;
 
-import org.polymap.kaps.model.data.AusstattungBewertungComposite;
-import org.polymap.kaps.model.data.BodenRichtwertRichtlinieArtDerNutzungComposite;
-import org.polymap.kaps.model.data.BodenRichtwertRichtlinieErgaenzungComposite;
-import org.polymap.kaps.model.data.BodennutzungComposite;
-import org.polymap.kaps.model.data.ErmittlungModernisierungsgradComposite;
-import org.polymap.kaps.model.data.ErtragswertverfahrenComposite;
-import org.polymap.kaps.model.data.FlurComposite;
-import org.polymap.kaps.model.data.FlurstueckComposite;
-import org.polymap.kaps.model.data.GebaeudeArtComposite;
-import org.polymap.kaps.model.data.GebaeudeComposite;
-import org.polymap.kaps.model.data.GemarkungComposite;
-import org.polymap.kaps.model.data.GemeindeComposite;
-import org.polymap.kaps.model.data.KaeuferKreisComposite;
-import org.polymap.kaps.model.data.NHK2010AnbautenComposite;
-import org.polymap.kaps.model.data.NHK2010BaupreisIndexComposite;
-import org.polymap.kaps.model.data.NutzungComposite;
-import org.polymap.kaps.model.data.RichtwertzoneZeitraumComposite;
-import org.polymap.kaps.model.data.StrasseComposite;
-import org.polymap.kaps.model.data.VertragsArtComposite;
-import org.polymap.kaps.model.data.WohnungComposite;
+import org.polymap.kaps.model.data.*;
 import org.polymap.kaps.model.idgen.EingangsNummerGeneratorService;
 import org.polymap.kaps.model.idgen.GebaeudeNummerGeneratorService;
 import org.polymap.kaps.model.idgen.ObjektNummerGeneratorService;
 import org.polymap.kaps.model.idgen.SchlGeneratorService;
 import org.polymap.kaps.model.idgen.WohnungsNummerGeneratorService;
-import org.polymap.kaps.ui.form.BewertungAnhandVonAustattungsmerkmalenFormEditorPage;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -97,26 +77,26 @@ public class KapsRepository
 
     // instance *******************************************
 
-    private IOperationSaveListener                          operationListener = new OperationSaveListener();
+    private IOperationSaveListener                                operationListener = new OperationSaveListener();
 
     // private Map<String,VertragsArtComposite> btNamen;
 
     // private Map<String,VertragsArtComposite> btNummern;
 
     /** Allow direct access for operations. */
-    protected KapsService                                   kapsService;
+    protected KapsService                                         kapsService;
 
     // private Map<String, VertragsArtComposite> vertragsArtNamen;
 
-    public final  ServiceReference<EingangsNummerGeneratorService> eingangsNummern;
+    public final ServiceReference<EingangsNummerGeneratorService> eingangsNummern;
 
     public final ServiceReference<ObjektNummerGeneratorService>   objektnummern;
 
-    public final ServiceReference<GebaeudeNummerGeneratorService>   gebaeudeNummern;
+    public final ServiceReference<GebaeudeNummerGeneratorService> gebaeudeNummern;
 
-    public final ServiceReference<WohnungsNummerGeneratorService>   wohnungsNummern;
+    public final ServiceReference<WohnungsNummerGeneratorService> wohnungsNummern;
 
-    private final ServiceReference<SchlGeneratorService>   schl;
+    private final ServiceReference<SchlGeneratorService>          schl;
 
 
     public static class SimpleEntityProvider<T extends Entity>
@@ -134,7 +114,8 @@ public class KapsRepository
         private ServiceReference<SchlGeneratorService> schl;
 
 
-        public SchlEntityProvider( QiModule repo, Class<T> entityClass, Name entityName, ServiceReference<SchlGeneratorService> schl ) {
+        public SchlEntityProvider( QiModule repo, Class<T> entityClass, Name entityName,
+                ServiceReference<SchlGeneratorService> schl ) {
             super( repo, entityClass, entityName );
             this.schl = schl;
         }
@@ -146,7 +127,7 @@ public class KapsRepository
             // set defaults
             if (value == null) {
                 if (entity.schl().qualifiedName().name().equals( propName )) {
-                    entity.schl().set( schl.get().generate(getEntityType().getType()).toString() );
+                    entity.schl().set( schl.get().generate( getEntityType().getType() ).toString() );
                     return true;
                 }
             }
@@ -346,25 +327,43 @@ public class KapsRepository
         }
         return namen;
     }
-    
+
+
     @Override
     public void removeEntity( Entity entity ) {
         if (entity instanceof WohnungComposite) {
-            removeWohnung((WohnungComposite)entity);
+            remove( (WohnungComposite)entity );
         }
-        else if (entity instanceof AusstattungBewertungComposite || entity instanceof ErmittlungModernisierungsgradComposite) {
+        else if (entity instanceof AusstattungBewertungComposite
+                || entity instanceof ErmittlungModernisierungsgradComposite || entity instanceof VertragsdatenAgrarComposite || entity instanceof VertragsdatenBaulandComposite) {
             // nichts weiter zu löschen hier
             super.removeEntity( entity );
-        } 
+        }
+        else if (entity instanceof VertragComposite) {
+            remove( (VertragComposite)entity );
+        }
         else if (entity instanceof FlurstueckComposite) {
-            // FIXME disable after import
-            super.removeEntity( entity );
+            remove( (FlurstueckComposite)entity );
+        }
+        else if (entity instanceof VertragsdatenErweitertComposite) {
+            remove( (VertragsdatenErweitertComposite)entity );
+        }
+        else if (entity instanceof ErtragswertverfahrenComposite) {
+            remove( (ErtragswertverfahrenComposite)entity );
+        }
+        else if (entity instanceof NHK2010BewertungComposite) {
+            remove( (NHK2010BewertungComposite)entity );
+        }
+        else if (entity instanceof NHK2010BewertungGebaeudeComposite) {
+            remove( (NHK2010BewertungGebaeudeComposite)entity );
         }
         else {
             Polymap.getSessionDisplay().asyncExec( new Runnable() {
 
                 public void run() {
-                    MessageDialog.openError( PolymapWorkbench.getShellToParentOn(), "Fehler beim Löschen",
+                    MessageDialog.openError(
+                            PolymapWorkbench.getShellToParentOn(),
+                            "Fehler beim Löschen",
                             "Das Löschen dieses Objektes ist noch nicht implementiert.\n Bitte legen Sie ein entsprechendes Ticket im trac an.\n\n http://polymap.org/kaps/newticket" );
                 }
             } );
@@ -372,19 +371,104 @@ public class KapsRepository
     }
 
 
-    /**
-     *
-     * @param entity
-     */
-    private void removeWohnung( WohnungComposite wohnung ) {
-        AusstattungBewertungComposite ausstattungBewertungComposite = AusstattungBewertungComposite.Mixin.forWohnung( wohnung );
+    private void remove( VertragsdatenErweitertComposite entity ) {
+        VertragComposite vertrag = VertragComposite.Mixin.forErweiterteDaten( entity );
+        if (vertrag != null) {
+            vertrag.erweiterteVertragsdaten().set( null );
+        }
+        super.removeEntity( entity );
+    }
+
+
+    private void remove( ErtragswertverfahrenComposite ew ) {
+        ErmittlungModernisierungsgradComposite ermittlungModernisierungsgradComposite = ErmittlungModernisierungsgradComposite.Mixin
+                .forErtragswertverfahren( ew );
+        if (ermittlungModernisierungsgradComposite != null) {
+            removeEntity( ermittlungModernisierungsgradComposite );
+        }
+        super.removeEntity( ew );
+    }
+
+
+    private void remove( WohnungComposite wohnung ) {
+        AusstattungBewertungComposite ausstattungBewertungComposite = AusstattungBewertungComposite.Mixin
+                .forWohnung( wohnung );
         if (ausstattungBewertungComposite != null) {
             removeEntity( ausstattungBewertungComposite );
         }
-        ErmittlungModernisierungsgradComposite ermittlungModernisierungsgradComposite = ErmittlungModernisierungsgradComposite.Mixin.forWohnung( wohnung );
+        ErmittlungModernisierungsgradComposite ermittlungModernisierungsgradComposite = ErmittlungModernisierungsgradComposite.Mixin
+                .forWohnung( wohnung );
         if (ermittlungModernisierungsgradComposite != null) {
             removeEntity( ermittlungModernisierungsgradComposite );
         }
         super.removeEntity( wohnung );
+    }
+
+
+    private void remove( FlurstueckComposite flurstueck ) {
+        for (GebaeudeComposite gebaeude : findEntities( GebaeudeComposite.class, null, 0, Integer.MAX_VALUE )) {
+            if (gebaeude.flurstuecke().contains( flurstueck )) {
+                gebaeude.flurstuecke().remove( flurstueck );
+            }
+        }
+        for (WohnungComposite wohnung : WohnungComposite.Mixin.findWohnungenFor( flurstueck )) {
+            wohnung.flurstueck().set( null );
+        }
+        // vertrag am Flurstueck, deshalb nicht zu löschen
+        super.removeEntity( flurstueck );
+    }
+
+
+    private void remove( NHK2010BewertungComposite r ) {
+        for (NHK2010BewertungGebaeudeComposite g : NHK2010BewertungGebaeudeComposite.Mixin.forBewertung( r )) {
+            removeEntity( g );
+        }
+        super.removeEntity( r );
+    }
+
+
+    private void remove( NHK2010BewertungGebaeudeComposite r ) {
+        ErmittlungModernisierungsgradComposite g = ErmittlungModernisierungsgradComposite.Mixin.forNHK2010( r );
+        if (g != null) {
+            removeEntity( g );
+        }
+        super.removeEntity( r );
+    }
+
+
+    private void remove( VertragComposite vertrag ) {
+        ErmittlungModernisierungsgradComposite ermittlungModernisierungsgradComposite = ErmittlungModernisierungsgradComposite.Mixin
+                .forVertrag( vertrag );
+        if (ermittlungModernisierungsgradComposite != null) {
+            removeEntity( ermittlungModernisierungsgradComposite );
+        }
+        ErtragswertverfahrenComposite ertragswertverfahrenComposite = ErtragswertverfahrenComposite.Mixin
+                .forVertrag( vertrag );
+        if (ertragswertverfahrenComposite != null) {
+            removeEntity( ertragswertverfahrenComposite );
+        }
+        for (FlurstueckComposite flurstueck : FlurstueckComposite.Mixin.forEntity( vertrag )) {
+            removeEntity( flurstueck );
+        }
+        NHK2010BewertungComposite nHK2010BewertungComposite = NHK2010BewertungComposite.Mixin.forVertrag( vertrag );
+        if (nHK2010BewertungComposite != null) {
+            removeEntity( nHK2010BewertungComposite );
+        }
+        VertragsdatenAgrarComposite vertragsdatenAgrarComposite = VertragsdatenAgrarComposite.Mixin
+                .forVertrag( vertrag );
+        if (vertragsdatenAgrarComposite != null) {
+            removeEntity( vertragsdatenAgrarComposite );
+        }
+        VertragsdatenBaulandComposite vertragsdatenBaulandComposite = VertragsdatenBaulandComposite.Mixin
+                .forVertrag( vertrag );
+        if (vertragsdatenBaulandComposite != null) {
+            removeEntity( vertragsdatenBaulandComposite );
+        }
+        VertragsdatenErweitertComposite vertragsdatenErweitertComposite = vertrag.erweiterteVertragsdaten().get();
+        if (vertragsdatenErweitertComposite != null) {
+            removeEntity( vertragsdatenErweitertComposite );
+        }
+        // wohnung wird über flurstück gelöscht
+        super.removeEntity( vertrag );
     }
 }

@@ -14,6 +14,8 @@ package org.polymap.kaps.model;
 
 import static org.qi4j.api.query.QueryExpressions.orderBy;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Iterator;
 
 import java.io.File;
@@ -209,14 +211,16 @@ public class KapsRepositoryAssembler
         return query.iterator().hasNext();
     }
 
+
     private void migrateBaukosten( UnitOfWork uow )
             throws IOException {
         File file = new File( createDataDir(), "migration.baukostenindex" );
         if (!file.exists()) {
             log.info( "Migrating Baukostenindex" );
-            QueryBuilder<NHK2010BewertungGebaeudeComposite> builder = getModule().queryBuilderFactory().newQueryBuilder(
-                    NHK2010BewertungGebaeudeComposite.class );
-            Query<NHK2010BewertungGebaeudeComposite> query = builder.newQuery( uow ).maxResults( Integer.MAX_VALUE ).firstResult( 0 );
+            QueryBuilder<NHK2010BewertungGebaeudeComposite> builder = getModule().queryBuilderFactory()
+                    .newQueryBuilder( NHK2010BewertungGebaeudeComposite.class );
+            Query<NHK2010BewertungGebaeudeComposite> query = builder.newQuery( uow ).maxResults( Integer.MAX_VALUE )
+                    .firstResult( 0 );
             Iterator<NHK2010BewertungGebaeudeComposite> it = query.iterator();
             int count = 0;
             while (it.hasNext()) {
@@ -232,6 +236,7 @@ public class KapsRepositoryAssembler
             log.info( "Migration of " + count + " Baukostenindex Completed" );
         }
     }
+
 
     private void migrateBelastung( UnitOfWork uow )
             throws IOException {
@@ -291,22 +296,39 @@ public class KapsRepositoryAssembler
     private void migrateEingangsnummern( UnitOfWork uow )
             throws IOException {
         File file = new File( createDataDir(), "migration.Eingangsnummern" );
-//        if (!file.exists()) {
+        if (!file.exists()) {
             log.info( "Migrating Eingangsnummern" );
-            // find höchsten aus 2013
+
             QueryBuilder<VertragComposite> builder = getModule().queryBuilderFactory().newQueryBuilder(
                     VertragComposite.class );
             VertragComposite template = QueryExpressions.templateFor( VertragComposite.class );
-            BooleanExpression expr = QueryExpressions.lt( template.eingangsNr(), 2014 * 10000 );
+
+            // find höchsten aus 2013
+            Calendar cal = new GregorianCalendar();
+            cal.set( Calendar.DAY_OF_YEAR, 1 );
+            cal.set( Calendar.HOUR_OF_DAY, 0 );
+            cal.set( Calendar.MINUTE, 0 );
+            cal.set( Calendar.SECOND, 0 );
+            cal.set( Calendar.MILLISECOND, 0 );
+            cal.set( Calendar.YEAR, 2013 );
+
+            BooleanExpression expr = QueryExpressions.and( QueryExpressions.lt( template.eingangsNr(), 2014 * 100000 ),
+                    QueryExpressions.ge( template.vertragsDatum(), cal.getTime() ) );
             VertragComposite latest = builder.where( expr ).newQuery( uow )
                     .orderBy( orderBy( template.eingangsNr(), OrderBy.Order.DESCENDING ) ).maxResults( 1 ).find();
+
             int latestNumber = latest.eingangsNr().get();
             log.info( "Migrating Eingangsnummern, latest number was " + latestNumber );
-            
+
             // update alle > 201400000
-            expr = QueryExpressions.ge( template.eingangsNr(), 2014 * 10000 );
-            Query<VertragComposite> query = builder.where( expr ).newQuery( uow ).maxResults( Integer.MAX_VALUE )
-                    .firstResult( 0 );
+
+            cal.set( Calendar.YEAR, 2014 );
+
+            expr = QueryExpressions.and( QueryExpressions.ge( template.eingangsNr(), 2014 * 100000 ),
+                    QueryExpressions.lt( template.vertragsDatum(), cal.getTime() ) );
+            Query<VertragComposite> query = builder.where( expr ).newQuery( uow )
+                    .orderBy( orderBy( template.vertragsDatum(), OrderBy.Order.DESCENDING ) )
+                    .maxResults( Integer.MAX_VALUE ).firstResult( 0 );
             log.info( "Migrating Eingangsnummern, found " + query.count() + " wrong numbers" );
             Iterator<VertragComposite> it = query.iterator();
             int count = 0;
@@ -318,7 +340,6 @@ public class KapsRepositoryAssembler
             }
             file.createNewFile();
             log.info( "Migration of " + count + " Eingangsnummern Completed, latest number is " + latestNumber );
-//        }
+        }
     }
-
 }

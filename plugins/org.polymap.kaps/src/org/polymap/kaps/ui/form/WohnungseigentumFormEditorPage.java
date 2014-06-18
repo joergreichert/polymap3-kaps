@@ -39,14 +39,11 @@ import org.polymap.rhei.form.IFormEditorPageSite;
 import org.polymap.kaps.KapsPlugin;
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.GebaeudeComposite;
-import org.polymap.kaps.model.data.WohnungComposite;
 import org.polymap.kaps.model.data.WohnungseigentumComposite;
 import org.polymap.kaps.ui.ActionButton;
 import org.polymap.kaps.ui.KapsDefaultFormEditorPage;
 import org.polymap.kaps.ui.NotNullMyNumberValidator;
 import org.polymap.kaps.ui.SimplePickList;
-import org.polymap.kaps.ui.form.GebaeudeGrunddatenFormEditorPage.WohnungUpdateHandler;
-import org.polymap.kaps.ui.form.WohnungseigentumFormEditorPage.GebaeudeUpdateHandler;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -156,7 +153,7 @@ public class WohnungseigentumFormEditorPage
 
             @Override
             public void onSelection( GebaeudeComposite selectedObject ) {
-                if (openGebaeude != null) {
+                if (openGebaeude != null && !openGebaeude.isDisposed()) {
                     openGebaeude.setEnabled( selectedObject != null );
                 }
             }

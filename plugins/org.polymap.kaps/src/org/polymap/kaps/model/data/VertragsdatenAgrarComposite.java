@@ -526,7 +526,7 @@ public interface VertragsdatenAgrarComposite
 
         @Override
         public Property<Double> verkaufteFlaeche() {
-            return new ComputedPropertyInstance<Double>( new GenericPropertyInfo( VertragsdatenBaulandComposite.class,
+            return new ComputedPropertyInstance<Double>( new GenericPropertyInfo( VertragsdatenAgrarComposite.class,
                     "verkaufteFlaeche" ) ) {
 
                 @Override
@@ -553,109 +553,6 @@ public interface VertragsdatenAgrarComposite
                 }
             };
         }
-        //
-        // @Override
-        // public Association<RichtwertzoneComposite> richtwertZone() {
-        // return new ComputedAssociationInstance<RichtwertzoneComposite>( new
-        // GenericAssociationInfo(
-        // VertragsdatenAgrarComposite.class, "richtwertZone" ) ) {
-        //
-        // public RichtwertzoneComposite get() {
-        // FlurstueckComposite flurstueck = flurstueck().get();
-        // return flurstueck != null ? flurstueck.richtwertZone().get() : null;
-        // }
-        //
-        // @Override
-        // public void set( RichtwertzoneComposite anIgnoredValue )
-        // throws IllegalArgumentException, IllegalStateException {
-        // // ignored
-        // }
-        // };
-        // }
-
-        //
-        // @Override
-        // public Association<GebaeudeArtComposite> gebaeudeArt() {
-        // return new ComputedAssociationInstance<GebaeudeArtComposite>( new
-        // GenericAssociationInfo(
-        // VertragsdatenAgrarComposite.class, "gebaeudeArt" ) ) {
-        //
-        // public GebaeudeArtComposite get() {
-        // FlurstueckComposite flurstueck = flurstueck().get();
-        // return flurstueck != null ? flurstueck.gebaeudeArt().get() : null;
-        // }
-        //
-        //
-        // @Override
-        // public void set( GebaeudeArtComposite anIgnoredValue )
-        // throws IllegalArgumentException, IllegalStateException {
-        // // ignored
-        // }
-        // };
-        // }
-        //
-        //
-        // @Override
-        // public Property<Double> richtwert() {
-        // return new ComputedPropertyInstance<Double>( new GenericPropertyInfo(
-        // VertragsdatenAgrarComposite.class,
-        // "richtwert" ) ) {
-        //
-        // @Override
-        // public Double get() {
-        // RichtwertzoneZeitraumComposite rz = richtwertZoneG().get();
-        // return rz != null ? rz.euroQm().get() : null;
-        // }
-        //
-        //
-        // @Override
-        // public void set( Double anIgnoredValue )
-        // throws IllegalArgumentException, IllegalStateException {
-        // // ignored
-        // }
-        // };
-        // }
-
-        //
-        // @Override
-        // public Property<String> gfzBereich() {
-        // return new ComputedPropertyInstance<String>( new GenericPropertyInfo(
-        // VertragsdatenAgrarComposite.class,
-        // "gfzBereich" ) ) {
-        //
-        // @Override
-        // public String get() {
-        // RichtwertzoneComposite rz = flurstueck().get().richtwertZone().get();
-        // return rz != null ? rz.gfzBereich().get() : null;
-        // }
-        //
-        //
-        // @Override
-        // public void set( String anIgnoredValue )
-        // throws IllegalArgumentException, IllegalStateException {
-        // // ignored
-        // }
-        // };
-        // }
-        // @Override
-        // public Association<BodennutzungComposite> bodennutzung() {
-        // return new ComputedAssociationInstance<BodennutzungComposite>(
-        // new GenericAssociationInfo( VertragsdatenBaulandComposite.class,
-        // "bodennutzung" ) ) {
-        //
-        // public BodennutzungComposite get() {
-        // RichtwertzoneComposite rz = richtwertZone().get();
-        // return rz != null ? rz.bodenNutzung().get() : null;
-        // }
-        //
-        //
-        // @Override
-        // public void set( BodennutzungComposite anIgnoredValue )
-        // throws IllegalArgumentException, IllegalStateException {
-        // // ignored
-        // }
-        // };
-        // }
     }
 
 
