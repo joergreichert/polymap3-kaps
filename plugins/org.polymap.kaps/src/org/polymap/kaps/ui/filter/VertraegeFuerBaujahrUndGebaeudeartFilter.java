@@ -53,7 +53,6 @@ import org.polymap.kaps.model.data.GebaeudeArtComposite;
 import org.polymap.kaps.model.data.GemarkungComposite;
 import org.polymap.kaps.model.data.GemeindeComposite;
 import org.polymap.kaps.model.data.NutzungComposite;
-import org.polymap.kaps.model.data.StrasseComposite;
 import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.VertragsdatenBaulandComposite;
 import org.polymap.kaps.ui.MyNumberValidator;
@@ -129,6 +128,11 @@ public class VertraegeFuerBaujahrUndGebaeudeartFilter
         site.addStandardLayout( site.newFormField( result, "baujahr", Integer.class, new BetweenFormField(
                 new StringFormField(), new StringFormField() ), new BetweenValidator( new MyNumberValidator(
                 Integer.class ) ), "Baujahr" ) );
+
+        site.addStandardLayout( site.newFormField( result, "urkunde", String.class, new StringFormField(), null,
+                "Urkunde" ) );
+        site.addStandardLayout( site.newFormField( result, "notariat", String.class, new StringFormField(), null,
+                "Notariat" ) );
 
         return result;
     }
@@ -273,24 +277,48 @@ public class VertraegeFuerBaujahrUndGebaeudeartFilter
             vertraegeNachDatumUndFlurstueckUndBaujahr = vertraegeNachDatumUndFlurstueck;
         }
 
-        if (vertraegeNachDatumUndFlurstueckUndBaujahr.size() > 5000) {
-            Polymap.getSessionDisplay().asyncExec( new Runnable() {
+        if (vertraegeNachDatumUndFlurstueckUndBaujahr != null) {
+            if (vertraegeNachDatumUndFlurstueckUndBaujahr.size() > 5000) {
 
-                public void run() {
-                    MessageDialog.openError( PolymapWorkbench.getShellToParentOn(), "Zu viele Ergebnisse",
-                            "Es wurden über 5000 Ergebnisse gefunden. Bitte schränken Sie die Suche weiter ein." );
+                Polymap.getSessionDisplay().asyncExec( new Runnable() {
+
+                    public void run() {
+                        MessageDialog.openError( PolymapWorkbench.getShellToParentOn(), "Zu viele Ergebnisse",
+                                "Es wurden über 5000 Ergebnisse gefunden. Bitte schränken Sie die Suche weiter ein." );
+                    }
+                } );
+                return KapsRepository.instance().findEntities( VertragComposite.class,
+                        QueryExpressions.eq( template.identity(), "unknown" ), 0, -1 );
+            }
+            for (VertragComposite vertrag : vertraegeNachDatumUndFlurstueckUndBaujahr) {
+                BooleanExpression newExpr = QueryExpressions.eq( template.identity(), vertrag.id() );
+                if (fExpr == null) {
+                    fExpr = newExpr;
                 }
-            } );
-            return KapsRepository.instance().findEntities( VertragComposite.class,
-                    QueryExpressions.eq( template.identity(), "unknown" ), 0, -1 );
+                else {
+                    fExpr = QueryExpressions.or( fExpr, newExpr );
+                }
+            }
         }
-        for (VertragComposite vertrag : vertraegeNachDatumUndFlurstueckUndBaujahr) {
-            BooleanExpression newExpr = QueryExpressions.eq( template.identity(), vertrag.id() );
+
+        String urkunde = (String)site.getFieldValue( "urkunde" );
+        if (urkunde != null && !urkunde.trim().isEmpty()) {
+            BooleanExpression newExpr = QueryExpressions.eq( template.urkundenNummer(), urkunde.trim() );
             if (fExpr == null) {
                 fExpr = newExpr;
             }
             else {
-                fExpr = QueryExpressions.or( fExpr, newExpr );
+                fExpr = QueryExpressions.and( fExpr, newExpr );
+            }
+        }
+        String notariat = (String)site.getFieldValue( "notariat" );
+        if (notariat != null && !notariat.trim().isEmpty()) {
+            BooleanExpression newExpr = QueryExpressions.eq( template.notariat(), notariat.trim() );
+            if (fExpr == null) {
+                fExpr = newExpr;
+            }
+            else {
+                fExpr = QueryExpressions.and( fExpr, newExpr );
             }
         }
         // wenn keine gefunden, ungültige Query erzeugen, damit auch keine
