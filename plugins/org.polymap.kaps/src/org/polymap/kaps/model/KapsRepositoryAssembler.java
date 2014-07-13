@@ -20,6 +20,7 @@ import java.util.Iterator;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -191,6 +192,7 @@ public class KapsRepositoryAssembler
         migrateRichtwertzone( uow );
         migrateBaukosten( uow );
         migrateEingangsnummern( uow );
+        migrateVertragsdatenErweitert( uow );
         uow.complete();
         log.info( "Create Init Data Completed" );
     }
@@ -340,6 +342,20 @@ public class KapsRepositoryAssembler
             }
             file.createNewFile();
             log.info( "Migration of " + count + " Eingangsnummern Completed, latest number is " + latestNumber );
+        }
+    }
+
+
+    private void migrateVertragsdatenErweitert( UnitOfWork uow )
+            throws IOException, ParseException {
+        File file = new File( createDataDir(), "migration.Vertragsdatenerweitert" );
+        if (!file.exists()) {
+            log.info( "Migrating Eingangsnummern" );
+
+            QueryBuilder<VertragComposite> builder = getModule().queryBuilderFactory().newQueryBuilder(
+                    VertragComposite.class );
+            VertragsdatenErweitertImportFix.fix( uow, builder );
+            log.info( "Migration of  Vertragsdatenerweitert Completed" );
         }
     }
 }
