@@ -42,6 +42,8 @@ import org.polymap.kaps.model.SchlNamed;
 public interface BelastungComposite
         extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite, SchlNamed {
 
+    final static String NAME = "Belastung";
+
     @Optional
     @ImportColumn("SCHL")
     Property<String> schl();

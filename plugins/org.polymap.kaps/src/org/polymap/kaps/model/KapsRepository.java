@@ -173,6 +173,8 @@ public class KapsRepository
                     new RichtwertzoneEntityProvider( this ), new SimpleEntityProvider<VertragsArtComposite>( this,
                             VertragsArtComposite.class, new NameImpl( KapsRepository.NAMESPACE,
                                     VertragsArtComposite.NAME ) ),
+                    new SimpleEntityProvider<BelastungComposite>( this, BelastungComposite.class, new NameImpl(
+                            KapsRepository.NAMESPACE, BelastungComposite.NAME ) ),
                     new SimpleEntityProvider<RichtwertzoneZeitraumComposite>( this,
                             RichtwertzoneZeitraumComposite.class, new NameImpl( KapsRepository.NAMESPACE,
                                     RichtwertzoneZeitraumComposite.NAME ) ), new FlurstueckEntityProvider( this ),
@@ -335,7 +337,8 @@ public class KapsRepository
             remove( (WohnungComposite)entity );
         }
         else if (entity instanceof AusstattungBewertungComposite
-                || entity instanceof ErmittlungModernisierungsgradComposite || entity instanceof VertragsdatenAgrarComposite || entity instanceof VertragsdatenBaulandComposite) {
+                || entity instanceof ErmittlungModernisierungsgradComposite
+                || entity instanceof VertragsdatenAgrarComposite || entity instanceof VertragsdatenBaulandComposite) {
             // nichts weiter zu löschen hier
             super.removeEntity( entity );
         }
