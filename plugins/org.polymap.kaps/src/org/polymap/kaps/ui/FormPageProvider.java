@@ -13,22 +13,10 @@
 package org.polymap.kaps.ui;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.geotools.data.FeatureStore;
-import org.geotools.feature.FeatureCollection;
-import org.geotools.filter.identity.FeatureIdImpl;
 import org.opengis.feature.Feature;
-import org.opengis.filter.identity.FeatureId;
-
-import com.google.common.collect.Iterables;
-
-import org.polymap.core.data.DataPlugin;
-import org.polymap.core.data.PipelineFeatureSource;
-import org.polymap.core.project.ILayer;
-import org.polymap.core.project.IMap;
-import org.polymap.core.project.Layers;
 
 import org.polymap.rhei.form.FormEditor;
 import org.polymap.rhei.form.IFormEditorPage;
@@ -260,6 +248,10 @@ public class FormPageProvider
         }
         else if (name.equalsIgnoreCase( NHK2010BewertungComposite.NAME )) {
             result.add( new NHK2010BewertungFormEditorPage( formEditor, feature, fs ) );
+        }
+        else if (name.equalsIgnoreCase( BelastungComposite.NAME )) {
+            result.add( new DefaultEntityFormEditorPage( feature, fs, BelastungComposite.class, KapsRepository
+                    .instance(), BelastungComposite.NAME ) );
         }
         return result;
     }
