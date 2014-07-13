@@ -11,8 +11,6 @@
  * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
  */
 package org.polymap.kaps.ui.filter;
-
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -27,7 +25,6 @@ import org.qi4j.api.query.Query;
 import org.qi4j.api.query.QueryExpressions;
 import org.qi4j.api.query.grammar.BooleanExpression;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import org.eclipse.swt.layout.FormData;
@@ -289,7 +286,7 @@ public class VertragsdatenAgrarAgrarFilter
         if (bExpr != null) {
             fExpr = QueryExpressions.and( bExpr, fExpr );
         }
-
+       
         return KapsRepository.instance().findEntities( VertragsdatenAgrarComposite.class, fExpr, 0, getMaxResults() );
     }
 }

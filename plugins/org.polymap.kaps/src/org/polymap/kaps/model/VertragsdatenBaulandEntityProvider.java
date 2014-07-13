@@ -12,6 +12,8 @@
  */
 package org.polymap.kaps.model;
 
+import java.util.Date;
+
 import org.geotools.feature.NameImpl;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.opengis.feature.Feature;
@@ -26,7 +28,6 @@ import org.polymap.core.qi4j.QiModule;
 import org.polymap.rhei.data.entityfeature.EntitySourceProcessor;
 
 import org.polymap.kaps.model.data.VertragsdatenBaulandComposite;
-import org.polymap.kaps.model.data.WohnungseigentumComposite;
 import org.polymap.kaps.ui.form.EingangsNummerFormatter;
 
 public class VertragsdatenBaulandEntityProvider
@@ -49,12 +50,13 @@ public class VertragsdatenBaulandEntityProvider
         SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
         builder.init( (SimpleFeatureType)type );
         // builder.remove( "vertrag" );
+        builder.add( "vertragsDatum", Date.class );
         builder.add( "eingangsNr", String.class );
         type = builder.buildFeatureType();
 
         // aussortieren für die Tabelle
         SimpleFeatureType filtered = SimpleFeatureTypeBuilder.retype( (SimpleFeatureType)type,
-                new String[] { "eingangsNr" } );
+                new String[] { "vertragsDatum","eingangsNr" } );
         return filtered;
     }
 
@@ -69,9 +71,14 @@ public class VertragsdatenBaulandEntityProvider
             feature.getProperty( "eingangsNr" ).setValue(
                     EingangsNummerFormatter.format( entity.vertrag().get().eingangsNr().get().toString() ) );
         }
+        if (entity.vertrag().get() != null && entity.vertrag().get().vertragsDatum().get() != null) {
+            feature.getProperty( "vertragsDatum" ).setValue( entity.vertrag().get().vertragsDatum().get() );
+        }
+
         return feature;
     }
-    
+
+
     @Override
     public boolean modifyFeature( VertragsdatenBaulandComposite entity, String propName, Object value )
             throws Exception {
