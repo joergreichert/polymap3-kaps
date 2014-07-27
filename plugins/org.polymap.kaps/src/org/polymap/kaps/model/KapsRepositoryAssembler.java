@@ -355,6 +355,7 @@ public class KapsRepositoryAssembler
             QueryBuilder<VertragComposite> builder = getModule().queryBuilderFactory().newQueryBuilder(
                     VertragComposite.class );
             VertragsdatenErweitertImportFix.fix( uow, builder );
+            file.createNewFile();
             log.info( "Migration of  Vertragsdatenerweitert Completed" );
         }
     }

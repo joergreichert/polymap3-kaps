@@ -66,6 +66,10 @@ public abstract class KaufvertragFormEditorPage
                 Integer nummer = (Integer)ev.getNewValue();
                 updateEingangsNummer( nummer );
             }
+            if (ev.getPropertyName().equals( kaufvertrag.vollpreis().qualifiedName().name() )) {
+                Double nummer = (Double)ev.getNewValue();
+                erweiterteVertragsdaten.updateBasisPreis( nummer );
+            }
         }
     }
 

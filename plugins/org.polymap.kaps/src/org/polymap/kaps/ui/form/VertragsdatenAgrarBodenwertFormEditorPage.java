@@ -505,7 +505,7 @@ public class VertragsdatenAgrarBodenwertFormEditorPage
                         .erweiterteVertragsdaten().get();
                 if (vertragsdatenErweitertComposite != null) {
                     Double bereinigt = vertragsdatenErweitertComposite.bereinigterVollpreis().get();
-                    if (bereinigt != null) {
+                    if (bereinigt != null && bereinigt != 0.0d) {
                         kaufpreis = bereinigt;
                     }
                 }
