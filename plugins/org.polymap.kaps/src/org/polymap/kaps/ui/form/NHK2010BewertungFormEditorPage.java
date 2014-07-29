@@ -269,6 +269,10 @@ public class NHK2010BewertungFormEditorPage
                 pageSite.setFieldValue( prefix + "zweifamilienHaus", Boolean.FALSE );
                 pageSite.setFieldValue( prefix + "faktorZweifamilienhaus", null );
             }
+//            // reset also the GND if it was not 0 before
+//            if (composite != null && composite.gesamtNutzungsDauer().get() > 1.0d) {
+//                pageSite.setFieldValue( getPropertyName(nameTemplate.gesamtNutzungsDauer()), NumberFormatter.getFormatter( 0 ).format( composite.gesamtNutzungsDauer().get() ));
+//            }
         }
     }
 
@@ -1253,7 +1257,7 @@ public class NHK2010BewertungFormEditorPage
                         && ev.getFieldName().equalsIgnoreCase( prefix + "gebaeudeStandard" )) {
                     String value = ev.getNewValue();
                     String faktor = null;
-                    if (value != null) {
+                    if (value != null && (selectedComposite.get() != null && !value.equals( selectedComposite.get().gebaeudeStandard().get()))) {
                         if (value.startsWith( "1" )) {
                             faktor = "60";
                         }
@@ -1269,8 +1273,8 @@ public class NHK2010BewertungFormEditorPage
                         else if (value.startsWith( "5" )) {
                             faktor = "80";
                         }
+                        pageSite.setFieldValue( getPropertyName( nameTemplate.gesamtNutzungsDauer() ), faktor );
                     }
-                    pageSite.setFieldValue( getPropertyName( nameTemplate.gesamtNutzungsDauer() ), faktor );
                 }
             }
         } );
