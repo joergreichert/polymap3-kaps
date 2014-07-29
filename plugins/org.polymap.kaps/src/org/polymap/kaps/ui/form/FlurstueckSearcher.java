@@ -70,22 +70,24 @@ public abstract class FlurstueckSearcher
         extends Action
         implements IFormFieldListener {
 
-    private static Log                                   log = LogFactory.getLog( FlurstueckSearcher.class );
+    private static Log                log = LogFactory.getLog( FlurstueckSearcher.class );
 
-    private List<FlurstueckComposite>                    content;
+    private List<FlurstueckComposite> content;
 
-    private final String                                 prefix;
+    private final String              prefix;
 
-    private GemarkungComposite                           gemarkung;
+    private GemarkungComposite        gemarkung;
 
-    private FlurComposite                                flur;
+    private FlurComposite             flur;
 
-    private Integer                                      hauptNummer;
+    private Integer                   hauptNummer;
 
-    private String                                       unterNummer;
+    private String                    unterNummer;
+
+    private FlurstueckTableDialog     dialog;
 
 
-    public FlurstueckSearcher( String prefix) {
+    public FlurstueckSearcher( String prefix ) {
         super( "Flurstück suchen" );
         this.prefix = prefix;
 
@@ -121,12 +123,11 @@ public abstract class FlurstueckSearcher
             // }
             // }
             content = new ArrayList();
-            for (FlurstueckComposite fc : findFlurstuecke( gemarkung, flur, hauptNummer,
-                    unterNummer )) {
+            for (FlurstueckComposite fc : findFlurstuecke( gemarkung, flur, hauptNummer, unterNummer )) {
                 content.add( fc );
             }
 
-            FlurstueckTableDialog dialog = new FlurstueckTableDialog();
+            dialog = new FlurstueckTableDialog();
             dialog.setBlockOnOpen( true );
 
             if (dialog.open() == Window.OK) {
@@ -144,6 +145,7 @@ public abstract class FlurstueckSearcher
             PolymapWorkbench.handleError( KapsPlugin.PLUGIN_ID, this, "Fehler beim Öffnen der Flurstückstabelle.", e );
         }
     }
+
 
     private Iterable<FlurstueckComposite> findFlurstuecke( GemarkungComposite gemarkung, FlurComposite flur,
             Integer flurstuecksNummer, String unternummer ) {
@@ -188,6 +190,7 @@ public abstract class FlurstueckSearcher
         // 0, 100 );
         return matches;
     }
+
 
     /**
      * 
@@ -276,6 +279,13 @@ public abstract class FlurstueckSearcher
             getButton( IDialogConstants.OK_ID ).setEnabled( false );
         }
 
+
+        public void dispose() {
+            if (viewer != null) {
+                viewer.dispose();
+            }
+        }
+
     }
 
 
@@ -311,5 +321,18 @@ public abstract class FlurstueckSearcher
         flur = null;
         hauptNummer = null;
         unterNummer = null;
+    }
+
+
+    public void dispose() {
+        gemarkung = null;
+        if (content != null) {
+            content.clear();
+            content = null;
+        }
+        if (dialog != null) {
+            dialog.dispose();
+            dialog = null;
+        }
     }
 }

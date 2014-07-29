@@ -138,6 +138,16 @@ public class KaufvertragFlurstueckeFormEditorPage
 
     @Override
     public void dispose() {
+        super.dispose();
+        selectedGemarkung = null;
+        if (selectedComposite.get() != null) {
+            FlurstueckComposite composite = selectedComposite.get();
+            if (composite.gemarkung().get() != null) {
+                composite.gemarkungWA().set( composite.gemarkung().get().id() );
+            }
+        }
+        // formEditor.dispose();
+        sfAction.dispose();
         EventManager.instance().unsubscribe( fieldListener );
     }
 
@@ -169,6 +179,13 @@ public class KaufvertragFlurstueckeFormEditorPage
             throws Exception {
         FlurstueckComposite composite = selectedComposite.get();
         selectedGemarkung = composite != null ? composite.gemarkung().get() : null;
+        if (composite != null && selectedGemarkung == null) {
+            String gId = composite.gemarkungWA().get();
+            if (gId != null) {
+                selectedGemarkung = repository.findEntity( GemarkungComposite.class, gId );
+                composite.gemarkung().set( selectedGemarkung );
+            }
+        }
         selectedStrasse = composite != null ? composite.strasse().get() : null;
         selectedRichtwertzone = composite != null ? composite.richtwertZone().get() : null;
         selectedNutzung = composite != null ? composite.nutzung().get() : null;
@@ -202,7 +219,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                         new ReloadablePropertyAdapter<FlurstueckComposite>( selectedComposite, prefix + "gemarkung",
                                 new AssociationCallback<FlurstueckComposite>() {
 
-                                    public Association get( FlurstueckComposite entity ) {
+                                    public Association<GemarkungComposite> get( FlurstueckComposite entity ) {
                                         return entity.gemarkung();
                                     }
                                 } ) )
@@ -269,6 +286,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                     throws Exception {
                 assert toAdopt != null;
                 copyCompositeData( toAdopt );
+                sfAction.dispose();
             }
 
 
@@ -480,8 +498,8 @@ public class KaufvertragFlurstueckeFormEditorPage
                             public Association get( FlurstueckComposite entity ) {
                                 return entity.artDesBaugebiets();
                             }
-                        } ) ).setField( reloadable( artPicklist ) )
-                .setLayoutData( left().top( line4 ).create() ).create();
+                        } ) ).setField( reloadable( artPicklist ) ).setLayoutData( left().top( line4 ).create() )
+                .create();
 
         Composite line6 = newFormField( "Fläche in m²" )
                 .setParent( parent )
@@ -846,7 +864,9 @@ public class KaufvertragFlurstueckeFormEditorPage
             vdec = repository.newEntity( VertragsdatenErweitertComposite.class, null );
             kaufvertrag.erweiterteVertragsdaten().set( vdec );
         }
-        if (vdec.basispreis().get() == null || (kaufvertrag.vollpreis().get() != null && vdec.basispreis().get().doubleValue() != kaufvertrag.vollpreis().get().doubleValue())) {
+        if (vdec.basispreis().get() == null
+                || (kaufvertrag.vollpreis().get() != null && vdec.basispreis().get().doubleValue() != kaufvertrag
+                        .vollpreis().get().doubleValue())) {
             vdec.updateBasisPreis( kaufvertrag.vollpreis().get() );
         }
         return vdec;
@@ -856,7 +876,21 @@ public class KaufvertragFlurstueckeFormEditorPage
     @Override
     public void doSubmit( IProgressMonitor monitor )
             throws Exception {
+        // FlurstueckComposite composite = selectedComposite.get();
+        // if (composite != null) {
+        // GemarkungComposite g = composite.gemarkung().get();
+        // System.out.println(g);
+        // composite.gemarkung().set( null );
+        // composite.gemarkung().set( g );
+        // }
         super.doSubmit( monitor );
+        // composite = selectedComposite.get();
+        // if (composite != null) {
+        // GemarkungComposite g = composite.gemarkung().get();
+        // System.out.println(g);
+        // composite.gemarkung().set( null );
+        // composite.gemarkung().set( g );
+        // }
     }
 
 
@@ -865,11 +899,19 @@ public class KaufvertragFlurstueckeFormEditorPage
         // separate behandeln, da die 3 felder von zusätzlichen reloads von
         // gemakrung und nutzung
         // wieder zurückgesetzt werden
+        selectedGemarkung = toCopy.gemarkung().get();
         selectedStrasse = toCopy.strasse().get();
         selectedRichtwertzone = toCopy.richtwertZone().get();
         selectedArtDesBaugebietes = toCopy.artDesBaugebiets().get();
 
+        // pageSite.setFieldValue( prefix + "gemarkung", null );
+
+        // selectedComposite.get().gemarkung().set( toCopy.gemarkung().get() );
         pageSite.setFieldValue( prefix + "gemarkung", toCopy.gemarkung().get() );
+
+        // only a workaroung
+        selectedComposite.get().gemarkungWA().set( selectedGemarkung.id() );
+
         // current.gemarkung().set( toAdopt.gemarkung().get() );
         // pageSite.setFieldValue( prefix + "flur", toCopy.flur().get() );
         pageSite.setFieldValue( prefix + "hauptNummer", String.valueOf( toCopy.hauptNummer().get() ) );
@@ -902,4 +944,5 @@ public class KaufvertragFlurstueckeFormEditorPage
 
         // refreshReloadables();
     }
+
 }

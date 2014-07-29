@@ -45,7 +45,6 @@ import org.polymap.rhei.field.IFormField;
 import org.polymap.rhei.field.IFormFieldListener;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
-import org.polymap.kaps.model.data.FlurstueckComposite;
 import org.polymap.kaps.ui.NamedCompositesFeatureContentProvider.FeatureTableElement;
 
 /**
@@ -278,6 +277,9 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
                 }
             }
         } );
+        if (model.size() > 0) {
+            viewer.getTable().select( 0 );
+        }
         return viewer.getTable();
     }
 
@@ -364,4 +366,14 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
         }
     }
 
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        if (model != null) {
+            model.clear();
+            model = null;
+        }
+        // viewer.dispose();
+    }
 }

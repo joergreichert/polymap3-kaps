@@ -169,6 +169,9 @@ public interface FlurstueckComposite
     // GEMARKUNG VARCHAR(4),
     @Optional
     Association<GemarkungComposite> gemarkung();
+    
+    @Optional
+    Property<String> gemarkungWA();
 
 
     // FLUR VARCHAR(3),
