@@ -64,7 +64,7 @@ public class BooleanFormField
     public BooleanFormField() {
         values.put( "ja", "J" );
         values.put( "nein", "N" );
-        values.put( "unbekannt", null );
+        values.put( "unbekannt", "U" );
     }
 
 
@@ -161,7 +161,7 @@ public class BooleanFormField
 
         // find label for given value
         for (Map.Entry<String, String> entry : values.entrySet()) {
-            if ((value == null && entry.getValue() == null) || value.equals( entry.getValue() )) {
+            if ((value == null && entry.getValue().equals( "U" )) || value.equals( entry.getValue() )) {
                 combo.setText( entry.getKey() );
                 break;
             }
