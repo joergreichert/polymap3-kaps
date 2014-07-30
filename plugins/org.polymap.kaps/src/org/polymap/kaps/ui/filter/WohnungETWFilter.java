@@ -13,7 +13,9 @@
 package org.polymap.kaps.ui.filter;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -22,14 +24,12 @@ import org.qi4j.api.query.Query;
 import org.qi4j.api.query.QueryExpressions;
 import org.qi4j.api.query.grammar.BooleanExpression;
 
+import com.google.common.collect.Sets;
+
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 
-import org.eclipse.jface.dialogs.MessageDialog;
-
 import org.polymap.core.project.ILayer;
-import org.polymap.core.runtime.Polymap;
-import org.polymap.core.workbench.PolymapWorkbench;
 
 import org.polymap.rhei.field.BetweenFormField;
 import org.polymap.rhei.field.BetweenValidator;
@@ -60,7 +60,8 @@ public class WohnungETWFilter
 
 
     public WohnungETWFilter( ILayer layer ) {
-        super( WohnungETWFilter.class.getName(), layer, "nach Nutzung, Datum, Gemeinde...", null, 10000, WohnungComposite.class );
+        super( WohnungETWFilter.class.getName(), layer, "nach Nutzung, Datum, Gemeinde...", null, 10000,
+                WohnungComposite.class );
     }
 
 
@@ -126,30 +127,19 @@ public class WohnungETWFilter
             }
         }
 
-        BooleanExpression fExpr = null;
         WohnungComposite template = QueryExpressions.templateFor( WohnungComposite.class );
 
         // if (nutzungen != null || gemeinde != null) {
         FlurstueckComposite flurTemplate = QueryExpressions.templateFor( FlurstueckComposite.class );
 
         // nach Vertragsdatum vorsortieren
-        BooleanExpression vExpr = null;
+        Set<VertragComposite> vertraegeNachDatum = null;
         if (vertragsDatumExpr != null) {
+            vertraegeNachDatum = Sets.newHashSet();
             Query<VertragComposite> vertraege = KapsRepository.instance().findEntities( VertragComposite.class,
                     vertragsDatumExpr, 0, -1 );
             for (VertragComposite vertrag : vertraege) {
-                BooleanExpression newExpr = QueryExpressions.eq( flurTemplate.vertrag(), vertrag );
-                if (vExpr == null) {
-                    vExpr = newExpr;
-                }
-                else {
-                    vExpr = QueryExpressions.or( vExpr, newExpr );
-                }
-            }
-            // vertragsdatum wurde gesetzt, aber keine Verträge gefunden, also auch
-            // keine Flurstücke finden
-            if (vExpr == null) {
-                vExpr = QueryExpressions.eq( flurTemplate.identity(), "unknown" );
+                vertraegeNachDatum.add( vertrag );
             }
         }
 
@@ -159,8 +149,8 @@ public class WohnungETWFilter
             GemarkungComposite gemarkungTemplate = QueryExpressions.templateFor( GemarkungComposite.class );
             Query<GemarkungComposite> gemarkungen = KapsRepository.instance().findEntities( GemarkungComposite.class,
                     QueryExpressions.eq( gemarkungTemplate.gemeinde(), gemeinde ), 0, -1 );
-            for (GemarkungComposite gemarkung : gemarkungen) {
-                BooleanExpression newExpr = QueryExpressions.eq( flurTemplate.gemarkung(), gemarkung );
+            for (GemarkungComposite gemarkungg : gemarkungen) {
+                BooleanExpression newExpr = QueryExpressions.eq( flurTemplate.gemarkung(), gemarkungg );
                 if (gExpr == null) {
                     gExpr = newExpr;
                 }
@@ -200,7 +190,6 @@ public class WohnungETWFilter
                 }
             }
         }
-
         if (nExpr != null) {
             if (gaExpr != null) {
                 nExpr = QueryExpressions.and( nExpr, gaExpr );
@@ -208,15 +197,6 @@ public class WohnungETWFilter
         }
         else {
             nExpr = gaExpr;
-        }
-
-        if (nExpr != null) {
-            if (vExpr != null) {
-                nExpr = QueryExpressions.and( nExpr, vExpr );
-            }
-        }
-        else {
-            nExpr = vExpr;
         }
         if (nExpr != null) {
             if (gExpr != null) {
@@ -226,37 +206,64 @@ public class WohnungETWFilter
         else {
             nExpr = gExpr;
         }
+        Set<FlurstueckComposite> gefilterterFlurstuecke = null;
+        if (nExpr != null) {
+            Query<FlurstueckComposite> flurstuecke = KapsRepository.instance().findEntities( FlurstueckComposite.class,
+                    nExpr, 0, -1 );
 
-        Query<FlurstueckComposite> flurstuecke = KapsRepository.instance().findEntities( FlurstueckComposite.class,
-                nExpr, 0, -1 );
-        if (flurstuecke.count() > 5000) {
-            Polymap.getSessionDisplay().asyncExec( new Runnable() {
-
-                public void run() {
-                    MessageDialog.openError( PolymapWorkbench.getShellToParentOn(), "Zu viele Ergebnisse",
-                            "Es wurden zu viele Ergebnisse gefunden. Bitte schränken Sie die Suche weiter ein." );
+            gefilterterFlurstuecke = new HashSet<FlurstueckComposite>();
+            for (FlurstueckComposite fc : flurstuecke) {
+                // mehrere Flurstücke können einem Vertrag angehören
+                VertragComposite vertrag = fc.vertrag().get();
+                if (vertrag != null) {
+                    if (vertraegeNachDatum == null || vertraegeNachDatum.contains( vertrag )) {
+                        gefilterterFlurstuecke.add( fc );
+                    }
                 }
-            } );
-            return KapsRepository.instance().findEntities( WohnungComposite.class,
-                    QueryExpressions.eq( template.identity(), "unknown" ), 0, -1 );
-        }
-        for (FlurstueckComposite fc : flurstuecke) {
-            // mehrere Flurstücke können einem Vertrag angehören
-            BooleanExpression newExpr = QueryExpressions.eq( template.flurstueck(), fc );
-            if (fExpr == null) {
-                fExpr = newExpr;
-            }
-            else {
-                fExpr = QueryExpressions.or( fExpr, newExpr );
             }
         }
-        // wenn keine verträge gefunden, ungültige Query erzeugen, damit auch keine
-        // Verträge gefunden werden
-        if (fExpr == null) {
-            fExpr = QueryExpressions.eq( template.identity(), "unknown" );
-        }
+        // if (gefilterterFlurstuecke.size() > 5000) {
+        // Polymap.getSessionDisplay().asyncExec( new Runnable() {
+        //
+        // public void run() {
+        // MessageDialog.openError( PolymapWorkbench.getShellToParentOn(),
+        // "Zu viele Ergebnisse",
+        // "Es wurden über 5000 Verträge gefunden. Bitte schränken Sie die Suche weiter ein."
+        // );
+        // }
+        // } );
+        // return KapsRepository.instance().findEntities( WohnungComposite.class,
+        // QueryExpressions.eq( template.identity(), "unknown" ), 0, -1 );
         // }
 
-        return KapsRepository.instance().findEntities( WohnungComposite.class, fExpr, 0, getMaxResults() );
+        BooleanExpression wExpr = null;
+        if (gefilterterFlurstuecke != null || vertraegeNachDatum != null) {
+            // ansonsten alles zurückgeben
+
+            Query<WohnungComposite> alleWohnungen = KapsRepository.instance().findEntities( WohnungComposite.class,
+                    null, 0, -1 );
+
+            for (WohnungComposite wohnung : alleWohnungen) {
+                VertragComposite wVertrag = wohnung.vertrag().get();
+                FlurstueckComposite wFlurstueck = wohnung.flurstueck().get();
+
+                if (((vertraegeNachDatum == null && wVertrag == null) || (vertraegeNachDatum == null || vertraegeNachDatum.contains( wVertrag )))
+                        && ((gefilterterFlurstuecke == null && wFlurstueck == null) || (gefilterterFlurstuecke == null || gefilterterFlurstuecke
+                                .contains( wFlurstueck )))) {
+                    BooleanExpression newExpr = QueryExpressions.eq( template.identity(), wohnung.id() );
+                    if (wExpr == null) {
+                        wExpr = newExpr;
+                    }
+                    else {
+                        wExpr = QueryExpressions.or( wExpr, newExpr );
+                    }
+                }
+
+            }
+            if (wExpr == null) {
+                wExpr = QueryExpressions.eq( template.identity(), "unknown" );
+            }
+        }
+        return KapsRepository.instance().findEntities( WohnungComposite.class, wExpr, 0, getMaxResults() );
     }
 }
