@@ -27,14 +27,11 @@ import org.eclipse.swt.widgets.Composite;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 
-import org.polymap.core.model.Entity;
 import org.polymap.core.project.ILayer;
 import org.polymap.core.runtime.Polymap;
 import org.polymap.core.workbench.PolymapWorkbench;
 
-import org.polymap.rhei.data.entityfeature.AbstractEntityFilter;
 import org.polymap.rhei.field.BetweenFormField;
-import org.polymap.rhei.field.BetweenValidator;
 import org.polymap.rhei.field.DateTimeFormField;
 import org.polymap.rhei.field.PicklistFormField;
 import org.polymap.rhei.field.StringFormField;
@@ -42,12 +39,10 @@ import org.polymap.rhei.filter.IFilterEditorSite;
 
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.FlurstueckComposite;
-import org.polymap.kaps.model.data.GebaeudeArtComposite;
 import org.polymap.kaps.model.data.GemarkungComposite;
 import org.polymap.kaps.model.data.GemeindeComposite;
 import org.polymap.kaps.model.data.NutzungComposite;
 import org.polymap.kaps.model.data.VertragComposite;
-import org.polymap.kaps.model.data.VertragsdatenBaulandComposite;
 import org.polymap.kaps.ui.MyNumberValidator;
 
 /**
@@ -55,7 +50,7 @@ import org.polymap.kaps.ui.MyNumberValidator;
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 public class VertraegeFuerFlurstueckeFilter
-        extends AbstractEntityFilter {
+        extends KapsEntityFilter<VertragComposite> {
 
     private static Log log = LogFactory.getLog( VertraegeFuerFlurstueckeFilter.class );
 
@@ -93,7 +88,7 @@ public class VertraegeFuerFlurstueckeFilter
     }
 
 
-    protected Query<? extends Entity> createQuery( IFilterEditorSite site ) {
+    protected Query<VertragComposite> createQuery( IFilterEditorSite site ) {
 
         GemeindeComposite gemeinde = (GemeindeComposite)site.getFieldValue( "gemeinde" );
         NutzungComposite nutzung = (NutzungComposite)site.getFieldValue( "nutzung" );
@@ -105,10 +100,10 @@ public class VertraegeFuerFlurstueckeFilter
         if (vertragsDatum != null) {
             VertragComposite dateTemplate = QueryExpressions.templateFor( VertragComposite.class );
             BooleanExpression ge = vertragsDatum[0] != null ? QueryExpressions.ge( dateTemplate.vertragsDatum(),
-                    (Date)vertragsDatum[0] ) : null;
+                    dayStart( (Date)vertragsDatum[0] ) ) : null;
 
             BooleanExpression le = vertragsDatum[1] != null ? QueryExpressions.le( dateTemplate.vertragsDatum(),
-                    (Date)vertragsDatum[1] ) : null;
+                    dayEnd( (Date)vertragsDatum[1] ) ) : null;
 
             if (ge != null) {
                 vertragsDatumExpr = ge;
@@ -158,8 +153,8 @@ public class VertraegeFuerFlurstueckeFilter
             }
 
             BooleanExpression hExpr = nummer != null ? QueryExpressions.eq( flurTemplate.hauptNummer(), nummer ) : null;
-            BooleanExpression uExpr = unternummer != null && !unternummer.isEmpty() ? QueryExpressions.eq( flurTemplate.unterNummer(),
-                    unternummer ) : null;
+            BooleanExpression uExpr = unternummer != null && !unternummer.isEmpty() ? QueryExpressions.eq(
+                    flurTemplate.unterNummer(), unternummer ) : null;
             BooleanExpression nExpr = nutzung != null ? QueryExpressions.eq( flurTemplate.nutzung(), nutzung ) : null;
 
             // expressions sammeln

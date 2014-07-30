@@ -31,12 +31,10 @@ import org.eclipse.swt.widgets.Composite;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 
-import org.polymap.core.model.Entity;
 import org.polymap.core.project.ILayer;
 import org.polymap.core.runtime.Polymap;
 import org.polymap.core.workbench.PolymapWorkbench;
 
-import org.polymap.rhei.data.entityfeature.AbstractEntityFilter;
 import org.polymap.rhei.field.BetweenFormField;
 import org.polymap.rhei.field.BetweenValidator;
 import org.polymap.rhei.field.DateTimeFormField;
@@ -62,7 +60,7 @@ import org.polymap.kaps.ui.MyNumberValidator;
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 public class VertraegeFuerBaujahrUndGebaeudeartFilter
-        extends AbstractEntityFilter {
+        extends KapsEntityFilter<VertragComposite> {
 
     private static Log         log = LogFactory.getLog( VertraegeFuerBaujahrUndGebaeudeartFilter.class );
 
@@ -138,7 +136,7 @@ public class VertraegeFuerBaujahrUndGebaeudeartFilter
     }
 
 
-    protected Query<? extends Entity> createQuery( IFilterEditorSite site ) {
+    protected Query<VertragComposite> createQuery( IFilterEditorSite site ) {
 
         GebaeudeArtComposite gebaeude = (GebaeudeArtComposite)site.getFieldValue( "gebart" );
         NutzungComposite nutzung = (NutzungComposite)site.getFieldValue( "nutzung" );
@@ -148,10 +146,10 @@ public class VertraegeFuerBaujahrUndGebaeudeartFilter
         if (vertragsDatum != null) {
             VertragComposite dateTemplate = QueryExpressions.templateFor( VertragComposite.class );
             BooleanExpression ge = vertragsDatum[0] != null ? QueryExpressions.ge( dateTemplate.vertragsDatum(),
-                    (Date)vertragsDatum[0] ) : null;
+                    dayStart((Date)vertragsDatum[0] )) : null;
 
             BooleanExpression le = vertragsDatum[1] != null ? QueryExpressions.le( dateTemplate.vertragsDatum(),
-                    (Date)vertragsDatum[1] ) : null;
+                    dayEnd((Date)vertragsDatum[1] )) : null;
 
             if (ge != null) {
                 vertragsDatumExpr = ge;

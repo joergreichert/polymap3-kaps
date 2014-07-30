@@ -13,7 +13,6 @@
 package org.polymap.kaps.ui.filter;
 
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
@@ -61,7 +60,7 @@ import org.polymap.kaps.ui.NotNullValidator;
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 public class VertragsdatenBaulandBRLFilter
-        extends KapsEntityFilter {
+        extends KapsEntityFilter<VertragsdatenBaulandComposite> {
 
     private static Log         log = LogFactory.getLog( VertragsdatenBaulandBRLFilter.class );
 
@@ -135,7 +134,7 @@ public class VertragsdatenBaulandBRLFilter
 
 
     @Override
-    protected Query<? extends VertragsdatenBaulandComposite> createQuery( IFilterEditorSite site ) {
+    protected Query<VertragsdatenBaulandComposite> createQuery( IFilterEditorSite site ) {
 
         List<NutzungComposite> nutzungen = (List<NutzungComposite>)site.getFieldValue( "nutzung" );
         GemeindeComposite gemeinde = (GemeindeComposite)site.getFieldValue( "gemeinde" );

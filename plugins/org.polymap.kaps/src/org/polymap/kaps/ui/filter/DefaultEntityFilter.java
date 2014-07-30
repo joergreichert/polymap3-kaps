@@ -39,7 +39,6 @@ import org.polymap.core.model.EntityType.Property;
 import org.polymap.core.project.ILayer;
 import org.polymap.core.qi4j.QiModule;
 
-import org.polymap.rhei.data.entityfeature.AbstractEntityFilter;
 import org.polymap.rhei.field.BetweenFormField;
 import org.polymap.rhei.field.BetweenValidator;
 import org.polymap.rhei.field.DateTimeFormField;
@@ -55,7 +54,7 @@ import org.polymap.kaps.ui.MyNumberValidator;
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 public class DefaultEntityFilter<T extends Entity>
-        extends AbstractEntityFilter {
+        extends KapsEntityFilter<T> {
 
     public static abstract class PropertyFilter<T> {
 
@@ -351,11 +350,11 @@ public class DefaultEntityFilter<T extends Entity>
         Object[] betweenValues = (Object[])value;
         BooleanExpression ge = betweenValues[0] != null ? QueryExpressions.ge(
                 (org.qi4j.api.property.Property<Date>)propertyMethod.invoke( template, new Object[0] ),
-                (Date)betweenValues[0] ) : null;
+                dayStart((Date)betweenValues[0] )) : null;
 
         BooleanExpression le = betweenValues[1] != null ? QueryExpressions.le(
                 (org.qi4j.api.property.Property<Date>)propertyMethod.invoke( template, new Object[0] ),
-                (Date)betweenValues[1] ) : null;
+                dayEnd((Date)betweenValues[1] )) : null;
 
         currentExpression = ge;
         if (le != null) {

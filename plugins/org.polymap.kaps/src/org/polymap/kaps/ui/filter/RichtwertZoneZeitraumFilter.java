@@ -23,10 +23,8 @@ import org.qi4j.api.query.grammar.BooleanExpression;
 
 import org.eclipse.swt.widgets.Composite;
 
-import org.polymap.core.model.Entity;
 import org.polymap.core.project.ILayer;
 
-import org.polymap.rhei.data.entityfeature.AbstractEntityFilter;
 import org.polymap.rhei.field.BetweenFormField;
 import org.polymap.rhei.field.DateTimeFormField;
 import org.polymap.rhei.filter.IFilterEditorSite;
@@ -39,7 +37,7 @@ import org.polymap.kaps.model.data.RichtwertzoneZeitraumComposite;
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 public class RichtwertZoneZeitraumFilter
-        extends AbstractEntityFilter {
+        extends KapsEntityFilter<RichtwertzoneComposite> {
 
     private static Log log = LogFactory.getLog( RichtwertZoneZeitraumFilter.class );
 
@@ -75,7 +73,7 @@ public class RichtwertZoneZeitraumFilter
     }
 
 
-    protected Query<? extends Entity> createQuery( IFilterEditorSite site ) {
+    protected Query<RichtwertzoneComposite> createQuery( IFilterEditorSite site ) {
         RichtwertzoneComposite template = QueryExpressions.templateFor( RichtwertzoneComposite.class );
 
         Object[] jahre = (Object[])site.getFieldValue( "date" );
@@ -85,10 +83,10 @@ public class RichtwertZoneZeitraumFilter
                     .templateFor( RichtwertzoneZeitraumComposite.class );
             BooleanExpression expr2 = null;
 
-            BooleanExpression ge = jahre[0] != null ? QueryExpressions.ge( dateTemplate.gueltigAb(), (Date)jahre[0] )
+            BooleanExpression ge = jahre[0] != null ? QueryExpressions.ge( dateTemplate.gueltigAb(), dayStart((Date)jahre[0]) )
                     : null;
 
-            BooleanExpression le = jahre[1] != null ? QueryExpressions.le( dateTemplate.gueltigAb(), (Date)jahre[1] )
+            BooleanExpression le = jahre[1] != null ? QueryExpressions.le( dateTemplate.gueltigAb(), dayEnd((Date)jahre[1]) )
                     : null;
 
             if (ge != null) {
