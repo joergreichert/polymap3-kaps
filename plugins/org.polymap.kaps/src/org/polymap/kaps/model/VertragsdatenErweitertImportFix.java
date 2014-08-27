@@ -37,26 +37,29 @@ public class VertragsdatenErweitertImportFix {
 
 
     public static void add( UnitOfWork uow, QueryBuilder<VertragComposite> builder, VertragComposite template,
-            String eingangsNr, String zuschlag, String abschlag, String zubem, String abbem ) throws ParseException {
+            String eingangsNr, String zuschlag, String abschlag, String zubem, String abbem )
+            throws ParseException {
 
-        BooleanExpression expr = QueryExpressions.eq( template.eingangsNr(), ((Long)NumberFormat.getNumberInstance(Locale.ENGLISH).parse( eingangsNr )).intValue());
+        BooleanExpression expr = QueryExpressions.eq( template.eingangsNr(),
+                ((Long)NumberFormat.getNumberInstance( Locale.ENGLISH ).parse( eingangsNr )).intValue() );
         VertragComposite latest = builder.where( expr ).newQuery( uow ).maxResults( 1 ).find();
-
-        log.info( "Changing Vertrag " + latest.eingangsNr().get() );
-        VertragsdatenErweitertComposite vertragsdatenErweitertComposite = latest.erweiterteVertragsdaten().get();
-        if (zuschlag != null) {
-            vertragsdatenErweitertComposite.zuschlag().set( Double.valueOf( zuschlag ) );
+        if (latest != null) {
+            log.info( "Changing Vertrag " + latest.eingangsNr().get() );
+            VertragsdatenErweitertComposite vertragsdatenErweitertComposite = latest.erweiterteVertragsdaten().get();
+            if (zuschlag != null) {
+                vertragsdatenErweitertComposite.zuschlag().set( Double.valueOf( zuschlag ) );
+            }
+            if (zubem != null) {
+                vertragsdatenErweitertComposite.zuschlagBemerkung().set( zubem );
+            }
+            if (abschlag != null) {
+                vertragsdatenErweitertComposite.abschlag().set( Double.valueOf( abschlag ) );
+            }
+            if (abbem != null) {
+                vertragsdatenErweitertComposite.abschlagBemerkung().set( abbem );
+            }
+            recalculate( vertragsdatenErweitertComposite );
         }
-        if (zubem != null) {
-            vertragsdatenErweitertComposite.zuschlagBemerkung().set( zubem );
-        }
-        if (abschlag != null) {
-            vertragsdatenErweitertComposite.abschlag().set( Double.valueOf( abschlag ) );
-        }
-        if (abbem != null) {
-            vertragsdatenErweitertComposite.abschlagBemerkung().set( abbem );
-        }
-        recalculate( vertragsdatenErweitertComposite );
     }
 
 
@@ -79,7 +82,8 @@ public class VertragsdatenErweitertImportFix {
     }
 
 
-    public static void fix( UnitOfWork uow, QueryBuilder<VertragComposite> builder ) throws ParseException {
+    public static void fix( UnitOfWork uow, QueryBuilder<VertragComposite> builder )
+            throws ParseException {
         VertragComposite template = QueryExpressions.templateFor( VertragComposite.class );
         add( uow, builder, template, "2.00110231E8", null, "447.0", null, "Preis für Eingangstor" );
         add( uow, builder, template, "2.00110674E8", null, "5113.0", null, "Gebäudewert" );
