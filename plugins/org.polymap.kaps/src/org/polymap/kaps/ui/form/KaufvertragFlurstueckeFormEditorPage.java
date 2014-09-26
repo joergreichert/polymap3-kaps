@@ -222,6 +222,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                                 new AssociationCallback<FlurstueckComposite>() {
 
                                     public Association<GemarkungComposite> get( FlurstueckComposite entity ) {
+//                                        log.info( "gemarkungComposite " +  entity.gemarkung());
                                         return entity.gemarkung();
                                     }
                                 } ) )
@@ -367,11 +368,10 @@ public class KaufvertragFlurstueckeFormEditorPage
                 .setLayoutData( right().left( 75 ).top( line1 ).create() ).create();
 
         final PicklistFormField richtwertZonePickList = new PicklistFormField( new PicklistFormField.ValueProvider() {
-
             @Override
             public SortedMap<String, Object> get() {
                 if (selectedGemarkung != null) {
-                    GemeindeComposite gemeinde = selectedGemarkung.gemeinde().get();
+                    GemeindeComposite gemeinde = selectedGemarkung.gemeinde().get();                    
                     return RichtwertzoneProvider.findFor( gemeinde );
                 }
                 return Maps.newTreeMap();
@@ -394,8 +394,9 @@ public class KaufvertragFlurstueckeFormEditorPage
             @Override
             public void fieldChange( FormFieldEvent ev ) {
                 if (ev.getEventCode() == VALUE_CHANGE && ev.getFieldName().equalsIgnoreCase( prefix + "gemarkung" )) {
-                    if ((ev.getNewValue() == null && selectedGemarkung != null)
-                            || (ev.getNewValue() != null && !ev.getNewValue().equals( selectedGemarkung ))) {
+//                    log.info( "gemarkungListener: " + ev);
+//                    if ((ev.getNewValue() == null && selectedGemarkung != null)
+//                            || (ev.getNewValue() != null && !ev.getNewValue().equals( selectedGemarkung ))) {
                         selectedGemarkung = ev.getNewValue();
                         // strassePickList.
                         strassePickList.reloadValues();
@@ -406,7 +407,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                         // selectedComposite.get().richtwertZone().get() : null );
                     }
                 }
-            }
+//            }
         } );
 
         // newFormField( "Kartenblatt" )
@@ -480,14 +481,14 @@ public class KaufvertragFlurstueckeFormEditorPage
             @Override
             public void fieldChange( FormFieldEvent ev ) {
                 if (ev.getEventCode() == VALUE_CHANGE && ev.getFieldName().equalsIgnoreCase( prefix + "nutzung" )) {
-                    if ((ev.getNewValue() == null && selectedNutzung != null)
-                            || (ev.getNewValue() != null && !ev.getNewValue().equals( selectedNutzung ))) {
+//                    if ((ev.getNewValue() == null && selectedNutzung != null)
+//                            || (ev.getNewValue() != null && !ev.getNewValue().equals( selectedNutzung ))) {
                         selectedNutzung = ev.getNewValue();
                         artPicklist.reloadValues();
                         pageSite.setFieldValue( prefix + "artDesBaugebiets", selectedArtDesBaugebietes );
                     }
                 }
-            }
+//            }
         } );
 
         Composite line5 = newFormField( "Art" )
@@ -878,6 +879,7 @@ public class KaufvertragFlurstueckeFormEditorPage
     @Override
     public void doSubmit( IProgressMonitor monitor )
             throws Exception {
+        log.info( "doSubmit" );
         // FlurstueckComposite composite = selectedComposite.get();
         // if (composite != null) {
         // GemarkungComposite g = composite.gemarkung().get();
@@ -907,6 +909,7 @@ public class KaufvertragFlurstueckeFormEditorPage
         }
         selectedStrasse = toCopy.strasse().get();
         selectedRichtwertzone = toCopy.richtwertZone().get();
+        selectedNutzung = toCopy.nutzung().get();
         selectedArtDesBaugebietes = toCopy.artDesBaugebiets().get();
 
         // pageSite.setFieldValue( prefix + "gemarkung", null );
@@ -923,7 +926,7 @@ public class KaufvertragFlurstueckeFormEditorPage
         // pageSite.setFieldValue( prefix + "flur", toCopy.flur().get() );
         pageSite.setFieldValue( prefix + "hauptNummer", String.valueOf( toCopy.hauptNummer().get() ) );
         pageSite.setFieldValue( prefix + "unterNummer", toCopy.unterNummer().get() );
-        pageSite.setFieldValue( prefix + "strasse", toCopy.strasse().get() );
+//        pageSite.setFieldValue( prefix + "strasse", toCopy.strasse().get() );
         pageSite.setFieldValue( prefix + "hausnummer", toCopy.hausnummer().get() );
         pageSite.setFieldValue( prefix + "hausnummerZusatz", toCopy.hausnummerZusatz().get() );
         pageSite.setFieldValue( prefix + "richtwertZone", toCopy.richtwertZone().get() );
@@ -931,9 +934,9 @@ public class KaufvertragFlurstueckeFormEditorPage
         // toAdopt.kartenBlatt().get() );
         // pageSite.setFieldValue( prefix + "baublock",
         // toAdopt.baublock().get() );
-        pageSite.setFieldValue( prefix + "nutzung", toCopy.nutzung().get() );
+//        pageSite.setFieldValue( prefix + "nutzung", toCopy.nutzung().get() );
         pageSite.setFieldValue( prefix + "gebaeudeArt", toCopy.gebaeudeArt().get() );
-        pageSite.setFieldValue( prefix + "artDesBaugebiets", toCopy.artDesBaugebiets().get() );
+//        pageSite.setFieldValue( prefix + "artDesBaugebiets", toCopy.artDesBaugebiets().get() );
         pageSite.setFieldValue( prefix + "flaeche", toCopy.flaeche().get() != null ? NumberFormatter.getFormatter( 2 )
                 .format( toCopy.flaeche().get() ) : null );
         pageSite.setFieldValue(

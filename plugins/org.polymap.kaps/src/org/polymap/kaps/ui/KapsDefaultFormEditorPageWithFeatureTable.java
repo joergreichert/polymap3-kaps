@@ -24,6 +24,9 @@ import java.lang.reflect.Proxy;
 import org.geotools.data.FeatureStore;
 import org.opengis.feature.Feature;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -52,6 +55,8 @@ import org.polymap.kaps.ui.NamedCompositesFeatureContentProvider.FeatureTableEle
  */
 public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity>
         extends KapsDefaultFormEditorPage {
+
+    private static Log                log    = LogFactory.getLog( KapsDefaultFormEditorPageWithFeatureTable.class );
 
     public class LastNameInvocationHandler
             implements InvocationHandler {
@@ -108,6 +113,8 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
 
     protected void refreshReloadables()
             throws Exception {
+//        log.info("refreshReloadables");
+//        Thread.currentThread().dumpStack();
         boolean enabled = selectedComposite.get() != null;
         for (IFormField field : reloadables) {
             field.setEnabled( enabled );
@@ -155,12 +162,12 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
 
         // model/content
         viewer.setContent( new NamedCompositesFeatureContentProvider( null, type ) );
-        try {
-            doLoad( new NullProgressMonitor() );
-        }
-        catch (Exception e) {
-            throw new RuntimeException( e );
-        }
+//        try {
+//            doLoad( new NullProgressMonitor() );
+//        }
+//        catch (Exception e) {
+//            throw new RuntimeException( e );
+//        }
 
         ActionButton addBtn = null;
         if (addAllowed) {
@@ -237,7 +244,7 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
 
                         // pageSite.reloadEditor();
                         doLoad( new NullProgressMonitor() );
-                        refreshReloadables();
+//                        refreshReloadables();
 
                         dirty = true;
                         // pageSite.fireEvent( this, id,
@@ -329,6 +336,10 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
 
             viewer.setInput( model );
             // viewer.refresh( true );
+            if (model.size() > 0) {
+                viewer.getTable().select( 0 );
+                selectedComposite.set( model.get( 0 ) );
+            }
         }
 
         if (pageSite != null) {

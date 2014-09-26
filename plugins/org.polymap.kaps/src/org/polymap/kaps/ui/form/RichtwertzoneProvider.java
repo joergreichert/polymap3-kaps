@@ -16,12 +16,17 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.NavigableMap;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
 
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.GemeindeComposite;
@@ -94,13 +99,14 @@ public class RichtwertzoneProvider {
                     return o1.compareTo( o2 );
                 }
                 return -1;
-            } else if (zz2 == null) {
+            }
+            else if (zz2 == null) {
                 return 1;
             }
 
-            Date g1= zz1.gueltigAb().get();
+            Date g1 = zz1.gueltigAb().get();
             Date g2 = zz2.gueltigAb().get();
-            
+
             if (g1 == null || g2 == null || g1.equals( g2 )) {
                 return o1.compareTo( o2 );
             }
@@ -118,6 +124,9 @@ public class RichtwertzoneProvider {
      * @return
      */
     public static SortedMap<String, Object> findFor( GemeindeComposite gemeinde, Date date ) {
+//      long start = System.currentTimeMillis();
+
+//        log.info( "findFor: " + gemeinde.schl().get() + ", " + date.getDate() );
         if (gemeinde == null) {
             throw new IllegalArgumentException( "gemeinde must not be null" );
         }
@@ -139,6 +148,8 @@ public class RichtwertzoneProvider {
         }
         TreeMap<String, Object> sorted = new TreeMap<String, Object>( new RWZComparator( zonen ) );
         sorted.putAll( zonen );
+//      log.info( "findFor: " + gemeinde.schl().get() + " needed " + (System.currentTimeMillis() - start) + "ms" );
+
         return sorted.descendingMap();
     }
 
@@ -166,14 +177,43 @@ public class RichtwertzoneProvider {
     // }
 
     public static SortedMap<String, Object> findFor( GemeindeComposite gemeinde ) {
-        Map<String, RichtwertzoneComposite> zonen = new HashMap<String, RichtwertzoneComposite>();
-        Iterable<RichtwertzoneComposite> iterable = RichtwertzoneComposite.Mixin.findZoneIn( gemeinde );
-        for (RichtwertzoneComposite zone : iterable) {
-            String prefix = zone.schl().get();
-            zonen.put( prefix + " - " + zone.name().get(), zone );
+//        long start = System.currentTimeMillis();
+        SortedMap<String, Object> ret = null;
+        try {
+            ret = getCache().get( gemeinde );
         }
-        TreeMap<String, Object> sorted = new TreeMap<String, Object>( new RWComparator( zonen ) );
-        sorted.putAll( zonen );
-        return sorted.descendingMap();
+        catch (ExecutionException e) {
+            e.printStackTrace();
+            ret = new TreeMap();
+        }
+//        log.info( "findFor: " + gemeinde.schl().get() + " needed " + (System.currentTimeMillis() - start) + "ms" );
+        return ret;
+    }
+
+    private static Cache<GemeindeComposite, SortedMap<String, Object>> gemeindeCache;
+
+
+    private static Cache<GemeindeComposite, SortedMap<String, Object>> getCache() {
+        if (gemeindeCache == null) {
+            gemeindeCache = CacheBuilder.newBuilder().weakKeys().maximumSize( 10000 )
+                    .expireAfterWrite( 1, TimeUnit.MINUTES )
+                    .build( new CacheLoader<GemeindeComposite, SortedMap<String, Object>>() {
+
+                        public SortedMap<String, Object> load( GemeindeComposite gemeinde ) {
+                            Map<String, RichtwertzoneComposite> zonen = new HashMap<String, RichtwertzoneComposite>();
+                            Iterable<RichtwertzoneComposite> iterable = RichtwertzoneComposite.Mixin
+                                    .findZoneIn( gemeinde );
+                            for (RichtwertzoneComposite zone : iterable) {
+                                String prefix = zone.schl().get();
+                                zonen.put( prefix + " - " + zone.name().get(), zone );
+                            }
+                            TreeMap<String, Object> sorted = new TreeMap<String, Object>( new RWComparator( zonen ) );
+                            sorted.putAll( zonen );
+                            SortedMap<String, Object> ret = sorted.descendingMap();
+                            return ret;
+                        }
+                    } );
+        }
+        return gemeindeCache;
     }
 }

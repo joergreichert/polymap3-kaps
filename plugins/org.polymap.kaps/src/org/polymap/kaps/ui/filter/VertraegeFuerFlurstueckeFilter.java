@@ -32,6 +32,7 @@ import org.polymap.core.runtime.Polymap;
 import org.polymap.core.workbench.PolymapWorkbench;
 
 import org.polymap.rhei.field.BetweenFormField;
+import org.polymap.rhei.field.BetweenValidator;
 import org.polymap.rhei.field.DateTimeFormField;
 import org.polymap.rhei.field.PicklistFormField;
 import org.polymap.rhei.field.StringFormField;
@@ -44,6 +45,7 @@ import org.polymap.kaps.model.data.GemeindeComposite;
 import org.polymap.kaps.model.data.NutzungComposite;
 import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.ui.MyNumberValidator;
+import org.polymap.kaps.ui.NotNullValidator;
 
 /**
  * 
@@ -70,7 +72,7 @@ public class VertraegeFuerFlurstueckeFilter
         Composite result = site.createStandardLayout( parent );
 
         site.addStandardLayout( site.newFormField( result, "datum", Date.class, new BetweenFormField(
-                new DateTimeFormField(), new DateTimeFormField() ), null, "Vertragsdatum" ) );
+                new DateTimeFormField(), new DateTimeFormField() ), new BetweenValidator( new NotNullValidator() ), "Vertragsdatum" ) );
 
         site.addStandardLayout( site.newFormField( result, "gemeinde", GemeindeComposite.class, new PicklistFormField(
                 KapsRepository.instance().entitiesWithNames( GemeindeComposite.class ) ), null, "Gemeinde" ) );

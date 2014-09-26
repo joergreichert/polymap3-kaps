@@ -221,16 +221,17 @@ public class VertragsdatenBaulandBRLFilter
             nExpr = gExpr;
         }
 
-        Query<FlurstueckComposite> flurstuecke = KapsRepository.instance().findEntities( FlurstueckComposite.class,
-                nExpr, 0, -1 );
-
         Set<VertragComposite> vertraegeNachDatumUndFlurstueck = Sets.newHashSet();
-        for (FlurstueckComposite fc : flurstuecke) {
-            // mehrere Flurstücke können einem Vertrag angehören
-            VertragComposite vertrag = fc.vertrag().get();
-            if (vertrag != null) {
-                if (vertraegeNachDatum == null || vertraegeNachDatum.contains( vertrag )) {
-                    vertraegeNachDatumUndFlurstueck.add( vertrag );
+        if (nExpr != null) {
+            Query<FlurstueckComposite> flurstuecke = KapsRepository.instance().findEntities( FlurstueckComposite.class,
+                    nExpr, 0, -1 );
+            for (FlurstueckComposite fc : flurstuecke) {
+                // mehrere Flurstücke können einem Vertrag angehören
+                VertragComposite vertrag = fc.vertrag().get();
+                if (vertrag != null) {
+                    if (vertraegeNachDatum == null || vertraegeNachDatum.contains( vertrag )) {
+                        vertraegeNachDatumUndFlurstueck.add( vertrag );
+                    }
                 }
             }
         }

@@ -11,6 +11,7 @@
  * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
  */
 package org.polymap.kaps.ui.filter;
+
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -63,7 +64,8 @@ import org.polymap.kaps.ui.NotNullValidator;
 public class VertragsdatenAgrarAgrarFilter
         extends KapsEntityFilter<VertragsdatenAgrarComposite> {
 
-    private static Log log = LogFactory.getLog( VertragsdatenAgrarAgrarFilter.class );
+    private static Log         log = LogFactory.getLog( VertragsdatenAgrarAgrarFilter.class );
+
     private IFormFieldListener gemeindeListener;
 
 
@@ -225,17 +227,19 @@ public class VertragsdatenAgrarAgrarFilter
         else {
             nExpr = gExpr;
         }
-
-        Query<FlurstueckComposite> flurstuecke = KapsRepository.instance().findEntities( FlurstueckComposite.class,
-                nExpr, 0, -1 );
-
         Set<VertragComposite> vertraegeNachDatumUndFlurstueck = new HashSet<VertragComposite>();
-        for (FlurstueckComposite fc : flurstuecke) {
-            // mehrere Flurstücke können einem Vertrag angehören
-            VertragComposite vertrag = fc.vertrag().get();
-            if (vertrag != null) {
-                if (vertraegeNachDatum == null || vertraegeNachDatum.contains( vertrag )) {
-                    vertraegeNachDatumUndFlurstueck.add( vertrag );
+
+        if (nExpr != null) {
+            Query<FlurstueckComposite> flurstuecke = KapsRepository.instance().findEntities( FlurstueckComposite.class,
+                    nExpr, 0, -1 );
+
+            for (FlurstueckComposite fc : flurstuecke) {
+                // mehrere Flurstücke können einem Vertrag angehören
+                VertragComposite vertrag = fc.vertrag().get();
+                if (vertrag != null) {
+                    if (vertraegeNachDatum == null || vertraegeNachDatum.contains( vertrag )) {
+                        vertraegeNachDatumUndFlurstueck.add( vertrag );
+                    }
                 }
             }
         }
@@ -286,7 +290,7 @@ public class VertragsdatenAgrarAgrarFilter
         if (bExpr != null) {
             fExpr = QueryExpressions.and( bExpr, fExpr );
         }
-       
+
         return KapsRepository.instance().findEntities( VertragsdatenAgrarComposite.class, fExpr, 0, getMaxResults() );
     }
 }
