@@ -147,7 +147,9 @@ public class KaufvertragFlurstueckeFormEditorPage
             }
         }
         // formEditor.dispose();
-        sfAction.dispose();
+        if (sfAction != null) {
+            sfAction.dispose();
+        }
         EventManager.instance().unsubscribe( fieldListener );
     }
 
