@@ -243,10 +243,29 @@ public abstract class WohnungSearcher
                         // und dann alle wohnungen suchen, die zu einem der
                         // flurstuecke gehören
                         FlurstueckComposite fsTemplate = QueryExpressions.templateFor( FlurstueckComposite.class );
-                        BooleanExpression bExpr = QueryExpressions.and(
-                                QueryExpressions.eq( fsTemplate.gemarkung(), flurstueck.gemarkung().get() ),
-                                QueryExpressions.eq( fsTemplate.hauptNummer(), flurstueck.hauptNummer().get() ),
-                                QueryExpressions.eq( fsTemplate.unterNummer(), flurstueck.unterNummer().get() ) );
+                        BooleanExpression bExpr = null;
+                        
+                        if (flurstueck.gemarkung().get() != null) {
+                          bExpr = QueryExpressions.eq( fsTemplate.gemarkung(), flurstueck.gemarkung().get() );
+                        } else {
+                            log.error("Flurstück " + flurstueck.hauptNummer().get() + "/" + flurstueck.unterNummer().get() + ": Gemarkung fehlt");
+                        }  
+                        if (flurstueck.hauptNummer().get() != null) {
+                            BooleanExpression hExpr = QueryExpressions.eq( fsTemplate.hauptNummer(), flurstueck.hauptNummer().get() );
+                            if (bExpr != null) {
+                                bExpr = QueryExpressions.and( bExpr, hExpr );
+                            } else {
+                                bExpr = hExpr;
+                            }
+                        }
+                        if (flurstueck.unterNummer().get() != null) {
+                            BooleanExpression hExpr = QueryExpressions.eq( fsTemplate.unterNummer(), flurstueck.unterNummer().get() );
+                            if (bExpr != null) {
+                                bExpr = QueryExpressions.and( bExpr, hExpr );
+                            } else {
+                                bExpr = hExpr;
+                            }
+                        }
                         for (FlurstueckComposite fsFound : KapsRepository.instance().findEntities(
                                 FlurstueckComposite.class, bExpr, 0, -1 )) {
 

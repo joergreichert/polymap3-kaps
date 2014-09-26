@@ -84,11 +84,10 @@ public class MyNumberValidator
         if (fieldValue instanceof String) {
             try {
                 transform2Model( fieldValue );
-                log.debug( "value: " + fieldValue + " valid!" );
                 return null;
             }
             catch (Exception e) {
-                log.debug( "value: " + fieldValue + " INVALID!", e );
+                log.error( "value: " + fieldValue + " INVALID!", e );
                 return "Eingabe ist keine korrekte Zahlenangabe: " + fieldValue + "\nAnzahl Stellen vor dem Komma: "
                         + nf.getMinimumIntegerDigits() + "-" + nf.getMaximumIntegerDigits()
                         + "\nAnzahl Stellen nach dem Komma: " + nf.getMinimumFractionDigits() + "-"
@@ -105,11 +104,14 @@ public class MyNumberValidator
             return null;
         }
         else if (fieldValue instanceof String) {
+            if (((String)fieldValue).isEmpty()) {
+                return null;
+            }
             ParsePosition pp = new ParsePosition( 0 );
             Number result = nf.parse( (String)fieldValue, pp );
 
             if (pp.getErrorIndex() > -1 || pp.getIndex() < ((String)fieldValue).length()) {
-                throw new ParseException( "field value: " + fieldValue, pp.getErrorIndex() );
+                throw new ParseException( "field value: " + fieldValue + " for targetClass " + targetClass.getName(), pp.getErrorIndex());
             }
 
             log.debug( "value: " + fieldValue + " -> " + result.doubleValue() );

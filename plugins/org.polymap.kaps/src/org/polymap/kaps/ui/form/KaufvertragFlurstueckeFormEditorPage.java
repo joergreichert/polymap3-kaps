@@ -902,6 +902,9 @@ public class KaufvertragFlurstueckeFormEditorPage
         // gemakrung und nutzung
         // wieder zurückgesetzt werden
         selectedGemarkung = toCopy.gemarkung().get();
+        if (selectedGemarkung == null) {
+            log.error("Flurstück " + toCopy.hauptNummer().get() + "/" + toCopy.unterNummer().get() + ": Gemarkung fehlt");
+        }
         selectedStrasse = toCopy.strasse().get();
         selectedRichtwertzone = toCopy.richtwertZone().get();
         selectedArtDesBaugebietes = toCopy.artDesBaugebiets().get();
@@ -911,8 +914,10 @@ public class KaufvertragFlurstueckeFormEditorPage
         // selectedComposite.get().gemarkung().set( toCopy.gemarkung().get() );
         pageSite.setFieldValue( prefix + "gemarkung", toCopy.gemarkung().get() );
 
-        // only a workaroung
-        selectedComposite.get().gemarkungWA().set( selectedGemarkung.id() );
+        if (selectedComposite.get() != null && selectedGemarkung != null) {
+            // only a workaround
+            selectedComposite.get().gemarkungWA().set( selectedGemarkung.id() );
+        }
 
         // current.gemarkung().set( toAdopt.gemarkung().get() );
         // pageSite.setFieldValue( prefix + "flur", toCopy.flur().get() );

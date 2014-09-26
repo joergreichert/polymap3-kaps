@@ -63,20 +63,24 @@ public abstract class SimplePickList<T> {
 
     public void setEnabled( boolean enabled ) {
         onSelectionInternal( null );
-        combo.deselectAll();
-        combo.removeAll();
+        if (combo != null && !combo.isDisposed()) {
+            combo.deselectAll();
+            combo.removeAll();
 
-        if (enabled) {
-            values = getValues();
-            for (String label : values.keySet()) {
-                combo.add( label );
+            if (enabled) {
+                values = getValues();
+                for (String label : values.keySet()) {
+                    combo.add( label );
+                }
+                if (!values.keySet().isEmpty()) {
+                    combo.select( 0 );
+                    onSelectionInternal( values.get( combo.getText() ) );
+                }
             }
-            if (!values.keySet().isEmpty()) {
-                combo.select( 0 );
-                onSelectionInternal( values.get( combo.getText()) );
-            }
+            combo.setEnabled( enabled );
+        } else {
+            log.error( "combo.setEnabled(" + enabled + ") is called but combo is disposed" );
         }
-        combo.setEnabled( enabled );
     }
 
 

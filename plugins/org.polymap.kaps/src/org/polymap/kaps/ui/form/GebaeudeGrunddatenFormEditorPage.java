@@ -26,7 +26,6 @@ import org.apache.commons.logging.LogFactory;
 import org.eclipse.swt.widgets.Composite;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.dialogs.MessageDialog;
 
 import org.eclipse.ui.forms.widgets.Section;
 
@@ -37,14 +36,10 @@ import org.polymap.core.runtime.Polymap;
 import org.polymap.core.runtime.event.EventFilter;
 import org.polymap.core.runtime.event.EventHandler;
 import org.polymap.core.runtime.event.EventManager;
-import org.polymap.core.workbench.PolymapWorkbench;
 
 import org.polymap.rhei.data.entityfeature.AssociationAdapter;
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
-import org.polymap.rhei.field.FormFieldEvent;
-import org.polymap.rhei.field.IFormField;
 import org.polymap.rhei.field.IFormFieldLabel;
-import org.polymap.rhei.field.IFormFieldListener;
 import org.polymap.rhei.field.PicklistFormField;
 import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.field.TextFormField;
@@ -60,7 +55,6 @@ import org.polymap.kaps.ui.KapsDefaultFormEditorPage;
 import org.polymap.kaps.ui.MyNumberValidator;
 import org.polymap.kaps.ui.NotNullMyNumberValidator;
 import org.polymap.kaps.ui.SimplePickList;
-import org.polymap.kaps.ui.form.GebaeudeGrunddatenFormEditorPage.WohnungUpdateHandler;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -253,7 +247,7 @@ public class GebaeudeGrunddatenFormEditorPage
 
             @Override
             public void onSelection( WohnungComposite selectedObject ) {
-                if (openGebaeude != null) {
+                if (openGebaeude != null && !openGebaeude.isDisposed()) {
                     openGebaeude.setEnabled( selectedObject != null );
                 }
             }
