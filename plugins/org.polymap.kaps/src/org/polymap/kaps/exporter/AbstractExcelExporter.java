@@ -63,10 +63,9 @@ import org.polymap.core.workbench.PolymapWorkbench;
 
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.LabelSupport;
+import org.polymap.kaps.model.Named;
 import org.polymap.kaps.model.SchlNamed;
-import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.ui.NumberFormatter;
-import org.polymap.kaps.ui.form.EingangsNummerFormatter;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -122,6 +121,9 @@ public abstract class AbstractExcelExporter<T extends Entity>
             this( key, value == null ? "" : (value.equals( Boolean.TRUE ) ? "ja" : "nein") );
         }
 
+        public Value( String key, Named value ) {
+            this( key, value != null ? value.name().get() : "");
+        }
 
         public Value( LabelSupport entity, Property<Integer> property, boolean useGrouping ) {
             this( entity.getLabel( property ), property.get(), useGrouping );
@@ -334,16 +336,19 @@ public abstract class AbstractExcelExporter<T extends Entity>
 
                 T entity = repo.findEntity( type, feature.getIdentifier().getID() );
 
-                List<Value> values = createValues( entity, errors );
+                List<List<Value>> values = createMultiRowValues( entity, errors );
                 if (values != null && !values.isEmpty()) {
-                    // header
-                    if (noHeaderYet) {
-                        csvWriter.writeHeader( getHeaders( values ) );
-                        noHeaderYet = false;
-                    }
+                    for (List<Value> row : values) {
 
-                    // all properties
-                    csvWriter.write( getValues( values ) );
+                        // header
+                        if (noHeaderYet) {
+                            csvWriter.writeHeader( getHeaders( row ) );
+                            noHeaderYet = false;
+                        }
+
+                        // all properties
+                        csvWriter.write( getValues( row ) );
+                    }
                 }
             }
 
@@ -380,13 +385,16 @@ public abstract class AbstractExcelExporter<T extends Entity>
     }
 
 
-    protected abstract List<Value> createValues( T entity, List<String> errors );
+    protected abstract List<List<Value>> createMultiRowValues( T entity, List<String> errors );
 
 
-    protected String error( VertragComposite vertrag, String msg ) {
-        return EingangsNummerFormatter.format( vertrag.eingangsNr().get() ) + ": " + msg;
+    protected String error( Named name, String msg ) {
+        return name.name().get() + ": " + msg;
     }
 
+//    protected String error( Named name, String msg ) {
+//        return EingangsNummerFormatter.format( vertrag.eingangsNr().get() ) + ": " + msg;
+//    }
 
     public static void main( String[] args ) {
         System.out.println( fileFormat.format( new Date() ) );

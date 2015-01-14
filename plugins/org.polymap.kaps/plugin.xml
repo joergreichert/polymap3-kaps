@@ -90,6 +90,13 @@
             label="In Richtwertzone importieren"
             tooltip="Geometrie auslesen und in Richtwertzone importieren">
       </featureOperation>
+      <featureOperation
+            class="org.polymap.kaps.exporter.VertragsdatenGebaudeExporter"
+            icon="icons/exportas.gif"
+            id="org.polymap.kaps.exporter.VertragsdatenGebaudeExporter"
+            label="Export Vertragsdaten für Gebäude"
+            tooltip="Export Vertragsdaten für Gebäude">
+      </featureOperation>
    </extension>
    <extension
          point="org.polymap.core.operation.concerns">
@@ -97,6 +104,11 @@
             class="org.polymap.kaps.ui.NewFeatureOperationConcern"
             id="org.polymap.kaps.ui.NewFeatureOperationConcern"
             name="org.polymap.kaps.ui.NewFeatureOperationConcern">
+      </concern>
+      <concern
+            class="org.polymap.kaps.ui.RemoveFeaturesOperationConcern"
+            id="org.polymap.kaps.ui.RemoveFeaturesOperationConcern"
+            name="org.polymap.kaps.ui.RemoveFeaturesOperationConcern">
       </concern>
    </extension>
    <extension

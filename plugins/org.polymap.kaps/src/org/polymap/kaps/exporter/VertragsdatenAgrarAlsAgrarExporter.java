@@ -29,7 +29,7 @@ import org.polymap.kaps.ui.form.EingangsNummerFormatter;
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 public class VertragsdatenAgrarAlsAgrarExporter
-        extends AbstractExcelExporter<VertragsdatenAgrarComposite> {
+        extends AbstractSingleRowExcelExporter<VertragsdatenAgrarComposite> {
 
     public VertragsdatenAgrarAlsAgrarExporter() {
         super( VertragsdatenAgrarComposite.class, VertragsdatenAgrarComposite.NAME, "statistik_agrar", "Verträge" );

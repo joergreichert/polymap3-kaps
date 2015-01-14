@@ -300,6 +300,8 @@ public abstract class GebaeudeSearcher
             content.clear();
             FlurstueckComposite flurstueck = selectedComposite.get();
             if (flurstueck != null) {
+                // suche über alle flurstücke
+                
                 FlurstueckComposite fsTemplate = QueryExpressions.templateFor( FlurstueckComposite.class );
                 BooleanExpression bExpr = QueryExpressions.and(
                         QueryExpressions.eq( fsTemplate.gemarkung(), flurstueck.gemarkung().get() ),

@@ -27,7 +27,7 @@ import org.polymap.kaps.ui.form.EingangsNummerFormatter;
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 public class WohnungAlsETWExporter
-        extends AbstractExcelExporter<WohnungComposite> {
+        extends AbstractSingleRowExcelExporter<WohnungComposite> {
 
     public WohnungAlsETWExporter() {
         super( WohnungComposite.class, WohnungComposite.NAME, "statistik_etw", "Verträge" );

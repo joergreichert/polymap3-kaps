@@ -332,7 +332,7 @@ public class KapsRepository
 
 
     @Override
-    public void removeEntity( Entity entity ) {
+    public void removeEntity( final Entity entity ) {
         if (entity instanceof WohnungComposite) {
             remove( (WohnungComposite)entity );
         }

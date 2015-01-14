@@ -30,8 +30,6 @@ import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.form.FormEditor;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
-import org.polymap.kaps.model.data.VertragComposite;
-import org.polymap.kaps.model.data.VertragsdatenErweitertComposite;
 import org.polymap.kaps.ui.FieldCalculation;
 import org.polymap.kaps.ui.FieldListener;
 import org.polymap.kaps.ui.FieldSummation;
@@ -47,21 +45,20 @@ import org.polymap.kaps.ui.NumberFormatter;
 public class KaufvertragErweitertFormEditorPage
         extends KaufvertragFormEditorPage {
 
-   
-    private FieldCalculation                      refresher;
+    private FieldCalculation    refresher;
 
-    private FieldListener                         fieldListener;
+    private FieldListener       fieldListener;
 
-    private FieldSummation                        vollpreis;
+    private FieldSummation      vollpreis;
 
-    private InterEditorListener                   editorListener;
+    private InterEditorListener editorListener;
 
 
     public KaufvertragErweitertFormEditorPage( FormEditor formEditor, Feature feature, FeatureStore featureStore ) {
         super( KaufvertragErweitertFormEditorPage.class.getName(), "Zu-/Abschlag", feature, featureStore );
         EventManager.instance().subscribe( fieldListener = new FieldListener( kaufvertrag.vollpreis() ),
                 new FieldListener.EventFilter( formEditor ) );
-        
+
         EventManager.instance().subscribe(
                 editorListener = new InterEditorListener( erweiterteVertragsdaten.wertbeeinflussendeUmstaende() ) {
 
@@ -89,8 +86,10 @@ public class KaufvertragErweitertFormEditorPage
     @Override
     public void afterDoLoad( IProgressMonitor monitor )
             throws Exception {
-        fieldListener.flush( pageSite );
-        editorListener.flush( pageSite );
+        if (pageSite != null) {
+            fieldListener.flush( pageSite );
+            editorListener.flush( pageSite );
+        }
     }
 
 

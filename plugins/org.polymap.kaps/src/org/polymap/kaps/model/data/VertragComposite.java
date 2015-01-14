@@ -27,6 +27,8 @@ import org.qi4j.api.entity.association.kaps.ComputedAssociationInstance;
 import org.qi4j.api.entity.association.kaps.GenericAssociationInfo;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.property.Computed;
+import org.qi4j.api.property.ComputedPropertyInstance;
+import org.qi4j.api.property.GenericPropertyInfo;
 import org.qi4j.api.property.Property;
 import org.qi4j.api.query.QueryExpressions;
 import org.qi4j.api.query.grammar.BooleanExpression;
@@ -42,6 +44,8 @@ import org.polymap.core.runtime.event.EventManager;
 import org.polymap.kaps.importer.ImportColumn;
 import org.polymap.kaps.importer.ImportTable;
 import org.polymap.kaps.model.KapsRepository;
+import org.polymap.kaps.model.Named;
+import org.polymap.kaps.ui.form.EingangsNummerFormatter;
 
 /**
  * 
@@ -54,7 +58,7 @@ import org.polymap.kaps.model.KapsRepository;
 })
 @ImportTable("K_BUCH")
 public interface VertragComposite
-        extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite {
+        extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite, Named {
 
     // CREATE TABLE K_BUCH (
     // EINGANGSNR DOUBLE,
@@ -360,6 +364,21 @@ public interface VertragComposite
 
         private static Log log = LogFactory.getLog( Mixin.class );
 
+
+        @Override
+        public Property<String> name() {
+            return new ComputedPropertyInstance<String>( new GenericPropertyInfo( VertragComposite.class, "name" ) ) {
+
+                public String get() {
+                    if (eingangsNr().get() != null) {
+                        return EingangsNummerFormatter.format( eingangsNr().get() );
+                    } else {
+                        return "-";
+                    }
+                }
+            };
+
+        }
 
         // FIXME uncomment after import
         @Override

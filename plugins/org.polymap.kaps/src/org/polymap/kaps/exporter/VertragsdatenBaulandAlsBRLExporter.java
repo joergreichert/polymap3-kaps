@@ -31,7 +31,7 @@ import org.polymap.kaps.ui.form.EingangsNummerFormatter;
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 public class VertragsdatenBaulandAlsBRLExporter
-        extends AbstractExcelExporter<VertragsdatenBaulandComposite> {
+        extends AbstractSingleRowExcelExporter<VertragsdatenBaulandComposite> {
 
     public VertragsdatenBaulandAlsBRLExporter() {
         super( VertragsdatenBaulandComposite.class, VertragsdatenBaulandComposite.NAME, "statistik_brl", "Verträge" );

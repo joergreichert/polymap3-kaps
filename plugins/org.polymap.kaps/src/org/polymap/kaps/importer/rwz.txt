@@ -1,0 +1,738 @@
+1. doppelte Zone 0000001;522020 wurde importiert
+2. doppelte Zone 0000001;522060 wurde nicht importiert
+3. doppelte Zone 0000006;522020 wurde importiert
+4. doppelte Zone 0000006;522060 wurde nicht importiert
+5. doppelte Zone 0000011;522020 wurde importiert
+6. doppelte Zone 0000011;522060 wurde nicht importiert
+7. doppelte Zone 0000021;522020 wurde importiert
+8. doppelte Zone 0000021;522060 wurde nicht importiert
+9. doppelte Zone 0000031;522020 wurde importiert
+10. doppelte Zone 0000031;522060 wurde nicht importiert
+11. doppelte Zone 0000051;522020 wurde importiert
+12. doppelte Zone 0000051;522060 wurde nicht importiert
+13. doppelte Zone 0000071;522020 wurde importiert
+14. doppelte Zone 0000071;522060 wurde nicht importiert
+15. doppelte Zone 0000072;522020 wurde importiert
+16. doppelte Zone 0000072;522060 wurde nicht importiert
+17. doppelte Zone 0000073;522020 wurde importiert
+18. doppelte Zone 0000073;522060 wurde nicht importiert
+19. doppelte Zone 0000074;522020 wurde importiert
+20. doppelte Zone 0000074;522060 wurde nicht importiert
+21. doppelte Zone 0000075;522020 wurde importiert
+22. doppelte Zone 0000075;522060 wurde nicht importiert
+23. doppelte Zone 0000076;522020 wurde importiert
+24. doppelte Zone 0000076;522060 wurde nicht importiert
+25. doppelte Zone 0000081;522020 wurde importiert
+26. doppelte Zone 0000081;522060 wurde nicht importiert
+27. doppelte Zone 0000082;522020 wurde importiert
+28. doppelte Zone 0000082;522060 wurde nicht importiert
+29. doppelte Zone 0000100;522020 wurde importiert
+30. doppelte Zone 0000100;522060 wurde nicht importiert
+31. doppelte Zone 0000101;522035 wurde importiert
+32. doppelte Zone 0000101;522060 wurde nicht importiert
+33. doppelte Zone 0000121;522035 wurde importiert
+34. doppelte Zone 0000121;522060 wurde nicht importiert
+35. doppelte Zone 0000241;522050 wurde importiert
+36. doppelte Zone 0000241;522060 wurde nicht importiert
+37. doppelte Zone 0000251;522050 wurde importiert
+38. doppelte Zone 0000251;522150 wurde nicht importiert
+39. doppelte Zone 0000261;522050 wurde importiert
+40. doppelte Zone 0000261;522150 wurde nicht importiert
+41. doppelte Zone 0000285;522050 wurde importiert
+42. doppelte Zone 0000285;522150 wurde nicht importiert
+43. doppelte Zone 0000286;522050 wurde importiert
+44. doppelte Zone 0000286;522150 wurde nicht importiert
+45. doppelte Zone 0000287;522050 wurde importiert
+46. doppelte Zone 0000287;522150 wurde nicht importiert
+47. doppelte Zone 0000291;522050 wurde importiert
+48. doppelte Zone 0000291;522150 wurde nicht importiert
+49. doppelte Zone 0000292;522050 wurde importiert
+50. doppelte Zone 0000292;522150 wurde nicht importiert
+51. doppelte Zone 0000293;522050 wurde importiert
+52. doppelte Zone 0000293;522150 wurde nicht importiert
+53. doppelte Zone 0000294;522050 wurde importiert
+54. doppelte Zone 0000294;522150 wurde nicht importiert
+55. doppelte Zone 0000300;522050 wurde importiert
+56. doppelte Zone 0000300;522150 wurde nicht importiert
+57. doppelte Zone 0000301;522090 wurde importiert
+58. doppelte Zone 0000301;522150 wurde nicht importiert
+59. doppelte Zone 0000311;522090 wurde importiert
+60. doppelte Zone 0000311;522150 wurde nicht importiert
+61. doppelte Zone 0000500;522110 wurde importiert
+62. doppelte Zone 0000500;522150 wurde nicht importiert
+63. doppelte Zone 0000611;522140 wurde importiert
+64. doppelte Zone 0000611;522150 wurde nicht importiert
+65. doppelte Zone 0000681;522140 wurde importiert
+66. doppelte Zone 0000681;522190 wurde nicht importiert
+67. doppelte Zone 0000682;522140 wurde importiert
+68. doppelte Zone 0000682;522190 wurde nicht importiert
+69. doppelte Zone 0000683;522140 wurde importiert
+70. doppelte Zone 0000683;522190 wurde nicht importiert
+71. doppelte Zone 0000691;522140 wurde importiert
+72. doppelte Zone 0000691;522190 wurde nicht importiert
+73. doppelte Zone 0000711;522190 wurde importiert
+74. doppelte Zone 0000711;522440 wurde nicht importiert
+75. doppelte Zone 0000721;522190 wurde importiert
+76. doppelte Zone 0000721;522440 wurde nicht importiert
+77. doppelte Zone 0000800;522060 wurde importiert
+78. doppelte Zone 0000800;522190 wurde nicht importiert
+79. doppelte Zone 0000800;522440 wurde nicht importiert
+80. doppelte Zone 0000900;522170 wurde importiert
+81. doppelte Zone 0000900;522190 wurde nicht importiert
+82. doppelte Zone 0000901;522180 wurde importiert
+83. doppelte Zone 0000901;522190 wurde nicht importiert
+84. doppelte Zone 0000902;522180 wurde importiert
+85. doppelte Zone 0000902;522190 wurde nicht importiert
+86. doppelte Zone 0000906;522180 wurde importiert
+87. doppelte Zone 0000906;522190 wurde nicht importiert
+88. doppelte Zone 0000941;522180 wurde importiert
+89. doppelte Zone 0000941;522230 wurde nicht importiert
+90. doppelte Zone 0000942;522180 wurde importiert
+91. doppelte Zone 0000942;522230 wurde nicht importiert
+92. doppelte Zone 0000943;522180 wurde importiert
+93. doppelte Zone 0000943;522230 wurde nicht importiert
+94. doppelte Zone 0000944;522180 wurde importiert
+95. doppelte Zone 0000944;522230 wurde nicht importiert
+96. doppelte Zone 0000945;522180 wurde importiert
+97. doppelte Zone 0000945;522230 wurde nicht importiert
+98. doppelte Zone 0000946;522180 wurde importiert
+99. doppelte Zone 0000946;522230 wurde nicht importiert
+100. doppelte Zone 0000947;522180 wurde importiert
+101. doppelte Zone 0000947;522230 wurde nicht importiert
+102. doppelte Zone 0000948;522180 wurde importiert
+103. doppelte Zone 0000948;522230 wurde nicht importiert
+104. doppelte Zone 0000949;522180 wurde importiert
+105. doppelte Zone 0000949;522230 wurde nicht importiert
+106. doppelte Zone 0000950;522180 wurde importiert
+107. doppelte Zone 0000950;522230 wurde nicht importiert
+108. doppelte Zone 0000951;522180 wurde importiert
+109. doppelte Zone 0000951;522230 wurde nicht importiert
+110. doppelte Zone 0000952;522180 wurde importiert
+111. doppelte Zone 0000952;522230 wurde nicht importiert
+112. doppelte Zone 0000953;522180 wurde importiert
+113. doppelte Zone 0000953;522230 wurde nicht importiert
+114. doppelte Zone 0000954;522180 wurde importiert
+115. doppelte Zone 0000954;522230 wurde nicht importiert
+116. doppelte Zone 0000955;522180 wurde importiert
+117. doppelte Zone 0000955;522230 wurde nicht importiert
+118. doppelte Zone 0000956;522180 wurde importiert
+119. doppelte Zone 0000956;522230 wurde nicht importiert
+120. doppelte Zone 0000957;522180 wurde importiert
+121. doppelte Zone 0000957;522230 wurde nicht importiert
+122. doppelte Zone 0000958;522180 wurde importiert
+123. doppelte Zone 0000958;522230 wurde nicht importiert
+124. doppelte Zone 0000959;522180 wurde importiert
+125. doppelte Zone 0000959;522230 wurde nicht importiert
+126. doppelte Zone 0000960;522180 wurde importiert
+127. doppelte Zone 0000960;522230 wurde nicht importiert
+128. doppelte Zone 0000990;522180 wurde importiert
+129. doppelte Zone 0000990;522230 wurde nicht importiert
+130. doppelte Zone 0000991;522180 wurde importiert
+131. doppelte Zone 0000991;522230 wurde nicht importiert
+132. doppelte Zone 0000992;522180 wurde importiert
+133. doppelte Zone 0000992;522230 wurde nicht importiert
+134. doppelte Zone 0000993;522180 wurde importiert
+135. doppelte Zone 0000993;522230 wurde nicht importiert
+136. doppelte Zone 0000994;522180 wurde importiert
+137. doppelte Zone 0000994;522230 wurde nicht importiert
+138. doppelte Zone 0000995;522180 wurde importiert
+139. doppelte Zone 0000995;522230 wurde nicht importiert
+140. doppelte Zone 0000996;522180 wurde importiert
+141. doppelte Zone 0000996;522230 wurde nicht importiert
+142. doppelte Zone 0000997;522180 wurde importiert
+143. doppelte Zone 0000997;522230 wurde nicht importiert
+144. doppelte Zone 0000998;522180 wurde importiert
+145. doppelte Zone 0000998;522230 wurde nicht importiert
+146. doppelte Zone 0000999;522180 wurde importiert
+147. doppelte Zone 0000999;522230 wurde nicht importiert
+148. doppelte Zone 0001000;522180 wurde importiert
+149. doppelte Zone 0001000;522230 wurde nicht importiert
+150. doppelte Zone 0001001;522180 wurde importiert
+151. doppelte Zone 0001001;522230 wurde nicht importiert
+152. doppelte Zone 0001002;522180 wurde importiert
+153. doppelte Zone 0001002;522230 wurde nicht importiert
+154. doppelte Zone 0001025;522180 wurde importiert
+155. doppelte Zone 0001025;522230 wurde nicht importiert
+156. doppelte Zone 0001026;522180 wurde importiert
+157. doppelte Zone 0001026;522230 wurde nicht importiert
+158. doppelte Zone 0001027;522180 wurde importiert
+159. doppelte Zone 0001027;522230 wurde nicht importiert
+160. doppelte Zone 0001028;522180 wurde importiert
+161. doppelte Zone 0001028;522230 wurde nicht importiert
+162. doppelte Zone 0001029;522180 wurde importiert
+163. doppelte Zone 0001029;522230 wurde nicht importiert
+164. doppelte Zone 0001065;522180 wurde importiert
+165. doppelte Zone 0001065;522230 wurde nicht importiert
+166. doppelte Zone 0001070;522180 wurde importiert
+167. doppelte Zone 0001070;522230 wurde nicht importiert
+168. doppelte Zone 0001102;522180 wurde importiert
+169. doppelte Zone 0001102;522230 wurde nicht importiert
+170. doppelte Zone 0001146;522180 wurde importiert
+171. doppelte Zone 0001146;522230 wurde nicht importiert
+172. doppelte Zone 0001181;522180 wurde importiert
+173. doppelte Zone 0001181;522230 wurde nicht importiert
+174. doppelte Zone 0001226;522180 wurde importiert
+175. doppelte Zone 0001226;522230 wurde nicht importiert
+176. doppelte Zone 0001231;522180 wurde importiert
+177. doppelte Zone 0001231;522230 wurde nicht importiert
+178. doppelte Zone 0001232;522180 wurde importiert
+179. doppelte Zone 0001232;522230 wurde nicht importiert
+180. doppelte Zone 0001271;522180 wurde importiert
+181. doppelte Zone 0001271;522350 wurde nicht importiert
+182. doppelte Zone 0001272;522180 wurde importiert
+183. doppelte Zone 0001272;522350 wurde nicht importiert
+184. doppelte Zone 0001305;522180 wurde importiert
+185. doppelte Zone 0001305;522350 wurde nicht importiert
+186. doppelte Zone 0001306;522180 wurde importiert
+187. doppelte Zone 0001306;522350 wurde nicht importiert
+188. doppelte Zone 0001307;522180 wurde importiert
+189. doppelte Zone 0001307;522350 wurde nicht importiert
+190. doppelte Zone 0001308;522180 wurde importiert
+191. doppelte Zone 0001308;522350 wurde nicht importiert
+192. doppelte Zone 0001309;522180 wurde importiert
+193. doppelte Zone 0001309;522350 wurde nicht importiert
+194. doppelte Zone 0001310;522180 wurde importiert
+195. doppelte Zone 0001310;522350 wurde nicht importiert
+196. doppelte Zone 0001311;522180 wurde importiert
+197. doppelte Zone 0001311;522350 wurde nicht importiert
+198. doppelte Zone 0001312;522180 wurde importiert
+199. doppelte Zone 0001312;522350 wurde nicht importiert
+200. doppelte Zone 0001313;522180 wurde importiert
+201. doppelte Zone 0001313;522350 wurde nicht importiert
+202. doppelte Zone 0001314;522180 wurde importiert
+203. doppelte Zone 0001314;522350 wurde nicht importiert
+204. doppelte Zone 0001341;522180 wurde importiert
+205. doppelte Zone 0001341;522350 wurde nicht importiert
+206. doppelte Zone 0001345;522180 wurde importiert
+207. doppelte Zone 0001345;522350 wurde nicht importiert
+208. doppelte Zone 0001346;522180 wurde importiert
+209. doppelte Zone 0001346;522350 wurde nicht importiert
+210. doppelte Zone 0001350;522180 wurde importiert
+211. doppelte Zone 0001350;522350 wurde nicht importiert
+212. doppelte Zone 0001385;522180 wurde importiert
+213. doppelte Zone 0001385;522350 wurde nicht importiert
+214. doppelte Zone 0001520;522180 wurde importiert
+215. doppelte Zone 0001520;522360 wurde nicht importiert
+216. doppelte Zone 0001521;522180 wurde importiert
+217. doppelte Zone 0001521;522360 wurde nicht importiert
+218. doppelte Zone 0001545;522180 wurde importiert
+219. doppelte Zone 0001545;522360 wurde nicht importiert
+220. doppelte Zone 0001546;522180 wurde importiert
+221. doppelte Zone 0001546;522360 wurde nicht importiert
+222. doppelte Zone 0001547;522180 wurde importiert
+223. doppelte Zone 0001547;522360 wurde nicht importiert
+224. doppelte Zone 0001548;522180 wurde importiert
+225. doppelte Zone 0001548;522360 wurde nicht importiert
+226. doppelte Zone 0001549;522180 wurde importiert
+227. doppelte Zone 0001549;522360 wurde nicht importiert
+228. doppelte Zone 0001550;522180 wurde importiert
+229. doppelte Zone 0001550;522360 wurde nicht importiert
+230. doppelte Zone 0001551;522180 wurde importiert
+231. doppelte Zone 0001551;522360 wurde nicht importiert
+232. doppelte Zone 0001552;522180 wurde importiert
+233. doppelte Zone 0001552;522360 wurde nicht importiert
+234. doppelte Zone 0001553;522180 wurde importiert
+235. doppelte Zone 0001553;522360 wurde nicht importiert
+236. doppelte Zone 0001554;522180 wurde importiert
+237. doppelte Zone 0001554;522360 wurde nicht importiert
+238. doppelte Zone 0001555;522180 wurde importiert
+239. doppelte Zone 0001555;522360 wurde nicht importiert
+240. doppelte Zone 0001556;522180 wurde importiert
+241. doppelte Zone 0001556;522360 wurde nicht importiert
+242. doppelte Zone 0001557;522180 wurde importiert
+243. doppelte Zone 0001557;522360 wurde nicht importiert
+244. doppelte Zone 0001558;522180 wurde importiert
+245. doppelte Zone 0001558;522360 wurde nicht importiert
+246. doppelte Zone 0001559;522180 wurde importiert
+247. doppelte Zone 0001559;522360 wurde nicht importiert
+248. doppelte Zone 0001560;522180 wurde importiert
+249. doppelte Zone 0001560;522360 wurde nicht importiert
+250. doppelte Zone 0001561;522180 wurde importiert
+251. doppelte Zone 0001561;522360 wurde nicht importiert
+252. doppelte Zone 0001581;522180 wurde importiert
+253. doppelte Zone 0001581;522360 wurde nicht importiert
+254. doppelte Zone 0001582;522180 wurde importiert
+255. doppelte Zone 0001582;522360 wurde nicht importiert
+256. doppelte Zone 0001583;522180 wurde importiert
+257. doppelte Zone 0001583;522360 wurde nicht importiert
+258. doppelte Zone 0001584;522180 wurde importiert
+259. doppelte Zone 0001584;522360 wurde nicht importiert
+260. doppelte Zone 0001585;522180 wurde importiert
+261. doppelte Zone 0001585;522360 wurde nicht importiert
+262. doppelte Zone 0001586;522180 wurde importiert
+263. doppelte Zone 0001586;522360 wurde nicht importiert
+264. doppelte Zone 0001587;522180 wurde importiert
+265. doppelte Zone 0001587;522360 wurde nicht importiert
+266. doppelte Zone 0001588;522180 wurde importiert
+267. doppelte Zone 0001588;522360 wurde nicht importiert
+268. doppelte Zone 0001589;522180 wurde importiert
+269. doppelte Zone 0001589;522360 wurde nicht importiert
+270. doppelte Zone 0001590;522180 wurde importiert
+271. doppelte Zone 0001590;522360 wurde nicht importiert
+272. doppelte Zone 0001591;522180 wurde importiert
+273. doppelte Zone 0001591;522360 wurde nicht importiert
+274. doppelte Zone 0001592;522180 wurde importiert
+275. doppelte Zone 0001592;522360 wurde nicht importiert
+276. doppelte Zone 0001593;522180 wurde importiert
+277. doppelte Zone 0001593;522360 wurde nicht importiert
+278. doppelte Zone 0001594;522180 wurde importiert
+279. doppelte Zone 0001594;522360 wurde nicht importiert
+280. doppelte Zone 0001595;522180 wurde importiert
+281. doppelte Zone 0001595;522360 wurde nicht importiert
+282. doppelte Zone 0001596;522180 wurde importiert
+283. doppelte Zone 0001596;522360 wurde nicht importiert
+284. doppelte Zone 0001597;522180 wurde importiert
+285. doppelte Zone 0001597;522360 wurde nicht importiert
+286. doppelte Zone 0001598;522180 wurde importiert
+287. doppelte Zone 0001598;522360 wurde nicht importiert
+288. doppelte Zone 0001621;522180 wurde importiert
+289. doppelte Zone 0001621;522360 wurde nicht importiert
+290. doppelte Zone 0001622;522180 wurde importiert
+291. doppelte Zone 0001622;522360 wurde nicht importiert
+292. doppelte Zone 0001623;522180 wurde importiert
+293. doppelte Zone 0001623;522360 wurde nicht importiert
+294. doppelte Zone 0001624;522180 wurde importiert
+295. doppelte Zone 0001624;522360 wurde nicht importiert
+296. doppelte Zone 0001625;522180 wurde importiert
+297. doppelte Zone 0001625;522360 wurde nicht importiert
+298. doppelte Zone 0001626;522180 wurde importiert
+299. doppelte Zone 0001626;522360 wurde nicht importiert
+300. doppelte Zone 0001627;522180 wurde importiert
+301. doppelte Zone 0001627;522360 wurde nicht importiert
+302. doppelte Zone 0001661;522180 wurde importiert
+303. doppelte Zone 0001661;522360 wurde nicht importiert
+304. doppelte Zone 0001662;522180 wurde importiert
+305. doppelte Zone 0001662;522360 wurde nicht importiert
+306. doppelte Zone 0001663;522180 wurde importiert
+307. doppelte Zone 0001663;522360 wurde nicht importiert
+308. doppelte Zone 0001664;522180 wurde importiert
+309. doppelte Zone 0001664;522360 wurde nicht importiert
+310. doppelte Zone 0001665;522180 wurde importiert
+311. doppelte Zone 0001665;522360 wurde nicht importiert
+312. doppelte Zone 0001666;522180 wurde importiert
+313. doppelte Zone 0001666;522360 wurde nicht importiert
+314. doppelte Zone 0001705;522180 wurde importiert
+315. doppelte Zone 0001705;522360 wurde nicht importiert
+316. doppelte Zone 0001715;522180 wurde importiert
+317. doppelte Zone 0001715;522360 wurde nicht importiert
+318. doppelte Zone 0001717;522180 wurde importiert
+319. doppelte Zone 0001717;522360 wurde nicht importiert
+320. doppelte Zone 0001753;522180 wurde importiert
+321. doppelte Zone 0001753;522360 wurde nicht importiert
+322. doppelte Zone 0001781;522180 wurde importiert
+323. doppelte Zone 0001781;522360 wurde nicht importiert
+324. doppelte Zone 0001821;522180 wurde importiert
+325. doppelte Zone 0001821;522360 wurde nicht importiert
+326. doppelte Zone 0001822;522180 wurde importiert
+327. doppelte Zone 0001822;522360 wurde nicht importiert
+328. doppelte Zone 0001823;522180 wurde importiert
+329. doppelte Zone 0001823;522360 wurde nicht importiert
+330. doppelte Zone 0001824;522180 wurde importiert
+331. doppelte Zone 0001824;522360 wurde nicht importiert
+332. doppelte Zone 0001825;522180 wurde importiert
+333. doppelte Zone 0001825;522360 wurde nicht importiert
+334. doppelte Zone 0001826;522180 wurde importiert
+335. doppelte Zone 0001826;522360 wurde nicht importiert
+336. doppelte Zone 0001827;522180 wurde importiert
+337. doppelte Zone 0001827;522360 wurde nicht importiert
+338. doppelte Zone 0001828;522180 wurde importiert
+339. doppelte Zone 0001828;522360 wurde nicht importiert
+340. doppelte Zone 0001829;522180 wurde importiert
+341. doppelte Zone 0001829;522360 wurde nicht importiert
+342. doppelte Zone 0001830;522180 wurde importiert
+343. doppelte Zone 0001830;522360 wurde nicht importiert
+344. doppelte Zone 0001831;522180 wurde importiert
+345. doppelte Zone 0001831;522360 wurde nicht importiert
+346. doppelte Zone 0001901;522180 wurde importiert
+347. doppelte Zone 0001901;522460 wurde nicht importiert
+348. doppelte Zone 0001902;522180 wurde importiert
+349. doppelte Zone 0001902;522460 wurde nicht importiert
+350. doppelte Zone 0001903;522180 wurde importiert
+351. doppelte Zone 0001903;522460 wurde nicht importiert
+352. doppelte Zone 0001904;522180 wurde importiert
+353. doppelte Zone 0001904;522460 wurde nicht importiert
+354. doppelte Zone 0001905;522180 wurde importiert
+355. doppelte Zone 0001905;522460 wurde nicht importiert
+356. doppelte Zone 0001906;522180 wurde importiert
+357. doppelte Zone 0001906;522460 wurde nicht importiert
+358. doppelte Zone 0001907;522180 wurde importiert
+359. doppelte Zone 0001907;522460 wurde nicht importiert
+360. doppelte Zone 0001908;522180 wurde importiert
+361. doppelte Zone 0001908;522460 wurde nicht importiert
+362. doppelte Zone 0001909;522180 wurde importiert
+363. doppelte Zone 0001909;522460 wurde nicht importiert
+364. doppelte Zone 0001910;522180 wurde importiert
+365. doppelte Zone 0001910;522460 wurde nicht importiert
+366. doppelte Zone 0001950;522180 wurde importiert
+367. doppelte Zone 0001950;522460 wurde nicht importiert
+368. doppelte Zone 0001951;522180 wurde importiert
+369. doppelte Zone 0001951;522460 wurde nicht importiert
+370. doppelte Zone 0001952;522180 wurde importiert
+371. doppelte Zone 0001952;522460 wurde nicht importiert
+372. doppelte Zone 0001953;522180 wurde importiert
+373. doppelte Zone 0001953;522460 wurde nicht importiert
+374. doppelte Zone 0001954;522180 wurde importiert
+375. doppelte Zone 0001954;522460 wurde nicht importiert
+376. doppelte Zone 0001955;522180 wurde importiert
+377. doppelte Zone 0001955;522460 wurde nicht importiert
+378. doppelte Zone 0001956;522180 wurde importiert
+379. doppelte Zone 0001956;522460 wurde nicht importiert
+380. doppelte Zone 0001957;522180 wurde importiert
+381. doppelte Zone 0001957;522460 wurde nicht importiert
+382. doppelte Zone 0001958;522180 wurde importiert
+383. doppelte Zone 0001958;522460 wurde nicht importiert
+384. doppelte Zone 0001985;522180 wurde importiert
+385. doppelte Zone 0001985;522460 wurde nicht importiert
+386. doppelte Zone 0001986;522180 wurde importiert
+387. doppelte Zone 0001986;522460 wurde nicht importiert
+388. doppelte Zone 0002000;522150 wurde importiert
+389. doppelte Zone 0002000;522230 wurde nicht importiert
+390. doppelte Zone 0002000;522460 wurde nicht importiert
+391. doppelte Zone 0002184;522180 wurde importiert
+392. doppelte Zone 0002184;522460 wurde nicht importiert
+393. doppelte Zone 0002185;522180 wurde importiert
+394. doppelte Zone 0002185;522460 wurde nicht importiert
+395. doppelte Zone 0002221;522180 wurde importiert
+396. doppelte Zone 0002221;522490 wurde nicht importiert
+397. doppelte Zone 0002222;522180 wurde importiert
+398. doppelte Zone 0002222;522490 wurde nicht importiert
+399. doppelte Zone 0002223;522180 wurde importiert
+400. doppelte Zone 0002223;522490 wurde nicht importiert
+401. doppelte Zone 0002224;522180 wurde importiert
+402. doppelte Zone 0002224;522490 wurde nicht importiert
+403. doppelte Zone 0002225;522180 wurde importiert
+404. doppelte Zone 0002225;522490 wurde nicht importiert
+405. doppelte Zone 0002226;522180 wurde importiert
+406. doppelte Zone 0002226;522490 wurde nicht importiert
+407. doppelte Zone 0002227;522180 wurde importiert
+408. doppelte Zone 0002227;522490 wurde nicht importiert
+409. doppelte Zone 0002228;522180 wurde importiert
+410. doppelte Zone 0002228;522490 wurde nicht importiert
+411. doppelte Zone 0002301;522180 wurde importiert
+412. doppelte Zone 0002301;522490 wurde nicht importiert
+413. doppelte Zone 0002302;522180 wurde importiert
+414. doppelte Zone 0002302;522490 wurde nicht importiert
+415. doppelte Zone 0002305;522180 wurde importiert
+416. doppelte Zone 0002305;522490 wurde nicht importiert
+417. doppelte Zone 0002306;522180 wurde importiert
+418. doppelte Zone 0002306;522490 wurde nicht importiert
+419. doppelte Zone 0002307;522180 wurde importiert
+420. doppelte Zone 0002307;522490 wurde nicht importiert
+421. doppelte Zone 0002308;522180 wurde importiert
+422. doppelte Zone 0002308;522490 wurde nicht importiert
+423. doppelte Zone 0002309;522180 wurde importiert
+424. doppelte Zone 0002309;522490 wurde nicht importiert
+425. doppelte Zone 0002310;522180 wurde importiert
+426. doppelte Zone 0002310;522490 wurde nicht importiert
+427. doppelte Zone 0002311;522180 wurde importiert
+428. doppelte Zone 0002311;522490 wurde nicht importiert
+429. doppelte Zone 0002315;522180 wurde importiert
+430. doppelte Zone 0002315;522490 wurde nicht importiert
+431. doppelte Zone 0002361;522180 wurde importiert
+432. doppelte Zone 0002361;522490 wurde nicht importiert
+433. doppelte Zone 0002470;522180 wurde importiert
+434. doppelte Zone 0002470;522490 wurde nicht importiert
+435. doppelte Zone 0002601;522070 wurde importiert
+436. doppelte Zone 0002601;522200 wurde nicht importiert
+437. doppelte Zone 0002672;522120 wurde importiert
+438. doppelte Zone 0002672;522200 wurde nicht importiert
+439. doppelte Zone 0002731;522210 wurde importiert
+440. doppelte Zone 0002731;522260 wurde nicht importiert
+441. doppelte Zone 0002741;522210 wurde importiert
+442. doppelte Zone 0002741;522260 wurde nicht importiert
+443. doppelte Zone 0002751;522210 wurde importiert
+444. doppelte Zone 0002751;522260 wurde nicht importiert
+445. doppelte Zone 0002762;522210 wurde importiert
+446. doppelte Zone 0002762;522280 wurde nicht importiert
+447. doppelte Zone 0002772;522210 wurde importiert
+448. doppelte Zone 0002772;522280 wurde nicht importiert
+449. doppelte Zone 0002782;522210 wurde importiert
+450. doppelte Zone 0002782;522280 wurde nicht importiert
+451. doppelte Zone 0002787;522210 wurde importiert
+452. doppelte Zone 0002787;522280 wurde nicht importiert
+453. doppelte Zone 0002792;522210 wurde importiert
+454. doppelte Zone 0002792;522280 wurde nicht importiert
+455. doppelte Zone 0002891;522240 wurde importiert
+456. doppelte Zone 0002891;522290 wurde nicht importiert
+457. doppelte Zone 0002892;522240 wurde importiert
+458. doppelte Zone 0002892;522300 wurde nicht importiert
+459. doppelte Zone 0003000;522035 wurde importiert
+460. doppelte Zone 0003000;522460 wurde nicht importiert
+461. doppelte Zone 0003101;522320 wurde importiert
+462. doppelte Zone 0003101;522330 wurde nicht importiert
+463. doppelte Zone 0003121;522320 wurde importiert
+464. doppelte Zone 0003121;522330 wurde nicht importiert
+465. doppelte Zone 0003184;522320 wurde importiert
+466. doppelte Zone 0003184;522500 wurde nicht importiert
+467. doppelte Zone 0003282;522340 wurde importiert
+468. doppelte Zone 0003282;522530 wurde nicht importiert
+469. doppelte Zone 0003400;522390 wurde importiert
+470. doppelte Zone 0003400;522530 wurde nicht importiert
+471. doppelte Zone 0003401;522400 wurde importiert
+472. doppelte Zone 0003401;522530 wurde nicht importiert
+473. doppelte Zone 0003421;522400 wurde importiert
+474. doppelte Zone 0003421;522540 wurde nicht importiert
+475. doppelte Zone 0003483;522400 wurde importiert
+476. doppelte Zone 0003483;522540 wurde nicht importiert
+477. doppelte Zone 0003484;522400 wurde importiert
+478. doppelte Zone 0003484;522550 wurde nicht importiert
+479. doppelte Zone 0003671;522420 wurde importiert
+480. doppelte Zone 0003671;522580 wurde nicht importiert
+481. doppelte Zone 0003672;522420 wurde importiert
+482. doppelte Zone 0003672;522580 wurde nicht importiert
+483. doppelte Zone 0003673;522420 wurde importiert
+484. doppelte Zone 0003673;522580 wurde nicht importiert
+485. doppelte Zone 0003674;522420 wurde importiert
+486. doppelte Zone 0003674;522580 wurde nicht importiert
+487. doppelte Zone 0003675;522420 wurde importiert
+488. doppelte Zone 0003675;522580 wurde nicht importiert
+489. doppelte Zone 0003731;522430 wurde importiert
+490. doppelte Zone 0003731;522600 wurde nicht importiert
+491. doppelte Zone 0004000;522060 wurde importiert
+492. doppelte Zone 0004000;522470 wurde nicht importiert
+493. doppelte Zone 0004011;522060 wurde importiert
+494. doppelte Zone 0004011;522480 wurde nicht importiert
+495. doppelte Zone 0004021;522060 wurde importiert
+496. doppelte Zone 0004021;522480 wurde nicht importiert
+497. doppelte Zone 0004031;522060 wurde importiert
+498. doppelte Zone 0004031;522480 wurde nicht importiert
+499. doppelte Zone 0004041;522060 wurde importiert
+500. doppelte Zone 0004041;522480 wurde nicht importiert
+501. doppelte Zone 0004051;522060 wurde importiert
+502. doppelte Zone 0004051;522480 wurde nicht importiert
+503. doppelte Zone 0004061;522060 wurde importiert
+504. doppelte Zone 0004061;522480 wurde nicht importiert
+505. doppelte Zone 0004071;522060 wurde importiert
+506. doppelte Zone 0004071;522480 wurde nicht importiert
+507. doppelte Zone 0004081;522060 wurde importiert
+508. doppelte Zone 0004081;522480 wurde nicht importiert
+509. doppelte Zone 0004091;522060 wurde importiert
+510. doppelte Zone 0004091;522480 wurde nicht importiert
+511. doppelte Zone 0004101;522060 wurde importiert
+512. doppelte Zone 0004101;522520 wurde nicht importiert
+513. doppelte Zone 0004111;522060 wurde importiert
+514. doppelte Zone 0004111;522520 wurde nicht importiert
+515. doppelte Zone 0004121;522060 wurde importiert
+516. doppelte Zone 0004121;522520 wurde nicht importiert
+517. doppelte Zone 0004171;522060 wurde importiert
+518. doppelte Zone 0004171;522520 wurde nicht importiert
+519. doppelte Zone 0004181;522060 wurde importiert
+520. doppelte Zone 0004181;522520 wurde nicht importiert
+521. doppelte Zone 0004301;522150 wurde importiert
+522. doppelte Zone 0004301;522590 wurde nicht importiert
+523. doppelte Zone 0004311;522150 wurde importiert
+524. doppelte Zone 0004311;522590 wurde nicht importiert
+525. doppelte Zone 0004371;522150 wurde importiert
+526. doppelte Zone 0004371;522590 wurde nicht importiert
+527. doppelte Zone 0004426;522190 wurde importiert
+528. doppelte Zone 0004426;522340 wurde nicht importiert
+529. doppelte Zone 0004431;522190 wurde importiert
+530. doppelte Zone 0004431;522440 wurde nicht importiert
+531. doppelte Zone 0004451;522035 wurde importiert
+532. doppelte Zone 0004451;522190 wurde nicht importiert
+533. doppelte Zone 0004461;522190 wurde importiert
+534. doppelte Zone 0004461;522200 wurde nicht importiert
+535. doppelte Zone 0004471;522190 wurde importiert
+536. doppelte Zone 0004471;522440 wurde nicht importiert
+537. doppelte Zone 0005046;522080 wurde importiert
+538. doppelte Zone 0005046;522460 wurde nicht importiert
+539. doppelte Zone 0005066;522080 wurde importiert
+540. doppelte Zone 0005066;522460 wurde nicht importiert
+541. doppelte Zone 0005106;522080 wurde importiert
+542. doppelte Zone 0005106;522460 wurde nicht importiert
+543. doppelte Zone 0005116;522080 wurde importiert
+544. doppelte Zone 0005116;522460 wurde nicht importiert
+545. doppelte Zone 0005221;522250 wurde importiert
+546. doppelte Zone 0005221;522490 wurde nicht importiert
+547. doppelte Zone 0005226;522250 wurde importiert
+548. doppelte Zone 0005226;522490 wurde nicht importiert
+549. doppelte Zone 0005231;522250 wurde importiert
+550. doppelte Zone 0005231;522490 wurde nicht importiert
+551. doppelte Zone 0005276;522310 wurde importiert
+552. doppelte Zone 0005276;522490 wurde nicht importiert
+553. doppelte Zone 0005296;522310 wurde importiert
+554. doppelte Zone 0005296;522490 wurde nicht importiert
+555. doppelte Zone 0005306;522310 wurde importiert
+556. doppelte Zone 0005306;522490 wurde nicht importiert
+557. doppelte Zone 0005321;522310 wurde importiert
+558. doppelte Zone 0005321;522490 wurde nicht importiert
+559. doppelte Zone 0005516;522070 wurde importiert
+560. doppelte Zone 0005516;522450 wurde nicht importiert
+561. doppelte Zone 0005526;522070 wurde importiert
+562. doppelte Zone 0005526;522510 wurde nicht importiert
+563. doppelte Zone 0005536;522070 wurde importiert
+564. doppelte Zone 0005536;522510 wurde nicht importiert
+565. doppelte Zone 0005546;522070 wurde importiert
+566. doppelte Zone 0005546;522510 wurde nicht importiert
+567. doppelte Zone 0005561;522120 wurde importiert
+568. doppelte Zone 0005561;522510 wurde nicht importiert
+569. doppelte Zone 0005581;522120 wurde importiert
+570. doppelte Zone 0005581;522510 wurde nicht importiert
+571. doppelte Zone 0005586;522120 wurde importiert
+572. doppelte Zone 0005586;522510 wurde nicht importiert
+573. doppelte Zone 0005591;522120 wurde importiert
+574. doppelte Zone 0005591;522510 wurde nicht importiert
+575. doppelte Zone 0005611;522260 wurde importiert
+576. doppelte Zone 0005611;522510 wurde nicht importiert
+577. doppelte Zone 0005661;522290 wurde importiert
+578. doppelte Zone 0005661;522570 wurde nicht importiert
+579. doppelte Zone 0005666;522290 wurde importiert
+580. doppelte Zone 0005666;522570 wurde nicht importiert
+581. doppelte Zone 0005667;522290 wurde importiert
+582. doppelte Zone 0005667;522570 wurde nicht importiert
+583. doppelte Zone 0005701;522300 wurde importiert
+584. doppelte Zone 0005701;522310 wurde nicht importiert
+585. doppelte Zone 0005716;522300 wurde importiert
+586. doppelte Zone 0005716;522310 wurde nicht importiert
+587. doppelte Zone 0005721;522310 wurde importiert
+588. doppelte Zone 0005721;522460 wurde nicht importiert
+589. doppelte Zone 0005751;522310 wurde importiert
+590. doppelte Zone 0005751;522330 wurde nicht importiert
+591. doppelte Zone 0005756;522310 wurde importiert
+592. doppelte Zone 0005756;522330 wurde nicht importiert
+593. doppelte Zone 0005757;522310 wurde importiert
+594. doppelte Zone 0005757;522330 wurde nicht importiert
+595. doppelte Zone 0005761;522310 wurde importiert
+596. doppelte Zone 0005761;522330 wurde nicht importiert
+597. doppelte Zone 0005766;522310 wurde importiert
+598. doppelte Zone 0005766;522330 wurde nicht importiert
+599. doppelte Zone 0005771;522310 wurde importiert
+600. doppelte Zone 0005771;522330 wurde nicht importiert
+601. doppelte Zone 0005776;522310 wurde importiert
+602. doppelte Zone 0005776;522330 wurde nicht importiert
+603. doppelte Zone 0005777;522310 wurde importiert
+604. doppelte Zone 0005777;522330 wurde nicht importiert
+605. doppelte Zone 0005791;522310 wurde importiert
+606. doppelte Zone 0005791;522330 wurde nicht importiert
+607. doppelte Zone 0005811;522080 wurde importiert
+608. doppelte Zone 0005811;522330 wurde nicht importiert
+609. doppelte Zone 0005821;522080 wurde importiert
+610. doppelte Zone 0005821;522380 wurde nicht importiert
+611. doppelte Zone 0005824;522080 wurde importiert
+612. doppelte Zone 0005824;522380 wurde nicht importiert
+613. doppelte Zone 0005836;522080 wurde importiert
+614. doppelte Zone 0005836;522500 wurde nicht importiert
+615. doppelte Zone 0005846;522220 wurde importiert
+616. doppelte Zone 0005846;522500 wurde nicht importiert
+617. doppelte Zone 0005856;522220 wurde importiert
+618. doppelte Zone 0005856;522500 wurde nicht importiert
+619. doppelte Zone 0005866;522220 wurde importiert
+620. doppelte Zone 0005866;522500 wurde nicht importiert
+621. doppelte Zone 0005911;522220 wurde importiert
+622. doppelte Zone 0005911;522540 wurde nicht importiert
+623. doppelte Zone 0005921;522220 wurde importiert
+624. doppelte Zone 0005921;522540 wurde nicht importiert
+625. doppelte Zone 0005951;522370 wurde importiert
+626. doppelte Zone 0005951;522410 wurde nicht importiert
+627. doppelte Zone 0005951;522540 wurde nicht importiert
+628. doppelte Zone 0005961;522370 wurde importiert
+629. doppelte Zone 0005961;522540 wurde nicht importiert
+630. doppelte Zone 0005962;522370 wurde importiert
+631. doppelte Zone 0005962;522540 wurde nicht importiert
+632. doppelte Zone 0005971;522370 wurde importiert
+633. doppelte Zone 0005971;522580 wurde nicht importiert
+634. doppelte Zone 0005981;522370 wurde importiert
+635. doppelte Zone 0005981;522580 wurde nicht importiert
+636. doppelte Zone 0005991;522370 wurde importiert
+637. doppelte Zone 0005991;522580 wurde nicht importiert
+638. doppelte Zone 0006001;522370 wurde importiert
+639. doppelte Zone 0006001;522600 wurde nicht importiert
+640. doppelte Zone 0006016;522370 wurde importiert
+641. doppelte Zone 0006016;522600 wurde nicht importiert
+642. doppelte Zone 0006053;522150 wurde importiert
+643. doppelte Zone 0006053;522410 wurde nicht importiert
+644. doppelte Zone 0006061;522350 wurde importiert
+645. doppelte Zone 0006061;522610 wurde nicht importiert
+646. doppelte Zone 0006062;522350 wurde importiert
+647. doppelte Zone 0006062;522610 wurde nicht importiert
+648. doppelte Zone 0006067;522360 wurde importiert
+649. doppelte Zone 0006067;522610 wurde nicht importiert
+650. doppelte Zone 0006068;522360 wurde importiert
+651. doppelte Zone 0006068;522610 wurde nicht importiert
+652. doppelte Zone 0006072;522460 wurde importiert
+653. doppelte Zone 0006072;522610 wurde nicht importiert
+654. doppelte Zone 0006076;522490 wurde importiert
+655. doppelte Zone 0006076;522610 wurde nicht importiert
+656. doppelte Zone 0006077;522490 wurde importiert
+657. doppelte Zone 0006077;522610 wurde nicht importiert
+658. doppelte Zone 0006086;522120 wurde importiert
+659. doppelte Zone 0006086;522610 wurde nicht importiert
+660. doppelte Zone 0006090;522260 wurde importiert
+661. doppelte Zone 0006090;522610 wurde nicht importiert
+662. doppelte Zone 0006091;522280 wurde importiert
+663. doppelte Zone 0006091;522610 wurde nicht importiert
+664. doppelte Zone 0006094;522290 wurde importiert
+665. doppelte Zone 0006094;522610 wurde nicht importiert
+666. doppelte Zone 0006098;522300 wurde importiert
+667. doppelte Zone 0006098;522610 wurde nicht importiert
+668. doppelte Zone 0006111;522500 wurde importiert
+669. doppelte Zone 0006111;522620 wurde nicht importiert
+670. doppelte Zone 0006115;522530 wurde importiert
+671. doppelte Zone 0006115;522620 wurde nicht importiert
+672. doppelte Zone 0006119;522540 wurde importiert
+673. doppelte Zone 0006119;522620 wurde nicht importiert
+674. doppelte Zone 0006121;522550 wurde importiert
+675. doppelte Zone 0006121;522620 wurde nicht importiert
+676. doppelte Zone 0006123;522540 wurde importiert
+677. doppelte Zone 0006123;522620 wurde nicht importiert
+678. doppelte Zone 0006158;522230 wurde importiert
+679. doppelte Zone 0006158;522620 wurde nicht importiert
+680. doppelte Zone 0007500;522080 wurde importiert
+681. doppelte Zone 0007500;522600 wurde nicht importiert
+682. doppelte Zone 0007501;522060 wurde importiert
+683. doppelte Zone 0007501;522080 wurde nicht importiert
+684. doppelte Zone 0007502;522080 wurde importiert
+685. doppelte Zone 0007502;522150 wurde nicht importiert
+686. doppelte Zone 0007503;522080 wurde importiert
+687. doppelte Zone 0007503;522190 wurde nicht importiert
+688. doppelte Zone 0007504;522080 wurde importiert
+689. doppelte Zone 0007504;522230 wurde nicht importiert
+690. doppelte Zone 0007506;522080 wurde importiert
+691. doppelte Zone 0007506;522360 wurde nicht importiert
+692. doppelte Zone 0007507;522080 wurde importiert
+693. doppelte Zone 0007507;522460 wurde nicht importiert
+694. doppelte Zone 0007508;522080 wurde importiert
+695. doppelte Zone 0007508;522490 wurde nicht importiert
+696. doppelte Zone 0007509;522010 wurde importiert
+697. doppelte Zone 0007509;522080 wurde nicht importiert
+698. doppelte Zone 0007510;522070 wurde importiert
+699. doppelte Zone 0007510;522080 wurde nicht importiert
+700. doppelte Zone 0007511;522080 wurde importiert
+701. doppelte Zone 0007511;522120 wurde nicht importiert
+702. doppelte Zone 0007512;522080 wurde importiert
+703. doppelte Zone 0007512;522260 wurde nicht importiert
+704. doppelte Zone 0007513;522080 wurde importiert
+705. doppelte Zone 0007513;522280 wurde nicht importiert
+706. doppelte Zone 0007514;522080 wurde importiert
+707. doppelte Zone 0007514;522290 wurde nicht importiert
+708. doppelte Zone 0007515;522080 wurde importiert
+709. doppelte Zone 0007515;522300 wurde nicht importiert
+710. doppelte Zone 0007516;522080 wurde importiert
+711. doppelte Zone 0007516;522460 wurde nicht importiert
+712. doppelte Zone 0007517;522080 wurde importiert
+713. doppelte Zone 0007517;522330 wurde nicht importiert
+714. doppelte Zone 0007520;522250 wurde importiert
+715. doppelte Zone 0007520;522530 wurde nicht importiert
+716. doppelte Zone 0007521;522250 wurde importiert
+717. doppelte Zone 0007521;522540 wurde nicht importiert
+718. doppelte Zone 0007540;522300 wurde importiert
+719. doppelte Zone 0007540;522310 wurde nicht importiert
+720. doppelte Zone 0007540;522350 wurde nicht importiert
+721. doppelte Zone 0007541;522310 wurde importiert
+722. doppelte Zone 0007541;522460 wurde nicht importiert
+723. doppelte Zone 0007542;522310 wurde importiert
+724. doppelte Zone 0007542;522330 wurde nicht importiert
+725. doppelte Zone 0007544;522310 wurde importiert
+726. doppelte Zone 0007544;522500 wurde nicht importiert
+727. doppelte Zone 0007545;522310 wurde importiert
+728. doppelte Zone 0007545;522530 wurde nicht importiert
+729. doppelte Zone 0007546;522310 wurde importiert
+730. doppelte Zone 0007546;522540 wurde nicht importiert
+731. doppelte Zone 0008200;522060 wurde importiert
+732. doppelte Zone 0008200;522400 wurde nicht importiert
+733. doppelte Zone 0008400;522060 wurde importiert
+734. doppelte Zone 0008400;522180 wurde nicht importiert
+735. doppelte Zone 0009984;522210 wurde importiert
+736. doppelte Zone 0009984;522240 wurde nicht importiert
+737. doppelte Zone 3633901;522430 wurde importiert
+738. doppelte Zone 3633901;522440 wurde nicht importiert

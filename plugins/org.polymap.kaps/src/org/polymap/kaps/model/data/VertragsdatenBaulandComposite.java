@@ -36,6 +36,7 @@ import org.polymap.core.qi4j.event.PropertyChangeSupport;
 import org.polymap.kaps.importer.ImportColumn;
 import org.polymap.kaps.importer.ImportTable;
 import org.polymap.kaps.model.KapsRepository;
+import org.polymap.kaps.model.Named;
 
 /**
  * 
@@ -48,7 +49,7 @@ import org.polymap.kaps.model.KapsRepository;
 })
 @ImportTable("K_BEVERW")
 public interface VertragsdatenBaulandComposite
-        extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite {
+        extends QiEntity, PropertyChangeSupport, ModelChangeSupport, EntityComposite, Named {
 
     String NAME = "Erweiterte Vertragsdaten Bauland";
 
@@ -1160,6 +1161,20 @@ public interface VertragsdatenBaulandComposite
         // }
         // };
         // }
+        @Override
+        public Property<String> name() {
+            return new ComputedPropertyInstance<String>( new GenericPropertyInfo( VertragsdatenBaulandComposite.class, "name" ) ) {
+
+                public String get() {
+                    if (vertrag().get() != null) {
+                        return vertrag().get().name().get();
+                    } else {
+                        return "-";
+                    }
+                }
+            };
+
+        }
     }
 
 

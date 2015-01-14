@@ -14,7 +14,9 @@ package org.polymap.kaps.ui;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import java.beans.PropertyChangeEvent;
 import java.lang.reflect.InvocationHandler;
@@ -56,7 +58,8 @@ import org.polymap.kaps.ui.NamedCompositesFeatureContentProvider.FeatureTableEle
 public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity>
         extends KapsDefaultFormEditorPage {
 
-    private static Log                log    = LogFactory.getLog( KapsDefaultFormEditorPageWithFeatureTable.class );
+    private static Log log = LogFactory.getLog( KapsDefaultFormEditorPageWithFeatureTable.class );
+
 
     public class LastNameInvocationHandler
             implements InvocationHandler {
@@ -87,6 +90,8 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
 
     protected CompositeProvider<T> selectedComposite = new CompositeProvider<T>();
 
+    private Set<T>                 deletedComposites = new HashSet<T>();
+
     private List<IFormField>       reloadables       = new ArrayList<IFormField>();
 
     private boolean                updatingElements;
@@ -113,8 +118,8 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
 
     protected void refreshReloadables()
             throws Exception {
-//        log.info("refreshReloadables");
-//        Thread.currentThread().dumpStack();
+        // log.info("refreshReloadables");
+        // Thread.currentThread().dumpStack();
         boolean enabled = selectedComposite.get() != null;
         for (IFormField field : reloadables) {
             field.setEnabled( enabled );
@@ -162,12 +167,12 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
 
         // model/content
         viewer.setContent( new NamedCompositesFeatureContentProvider( null, type ) );
-//        try {
-//            doLoad( new NullProgressMonitor() );
-//        }
-//        catch (Exception e) {
-//            throw new RuntimeException( e );
-//        }
+        // try {
+        // doLoad( new NullProgressMonitor() );
+        // }
+        // catch (Exception e) {
+        // throw new RuntimeException( e );
+        // }
 
         ActionButton addBtn = null;
         if (addAllowed) {
@@ -238,13 +243,13 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
                             Collection<T> viewerInput = (Collection<T>)viewer.getInput();
                             viewerInput.remove( toSelect );
                         }
-                        deleteComposite( toSelect );
+                        queueDeleteComposite( toSelect );
 
                         selectedComposite.set( null );
 
                         // pageSite.reloadEditor();
                         doLoad( new NullProgressMonitor() );
-//                        refreshReloadables();
+                        // refreshReloadables();
 
                         dirty = true;
                         // pageSite.fireEvent( this, id,
@@ -291,6 +296,18 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
     }
 
 
+    protected void queueDeleteComposite( final T toSelect ) {
+        deletedComposites.add( toSelect );
+        queue( new UpdateCommand() {
+
+            @Override
+            public void execute() {
+                deleteComposite( toSelect );
+            }
+        } );
+    }
+
+
     protected void deleteComposite( T toSelect ) {
         repository.removeEntity( toSelect );
     }
@@ -326,7 +343,7 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
         if (viewer != null && !viewer.isBusy()) {
             // model = new HashMap();
             for (T elm : getElements()) {
-                if (!model.contains( elm )) {
+                if (!model.contains( elm ) && !deletedComposites.contains( elm )) {
                     // TODO wie wird der EventHandler registriert?
                     // elm.addPropertyChangeListener( this );
                     model.add( elm );
@@ -355,6 +372,7 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
         if (model != null) {
             updateElements( model );
         }
+        deletedComposites.clear();
         super.doSubmit( monitor );
         dirty = false;
     }
