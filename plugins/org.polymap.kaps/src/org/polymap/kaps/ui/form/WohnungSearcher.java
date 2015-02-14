@@ -50,11 +50,11 @@ import org.polymap.core.project.ui.util.SimpleFormData;
 import org.polymap.core.workbench.PolymapWorkbench;
 
 import org.polymap.rhei.data.entityfeature.PropertyDescriptorAdapter;
-import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter.CompositeProvider;
 
 import org.polymap.kaps.KapsPlugin;
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.FlurstueckComposite;
+import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.WohnungComposite;
 import org.polymap.kaps.ui.ActionButton;
 import org.polymap.kaps.ui.NamedCompositesFeatureContentProvider;
@@ -66,19 +66,19 @@ import org.polymap.kaps.ui.NamedCompositesFeatureContentProvider;
 public abstract class WohnungSearcher
         extends Action {
 
-    private static Log                                   log     = LogFactory.getLog( WohnungSearcher.class );
+    private static Log             log     = LogFactory.getLog( WohnungSearcher.class );
 
-    private List<WohnungComposite>                       content = new ArrayList<WohnungComposite>();
+    private List<WohnungComposite> content = new ArrayList<WohnungComposite>();
 
-    private final CompositeProvider<FlurstueckComposite> selectedComposite;
+    private final VertragComposite vertrag;
 
 
-    public WohnungSearcher( CompositeProvider<FlurstueckComposite> selectedComposite ) {
+    public WohnungSearcher( VertragComposite vertrag ) {
         super( "vorhandene Wohnung suchen" );
 
         setToolTipText( "vorhandene Wohnung suchen und mit Flurstück verknüpfen" );
         setEnabled( false );
-        this.selectedComposite = selectedComposite;
+        this.vertrag = vertrag;
     }
 
 
@@ -235,39 +235,56 @@ public abstract class WohnungSearcher
                     }
 
                     // add search for flurstück
-                    FlurstueckComposite flurstueck = selectedComposite.get();
                     BooleanExpression fsExpr = null;
-                    if (flurstueck != null) {
+                    if (vertrag != null) {
                         // alle flurstücke mit gleicher gemarkung, nummer,
                         // unternummer finden
                         // und dann alle wohnungen suchen, die zu einem der
                         // flurstuecke gehören
                         FlurstueckComposite fsTemplate = QueryExpressions.templateFor( FlurstueckComposite.class );
-                        BooleanExpression bExpr = null;
-                        
-                        if (flurstueck.gemarkung().get() != null) {
-                          bExpr = QueryExpressions.eq( fsTemplate.gemarkung(), flurstueck.gemarkung().get() );
-                        } else {
-                            log.error("Flurstück " + flurstueck.hauptNummer().get() + "/" + flurstueck.unterNummer().get() + ": Gemarkung fehlt");
-                        }  
-                        if (flurstueck.hauptNummer().get() != null) {
-                            BooleanExpression hExpr = QueryExpressions.eq( fsTemplate.hauptNummer(), flurstueck.hauptNummer().get() );
-                            if (bExpr != null) {
-                                bExpr = QueryExpressions.and( bExpr, hExpr );
+                        BooleanExpression fsSubExpr = null;
+                        for (FlurstueckComposite flurstueck : FlurstueckComposite.Mixin.forEntity( vertrag )) {
+                            BooleanExpression bExpr = null;
+                            if (flurstueck.gemarkung().get() != null) {
+                                bExpr = QueryExpressions.eq( fsTemplate.gemarkung(), flurstueck.gemarkung().get() );
+                            }
+                            else {
+                                log.error( "Flurstück " + flurstueck.hauptNummer().get() + "/"
+                                        + flurstueck.unterNummer().get() + ": Gemarkung fehlt" );
+                            }
+                            if (flurstueck.hauptNummer().get() != null) {
+                                BooleanExpression hExpr = QueryExpressions.eq( fsTemplate.hauptNummer(), flurstueck
+                                        .hauptNummer().get() );
+                                if (bExpr != null) {
+                                    bExpr = QueryExpressions.and( bExpr, hExpr );
+                                }
+                                else {
+                                    bExpr = hExpr;
+                                }
+                            }
+                            if (flurstueck.unterNummer().get() != null) {
+                                BooleanExpression hExpr = QueryExpressions.eq( fsTemplate.unterNummer(), flurstueck
+                                        .unterNummer().get() );
+                                if (bExpr != null) {
+                                    bExpr = QueryExpressions.and( bExpr, hExpr );
+                                }
+                                else {
+                                    bExpr = hExpr;
+                                }
+                            }
+                            // 
+                            if (fsSubExpr == null) {
+                                fsSubExpr = bExpr; 
                             } else {
-                                bExpr = hExpr;
+                                fsSubExpr = bExpr != null ? QueryExpressions.or( bExpr, fsSubExpr ) : fsSubExpr;
                             }
                         }
-                        if (flurstueck.unterNummer().get() != null) {
-                            BooleanExpression hExpr = QueryExpressions.eq( fsTemplate.unterNummer(), flurstueck.unterNummer().get() );
-                            if (bExpr != null) {
-                                bExpr = QueryExpressions.and( bExpr, hExpr );
-                            } else {
-                                bExpr = hExpr;
-                            }
+                        if (fsSubExpr == null) {
+                            fsSubExpr = QueryExpressions.eq( fsTemplate.unterNummer(), "-- undefined --" );
                         }
+                        // finde alle Flurstücke mit gleicher Gemarkung, Hauptnummer und Unternummer
                         for (FlurstueckComposite fsFound : KapsRepository.instance().findEntities(
-                                FlurstueckComposite.class, bExpr, 0, -1 )) {
+                                FlurstueckComposite.class, fsSubExpr, 0, -1 )) {
 
                             fsExpr = fsExpr == null ? QueryExpressions.eq( template.flurstueck(), fsFound )
                                     : QueryExpressions.or( QueryExpressions.eq( template.flurstueck(), fsFound ),

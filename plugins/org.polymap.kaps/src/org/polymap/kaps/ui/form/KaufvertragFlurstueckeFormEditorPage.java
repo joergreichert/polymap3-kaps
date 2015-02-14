@@ -737,8 +737,7 @@ public class KaufvertragFlurstueckeFormEditorPage
             public SortedMap<String, WohnungComposite> getValues() {
                 SortedMap<String, WohnungComposite> values = new TreeMap<String, WohnungComposite>();
                 if (selectedComposite != null) {
-                    Iterable<WohnungComposite> iterable = WohnungComposite.Mixin.findWohnungenFor( selectedComposite
-                            .get() );
+                    Iterable<WohnungComposite> iterable = WohnungComposite.Mixin.findWohnungenFor( kaufvertrag );
                     for (WohnungComposite zone : iterable) {
                         values.put( zone.schl().get(), zone );
                     }
@@ -777,7 +776,7 @@ public class KaufvertragFlurstueckeFormEditorPage
         createWohnung.setLayoutData( left().left( 71 ).right( 85 ).height( 25 ).top( null ).create() );
         createWohnung.setEnabled( false );
 
-        searchWohnung = new ActionButton( parent, new WohnungSearcher( selectedComposite ) {
+        searchWohnung = new ActionButton( parent, new WohnungSearcher( kaufvertrag ) {
 
             @Override
             protected void adopt( final WohnungComposite wohnung )

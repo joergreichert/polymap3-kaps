@@ -892,8 +892,8 @@ public interface WohnungComposite
 
                 @Override
                 public String get() {
-                    return objektNummer().get() + "/" + gebaeudeNummer().get() + "/" + wohnungsNummer().get()
-                            + "/" + wohnungsFortfuehrung().get();
+                    return objektNummer().get() + "/" + gebaeudeNummer().get() + "/" + wohnungsNummer().get() + "/"
+                            + wohnungsFortfuehrung().get();
                 }
 
 
@@ -963,6 +963,21 @@ public interface WohnungComposite
             Query<WohnungComposite> matches = KapsRepository.instance().findEntities( WohnungComposite.class, expr, 0,
                     1 );
             return matches.find();
+        }
+
+
+        public static Iterable<WohnungComposite> findWohnungenFor( VertragComposite vertrag ) {
+            WohnungComposite template = QueryExpressions.templateFor( WohnungComposite.class );
+            BooleanExpression expr = null;
+            for (FlurstueckComposite flurstueck : FlurstueckComposite.Mixin.forEntity( vertrag )) {
+                BooleanExpression newExpr = QueryExpressions.eq( template.flurstueck(), flurstueck );
+                expr = expr == null ? newExpr : QueryExpressions.or( expr, newExpr );
+            }
+            if (expr == null) {
+                // vertrag ohne flurstuecke darf keine Wohnungen finden
+                expr = QueryExpressions.eq( template.baujahr(), -123d );
+            }
+            return KapsRepository.instance().findEntities( WohnungComposite.class, expr, 0, -1 );
         }
 
 
