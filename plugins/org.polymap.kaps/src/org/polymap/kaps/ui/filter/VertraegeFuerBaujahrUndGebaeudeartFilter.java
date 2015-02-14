@@ -52,6 +52,7 @@ import org.polymap.kaps.model.data.GemarkungComposite;
 import org.polymap.kaps.model.data.GemeindeComposite;
 import org.polymap.kaps.model.data.NutzungComposite;
 import org.polymap.kaps.model.data.VertragComposite;
+import org.polymap.kaps.model.data.VertragsArtComposite;
 import org.polymap.kaps.model.data.VertragsdatenBaulandComposite;
 import org.polymap.kaps.ui.MyNumberValidator;
 
@@ -83,6 +84,9 @@ public class VertraegeFuerBaujahrUndGebaeudeartFilter
 
         site.addStandardLayout( site.newFormField( result, "datum", Date.class, new BetweenFormField(
                 new DateTimeFormField(), new DateTimeFormField() ), null, "Vertragsdatum" ) );
+
+        site.addStandardLayout( site.newFormField( result, "vertragsart", VertragsArtComposite.class, new PicklistFormField(
+                KapsRepository.instance().entitiesWithNames( VertragsArtComposite.class ) ), null, "Vertragsart" ) );
 
         site.addStandardLayout( site.newFormField( result, "gemeinde", GemeindeComposite.class, new PicklistFormField(
                 KapsRepository.instance().entitiesWithNames( GemeindeComposite.class ) ), null, "Gemeinde" ) );
@@ -140,6 +144,7 @@ public class VertraegeFuerBaujahrUndGebaeudeartFilter
 
         GebaeudeArtComposite gebaeude = (GebaeudeArtComposite)site.getFieldValue( "gebart" );
         NutzungComposite nutzung = (NutzungComposite)site.getFieldValue( "nutzung" );
+        VertragsArtComposite art = (VertragsArtComposite)site.getFieldValue( "vertragsart" );
 
         Object[] vertragsDatum = (Object[])site.getFieldValue( "datum" );
         BooleanExpression vertragsDatumExpr = null;
@@ -156,6 +161,16 @@ public class VertraegeFuerBaujahrUndGebaeudeartFilter
             }
             if (le != null) {
                 vertragsDatumExpr = vertragsDatumExpr == null ? le : QueryExpressions.and( ge, le );
+            }
+        }
+        
+        if (art != null) {
+            VertragComposite vTemplate = QueryExpressions.templateFor( VertragComposite.class );
+            BooleanExpression artExpr = QueryExpressions.eq(vTemplate.vertragsArt(), art);
+            if (vertragsDatumExpr == null) {
+                vertragsDatumExpr = artExpr;
+            } else {
+                vertragsDatumExpr = QueryExpressions.and( vertragsDatumExpr, artExpr );
             }
         }
 
