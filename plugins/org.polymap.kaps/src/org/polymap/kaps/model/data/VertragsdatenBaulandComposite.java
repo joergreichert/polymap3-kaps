@@ -1071,6 +1071,12 @@ public interface VertragsdatenBaulandComposite
             return KapsRepository.instance().findEntities( VertragsdatenBaulandComposite.class, expr, 0, -1 ).find();
         }
 
+        public static Iterable<VertragsdatenBaulandComposite> forRWZ( RichtwertzoneZeitraumComposite zone ) {
+            VertragsdatenBaulandComposite template = QueryExpressions.templateFor( VertragsdatenBaulandComposite.class );
+            BooleanExpression expr = QueryExpressions.eq( template.richtwertZoneG(), zone );
+            return KapsRepository.instance().findEntities( VertragsdatenBaulandComposite.class, expr, 0, -1 );
+        }
+        
         @Override
         public Property<Double> richtwert() {
             return new ComputedPropertyInstance<Double>( new GenericPropertyInfo( VertragsdatenBaulandComposite.class,

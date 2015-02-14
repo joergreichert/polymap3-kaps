@@ -524,6 +524,18 @@ public interface VertragsdatenAgrarComposite
         }
 
 
+        public static Iterable<VertragsdatenAgrarComposite> forRWZ( RichtwertzoneZeitraumComposite zone ) {
+            VertragsdatenAgrarComposite template = QueryExpressions.templateFor( VertragsdatenAgrarComposite.class );
+            BooleanExpression expr = QueryExpressions.or( QueryExpressions.eq( template.richtwertZone1(), zone ),
+                    QueryExpressions.eq( template.richtwertZone2(), zone ),
+                    QueryExpressions.eq( template.richtwertZone3(), zone ),
+                    QueryExpressions.eq( template.richtwertZone4(), zone ),
+                    QueryExpressions.eq( template.richtwertZone5(), zone ),
+                    QueryExpressions.eq( template.richtwertZone6(), zone ) );
+            return KapsRepository.instance().findEntities( VertragsdatenAgrarComposite.class, expr, 0, -1 );
+        }
+
+
         @Override
         public Property<Double> verkaufteFlaeche() {
             return new ComputedPropertyInstance<Double>( new GenericPropertyInfo( VertragsdatenAgrarComposite.class,

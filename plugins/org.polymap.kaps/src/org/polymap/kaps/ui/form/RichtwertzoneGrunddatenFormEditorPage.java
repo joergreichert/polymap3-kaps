@@ -13,6 +13,8 @@
 package org.polymap.kaps.ui.form;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -21,6 +23,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.Feature;
 import org.opengis.feature.type.PropertyDescriptor;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -49,6 +52,7 @@ import org.polymap.core.operation.OperationSupport;
 import org.polymap.core.project.ILayer;
 import org.polymap.core.project.IMap;
 import org.polymap.core.qi4j.QiModule.EntityCreator;
+import org.polymap.core.runtime.Polymap;
 import org.polymap.core.workbench.PolymapWorkbench;
 
 import org.polymap.rhei.data.entityfeature.AssociationAdapter;
@@ -77,6 +81,8 @@ import org.polymap.kaps.model.data.NutzungComposite;
 import org.polymap.kaps.model.data.RichtwertZoneLageComposite;
 import org.polymap.kaps.model.data.RichtwertzoneComposite;
 import org.polymap.kaps.model.data.RichtwertzoneZeitraumComposite;
+import org.polymap.kaps.model.data.VertragsdatenAgrarComposite;
+import org.polymap.kaps.model.data.VertragsdatenBaulandComposite;
 import org.polymap.kaps.ui.KapsDefaultFormEditorPageWithFeatureTable;
 import org.polymap.kaps.ui.MyNumberValidator;
 import org.polymap.kaps.ui.NotNullValidator;
@@ -486,4 +492,27 @@ public class RichtwertzoneGrunddatenFormEditorPage
         }
     }
 
+
+    @Override
+    protected void queueDeleteComposite( RichtwertzoneZeitraumComposite entity ) {
+        final Set<String> vertrag = new HashSet<String>();
+        for (VertragsdatenBaulandComposite bauland : VertragsdatenBaulandComposite.Mixin.forRWZ( entity )) {
+            vertrag.add( EingangsNummerFormatter.format( bauland.vertrag().get().eingangsNr().get() ) );
+        }
+        for (VertragsdatenAgrarComposite agrar : VertragsdatenAgrarComposite.Mixin.forRWZ( entity )) {
+            vertrag.add( EingangsNummerFormatter.format( agrar.vertrag().get().eingangsNr().get() ) );
+        }
+        if (!vertrag.isEmpty()) {
+            Polymap.getSessionDisplay().asyncExec( new Runnable() {
+
+                public void run() {
+                    MessageDialog.openError( PolymapWorkbench.getShellToParentOn(), "Fehler beim Löschen",
+                            "Diese Richtwertzone wird noch benutzt in " + StringUtils.join( vertrag, ", " ) + " !" );
+                }
+            } );
+        }
+        else {
+            super.queueDeleteComposite( entity );
+        }
+    }
 }

@@ -15,6 +15,8 @@ package org.polymap.kaps.model;
 import static org.qi4j.api.query.QueryExpressions.templateFor;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -23,6 +25,7 @@ import java.text.SimpleDateFormat;
 import org.geotools.feature.NameImpl;
 import org.opengis.feature.type.Name;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -54,6 +57,7 @@ import org.polymap.kaps.model.idgen.GebaeudeNummerGeneratorService;
 import org.polymap.kaps.model.idgen.ObjektNummerGeneratorService;
 import org.polymap.kaps.model.idgen.SchlGeneratorService;
 import org.polymap.kaps.model.idgen.WohnungsNummerGeneratorService;
+import org.polymap.kaps.ui.form.EingangsNummerFormatter;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -360,6 +364,12 @@ public class KapsRepository
         else if (entity instanceof NHK2010BewertungGebaeudeComposite) {
             remove( (NHK2010BewertungGebaeudeComposite)entity );
         }
+        else if (entity instanceof RichtwertzoneZeitraumComposite) {
+            remove( (RichtwertzoneZeitraumComposite)entity );
+        }
+        else if (entity instanceof RichtwertzoneComposite) {
+            remove( (RichtwertzoneComposite)entity );
+        }
         else {
             Polymap.getSessionDisplay().asyncExec( new Runnable() {
 
@@ -370,6 +380,54 @@ public class KapsRepository
                             "Das Löschen dieses Objektes ist noch nicht implementiert.\n Bitte legen Sie ein entsprechendes Ticket im trac an.\n\n http://polymap.org/kaps/newticket" );
                 }
             } );
+        }
+    }
+
+
+    private void remove( RichtwertzoneZeitraumComposite entity ) {
+        final Set<String> vertrag = new HashSet<String>();
+        for (VertragsdatenBaulandComposite bauland : VertragsdatenBaulandComposite.Mixin.forRWZ( entity )) {
+            vertrag.add( EingangsNummerFormatter.format( bauland.vertrag().get().eingangsNr().get() ) );
+        }
+        for (VertragsdatenAgrarComposite agrar : VertragsdatenAgrarComposite.Mixin.forRWZ( entity )) {
+            vertrag.add( EingangsNummerFormatter.format( agrar.vertrag().get().eingangsNr().get() ) );
+        }
+        if (!vertrag.isEmpty()) {
+            Polymap.getSessionDisplay().asyncExec( new Runnable() {
+
+                public void run() {
+                    MessageDialog.openError( PolymapWorkbench.getShellToParentOn(), "Fehler beim Löschen",
+                            "Diese Richtwertzone wird noch benutzt in " + StringUtils.join( vertrag, ", " ) + " !" );
+                }
+            } );
+        }
+        else {
+            super.removeEntity( entity );
+        }
+    }
+
+
+    private void remove( RichtwertzoneComposite entity ) {
+        final Set<String> vertrag = new HashSet<String>();
+        for (RichtwertzoneZeitraumComposite zeitraum : RichtwertzoneZeitraumComposite.Mixin.forZone( entity )) {
+            for (VertragsdatenBaulandComposite bauland : VertragsdatenBaulandComposite.Mixin.forRWZ( zeitraum )) {
+                vertrag.add( EingangsNummerFormatter.format( bauland.vertrag().get().eingangsNr().get() ) );
+            }
+            for (VertragsdatenAgrarComposite agrar : VertragsdatenAgrarComposite.Mixin.forRWZ( zeitraum )) {
+                vertrag.add( EingangsNummerFormatter.format( agrar.vertrag().get().eingangsNr().get() ) );
+            }
+        }
+        if (!vertrag.isEmpty()) {
+            Polymap.getSessionDisplay().asyncExec( new Runnable() {
+
+                public void run() {
+                    MessageDialog.openError( PolymapWorkbench.getShellToParentOn(), "Fehler beim Löschen",
+                            "Diese Richtwertzone wird noch benutzt in " + StringUtils.join( vertrag, ", " ) + " !" );
+                }
+            } );
+        }
+        else {
+            super.removeEntity( entity );
         }
     }
 
