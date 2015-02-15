@@ -118,4 +118,14 @@ public class VertragsdatenBaulandAlsBRLExporter
 
         return result;
     }
+    
+
+    @Override
+    protected String getSortString( VertragsdatenBaulandComposite entity ) {
+        VertragComposite vertrag = entity.vertrag().get();
+        if (vertrag == null) {
+            return entity.toString();
+        }
+        return EingangsNummerFormatter.format( vertrag.eingangsNr().get() );
+    }
 }

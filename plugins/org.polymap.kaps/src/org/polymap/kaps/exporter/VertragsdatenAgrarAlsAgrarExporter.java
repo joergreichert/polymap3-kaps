@@ -133,4 +133,14 @@ public class VertragsdatenAgrarAlsAgrarExporter
 
         return result;
     }
+
+
+    @Override
+    protected String getSortString( VertragsdatenAgrarComposite entity ) {
+        VertragComposite vertrag = entity.vertrag().get();
+        if (vertrag == null) {
+            return entity.toString();
+        }
+        return EingangsNummerFormatter.format( vertrag.eingangsNr().get() );
+    }
 }

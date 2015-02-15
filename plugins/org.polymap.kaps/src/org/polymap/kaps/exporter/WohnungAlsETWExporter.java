@@ -117,4 +117,14 @@ public class WohnungAlsETWExporter
         // result.add(new Value(wohnung, wohnung.))
         return result;
     }
+    
+
+    @Override
+    protected String getSortString( WohnungComposite entity ) {
+        VertragComposite vertrag = entity.vertrag().get();
+        if (vertrag == null) {
+            return entity.schl().get();
+        }
+        return EingangsNummerFormatter.format( vertrag.eingangsNr().get() );
+    }
 }

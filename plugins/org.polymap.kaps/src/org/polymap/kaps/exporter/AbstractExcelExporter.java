@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -121,9 +123,11 @@ public abstract class AbstractExcelExporter<T extends Entity>
             this( key, value == null ? "" : (value.equals( Boolean.TRUE ) ? "ja" : "nein") );
         }
 
+
         public Value( String key, Named value ) {
-            this( key, value != null ? value.name().get() : "");
+            this( key, value != null ? value.name().get() : "" );
         }
+
 
         public Value( LabelSupport entity, Property<Integer> property, boolean useGrouping ) {
             this( entity.getLabel( property ), property.get(), useGrouping );
@@ -324,7 +328,18 @@ public abstract class AbstractExcelExporter<T extends Entity>
             boolean noHeaderYet = true;
             final KapsRepository repo = KapsRepository.instance();
 
+            SortedMap<String, T> sortedEntities = new TreeMap<String, T>();
+
             while (it.hasNext()) {
+                Feature feature = it.next();
+
+                T entity = repo.findEntity( type, feature.getIdentifier().getID() );
+                String key = getSortString( entity );
+                sortedEntities.put( key, entity );
+            }
+
+            for (T entity : sortedEntities.values()) {
+
                 if (monitor.isCanceled()) {
                     throw new OperationCanceledException();
                 }
@@ -332,9 +347,6 @@ public abstract class AbstractExcelExporter<T extends Entity>
                     monitor.subTask( "Objekte: " + count++ );
                     monitor.worked( 100 );
                 }
-                Feature feature = it.next();
-
-                T entity = repo.findEntity( type, feature.getIdentifier().getID() );
 
                 List<List<Value>> values = createMultiRowValues( entity, errors );
                 if (values != null && !values.isEmpty()) {
@@ -367,6 +379,9 @@ public abstract class AbstractExcelExporter<T extends Entity>
     }
 
 
+    protected abstract String getSortString( T entity );
+
+
     private String[] getHeaders( List<Value> values ) {
         List<String> headers = new ArrayList<String>();
         for (Value entry : values) {
@@ -392,9 +407,11 @@ public abstract class AbstractExcelExporter<T extends Entity>
         return name.name().get() + ": " + msg;
     }
 
-//    protected String error( Named name, String msg ) {
-//        return EingangsNummerFormatter.format( vertrag.eingangsNr().get() ) + ": " + msg;
-//    }
+
+    // protected String error( Named name, String msg ) {
+    // return EingangsNummerFormatter.format( vertrag.eingangsNr().get() ) + ": " +
+    // msg;
+    // }
 
     public static void main( String[] args ) {
         System.out.println( fileFormat.format( new Date() ) );
