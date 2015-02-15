@@ -12,6 +12,7 @@
  */
 package org.polymap.kaps.ui.filter;
 
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -21,6 +22,8 @@ import org.apache.commons.logging.LogFactory;
 import org.qi4j.api.query.Query;
 import org.qi4j.api.query.QueryExpressions;
 import org.qi4j.api.query.grammar.BooleanExpression;
+
+import com.google.common.collect.Sets;
 
 import org.eclipse.swt.widgets.Composite;
 
@@ -37,26 +40,27 @@ import org.polymap.rhei.filter.IFilterEditorSite;
 
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.FlurstueckComposite;
+import org.polymap.kaps.model.data.GebaeudeComposite;
 import org.polymap.kaps.model.data.GemarkungComposite;
 import org.polymap.kaps.model.data.GemeindeComposite;
-import org.polymap.kaps.model.data.NutzungComposite;
+import org.polymap.kaps.model.data.StrasseComposite;
 import org.polymap.kaps.ui.MyNumberValidator;
 
 /**
  * 
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
-public class FlurstueckeFuerVertragGemeindeFilter
+public class GebaeudeFuerFlurstueckeFilter
         extends AbstractEntityFilter {
 
-    private static Log         log = LogFactory.getLog( FlurstueckeFuerVertragGemeindeFilter.class );
+    private static Log         log = LogFactory.getLog( GebaeudeFuerFlurstueckeFilter.class );
 
     private IFormFieldListener gemeindeListener;
 
 
-    public FlurstueckeFuerVertragGemeindeFilter( ILayer layer ) {
-        super( FlurstueckeFuerVertragGemeindeFilter.class.getName(), layer,
-                "nach Vertrag, Gemeinde, Nutzung, Nummern...", null, 10000, FlurstueckComposite.class );
+    public GebaeudeFuerFlurstueckeFilter( ILayer layer ) {
+        super( GebaeudeFuerFlurstueckeFilter.class.getName(), layer, "nach Gemeinde, Flurstück, Strasse...", null,
+                10000, GebaeudeComposite.class );
     }
 
 
@@ -87,20 +91,37 @@ public class FlurstueckeFuerVertragGemeindeFilter
             }
         } );
 
+        final PicklistFormField strassen = new PicklistFormField( new PicklistFormField.ValueProvider() {
+
+            @Override
+            public SortedMap<String, Object> get() {
+                SortedMap<String, Object> strassen = new TreeMap<String, Object>();
+                GemeindeComposite gemeinde = (GemeindeComposite)site.getFieldValue( "gemeinde" );
+                if (gemeinde != null) {
+                    for (StrasseComposite strasse : StrasseComposite.Mixin.findStrasseIn( gemeinde )) {
+                        strassen.put( strasse.name().get(), strasse );
+                    }
+                }
+                return strassen;
+            }
+        } );
+
         editor.addFieldListener( gemeindeListener = new IFormFieldListener() {
 
             @Override
             public void fieldChange( FormFieldEvent ev ) {
                 if ("gemeinde".equals( ev.getFieldName() )) {
                     gemarkungen.reloadValues();
+                    strassen.reloadValues();
                 }
             }
         } );
 
         site.addStandardLayout( site.newFormField( result, "gemarkung", GemarkungComposite.class, gemarkungen, null,
                 "Gemarkung" ) );
-        site.addStandardLayout( site.newFormField( result, "nutzung", NutzungComposite.class, new PicklistFormField(
-                KapsRepository.instance().entitiesWithNames( NutzungComposite.class ) ), null, "Nutzung" ) );
+
+        site.addStandardLayout( site
+                .newFormField( result, "strasse", StrasseComposite.class, strassen, null, "Strasse" ) );
 
         site.addStandardLayout( site.newFormField( result, "nummer", Integer.class, new StringFormField(),
                 new MyNumberValidator( Integer.class ), "Flurstücksnummer" ) );
@@ -116,7 +137,7 @@ public class FlurstueckeFuerVertragGemeindeFilter
 
         GemeindeComposite gemeinde = (GemeindeComposite)site.getFieldValue( "gemeinde" );
         GemarkungComposite gemarkung = (GemarkungComposite)site.getFieldValue( "gemarkung" );
-        NutzungComposite nutzung = (NutzungComposite)site.getFieldValue( "nutzung" );
+        StrasseComposite strasse = (StrasseComposite)site.getFieldValue( "strasse" );
         Integer nummer = (Integer)site.getFieldValue( "nummer" );
         String unternummer = (String)site.getFieldValue( "unternummer" );
 
@@ -125,13 +146,16 @@ public class FlurstueckeFuerVertragGemeindeFilter
         BooleanExpression hExpr = nummer != null ? QueryExpressions.eq( flurTemplate.hauptNummer(), nummer ) : null;
         BooleanExpression uExpr = unternummer != null && !unternummer.isEmpty() ? QueryExpressions.eq(
                 flurTemplate.unterNummer(), unternummer ) : null;
-        BooleanExpression nExpr = nutzung != null ? QueryExpressions.eq( flurTemplate.nutzung(), nutzung ) : null;
 
         BooleanExpression gExpr = null;
-        if (gemarkung != null) {
-            gExpr = QueryExpressions.eq( flurTemplate.gemarkung(), gemarkung );
+        if (strasse != null) {
+            gExpr = QueryExpressions.eq( flurTemplate.strasse(), strasse );
         }
-        else if (gemeinde != null) {
+        if (gemarkung != null) {
+            BooleanExpression gemExpr = QueryExpressions.eq( flurTemplate.gemarkung(), gemarkung );
+            gExpr = gExpr == null ? gemExpr : and( gExpr, gemExpr );
+        }
+        if (gExpr == null && gemeinde != null) {
             GemarkungComposite gemarkungTemplate = QueryExpressions.templateFor( GemarkungComposite.class );
             Query<GemarkungComposite> gemarkungen = KapsRepository.instance().findEntities( GemarkungComposite.class,
                     QueryExpressions.eq( gemarkungTemplate.gemeinde(), gemeinde ), 0, -1 );
@@ -144,7 +168,7 @@ public class FlurstueckeFuerVertragGemeindeFilter
                     gExpr = QueryExpressions.or( gExpr, newExpr );
                 }
             }
-            // gemeinde gewählt, aber keine gemeinden gefunden
+            // gemeinde gewählt, aber keine GemarkungComposite gefunden
             if (gExpr == null) {
                 gExpr = QueryExpressions.eq( flurTemplate.identity(), "unknown" );
             }
@@ -152,9 +176,50 @@ public class FlurstueckeFuerVertragGemeindeFilter
 
         // expressions sammeln
         BooleanExpression qExpr = hExpr == null ? uExpr : and( hExpr, uExpr );
-        qExpr = qExpr == null ? nExpr : and( qExpr, nExpr );
-        qExpr = qExpr == null ? gExpr :and( qExpr, gExpr );
+        qExpr = qExpr == null ? gExpr : and( qExpr, gExpr );
 
-        return KapsRepository.instance().findEntities( FlurstueckComposite.class, qExpr, 0, getMaxResults() );
+        Set<String> gebaeudeIds = null;
+        if (qExpr != null) {
+            gebaeudeIds = Sets.newHashSet();
+
+            // flurstücke eingeschränkt, falls keine gefunden werden ist das set leer
+            Query<FlurstueckComposite> flurstuecke = KapsRepository.instance().findEntities( FlurstueckComposite.class,
+                    qExpr, 0, -1 );
+            for (FlurstueckComposite fc : flurstuecke) {
+                // contains predicate geht bei ManyAssociaiton nicht, deshalb hier je
+                // Flustück checken, in welchen Gebaeuden das drin ist
+                for (GebaeudeComposite gebaeude : KapsRepository.instance().findEntities( GebaeudeComposite.class,
+                        null, 0, -1 )) {
+                    if (gebaeude.flurstuecke().contains( fc )) {
+                        gebaeudeIds.add( gebaeude.id() );
+                    }
+                }
+            }
+        }
+        BooleanExpression gebExpr = null;
+        GebaeudeComposite gebaeudeTemplate = QueryExpressions.templateFor( GebaeudeComposite.class );
+        if (gebaeudeIds == null) {
+            // keine Einschränkung, also alle finden
+        }
+        else if (gebaeudeIds.isEmpty()) {
+            // eingeschränkt nach Flurstücken, aber keine gefunden, also auch keine
+            // Gebäude finden
+            gebExpr = QueryExpressions.eq( gebaeudeTemplate.identity(), "unknown" );
+        }
+        else {
+            // filtern nach allen ids
+            for (String id : gebaeudeIds) {
+                BooleanExpression newExpr = QueryExpressions.eq( gebaeudeTemplate.identity(), id );
+                if (gebExpr == null) {
+                    gebExpr = newExpr;
+                }
+                else {
+                    gebExpr = QueryExpressions.or( gebExpr, newExpr );
+                }
+
+            }
+        }
+
+        return KapsRepository.instance().findEntities( GebaeudeComposite.class, gebExpr, 0, getMaxResults() );
     }
 }

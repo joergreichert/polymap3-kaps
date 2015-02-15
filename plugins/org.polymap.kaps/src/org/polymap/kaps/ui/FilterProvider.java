@@ -44,6 +44,7 @@ import org.polymap.kaps.ui.filter.EinzelneVertragsdatenBaulandFilter;
 import org.polymap.kaps.ui.filter.EinzelnerVertragFilter;
 import org.polymap.kaps.ui.filter.FlurstueckFuerEinzelnenVertragFilter;
 import org.polymap.kaps.ui.filter.FlurstueckeFuerVertragGemeindeFilter;
+import org.polymap.kaps.ui.filter.GebaeudeFuerFlurstueckeFilter;
 import org.polymap.kaps.ui.filter.RichtwertZoneFilter;
 import org.polymap.kaps.ui.filter.RichtwertZoneZeitraumFilter;
 import org.polymap.kaps.ui.filter.VertraegeFuerBaujahrUndGebaeudeartFilter;
@@ -132,12 +133,13 @@ public class FilterProvider
                     result.add( new DefaultEntityFilter( layer, type, repo ) );
                 }
                 else if (type.isAssignableFrom( GebaeudeComposite.class )) {
+                    result.add( new GebaeudeFuerFlurstueckeFilter( layer ) );
                     result.add( new DefaultEntityFilter( layer, type, repo, "objektNummer", "gebaeudeNummer",
                             "gebaeudeArt", "baujahr" ) );
                 }
                 else if (type.isAssignableFrom( FlurstueckComposite.class )) {
                     result.add( new FlurstueckFuerEinzelnenVertragFilter( layer ) );
-                    result.add( new FlurstueckeFuerVertragGemeindeFilter( layer ));
+                    result.add( new FlurstueckeFuerVertragGemeindeFilter( layer ) );
                 }
                 else {
                     // standard to all other entitytypes
