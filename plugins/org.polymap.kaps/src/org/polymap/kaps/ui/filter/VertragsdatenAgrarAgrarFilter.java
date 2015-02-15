@@ -42,7 +42,6 @@ import org.polymap.rhei.field.BetweenValidator;
 import org.polymap.rhei.field.DateTimeFormField;
 import org.polymap.rhei.field.FormFieldEvent;
 import org.polymap.rhei.field.IFormFieldListener;
-import org.polymap.rhei.field.PicklistFormField;
 import org.polymap.rhei.field.SelectlistFormField;
 import org.polymap.rhei.filter.FilterEditor;
 import org.polymap.rhei.filter.IFilterEditorSite;
@@ -88,26 +87,33 @@ public class VertragsdatenAgrarAgrarFilter
         site.addStandardLayout( site.newFormField( result, "datum", Date.class, new BetweenFormField(
                 new DateTimeFormField(), new DateTimeFormField() ), new BetweenValidator( new NotNullValidator() ),
                 "Vertragsdatum" ) );
-
-        site.addStandardLayout( site.newFormField( result, "gemeinde", GemeindeComposite.class, new PicklistFormField(
-                KapsRepository.instance().entitiesWithNames( GemeindeComposite.class ) ), null, "Gemeinde" ) );
+        SelectlistFormField gemeinden = new SelectlistFormField( KapsRepository.instance().entitiesWithNames( GemeindeComposite.class ) );
+        gemeinden.setIsMultiple( true );
+        Composite formField = site.newFormField( result, "gemeinde", GemeindeComposite.class,
+                gemeinden,
+                null, "Gemeinde" ) ;
+        site.addStandardLayout( formField );
+        ((FormData)formField.getLayoutData()).height = 200;
+        ((FormData)formField.getLayoutData()).width = 100;
+        
         FilterEditor editor = (FilterEditor)site;
-
-        final PicklistFormField gemarkungen = new PicklistFormField( new PicklistFormField.ValueProvider() {
+        final SelectlistFormField gemarkungen = new SelectlistFormField( new SelectlistFormField.ValueProvider() {
 
             @Override
             public SortedMap<String, Object> get() {
                 SortedMap<String, Object> gemarkungen = new TreeMap<String, Object>();
-                GemeindeComposite gemeinde = (GemeindeComposite)site.getFieldValue( "gemeinde" );
-                if (gemeinde != null) {
-                    for (GemarkungComposite gemarkung : GemarkungComposite.Mixin.forGemeinde( gemeinde )) {
-                        gemarkungen.put( gemarkung.schl().get() + "  -  " + gemarkung.name().get(), gemarkung );
+                List<GemeindeComposite> gemeinden = (List<GemeindeComposite>)site.getFieldValue( "gemeinde" );
+                if (gemeinden != null) {
+                    for (GemeindeComposite gemeinde : gemeinden) {
+                        for (GemarkungComposite gemarkung : GemarkungComposite.Mixin.forGemeinde( gemeinde )) {
+                            gemarkungen.put( gemarkung.schl().get() + "  -  " + gemarkung.name().get(), gemarkung );
+                        }
                     }
                 }
                 return gemarkungen;
             }
         } );
-
+        gemarkungen.setIsMultiple( true );
         editor.addFieldListener( gemeindeListener = new IFormFieldListener() {
 
             @Override
@@ -118,12 +124,16 @@ public class VertragsdatenAgrarAgrarFilter
             }
         } );
 
-        site.addStandardLayout( site.newFormField( result, "gemarkung", GemarkungComposite.class, gemarkungen, null,
-                "Gemarkung" ) );
+        formField = site.newFormField( result, "gemarkung", GemarkungComposite.class, gemarkungen, null,
+                "Gemarkung" );
+        site.addStandardLayout( formField );
+        ((FormData)formField.getLayoutData()).height = 200;
+        ((FormData)formField.getLayoutData()).width = 100;
+        
         SelectlistFormField field = new SelectlistFormField( KapsRepository.instance().entitiesWithNames(
                 NutzungComposite.class ) );
         field.setIsMultiple( true );
-        Composite formField = site.newFormField( result, "nutzung", NutzungComposite.class, field,
+        formField = site.newFormField( result, "nutzung", NutzungComposite.class, field,
                 new NotNullValidator(), "Nutzung" );
         site.addStandardLayout( formField );
         ((FormData)formField.getLayoutData()).height = 200;
@@ -146,7 +156,7 @@ public class VertragsdatenAgrarAgrarFilter
 
         List<NutzungComposite> nutzungen = (List<NutzungComposite>)site.getFieldValue( "nutzung" );
         List<BodennutzungComposite> bodennutzungen = (List<BodennutzungComposite>)site.getFieldValue( "bodennutzung" );
-        GemeindeComposite gemeinde = (GemeindeComposite)site.getFieldValue( "gemeinde" );
+        List<GemeindeComposite> gemeinden = (List<GemeindeComposite>)site.getFieldValue( "gemeinde" );
 
         Object[] vertragsDatum = (Object[])site.getFieldValue( "datum" );
         BooleanExpression vertragsDatumExpr = null;
@@ -182,15 +192,36 @@ public class VertragsdatenAgrarAgrarFilter
 
         // gemeinde
         BooleanExpression gExpr = null;
-        GemarkungComposite gemarkung = (GemarkungComposite)site.getFieldValue( "gemarkung" );
-        if (gemarkung != null) {
-            gExpr = QueryExpressions.eq( flurTemplate.gemarkung(), gemarkung );
+        List<GemarkungComposite> gemarkungen = (List<GemarkungComposite>)site.getFieldValue( "gemarkung" );
+        if (gemarkungen != null) {
+            for (GemarkungComposite gemarkung : gemarkungen) {
+                BooleanExpression newExpr = QueryExpressions.eq( flurTemplate.gemarkung(), gemarkung );
+                if (gExpr == null) {
+                    gExpr = newExpr;
+                }
+                else {
+                    gExpr = QueryExpressions.or( gExpr, newExpr );
+                }
+            }
         }
-        else if (gemeinde != null) {
+        else if (gemeinden != null) {
             GemarkungComposite gemarkungTemplate = QueryExpressions.templateFor( GemarkungComposite.class );
-            Query<GemarkungComposite> gemarkungen = KapsRepository.instance().findEntities( GemarkungComposite.class,
-                    QueryExpressions.eq( gemarkungTemplate.gemeinde(), gemeinde ), 0, -1 );
-            for (GemarkungComposite gemarkungg : gemarkungen) {
+            BooleanExpression gSubExpr = null;
+            for (GemeindeComposite gemeinde : gemeinden) {
+                BooleanExpression newExpr = QueryExpressions.eq( gemarkungTemplate.gemeinde(), gemeinde );
+                if (gSubExpr == null) {
+                    gSubExpr = newExpr;
+                }
+                else {
+                    gSubExpr = QueryExpressions.or( gSubExpr, newExpr );
+                }
+            }
+            if (gSubExpr == null) {
+                gSubExpr = QueryExpressions.eq( gemarkungTemplate.identity(), "unknown" );
+            }
+            Query<GemarkungComposite> subGemarkungen = KapsRepository.instance().findEntities(
+                    GemarkungComposite.class, gSubExpr, 0, -1 );
+            for (GemarkungComposite gemarkungg : subGemarkungen) {
                 BooleanExpression newExpr = QueryExpressions.eq( flurTemplate.gemarkung(), gemarkungg );
                 if (gExpr == null) {
                     gExpr = newExpr;
