@@ -14,6 +14,7 @@ package org.polymap.kaps.ui.filter;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -27,6 +28,7 @@ import org.qi4j.api.query.grammar.BooleanExpression;
 
 import com.google.common.collect.Sets;
 
+import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -41,6 +43,7 @@ import org.polymap.rhei.field.DateTimeFormField;
 import org.polymap.rhei.field.FormFieldEvent;
 import org.polymap.rhei.field.IFormFieldListener;
 import org.polymap.rhei.field.PicklistFormField;
+import org.polymap.rhei.field.SelectlistFormField;
 import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.filter.FilterEditor;
 import org.polymap.rhei.filter.IFilterEditorSite;
@@ -123,10 +126,14 @@ public class VertraegeFuerBaujahrUndGebaeudeartFilter
 
         site.addStandardLayout( site.newFormField( result, "nutzung", NutzungComposite.class, new PicklistFormField(
                 KapsRepository.instance().entitiesWithNames( NutzungComposite.class ) ), null, "Nutzung" ) );
-
-        site.addStandardLayout( site.newFormField( result, "gebart", GebaeudeArtComposite.class, new PicklistFormField(
-                KapsRepository.instance().entitiesWithNames( GebaeudeArtComposite.class ) ), null, "Gebäudeart" ) );
-
+        final SelectlistFormField arten = new SelectlistFormField(
+                KapsRepository.instance().entitiesWithNames( GebaeudeArtComposite.class ) );
+        arten.setIsMultiple( true );
+        Composite formField = site.newFormField( result, "gebart", GebaeudeArtComposite.class, arten, null, "Gebäudeart" );
+        site.addStandardLayout( formField );
+        ((FormData)formField.getLayoutData()).height = 200;
+        ((FormData)formField.getLayoutData()).width = 100;
+        
         site.addStandardLayout( site.newFormField( result, "baujahr", Integer.class, new BetweenFormField(
                 new StringFormField(), new StringFormField() ), new BetweenValidator( new MyNumberValidator(
                 Integer.class ) ), "Baujahr" ) );
@@ -142,7 +149,7 @@ public class VertraegeFuerBaujahrUndGebaeudeartFilter
 
     protected Query<VertragComposite> createQuery( IFilterEditorSite site ) {
 
-        GebaeudeArtComposite gebaeude = (GebaeudeArtComposite)site.getFieldValue( "gebart" );
+        List<GebaeudeArtComposite> gebaeudeArten = (List<GebaeudeArtComposite>)site.getFieldValue( "gebart" );
         NutzungComposite nutzung = (NutzungComposite)site.getFieldValue( "nutzung" );
         VertragsArtComposite art = (VertragsArtComposite)site.getFieldValue( "vertragsart" );
 
@@ -213,7 +220,19 @@ public class VertraegeFuerBaujahrUndGebaeudeartFilter
             }
         }
 
-        BooleanExpression qExpr = gebaeude != null ? QueryExpressions.eq( flurTemplate.gebaeudeArt(), gebaeude ) : null;
+        BooleanExpression qExpr = null;
+        if (gebaeudeArten != null) {
+            for (GebaeudeArtComposite gebaeudeArt : gebaeudeArten) {
+                BooleanExpression newExpr = QueryExpressions.eq( flurTemplate.gebaeudeArt(), gebaeudeArt );
+                if (qExpr == null) {
+                    qExpr = newExpr;
+                }
+                else {
+                    qExpr = QueryExpressions.or( qExpr, newExpr );
+                }
+            }
+        }
+        
         BooleanExpression nExpr = nutzung != null ? QueryExpressions.eq( flurTemplate.nutzung(), nutzung ) : null;
 
         if (qExpr != null) {
