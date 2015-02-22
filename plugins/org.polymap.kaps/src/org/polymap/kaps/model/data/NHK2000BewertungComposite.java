@@ -124,6 +124,42 @@ public interface NHK2000BewertungComposite
     //@ImportColumn("MAKLERBW")
     Property<Boolean> MAKLERBW();
 
+    // Wohnung eventuell noch relevant später, deshalb hier mit importieren
+     // OBJEKTNR - Long
+     @Optional
+     @ImportColumn("OBJEKTNR")
+     Property<Integer> OBJEKTNR();
+    
+    
+     // OBJEKTNRFORTF - Long
+     @Optional
+     @ImportColumn("OBJEKTNRFORTF")
+     Property<Integer> OBJEKTNRFORTF();
+    
+    
+     // GEBNR - Long
+     @Optional
+     @ImportColumn("GEBNR")
+     Property<Integer> GEBNR();
+        
+    
+     // GEBFORTF - Long
+     @Optional
+     @ImportColumn("GEBFORTF")
+     Property<Integer> GEBFORTF();
+
+
+    // WOHNUNGSNR - Long
+    @Optional
+    @ImportColumn("WOHNUNGSNR")
+    Property<Integer> WOHNUNGSNR();
+
+
+    // FORTF - Long
+    @Optional
+    @ImportColumn("FORTF")
+    Property<Integer> FORTF();
+
 
     /**
      * Methods and transient fields.
