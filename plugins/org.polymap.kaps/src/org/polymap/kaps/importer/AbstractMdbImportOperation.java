@@ -313,8 +313,20 @@ public abstract class AbstractMdbImportOperation
 
     protected Double asDouble( Integer value, Integer maxValue, Integer defaultValue ) {
         if (value != null) {
-            return (value < maxValue) ? value.doubleValue()
-                    : (defaultValue != null ? defaultValue.doubleValue() : null);
+            try {
+                if (value < maxValue) {
+                    return value.doubleValue();
+                }
+                else if (defaultValue != null) {
+                    return defaultValue.doubleValue();
+                }
+                else {
+                    return null;
+                }
+            }
+            catch (NullPointerException npe) {
+                System.out.println( value + " - " + maxValue + " - " + defaultValue );
+            }
         }
         return (defaultValue != null) ? defaultValue.doubleValue() : null;
     }

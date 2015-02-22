@@ -92,7 +92,7 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
 
     private Set<T>                 deletedComposites = new HashSet<T>();
 
-    private List<IFormField>       reloadables       = new ArrayList<IFormField>();
+    protected List<IFormField>       reloadables       = new ArrayList<IFormField>();
 
     private boolean                updatingElements;
 

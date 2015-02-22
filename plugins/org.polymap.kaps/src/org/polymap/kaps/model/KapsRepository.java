@@ -217,6 +217,7 @@ public class KapsRepository
                     new SimpleEntityProvider<NHK2010BaupreisIndexComposite>( this, NHK2010BaupreisIndexComposite.class,
                             new NameImpl( KapsRepository.NAMESPACE, NHK2010BaupreisIndexComposite.NAME ) ),
                     new NHK2010BewertungEntityProvider( this ),
+                    new NHK2000BewertungEntityProvider( this ),
                     new SimpleEntityProvider<ErmittlungModernisierungsgradComposite>( this,
                             ErmittlungModernisierungsgradComposite.class, new NameImpl( KapsRepository.NAMESPACE,
                                     ErmittlungModernisierungsgradComposite.NAME ) ),
@@ -342,7 +343,7 @@ public class KapsRepository
         }
         else if (entity instanceof AusstattungBewertungComposite
                 || entity instanceof ErmittlungModernisierungsgradComposite
-                || entity instanceof VertragsdatenAgrarComposite || entity instanceof VertragsdatenBaulandComposite) {
+                || entity instanceof VertragsdatenAgrarComposite || entity instanceof VertragsdatenBaulandComposite || entity instanceof NHK2000BewertungComposite || entity instanceof NHK2000BewertungGebaeudeComposite) {
             // nichts weiter zu löschen hier
             super.removeEntity( entity );
         }

@@ -122,7 +122,8 @@ public class KapsRepositoryAssembler
                 NHK2010BaupreisIndexComposite.class, NHK2010BewertungComposite.class,
                 NHK2010BewertungGebaeudeComposite.class, ErmittlungModernisierungsgradComposite.class,
                 ErtragswertverfahrenComposite.class, GebaeudeTypStaBuComposite.class, StockwerkStaBuComposite.class,
-                ImmobilienArtStaBuComposite.class, WohnlageStaBuComposite.class );
+                ImmobilienArtStaBuComposite.class, WohnlageStaBuComposite.class, NHK2000BewertungComposite.class,
+                NHK2000BewertungGebaeudeComposite.class );
 
         // persistence: workspace/Lucene
         File moduleRoot = createDataDir();

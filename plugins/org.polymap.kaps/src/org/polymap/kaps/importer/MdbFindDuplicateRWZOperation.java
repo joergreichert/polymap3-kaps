@@ -46,7 +46,7 @@ public class MdbFindDuplicateRWZOperation
         File parentFolder = new File( "kaps" );
         parentFolder.mkdirs();
 
-        monitor.beginTask( getLabel(), 12000 );
+        monitor.beginTask( getLabel(), 3300 );
         final Database db = Database.open( dbFile );
         try {
             Table table = db.getTable( "K_RIWE" );

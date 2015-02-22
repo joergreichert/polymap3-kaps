@@ -249,6 +249,9 @@ public class FormPageProvider
         else if (name.equalsIgnoreCase( NHK2010BewertungComposite.NAME )) {
             result.add( new NHK2010BewertungFormEditorPage( formEditor, feature, fs ) );
         }
+        else if (name.equalsIgnoreCase( NHK2000BewertungComposite.NAME )) {
+            result.add( new NHK2000BewertungFormEditorPage( formEditor, feature, fs ) );
+        }
         else if (name.equalsIgnoreCase( BelastungComposite.NAME )) {
             result.add( new DefaultEntityFormEditorPage( feature, fs, BelastungComposite.class, KapsRepository
                     .instance(), BelastungComposite.NAME ) );

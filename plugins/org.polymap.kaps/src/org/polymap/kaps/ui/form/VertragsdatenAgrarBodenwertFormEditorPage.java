@@ -546,6 +546,8 @@ public class VertragsdatenAgrarBodenwertFormEditorPage
 
 
     private SortedMap<String, Object> searchZonen() {
+        System.err.println(vb.vertrag().get().richtwertZoneAgrar().get());
+        System.err.println(vb.vertrag().get().richtwertZoneAgrar().get().gemeinde().get());
         return RichtwertzoneProvider.findFor(vb.vertrag().get().richtwertZoneAgrar().get().gemeinde().get(), vb.vertrag().get().vertragsDatum().get());
     }
 

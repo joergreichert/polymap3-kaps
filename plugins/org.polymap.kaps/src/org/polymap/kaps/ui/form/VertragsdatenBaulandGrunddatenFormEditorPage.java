@@ -51,6 +51,7 @@ import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.BodennutzungComposite;
 import org.polymap.kaps.model.data.ErschliessungsBeitragComposite;
 import org.polymap.kaps.model.data.ErtragswertverfahrenComposite;
+import org.polymap.kaps.model.data.NHK2000BewertungComposite;
 import org.polymap.kaps.model.data.NHK2010BewertungComposite;
 import org.polymap.kaps.model.data.RichtwertzoneComposite;
 import org.polymap.kaps.model.data.RichtwertzoneZeitraumComposite;
@@ -89,6 +90,8 @@ public class VertragsdatenBaulandGrunddatenFormEditorPage
     private ActionButton           openBewertungen;
 
     private ActionButton           openErtragswert;
+
+    private ActionButton           openBewertungen2000;
 
     private FormEditor             formEditor;
 
@@ -541,6 +544,21 @@ public class VertragsdatenBaulandGrunddatenFormEditorPage
         openErtragswert.setLayoutData( left().left( openBewertungen, 5 ).width( 25 ).height( 25 ).top( null )
                 .bottom( 100 ).create() );
         openErtragswert.setEnabled( true );
+
+        openBewertungen2000 = new ActionButton( parent, new Action( "NHK 2000 einsehen" ) {
+
+            @Override
+            public void run() {
+                NHK2000BewertungComposite bewertungComposite = NHK2000BewertungComposite.Mixin.forVertrag( vb.vertrag()
+                        .get() );
+                KapsPlugin.openEditor( fs, NHK2000BewertungComposite.NAME, bewertungComposite );
+            }
+        } ) {
+        };
+        openBewertungen2000.setLayoutData( right().right(75).left( openErtragswert, 5 ).width( 25 ).height( 25 ).top( null )
+                .bottom( 100 ).create() );
+        openBewertungen2000.setEnabled( NHK2000BewertungComposite.Mixin.forVertrag( vb.vertrag().get() ) != null );
+//        openBewertungen2000.setEnabled( true );
         return formSection;
     }
 

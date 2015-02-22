@@ -70,13 +70,16 @@ public class MdbImportWizard
         try {
             long start = System.currentTimeMillis();
             // MdbImportVertraegeOperation op =
-            AbstractModelChangeOperation op = new AbstractModelChangeOperation( "WinAKPS importieren" ) {
+            AbstractModelChangeOperation op = new AbstractModelChangeOperation( "WinAKPS - NHK2000 importieren" ) {
 
                 @Override
                 protected IStatus doExecute( IProgressMonitor monitor, IAdaptable info )
                         throws Exception {
-                    new MdbFindDuplicateRWZOperation( importPage.dbFile, importPage.tableNames ).doExecute( monitor,
+                    
+                    new MdbImportNHK2000Operation( importPage.dbFile, importPage.tableNames ).doExecute( monitor,
                             info );
+//                    new MdbFindDuplicateRWZOperation( importPage.dbFile, importPage.tableNames ).doExecute( monitor,
+//                            info );
 //                    new MdbImportVertraegeOperation( importPage.dbFile, importPage.tableNames ).doExecute( monitor,
 //                            info );
 //                    new MdbImportWohneigentumOperation( importPage.dbFile, importPage.tableNames ).doExecute( monitor,
