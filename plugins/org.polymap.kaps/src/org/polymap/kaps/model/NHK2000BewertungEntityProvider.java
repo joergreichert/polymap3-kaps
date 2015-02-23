@@ -49,13 +49,13 @@ public class NHK2000BewertungEntityProvider
         builder.init( (SimpleFeatureType)type );
         // builder.remove( "vertrag" );
         builder.add( "eingangsNr", String.class );
-//        builder.add( "objektNr", String.class );
+        builder.add( "objektNr", String.class );
         type = builder.buildFeatureType();
 
         // aussortieren für die Tabelle
         SimpleFeatureType filtered = SimpleFeatureTypeBuilder.retype( (SimpleFeatureType)type, new String[] {
                 "eingangsNr"
-//                , "objektNr" 
+                , "objektNr" 
                 } );
         return filtered;
     }
@@ -71,9 +71,11 @@ public class NHK2000BewertungEntityProvider
             feature.getProperty( "eingangsNr" ).setValue(
                     EingangsNummerFormatter.format( entity.vertrag().get().eingangsNr().get().toString() ) );
         }
-//        if (entity.OBJEKTNR().get() != null && entity.OBJEKTNR().get().intValue() != 0) {
-//            feature.getProperty( "objektNr" ).setValue( entity.OBJEKTNR().get() + "/" + entity.GEBNR().get() + "/" + entity.WOHNUNGSNR().get() + "/" + entity.FORTF() );            
-//        }
+        if (entity.OBJEKTNR().get() != null && entity.OBJEKTNR().get().intValue() != 0) {
+            feature.getProperty( "objektNr" ).setValue(
+                    entity.OBJEKTNR().get() + "/" + entity.GEBNR().get() + "/" + entity.WOHNUNGSNR().get() + "/"
+                            + entity.FORTF().get() );
+        }
         return feature;
     }
 }

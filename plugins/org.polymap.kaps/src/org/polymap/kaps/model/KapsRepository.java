@@ -343,12 +343,13 @@ public class KapsRepository
         }
         else if (entity instanceof AusstattungBewertungComposite
                 || entity instanceof ErmittlungModernisierungsgradComposite
-                || entity instanceof VertragsdatenAgrarComposite || entity instanceof VertragsdatenBaulandComposite || entity instanceof NHK2000BewertungComposite || entity instanceof NHK2000BewertungGebaeudeComposite) {
+                || entity instanceof VertragsdatenAgrarComposite || entity instanceof VertragsdatenBaulandComposite
+                || entity instanceof NHK2000BewertungGebaeudeComposite) {
             // nichts weiter zu löschen hier
             super.removeEntity( entity );
         }
-        else if (entity instanceof VertragComposite) {
-            remove( (VertragComposite)entity );
+        else if (entity instanceof NHK2000BewertungComposite) {
+            remove( (NHK2000BewertungComposite)entity );
         }
         else if (entity instanceof FlurstueckComposite) {
             remove( (FlurstueckComposite)entity );
@@ -382,6 +383,14 @@ public class KapsRepository
                 }
             } );
         }
+    }
+
+
+    private void remove( NHK2000BewertungComposite entity ) {
+        for (NHK2000BewertungGebaeudeComposite gebaeudeComposite : NHK2000BewertungGebaeudeComposite.Mixin.forBewertung( entity)) {
+            super.removeEntity( gebaeudeComposite );
+        }
+        super.removeEntity( entity );
     }
 
 

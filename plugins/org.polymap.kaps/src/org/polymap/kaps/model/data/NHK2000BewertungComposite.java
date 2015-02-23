@@ -51,6 +51,9 @@ public interface NHK2000BewertungComposite
     @Optional
     Association<VertragComposite> vertrag();
 
+    @Optional
+    Association<WohnungComposite> wohnung();
+
     // GESBAUWERT - Double
     @Optional
     @ImportColumn("GESBAUWERT")
@@ -173,6 +176,13 @@ public interface NHK2000BewertungComposite
         public final static NHK2000BewertungComposite forVertrag( VertragComposite vertrag ) {
             NHK2000BewertungComposite template = QueryExpressions.templateFor( NHK2000BewertungComposite.class );
             BooleanExpression expr = QueryExpressions.eq( template.vertrag(), vertrag );
+            return KapsRepository.instance().findEntities( NHK2000BewertungComposite.class, expr, 0, 1 ).find();
+        }
+        
+
+        public final static NHK2000BewertungComposite forWohnung( WohnungComposite wohnung ) {
+            NHK2000BewertungComposite template = QueryExpressions.templateFor( NHK2000BewertungComposite.class );
+            BooleanExpression expr = QueryExpressions.eq( template.wohnung(), wohnung );
             return KapsRepository.instance().findEntities( NHK2000BewertungComposite.class, expr, 0, 1 ).find();
         }
     }

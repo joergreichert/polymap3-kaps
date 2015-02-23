@@ -25,6 +25,7 @@ import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.NHK2000BewertungComposite;
 import org.polymap.kaps.model.data.NHK2000BewertungGebaeudeComposite;
 import org.polymap.kaps.model.data.VertragComposite;
+import org.polymap.kaps.model.data.WohnungComposite;
 
 /**
  * 
@@ -70,7 +71,7 @@ public class MdbImportNHK2000Operation
 
         AnnotatedCompositeImporter bewertungImporter = new AnnotatedCompositeImporter( NHK2000BewertungComposite.class,
                 table );
-        Map<Double, NHK2000BewertungComposite> allBewertungen = new HashMap<Double, NHK2000BewertungComposite>();
+        Map<String, NHK2000BewertungComposite> allBewertungen = new HashMap<String, NHK2000BewertungComposite>();
 
         Map<String, Object> builderRow = null;
         int count = 0;
@@ -80,9 +81,18 @@ public class MdbImportNHK2000Operation
             Integer lfd = (Integer)builderRow.get( "LFDNR" );
             if (0 == lfd) {
                 // Bewertung gefunden erstellen
+                NHK2000BewertungComposite bewertung = repo.newEntity( NHK2000BewertungComposite.class, null );
+                bewertungImporter.fillEntity( bewertung, builderRow );
+
+                bewertung.MAKLERBW().set( getBooleanValue( builderRow, "MAKLERBW" ) );
+                Double berzeitwert = bewertung.GESBAUWERT().get();
+                if (bewertung.AUSVHBETR().get() != null) {
+                    berzeitwert -= bewertung.AUSVHBETR().get();
+                }
+                bewertung.BERZEITW1().set( berzeitwert );
+
                 Double eingangsnummer = (Double)builderRow.get( "EINGANGSNR" );
                 if (eingangsnummer != null && eingangsnummer.doubleValue() > 0.0d) {
-                    NHK2000BewertungComposite bewertung = repo.newEntity( NHK2000BewertungComposite.class, null );
                     VertragComposite vertragTemplate = QueryExpressions.templateFor( VertragComposite.class );
                     BooleanExpression expr = QueryExpressions.eq( vertragTemplate.eingangsNr(),
                             eingangsnummer.intValue() );
@@ -93,19 +103,21 @@ public class MdbImportNHK2000Operation
                     }
                     bewertung.vertrag().set( vertrag );
 
-                    allBewertungen.put( eingangsnummer, bewertung );
-                    bewertungImporter.fillEntity( bewertung, builderRow );
-
-                    bewertung.MAKLERBW().set( getBooleanValue( builderRow, "MAKLERBW" ) );
-                    Double berzeitwert = bewertung.GESBAUWERT().get();
-                    if (bewertung.AUSVHBETR().get() != null) {
-                        berzeitwert -= bewertung.AUSVHBETR().get();
-                    }
-                    bewertung.BERZEITW1().set( berzeitwert );
+                    allBewertungen.put( eingangsnummer.toString(), bewertung );
                 }
-                // else {
-                // throw new IllegalStateException( "no EINGANGSNR found" );
-                // }
+                else if (bewertung.OBJEKTNR().get() != null) {
+                    // muss eine Wohnung sein
+                    WohnungComposite wohnungComposite = WohnungComposite.Mixin.forKeys( bewertung.OBJEKTNR().get(),
+                            bewertung.GEBNR().get(), bewertung.WOHNUNGSNR().get(), bewertung.FORTF().get() );
+                    if (wohnungComposite != null) {
+                        bewertung.wohnung().set( wohnungComposite );
+                    }
+                    allBewertungen.put( bewertung.OBJEKTNR().get() + "/" + bewertung.GEBNR().get() + "/"
+                            + bewertung.WOHNUNGSNR().get() + "/" + bewertung.FORTF().get(), bewertung );
+                }
+                else {
+                    throw new IllegalStateException( "no EINGANGSNR found" );
+                }
                 if ((++count % 200) == 0) {
                     monitor.worked( 200 );
                     monitor.setTaskName( "Objekte: " + count );
@@ -131,53 +143,59 @@ public class MdbImportNHK2000Operation
             Integer lfd = (Integer)builderRow.get( "LFDNR" );
             if (0 != lfd) {
                 // Bewertung gefunden erstellen
+                NHK2000BewertungGebaeudeComposite bewertungGebaeude = repo.newEntity(
+                        NHK2000BewertungGebaeudeComposite.class, null );
+
+                bewertungGebaeudeImporter.fillEntity( bewertungGebaeude, builderRow );
+                bewertungGebaeude.VERKJAHR().set( asDouble( (Integer)builderRow.get( "VERKJAHR" ) ) );
+                bewertungGebaeude.BERBAUJ1().set( asDouble( (Integer)builderRow.get( "BERBAUJ1" ) ) );
+                bewertungGebaeude.BAUJ1().set( asDouble( (Integer)builderRow.get( "BAUJ1" ) ) );
+
+                bewertungGebaeude.GND1().set( asDouble( (Integer)builderRow.get( "GND1" ) ) );
+                bewertungGebaeude.RND1().set( asDouble( (Integer)builderRow.get( "RND1" ) ) );
+                bewertungGebaeude.ALTER1().set( asDouble( (Integer)builderRow.get( "ALTER1" ) ) );
+                bewertungGebaeude.WERTMIN1().set( asDouble( (Integer)builderRow.get( "WERTMIN1" ) ) );
+                bewertungGebaeude.ABSCHLBM1().set( asDouble( (Integer)builderRow.get( "ABSCHLBM1" ) ) );
+                bewertungGebaeude.ZUABSCHL1().set( asDouble( (Integer)builderRow.get( "ZUABSCHL1" ) ) );
+
+                String rossV = (String)builderRow.get( "ROSS1" );
+                String ross = "-";
+                if ("L".equals( rossV )) {
+                    ross = "linear";
+                }
+                else if ("R".equals( rossV )) {
+                    ross = "Ross";
+                }
+                bewertungGebaeude.ROSS1().set( ross );
+
+                bewertungGebaeude.WOHNGEB().set( getBooleanValue( builderRow, "WOHNGEB" ) );
+                bewertungGebaeude.ABSCHLBM_BETRAG_EING().set( getBooleanValue( builderRow, "ABSCHLBM_BETRAG_EING" ) );
+                bewertungGebaeude.ABSCHLSO_BETRAG_EING().set( getBooleanValue( builderRow, "ABSCHLSO_BETRAG_EING" ) );
+
+                Double neuwert = bewertungGebaeude.NEUWERT1().get();
+                Double zeitwert = bewertungGebaeude.ZEITWERT1().get();
+                if (neuwert != null && zeitwert != null) {
+                    bewertungGebaeude.ALTERSWERTMINDERUNG().set( neuwert - zeitwert );
+                }
+
+                String bKey = null;
                 Double eingangsnummer = (Double)builderRow.get( "EINGANGSNR" );
                 if (eingangsnummer != null && eingangsnummer.doubleValue() > 0.0d) {
-                    NHK2000BewertungGebaeudeComposite bewertungGebaeude = repo.newEntity(
-                            NHK2000BewertungGebaeudeComposite.class, null );
-                    NHK2000BewertungComposite nhk2000BewertungComposite = allBewertungen.get( eingangsnummer );
-                    if (nhk2000BewertungComposite == null) {
-                        throw new IllegalStateException( "no bewertung found for " + eingangsnummer );
-                    }
-                    bewertungGebaeude.bewertung().set( nhk2000BewertungComposite );
+                    bKey = eingangsnummer.toString();
 
-                    bewertungGebaeudeImporter.fillEntity( bewertungGebaeude, builderRow );
-                    bewertungGebaeude.VERKJAHR().set( asDouble( (Integer)builderRow.get( "VERKJAHR" ) ) );
-                    bewertungGebaeude.BERBAUJ1().set( asDouble( (Integer)builderRow.get( "BERBAUJ1" ) ) );
-                    bewertungGebaeude.BAUJ1().set( asDouble( (Integer)builderRow.get( "BAUJ1" ) ) );
-
-                    bewertungGebaeude.GND1().set( asDouble( (Integer)builderRow.get( "GND1" ) ) );
-                    bewertungGebaeude.RND1().set( asDouble( (Integer)builderRow.get( "RND1" ) ) );
-                    bewertungGebaeude.ALTER1().set( asDouble( (Integer)builderRow.get( "ALTER1" ) ) );
-                    bewertungGebaeude.WERTMIN1().set( asDouble( (Integer)builderRow.get( "WERTMIN1" ) ) );
-                    bewertungGebaeude.ABSCHLBM1().set( asDouble( (Integer)builderRow.get( "ABSCHLBM1" ) ) );
-                    bewertungGebaeude.ZUABSCHL1().set( asDouble( (Integer)builderRow.get( "ZUABSCHL1" ) ) );
-
-                    String rossV = (String)builderRow.get( "ROSS1" );
-                    String ross = "-";
-                    if ("L".equals( rossV )) {
-                        ross = "linear";
-                    }
-                    else if ("R".equals( rossV )) {
-                        ross = "Ross";
-                    }
-                    bewertungGebaeude.ROSS1().set( ross );
-
-                    bewertungGebaeude.WOHNGEB().set( getBooleanValue( builderRow, "WOHNGEB" ) );
-                    bewertungGebaeude.ABSCHLBM_BETRAG_EING()
-                            .set( getBooleanValue( builderRow, "ABSCHLBM_BETRAG_EING" ) );
-                    bewertungGebaeude.ABSCHLSO_BETRAG_EING()
-                            .set( getBooleanValue( builderRow, "ABSCHLSO_BETRAG_EING" ) );
-
-                    Double neuwert = bewertungGebaeude.NEUWERT1().get();
-                    Double zeitwert = bewertungGebaeude.ZEITWERT1().get();
-                    if (neuwert != null && zeitwert != null) {
-                        bewertungGebaeude.ALTERSWERTMINDERUNG().set( neuwert - zeitwert );
-                    }
                 }
-                // else {
-                // throw new IllegalStateException( "no EINGANGSNR found" );
-                // }
+                else if (builderRow.get( "OBJEKTNR" ) != null) {
+                    bKey = builderRow.get( "OBJEKTNR" ) + "/" + builderRow.get( "GEBNR" ) + "/"
+                            + builderRow.get( "WOHNUNGSNR" ) + "/" + builderRow.get( "FORTF" );
+                }
+                else {
+                    throw new IllegalStateException( "no EINGANGSNR found" );
+                }
+                NHK2000BewertungComposite nhk2000BewertungComposite = allBewertungen.get( bKey );
+                if (nhk2000BewertungComposite == null) {
+                    throw new IllegalStateException( "no bewertung found for " + eingangsnummer );
+                }
+                bewertungGebaeude.bewertung().set( nhk2000BewertungComposite );
                 if ((++count % 200) == 0) {
                     monitor.worked( 200 );
                     monitor.setTaskName( "Objekte: " + count );

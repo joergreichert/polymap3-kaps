@@ -51,6 +51,7 @@ import org.polymap.kaps.model.NHK2000GebaeudeArtLabelProvider;
 import org.polymap.kaps.model.data.NHK2000BewertungComposite;
 import org.polymap.kaps.model.data.NHK2000BewertungGebaeudeComposite;
 import org.polymap.kaps.model.data.VertragComposite;
+import org.polymap.kaps.model.data.WohnungComposite;
 import org.polymap.kaps.ui.ActionButton;
 import org.polymap.kaps.ui.KapsDefaultFormEditorPageWithFeatureTable;
 import org.polymap.kaps.ui.MyNumberValidator;
@@ -100,30 +101,49 @@ public class NHK2000BewertungFormEditorPage
         super.createFormContent( site );
 
         final VertragComposite vertragComposite = bewertung.vertrag().get();
-        String nummer = vertragComposite != null ? EingangsNummerFormatter.format( vertragComposite.eingangsNr().get() )
-                : null;
-        site.setEditorTitle( formattedTitle( "NHK 2000", nummer, null ) );
-        site.setFormTitle( formattedTitle( "Bewertung nach NHK 2000", nummer, getTitle() ) );
-
+        final WohnungComposite wohnung = bewertung.wohnung().get();
         Composite parent = site.getPageBody();
-        String label = vertragComposite == null ? "Kein Vertrag zugewiesen" : "Vertrag " + nummer + " öffnen";
-        ActionButton openVertrag = new ActionButton( parent, new Action( label ) {
+        ActionButton openVertragOderWohnung = null;
+        if (vertragComposite != null) {
+            String nummer = vertragComposite != null ? EingangsNummerFormatter.format( vertragComposite.eingangsNr()
+                    .get() ) : null;
+            site.setEditorTitle( formattedTitle( "NHK 2000", nummer, null ) );
+            site.setFormTitle( formattedTitle( "Bewertung nach NHK 2000", nummer, getTitle() ) );
 
-            @Override
-            public void run() {
-                KapsPlugin.openEditor( fs, VertragComposite.NAME, vertragComposite );
-            }
-        } );
-        openVertrag.setLayoutData( left().height( 25 ).create() );
-        openVertrag.setEnabled( vertragComposite != null );
+            openVertragOderWohnung = new ActionButton( parent, new Action( "Vertrag " + nummer + " öffnen" ) {
+
+                @Override
+                public void run() {
+                    KapsPlugin.openEditor( fs, VertragComposite.NAME, vertragComposite );
+                }
+            } );
+            openVertragOderWohnung.setLayoutData( left().height( 25 ).create() );
+            openVertragOderWohnung.setEnabled( true );
+        }
+        else if (wohnung != null) {
+            String nummer = wohnung.objektNummer().get() + "/" + wohnung.gebaeudeNummer().get() + "/"
+                    + wohnung.wohnungsNummer().get() + "/" + wohnung.wohnungsFortfuehrung().get();
+            site.setEditorTitle( formattedTitle( "NHK 2000", nummer, null ) );
+            site.setFormTitle( formattedTitle( "Bewertung nach NHK 2000", nummer, getTitle() ) );
+
+            openVertragOderWohnung = new ActionButton( parent, new Action( "Wohnung " + nummer + " öffnen" ) {
+
+                @Override
+                public void run() {
+                    KapsPlugin.openEditor( fs, WohnungComposite.NAME, wohnung );
+                }
+            } );
+            openVertragOderWohnung.setLayoutData( left().height( 25 ).create() );
+            openVertragOderWohnung.setEnabled( true );
+        }
 
         Section tableSection = newSection( parent, "Auswahl Gebäude" );
-        tableSection.setLayoutData( new SimpleFormData( SECTION_SPACING ).left( 0 ).right( 50 ).top( openVertrag )
+        tableSection.setLayoutData( new SimpleFormData( SECTION_SPACING ).left( 0 ).right( 50 ).top( openVertragOderWohnung )
                 .create() );
         createTableForm( (Composite)tableSection.getClient(), parent, false, false, false );
 
         Section sumSection = newSection( parent, "Summen" );
-        sumSection.setLayoutData( new SimpleFormData( SECTION_SPACING ).left( tableSection, 0 ).top( openVertrag )
+        sumSection.setLayoutData( new SimpleFormData( SECTION_SPACING ).left( tableSection, 0 ).top( openVertragOderWohnung )
                 .right( 100 ).create() );
         createSumForm( site, sumSection );
 
