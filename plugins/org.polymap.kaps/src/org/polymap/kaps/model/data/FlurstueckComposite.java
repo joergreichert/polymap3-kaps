@@ -280,14 +280,5 @@ public interface FlurstueckComposite
                     expr, 0, -1 );
             return matches;
         }
-        //
-        // @Override
-        // public void beforeCompletion()
-        // throws UnitOfWorkCompletionException {
-        // if (flurstueck().get() == null && gemarkung.get() != null) {
-        // // neues Flurstueck angelegt, globales Flurstück ergänzen
-        //
-        // }
-        // }
     }
 }

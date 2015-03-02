@@ -21,7 +21,13 @@
             class="org.polymap.kaps.importer.MdbImportWizard"
             icon="icons/add.gif"
             id="org.polymap.kaps.winakpsimport"
-            name="WinAKPS Import ">
+            name="WinAKPS - NHK2000 importieren">
+      </wizard>
+      <wizard
+            class="org.polymap.kaps.importer.MdbFixRWZWizard"
+            icon="icons/add.gif"
+            id="org.polymap.kaps.winakpsimport.rwz"
+            name="WinAKPS - Richtwertzonen korrigieren">
       </wizard>
    </extension>
    <extension

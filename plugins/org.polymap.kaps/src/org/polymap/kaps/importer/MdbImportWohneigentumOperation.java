@@ -46,7 +46,6 @@ import org.polymap.kaps.model.data.StockwerkStaBuComposite;
 import org.polymap.kaps.model.data.StrasseComposite;
 import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.WohnungComposite;
-import org.polymap.kaps.model.data.WohnungseigentumComposite;
 import org.polymap.kaps.ui.form.EingangsNummerFormatter;
 
 /**

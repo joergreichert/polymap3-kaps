@@ -542,4 +542,10 @@ public class KapsRepository
         // wohnung wird über flurstück gelöscht
         super.removeEntity( vertrag );
     }
+//
+//
+//    public void forceRemoveEntity( final Entity entity ) {
+//        // remove without check for other references
+//        super.removeEntity( entity );
+//    }
 }
