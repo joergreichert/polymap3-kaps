@@ -80,7 +80,7 @@ public abstract class AbstractMdbImportOperation
         RichtwertzoneZeitraumComposite found = null;
         List<RichtwertzoneZeitraumComposite> zonen = allRichtwertZoneGueltigkeit.get( gemeinde );
         for (RichtwertzoneZeitraumComposite richtwertzone : zonen) {
-            if (richtwertzone.schl().get().equals( zone ) && richtwertzone.gueltigAb().get().equals( jahr )) {
+            if (richtwertzone != null && richtwertzone.schl().get().equals( zone ) && richtwertzone.gueltigAb().get().equals( jahr )) {
                 found = richtwertzone;
                 break;
             }
