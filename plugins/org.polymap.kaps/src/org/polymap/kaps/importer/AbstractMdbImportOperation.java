@@ -80,7 +80,8 @@ public abstract class AbstractMdbImportOperation
         RichtwertzoneZeitraumComposite found = null;
         List<RichtwertzoneZeitraumComposite> zonen = allRichtwertZoneGueltigkeit.get( gemeinde );
         for (RichtwertzoneZeitraumComposite richtwertzone : zonen) {
-            if (richtwertzone != null && richtwertzone.schl().get().equals( zone ) && richtwertzone.gueltigAb().get().equals( jahr )) {
+            if (richtwertzone != null && richtwertzone.schl().get() != null && richtwertzone.gueltigAb().get() != null
+                    && richtwertzone.schl().get().equals( zone ) && richtwertzone.gueltigAb().get().equals( jahr )) {
                 found = richtwertzone;
                 break;
             }
@@ -97,7 +98,7 @@ public abstract class AbstractMdbImportOperation
                 newYear.setYear( newYear.getYear() - 1 );
 
                 for (RichtwertzoneZeitraumComposite richtwertzone : zonen) {
-                    if (richtwertzone.schl().get().equals( zone ) && richtwertzone.gueltigAb().get().equals( newYear )) {
+                    if (richtwertzone.schl().get() != null && richtwertzone.gueltigAb().get() != null && richtwertzone.schl().get().equals( zone ) && richtwertzone.gueltigAb().get().equals( newYear )) {
                         found = richtwertzone;
                         break;
                     }
@@ -111,7 +112,7 @@ public abstract class AbstractMdbImportOperation
                     zone, gemeinde, jahr, id ) );
             for (List<RichtwertzoneZeitraumComposite> alleZonen : allRichtwertZoneGueltigkeit.values()) {
                 for (RichtwertzoneZeitraumComposite richtwertzone : alleZonen) {
-                    if (richtwertzone.schl().get().equals( zone ) && richtwertzone.gueltigAb().get().equals( jahr )) {
+                    if (richtwertzone.schl().get() != null && richtwertzone.gueltigAb().get() != null && richtwertzone.schl().get().equals( zone ) && richtwertzone.gueltigAb().get().equals( jahr )) {
                         found = richtwertzone;
                         break;
                     }
@@ -131,7 +132,7 @@ public abstract class AbstractMdbImportOperation
                 newYear.setYear( newYear.getYear() - 1 );
                 for (List<RichtwertzoneZeitraumComposite> alleZonen : allRichtwertZoneGueltigkeit.values()) {
                     for (RichtwertzoneZeitraumComposite richtwertzone : alleZonen) {
-                        if (richtwertzone.schl().get().equals( zone )
+                        if (richtwertzone.schl().get() != null && richtwertzone.gueltigAb().get() != null && richtwertzone.schl().get().equals( zone )
                                 && richtwertzone.gueltigAb().get().equals( newYear )) {
                             found = richtwertzone;
                             break;
@@ -146,7 +147,7 @@ public abstract class AbstractMdbImportOperation
                     gemeinde, id ) );
             for (List<RichtwertzoneZeitraumComposite> alleZonen : allRichtwertZoneGueltigkeit.values()) {
                 for (RichtwertzoneZeitraumComposite richtwertzone : alleZonen) {
-                    if (richtwertzone.schl().get().equals( zone )) {
+                    if (richtwertzone.schl().get() != null && richtwertzone.schl().get().equals( zone )) {
                         found = richtwertzone;
                         break;
                     }

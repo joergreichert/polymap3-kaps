@@ -191,6 +191,7 @@ public class KapsRepositoryAssembler
         }
         migrateBelastung( uow );
         migrateRichtwertzone( uow );
+//        findEmptyRichtwertZone( uow );
         migrateBaukosten( uow );
         migrateEingangsnummern( uow );
         migrateVertragsdatenErweitert( uow );
@@ -294,6 +295,24 @@ public class KapsRepositoryAssembler
             log.info( "Migration of " + count + " Richtwertzone Completed" );
         }
     }
+
+//
+//    private void findEmptyRichtwertZone( UnitOfWork uow )
+//            throws IOException {
+//        log.info( "Suche ungueltige Richtwertzone" );
+//        QueryBuilder<RichtwertzoneZeitraumComposite> builderZ = getModule().queryBuilderFactory().newQueryBuilder(
+//                RichtwertzoneZeitraumComposite.class );
+//        Iterator<RichtwertzoneZeitraumComposite> it = builderZ.newQuery( uow ).maxResults( Integer.MAX_VALUE )
+//                .iterator();
+//        int count = 0;
+//        while (it.hasNext()) {
+//            RichtwertzoneZeitraumComposite zeitraum = it.next();
+//            if (zeitraum.schl().get() == null || zeitraum.gueltigAb().get() == null) {
+//                log.info( "Zone " + zeitraum.id() + " " + (zeitraum.zone().get() != null ? zeitraum.zone().get().schl().get() : "null") + ":" + zeitraum.schl().get() + " fehlen Daten." );
+//            }
+//        }
+//        log.info( "Migration of " + count + " Richtwertzone Completed" );
+//    }
 
 
     private void migrateEingangsnummern( UnitOfWork uow )

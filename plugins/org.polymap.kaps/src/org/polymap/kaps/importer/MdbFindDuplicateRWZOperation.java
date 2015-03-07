@@ -113,9 +113,20 @@ public class MdbFindDuplicateRWZOperation
                 String gemeinde = composite.split( ";" )[1];
 
                 BooleanExpression expr = QueryExpressions.eq( template.schl(), zone );
-                RichtwertzoneComposite rwz = KapsRepository.instance()
-                        .findEntities( RichtwertzoneComposite.class, expr, 0, -1 ).find();
-                if (rwz != null && gemeinde.equals( rwz.gemeinde().get().schl().get() )) {
+                boolean found = false;
+                int cound = 0;
+                Query<RichtwertzoneComposite> entities = KapsRepository.instance().findEntities( RichtwertzoneComposite.class,
+                        expr, 0, -1 );
+                for (RichtwertzoneComposite rwz : entities) {
+                    if (rwz != null && gemeinde.equals( rwz.gemeinde().get().schl().get() )) {
+                        found = true;
+                    }
+                    count++;
+                }
+                if (count > 1) {
+                    log.info( count + ". Zone " + composite + " existiert schon mehrfach" );                    
+                }
+                if (found) {
                     log.info( count + ". doppelte Zone " + composite + " wurde importiert" );
                 }
                 else {
@@ -142,7 +153,7 @@ public class MdbFindDuplicateRWZOperation
 
             // alle richtwertzonen neu zu Vertragsdatenagrarland zuweisen
             korrigiereVertragsdatenAgrarland( db, monitor, allRichtwertZoneGueltigkeit, duplicateRWZ );
-            
+
             // alle richtwertzonen neu zu Flurstücken zuweisen
             korrigiereFlurstuecke( db, monitor, allRichtwertZoneGueltigkeit, duplicateRWZ );
 

@@ -1,0 +1,8 @@
+[INFO] KapsRepositoryAssembler - Zone RichtwertzoneZeitraumComposite-20140605-1357-0 3636050:null fehlen Daten.
+[INFO] KapsRepositoryAssembler - Zone RichtwertzoneZeitraumComposite-20140703-0913-0 null:null fehlen Daten.
+[INFO] KapsRepositoryAssembler - Zone RichtwertzoneZeitraumComposite-20140801-0923-0 null:null fehlen Daten.
+[INFO] KapsRepositoryAssembler - Zone RichtwertzoneZeitraumComposite-20140917-1502-0 2912050:null fehlen Daten.
+[INFO] KapsRepositoryAssembler - Zone RichtwertzoneZeitraumComposite-20140917-1508-0 3633901:null fehlen Daten.
+[INFO] KapsRepositoryAssembler - Zone RichtwertzoneZeitraumComposite-20140918-0804-0 3633901:3633901 fehlen Daten.
+[INFO] KapsRepositoryAssembler - Zone RichtwertzoneZeitraumComposite-20140918-0807-0 3535901:null fehlen Daten.
+[INFO] KapsRepositoryAssembler - Zone RichtwertzoneZeitraumComposite-20141016-0857-0 null:null fehlen Daten.
