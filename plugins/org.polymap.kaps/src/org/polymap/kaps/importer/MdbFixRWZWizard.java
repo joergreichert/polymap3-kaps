@@ -75,17 +75,23 @@ public class MdbFixRWZWizard
                 @Override
                 protected IStatus doExecute( IProgressMonitor monitor, IAdaptable info )
                         throws Exception {
-                    
-//                    new MdbImportNHK2000Operation( importPage.dbFile, importPage.tableNames ).doExecute( monitor,
+
+                    // new MdbImportNHK2000Operation( importPage.dbFile,
+                    // importPage.tableNames ).doExecute( monitor,
+                    // info );
+//                    new MdbFindDuplicateRWZOperation( importPage.dbFile, importPage.tableNames ).doExecute( monitor,
 //                            info );
-                    new MdbFindDuplicateRWZOperation( importPage.dbFile, importPage.tableNames ).doExecute( monitor,
-                            info );
-//                    new MdbImportVertraegeOperation( importPage.dbFile, importPage.tableNames ).doExecute( monitor,
-//                            info );
-//                    new MdbImportWohneigentumOperation( importPage.dbFile, importPage.tableNames ).doExecute( monitor,
-//                            info );
-//                    new MdbImportBewertungenOperation( importPage.dbFile, importPage.tableNames ).doExecute( monitor,
-//                            info );
+                    new MdbFixFlurstueckWohnungRelationOperation( importPage.dbFile, importPage.tableNames ).doExecute(
+                            monitor, info );
+                    // new MdbImportVertraegeOperation( importPage.dbFile,
+                    // importPage.tableNames ).doExecute( monitor,
+                    // info );
+                    // new MdbImportWohneigentumOperation( importPage.dbFile,
+                    // importPage.tableNames ).doExecute( monitor,
+                    // info );
+                    // new MdbImportBewertungenOperation( importPage.dbFile,
+                    // importPage.tableNames ).doExecute( monitor,
+                    // info );
                     return Status.OK_STATUS;
                 }
 
@@ -97,7 +103,7 @@ public class MdbFixRWZWizard
                 }
             };
             OperationSupport.instance().execute( op, true, true );
-            System.out.println("IMPORT needs " + ((System.currentTimeMillis() - start) / 1000) + "s");
+            System.out.println( "IMPORT needs " + ((System.currentTimeMillis() - start) / 1000) + "s" );
             return true;
         }
         catch (Exception e) {
