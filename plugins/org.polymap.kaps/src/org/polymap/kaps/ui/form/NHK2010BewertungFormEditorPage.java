@@ -1222,7 +1222,7 @@ public class NHK2010BewertungFormEditorPage
                 }
                 if (neuwert != null) {
                     pageSite.setFieldValue( getPropertyName( nameTemplate.neuWert() ),
-                            neuwert != null ? NumberFormatter.getFormatter( 2 ).format( neuwert ) : null );
+                            neuwert != null ? NumberFormatter.getFormatter( 2 ).format( MathUtil.round( neuwert )) : null );
                 }
             }
 
@@ -1518,8 +1518,8 @@ public class NHK2010BewertungFormEditorPage
             private void update() {
                 Double result = null;
 
-                if (restNutzungsDauer != null && gesamtNutzungsDauer != null && gesamtNutzungsDauer != 0
-                        && gesamtNutzungsDauer > restNutzungsDauer) {
+                if (restNutzungsDauer != null && gesamtNutzungsDauer != null && gesamtNutzungsDauer != 0) {
+//                        && gesamtNutzungsDauer > restNutzungsDauer) {
                     result = ((gesamtNutzungsDauer.doubleValue() - restNutzungsDauer.doubleValue()) / gesamtNutzungsDauer
                             .doubleValue()) * 100;
                 }
@@ -1571,7 +1571,7 @@ public class NHK2010BewertungFormEditorPage
                 Double result = null;
 
                 if (neuWert != null && altersWertMinderung != null) {
-                    result = neuWert / 100 * (100 - altersWertMinderung);
+                    result = altersWertMinderung > 0.0d ? neuWert / 100 * (100 - altersWertMinderung) : neuWert;
                 }
                 pageSite.setFieldValue( getPropertyName( nameTemplate.zeitwertRnd() ), result != null ? NumberFormatter
                         .getFormatter( 2 ).format( MathUtil.round( result ) ) : null );

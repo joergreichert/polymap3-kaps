@@ -12,9 +12,9 @@
  */
 package org.polymap.kaps.ui;
 
-import java.text.NumberFormat;
+import java.util.Locale;
 
-import org.polymap.core.runtime.Polymap;
+import java.text.NumberFormat;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -32,7 +32,7 @@ public class NumberFormatter {
 
 
     public final static NumberFormat getFormatter( int maxFractionDigits, int minFractionDigits, boolean useGrouping ) {
-        NumberFormat nf = NumberFormat.getInstance(Polymap.getSessionLocale());
+        NumberFormat nf = NumberFormat.getInstance(Locale.GERMANY);
         nf.setMaximumFractionDigits( maxFractionDigits );
         nf.setMinimumFractionDigits( minFractionDigits );
         nf.setMinimumIntegerDigits( 1 );
