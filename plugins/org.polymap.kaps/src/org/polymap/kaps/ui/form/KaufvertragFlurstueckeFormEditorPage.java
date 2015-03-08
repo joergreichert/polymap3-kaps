@@ -797,6 +797,9 @@ public class KaufvertragFlurstueckeFormEditorPage
                             gebaeude.flurstuecke().add( flurstueckComposite );
                         }
                     }
+                    // reload
+                    wohnungPicklist.setEnabled( false );
+                    wohnungPicklist.setEnabled( true );                    
                     // }
                     // } );
                 }
