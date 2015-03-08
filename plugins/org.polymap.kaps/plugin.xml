@@ -44,22 +44,29 @@
             class="org.polymap.kaps.exporter.WohnungAlsETWExporter"
             icon="icons/exportas.gif"
             id="org.polymap.kaps.exporter.WohnungAlsETWExporter"
-            label="Export Statistik ETW"
-            tooltip="Export Statistik ETW">
+            label="Exportieren als ETW"
+            tooltip="Exportieren als ETW">
       </featureOperation>
       <featureOperation
             class="org.polymap.kaps.exporter.VertragsdatenBaulandAlsBRLExporter"
             icon="icons/exportas.gif"
             id="org.polymap.kaps.exporter.VertragsdatenBaulandAlsBRLExporter"
-            label="Export Statistik BRL"
-            tooltip="Export Statistik BRL">
+            label="Exportieren als Statistik BRL"
+            tooltip="Exportieren als Statistik BRL">
+      </featureOperation>
+      <featureOperation
+            class="org.polymap.kaps.exporter.VertragsdatenBaulandAlsBRLWExporter"
+            icon="icons/exportas.gif"
+            id="org.polymap.kaps.exporter.VertragsdatenBaulandAlsBRLWExporter"
+            label="Exportieren als Statistik BRL-W"
+            tooltip="Exportieren als Statistik BRL-W">
       </featureOperation>
       <featureOperation
             class="org.polymap.kaps.exporter.VertragsdatenAgrarAlsAgrarExporter"
             icon="icons/exportas.gif"
             id="org.polymap.kaps.exporter.VertragsdatenAgrarAlsAgrarExporter"
-            label="Export Statistik Agrar"
-            tooltip="Export Statistik Agrar">
+            label="Exportieren als Statistik Agrar"
+            tooltip="Exportieren als Statistik Agrar">
       </featureOperation>
       <featureOperation
             class="org.polymap.kaps.exporter.RichtwertzoneAsBorisExporter"
