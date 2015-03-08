@@ -391,12 +391,12 @@ public abstract class AbstractExcelExporter<T extends Entity>
     }
 
 
-    private String[] getValues( List<Value> values ) {
+    private List<String> getValues( List<Value> values ) {
         List<String> headers = new ArrayList<String>();
         for (Value entry : values) {
             headers.add( entry.getValue() );
         }
-        return headers.toArray( new String[0] );
+        return headers;
     }
 
 

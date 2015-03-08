@@ -28,26 +28,29 @@ import org.polymap.kaps.ui.form.EingangsNummerFormatter;
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 public class VertragsdatenGebaudeExporter
-        extends AbstractExcelExporter<VertragsdatenBaulandComposite> {
+        extends AbstractExcelExporter<VertragComposite> {
 
     public VertragsdatenGebaudeExporter() {
-        super( VertragsdatenBaulandComposite.class, VertragsdatenBaulandComposite.NAME, "gebaeude", "Gebäude" );
+        super( VertragComposite.class, VertragComposite.NAME, "gebaeude", "Gebäude" );
     }
 
 
     @Override
-    protected List<List<Value>> createMultiRowValues( VertragsdatenBaulandComposite vdc, List<String> errors ) {
+    protected List<List<Value>> createMultiRowValues( VertragComposite vertrag, List<String> errors ) {
         List<List<Value>> result = new ArrayList<List<Value>>();
 
-        VertragComposite vertrag = vdc.vertrag().get();
-        if (vertrag == null) {
-            errors.add( error( vdc, "Keinen Vertrag gefunden!" ) );
+        VertragsdatenBaulandComposite vdc = VertragsdatenBaulandComposite.Mixin.forVertrag( vertrag );
+        if (vdc == null) {
+            errors.add( error( vertrag, "Keine VertragsdatenBauland gefunden!" ) );
             return result;
         }
         boolean firstRow = true;
         for (FlurstueckComposite fs : FlurstueckComposite.Mixin.forEntity( vertrag )) {
-            result.add( createValues( vertrag, vdc, fs, errors, firstRow ) );
-            firstRow = false;
+            List<Value> createValues = createValues( vertrag, vdc, fs, errors, firstRow );
+            if (!createValues.isEmpty()) {
+                result.add( createValues );
+                firstRow = false;
+            }
         }
         return result;
     }
@@ -102,11 +105,7 @@ public class VertragsdatenGebaudeExporter
     
 
     @Override
-    protected String getSortString( VertragsdatenBaulandComposite entity ) {
-        VertragComposite vertrag = entity.vertrag().get();
-        if (vertrag == null) {
-            return entity.toString();
-        }
+    protected String getSortString( VertragComposite vertrag ) {
         return EingangsNummerFormatter.format( vertrag.eingangsNr().get() );
     }
 }

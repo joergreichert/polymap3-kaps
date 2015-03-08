@@ -28,7 +28,10 @@ public abstract class AbstractSingleRowExcelExporter<T extends Entity>
     @Override
     protected List<List<Value>> createMultiRowValues( T entity, List<String> errors ) {
         List<List<Value>> result = new ArrayList<List<Value>>();
-        result.add( createValues( entity, errors ) );
+        List<Value> createValues = createValues( entity, errors  );
+        if (!createValues.isEmpty()) {
+            result.add( createValues );
+        }
         return result;
     }
 
