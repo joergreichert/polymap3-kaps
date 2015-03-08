@@ -247,21 +247,21 @@ public class VertragFlaecheStatistikExporter
                     }
                 }
             }
-            lines.add( new StringBuilder().append( "Gesamtzahl Kaufverträge" ).append( DELIMITER ).append( count )
+            lines.add( new StringBuilder().append( "Gesamtzahl Kaufvertraege" ).append( DELIMITER ).append( count )
                     .toString() );
             NumberFormat numberFormat = NumberFormatter.getFormatter( 0, true );
-            lines.add( new StringBuilder().append( "Gesamte verkaufte Fläche" ).append( DELIMITER )
+            lines.add( new StringBuilder().append( "Gesamte verkaufte Flaeche" ).append( DELIMITER )
                     .append( numberFormat.format( gesamteFlaeche ) ).append( DELIMITER ).append( "qm" ).toString() );
-            lines.add( new StringBuilder().append( "Größte verkaufte Fläche" ).append( DELIMITER )
+            lines.add( new StringBuilder().append( "Groesste verkaufte Flaeche" ).append( DELIMITER )
                     .append( numberFormat.format( groessteFlaeche ) ).append( DELIMITER ).append( "qm" ).toString() );
-            lines.add( new StringBuilder().append( "Kleinste verkaufte Fläche" ).append( DELIMITER )
+            lines.add( new StringBuilder().append( "Kleinste verkaufte Flaeche" ).append( DELIMITER )
                     .append( numberFormat.format( kleinsteFlaeche ) ).append( DELIMITER ).append( "qm" ).toString() );
-            lines.add( new StringBuilder().append( "Durchschnittlich verkaufte Fläche" ).append( DELIMITER )
+            lines.add( new StringBuilder().append( "Durchschnittlich verkaufte Flaeche" ).append( DELIMITER )
                     .append( numberFormat.format( gesamteFlaeche / count ) ).append( DELIMITER ).append( "qm" )
                     .toString() );
             lines.add( new StringBuilder().append( "Gesamter Kaufpreis" ).append( DELIMITER )
                     .append( numberFormat.format( gesamterKaufpreis ) ).append( DELIMITER ).append( "EUR" ).toString() );
-            lines.add( new StringBuilder().append( "Größter Kaufpreis" ).append( DELIMITER )
+            lines.add( new StringBuilder().append( "Groesster Kaufpreis" ).append( DELIMITER )
                     .append( numberFormat.format( hoechsterKaufpreis ) ).append( DELIMITER ).append( "EUR" ).toString() );
             lines.add( new StringBuilder().append( "Kleinster Kaufpreis" ).append( DELIMITER )
                     .append( numberFormat.format( niedrigsterKaufpreis ) ).append( DELIMITER ).append( "EUR" )
