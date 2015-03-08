@@ -164,7 +164,7 @@ public abstract class FlurstueckSearcher
             expr = (expr == null) ? in : QueryExpressions.and( expr, in );
         }
         if (unternummer != null && !unternummer.isEmpty()) {
-            BooleanExpression in = QueryExpressions.eq( template.unterNummer(), unternummer );
+            BooleanExpression in = QueryExpressions.matches( template.unterNummer(), "*" + unternummer + "*" );
             expr = (expr == null) ? in : QueryExpressions.and( expr, in );
         }
         Query<FlurstueckComposite> matches = KapsRepository.instance().findEntities( FlurstueckComposite.class, expr,
