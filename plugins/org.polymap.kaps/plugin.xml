@@ -97,11 +97,18 @@
             tooltip="Geometrie auslesen und in Richtwertzone importieren">
       </featureOperation>
       <featureOperation
+            class="org.polymap.kaps.exporter.VertragsdatenBaulandGebaudeExporter"
+            icon="icons/exportas.gif"
+            id="org.polymap.kaps.exporter.VertragsdatenBaulandGebaudeExporter"
+            label="Exportieren als Gebäude"
+            tooltip="Exportieren als Gebäude">
+      </featureOperation>
+      <featureOperation
             class="org.polymap.kaps.exporter.VertragsdatenGebaudeExporter"
             icon="icons/exportas.gif"
             id="org.polymap.kaps.exporter.VertragsdatenGebaudeExporter"
-            label="Export Vertragsdaten für Gebäude"
-            tooltip="Export Vertragsdaten für Gebäude">
+            label="Exportieren als Gebäude"
+            tooltip="Exportieren als Gebäude">
       </featureOperation>
    </extension>
    <extension
