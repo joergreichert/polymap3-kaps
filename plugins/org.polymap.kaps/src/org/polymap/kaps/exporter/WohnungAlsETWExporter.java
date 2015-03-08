@@ -125,6 +125,6 @@ public class WohnungAlsETWExporter
         if (vertrag == null) {
             return entity.schl().get();
         }
-        return EingangsNummerFormatter.format( vertrag.eingangsNr().get() );
+        return EingangsNummerFormatter.format( vertrag.eingangsNr().get() ) + "/" + entity.schl().get();
     }
 }

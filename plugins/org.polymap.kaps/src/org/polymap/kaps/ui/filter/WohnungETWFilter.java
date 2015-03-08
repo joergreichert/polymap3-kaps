@@ -46,6 +46,7 @@ import org.polymap.kaps.model.data.GemarkungComposite;
 import org.polymap.kaps.model.data.GemeindeComposite;
 import org.polymap.kaps.model.data.NutzungComposite;
 import org.polymap.kaps.model.data.VertragComposite;
+import org.polymap.kaps.model.data.VertragsArtComposite;
 import org.polymap.kaps.model.data.WohnungComposite;
 import org.polymap.kaps.ui.NotNullValidator;
 
@@ -79,6 +80,9 @@ public class WohnungETWFilter
                 new DateTimeFormField(), new DateTimeFormField() ), new BetweenValidator( new NotNullValidator() ),
                 "Vertragsdatum" ) );
 
+        site.addStandardLayout( site.newFormField( result, "vertragsart", VertragsArtComposite.class, new PicklistFormField(
+                KapsRepository.instance().entitiesWithNames( VertragsArtComposite.class ) ), null, "Vertragsart" ) );
+
         site.addStandardLayout( site.newFormField( result, "gemeinde", GemeindeComposite.class, new PicklistFormField(
                 KapsRepository.instance().entitiesWithNames( GemeindeComposite.class ) ), null, "Gemeinde" ) );
 
@@ -108,6 +112,7 @@ public class WohnungETWFilter
         List<NutzungComposite> nutzungen = (List<NutzungComposite>)site.getFieldValue( "nutzung" );
         List<GebaeudeArtComposite> gebaeudearten = (List<GebaeudeArtComposite>)site.getFieldValue( "gebaeudeArt" );
         GemeindeComposite gemeinde = (GemeindeComposite)site.getFieldValue( "gemeinde" );
+        VertragsArtComposite vertragsArt = (VertragsArtComposite)site.getFieldValue( "vertragsart" );
 
         Object[] vertragsDatum = (Object[])site.getFieldValue( "datum" );
         BooleanExpression vertragsDatumExpr = null;
@@ -127,6 +132,16 @@ public class WohnungETWFilter
             }
         }
 
+        if (vertragsArt != null) {
+            VertragComposite vTemplate = QueryExpressions.templateFor( VertragComposite.class );
+            BooleanExpression artExpr = QueryExpressions.eq(vTemplate.vertragsArt(), vertragsArt);
+            if (vertragsDatumExpr == null) {
+                vertragsDatumExpr = artExpr;
+            } else {
+                vertragsDatumExpr = QueryExpressions.and( vertragsDatumExpr, artExpr );
+            }
+        }
+        
         WohnungComposite template = QueryExpressions.templateFor( WohnungComposite.class );
 
         // if (nutzungen != null || gemeinde != null) {
