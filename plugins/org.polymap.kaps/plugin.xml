@@ -47,6 +47,13 @@
             label="Exportieren als ETW"
             tooltip="Exportieren als ETW">
       </featureOperation>
+       <featureOperation
+            class="org.polymap.kaps.exporter.VertragFlaecheStatistikExporter"
+            icon="icons/exportas.gif"
+            id="org.polymap.kaps.exporter.VertragFlaecheStatistikExporter"
+            label="Exportieren als Gesamtstatistik"
+            tooltip="Exportieren als Gesamtstatistik">
+      </featureOperation>
       <featureOperation
             class="org.polymap.kaps.exporter.VertragsdatenBaulandAlsBRLExporter"
             icon="icons/exportas.gif"
