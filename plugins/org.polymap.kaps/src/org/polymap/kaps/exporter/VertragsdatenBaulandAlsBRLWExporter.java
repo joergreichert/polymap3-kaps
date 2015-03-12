@@ -68,8 +68,8 @@ public class VertragsdatenBaulandAlsBRLWExporter
         }
 
         result.add( new Value( "Eingangsnummer", EingangsNummerFormatter.format( vertrag.eingangsNr().get() ) ) );
-        result.add( new Value( "Flst.-zaehler", flurstueck.flaechenAnteilZaehler().get(), 2 ) );
-        result.add( new Value( "Flst.-nenner", flurstueck.flaechenAnteilZaehler().get(), 2 ) );
+        result.add( new Value( "Flst.-zaehler", flurstueck.hauptNummer().get() ) );
+        result.add( new Value( "Flst.-nenner", flurstueck.unterNummer().get() ) );
 
         StrasseComposite strasseComposite = flurstueck.strasse().get();
         result.add( new Value( "Strasse", strasseComposite != null ? strasseComposite.name().get() : "" ) );
