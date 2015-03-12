@@ -26,7 +26,6 @@ import org.polymap.core.qi4j.QiModule;
 import org.polymap.rhei.data.entityfeature.EntitySourceProcessor;
 
 import org.polymap.kaps.model.data.WohnungComposite;
-import org.polymap.kaps.ui.form.EingangsNummerFormatter;
 
 public class WohnungEntityProvider
         extends KapsEntityProvider<WohnungComposite> {
@@ -46,14 +45,14 @@ public class WohnungEntityProvider
         // Spaltentyp ändern
         SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
         builder.init( (SimpleFeatureType)type );
-        builder.add( "eingangsNr", String.class );
+//        builder.add( "eingangsNr", String.class );
         type = builder.buildFeatureType();
 
         // WohnungComposite template = QueryExpressions.templateFor(
         // WohnungComposite.class );
         // aussortieren für die Tabelle
         SimpleFeatureType filtered = SimpleFeatureTypeBuilder.retype( (SimpleFeatureType)type, new String[] {
-                "eingangsNr", "objektNummer", "gebaeudeNummer", "wohnungsNummer", "wohnungsFortfuehrung" } );
+               /* "eingangsNr",*/ "objektNummer", "gebaeudeNummer", "wohnungsNummer", "wohnungsFortfuehrung" } );
         return filtered;
     }
 
@@ -64,10 +63,10 @@ public class WohnungEntityProvider
 
         // formatieren
         // eingangsnummer
-        if (entity.vertrag().get() != null && entity.vertrag().get().eingangsNr().get() != null) {
-            feature.getProperty( "eingangsNr" ).setValue(
-                    EingangsNummerFormatter.format( entity.vertrag().get().eingangsNr().get().toString() ) );
-        }
+//        if (entity.vertrag().get() != null && entity.vertrag().get().eingangsNr().get() != null) {
+//            feature.getProperty( "eingangsNr" ).setValue(
+//                    EingangsNummerFormatter.format( entity.vertrag().get().eingangsNr().get().toString() ) );
+//        }
         return feature;
     }
 }
