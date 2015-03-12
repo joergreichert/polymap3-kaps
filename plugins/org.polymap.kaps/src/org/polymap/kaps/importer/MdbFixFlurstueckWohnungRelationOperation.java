@@ -85,18 +85,19 @@ public class MdbFixFlurstueckWohnungRelationOperation
                             wohnungsNummer, wohnungsFortfuehrung );
                     if (wohnung != null) {
                         FlurstueckComposite aktuellesFlurstueck = wohnung.flurstueck().get();
-                        String gemarkung = (String)builderRow.get( "GEM" );
-                        Integer flurNummer = (Integer)builderRow.get( "FLSTNR" );
-                        String flurUnternummer = (String)builderRow.get( "FLSTNRU" );
+//                        String gemarkung = (String)builderRow.get( "GEM" );
+//                        Integer flurNummer = (Integer)builderRow.get( "FLSTNR" );
+//                        String flurUnternummer = (String)builderRow.get( "FLSTNRU" );
 
                         // --> check ob flurstück ohne vertrag existiert
                         if (aktuellesFlurstueck == null || aktuellesFlurstueck.vertrag().get() != null) {
-                            String key = gemarkung + ";" + flurNummer + ";" + flurUnternummer;
+                            String key = objektNummer + ";" + gebaeudeNummer;
                             Set<WohnungComposite> wohnungen = wrongWohnungen.get( key );
                             if (wohnungen == null) {
                                 wohnungen = new HashSet<WohnungComposite>();
                                 wrongWohnungen.put( key, wohnungen );
                             }
+                            log.info( "Wohnung kaputt: " +  wohnung.schl().get());
                             wohnungen.add( wohnung );
                         }
                     }
@@ -140,18 +141,17 @@ public class MdbFixFlurstueckWohnungRelationOperation
 //        monitor.beginTask( "Tabelle: " + table.getName(), table.getRowCount() );
         // data rows
         Map<String, Object> builderRow = null;
-        int count = 0;
+//        int count = 0;
         while ((builderRow = table.getNextRow()) != null) {
+            Integer objektNummer = (Integer)builderRow.get( "OBJEKTNR" );
+            Integer gebaeudeNummer = (Integer)builderRow.get( "GEBNR" );
+           
 
-            String gemarkung = (String)builderRow.get( "GEM" );
-            Integer flurNummer = (Integer)builderRow.get( "FLSTNR" );
-            String flurUnternummer = (String)builderRow.get( "FLSTNRU" );
-
-            if (wrongWohnungen.get( gemarkung + ";" + flurNummer + ";" + flurUnternummer ) != null) {
+            if (wrongWohnungen.get( objektNummer + ";" + gebaeudeNummer ) != null) {
                 FlurstueckComposite flurstueck = findFlurstueck( builderRow );
 
                 if (flurstueck == null) {
-                    log.info( "Flurstueck für " + gemarkung + ";" + flurNummer + ";" + flurUnternummer + " angelegt" );
+                    log.info( "Flurstueck für " + objektNummer + ";" + gebaeudeNummer + " angelegt" );
                     flurstueck = repo.newEntity( FlurstueckComposite.class, null );
 
                     flurstueck.gemarkung().set( findSchlNamed( GemarkungComposite.class, builderRow, "GEM", false ) );
@@ -195,8 +195,7 @@ public class MdbFixFlurstueckWohnungRelationOperation
                 }
 
                 // nun an allen Wohnungen setzen
-                for (WohnungComposite wohnung : wrongWohnungen.get( gemarkung + ";" + flurNummer + ";"
-                        + flurUnternummer )) {
+                for (WohnungComposite wohnung : wrongWohnungen.get( objektNummer + ";" + gebaeudeNummer )) {
                     wohnung.flurstueck().set( flurstueck );
                     log.info( "Flurstueck für Wohnung " + wohnung.schl().get() + " aktualisiert" );
                 }

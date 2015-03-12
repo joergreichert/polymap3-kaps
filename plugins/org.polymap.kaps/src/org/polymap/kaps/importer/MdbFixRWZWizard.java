@@ -70,7 +70,7 @@ public class MdbFixRWZWizard
         try {
             long start = System.currentTimeMillis();
             // MdbImportVertraegeOperation op =
-            AbstractModelChangeOperation op = new AbstractModelChangeOperation( "WinAKPS - Richtwertzonen korrigieren" ) {
+            AbstractModelChangeOperation op = new AbstractModelChangeOperation( "WinAKPS - Wohnungen korrigieren" ) {
 
                 @Override
                 protected IStatus doExecute( IProgressMonitor monitor, IAdaptable info )

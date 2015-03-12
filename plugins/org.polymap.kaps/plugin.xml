@@ -17,17 +17,17 @@
    </extension>
    <extension
          point="org.eclipse.ui.importWizards">
-      <wizard
+      <!--wizard
             class="org.polymap.kaps.importer.MdbImportWizard"
             icon="icons/add.gif"
             id="org.polymap.kaps.winakpsimport"
             name="WinAKPS - NHK2000 importieren">
-      </wizard>
+      </wizard-->
       <wizard
             class="org.polymap.kaps.importer.MdbFixRWZWizard"
             icon="icons/add.gif"
             id="org.polymap.kaps.winakpsimport.rwz"
-            name="WinAKPS - Richtwertzonen korrigieren">
+            name="WinAKPS - Wohnungen korrigieren">
       </wizard>
    </extension>
    <extension
