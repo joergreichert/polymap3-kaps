@@ -885,22 +885,22 @@ public class KaufvertragFlurstueckeFormEditorPage
     @Override
     public void doSubmit( IProgressMonitor monitor )
             throws Exception {
-        log.info( "doSubmit" );
-        FlurstueckComposite composite = selectedComposite.get();
-        if (composite != null) {
-            GemarkungComposite g = composite.gemarkung().get();
-            log.info( g + " before " + selectedGemarkung );
-            // composite.gemarkung().set( null );
-            // composite.gemarkung().set( g );
-        }
+//        log.info( "doSubmit" );
+//        FlurstueckComposite composite = selectedComposite.get();
+//        if (composite != null) {
+//            GemarkungComposite g = composite.gemarkung().get();
+//            log.info( g + " before " + selectedGemarkung );
+//            // composite.gemarkung().set( null );
+//            // composite.gemarkung().set( g );
+//        }
         super.doSubmit( monitor );
-        composite = selectedComposite.get();
-        if (composite != null) {
-            GemarkungComposite g = composite.gemarkung().get();
-            log.info( g + " after " + selectedGemarkung );
-            // composite.gemarkung().set( null );
-            // composite.gemarkung().set( g );
-        }
+//        composite = selectedComposite.get();
+//        if (composite != null) {
+//            GemarkungComposite g = composite.gemarkung().get();
+//            log.info( g + " after " + selectedGemarkung );
+//            // composite.gemarkung().set( null );
+//            // composite.gemarkung().set( g );
+//        }
         refreshReloadables();
     }
 
