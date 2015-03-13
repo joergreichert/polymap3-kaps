@@ -799,7 +799,7 @@ public class KaufvertragFlurstueckeFormEditorPage
                     }
                     // reload
                     wohnungPicklist.setEnabled( false );
-                    wohnungPicklist.setEnabled( true );                    
+                    wohnungPicklist.setEnabled( true );
                     // }
                     // } );
                 }
@@ -886,21 +886,22 @@ public class KaufvertragFlurstueckeFormEditorPage
     public void doSubmit( IProgressMonitor monitor )
             throws Exception {
         log.info( "doSubmit" );
-        // FlurstueckComposite composite = selectedComposite.get();
-        // if (composite != null) {
-        // GemarkungComposite g = composite.gemarkung().get();
-        // System.out.println(g);
-        // composite.gemarkung().set( null );
-        // composite.gemarkung().set( g );
-        // }
+        FlurstueckComposite composite = selectedComposite.get();
+        if (composite != null) {
+            GemarkungComposite g = composite.gemarkung().get();
+            log.info( g + " before " + selectedGemarkung );
+            // composite.gemarkung().set( null );
+            // composite.gemarkung().set( g );
+        }
         super.doSubmit( monitor );
-        // composite = selectedComposite.get();
-        // if (composite != null) {
-        // GemarkungComposite g = composite.gemarkung().get();
-        // System.out.println(g);
-        // composite.gemarkung().set( null );
-        // composite.gemarkung().set( g );
-        // }
+        composite = selectedComposite.get();
+        if (composite != null) {
+            GemarkungComposite g = composite.gemarkung().get();
+            log.info( g + " after " + selectedGemarkung );
+            // composite.gemarkung().set( null );
+            // composite.gemarkung().set( g );
+        }
+        refreshReloadables();
     }
 
 
