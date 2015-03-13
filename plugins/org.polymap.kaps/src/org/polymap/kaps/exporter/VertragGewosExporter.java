@@ -13,8 +13,13 @@
 package org.polymap.kaps.exporter;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
@@ -55,8 +60,14 @@ import org.polymap.core.workbench.PolymapWorkbench;
 
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.FlurstueckComposite;
+import org.polymap.kaps.model.data.GebaeudeArtComposite;
+import org.polymap.kaps.model.data.NutzungComposite;
 import org.polymap.kaps.model.data.VertragComposite;
+import org.polymap.kaps.model.data.VertragsArtComposite;
+import org.polymap.kaps.model.data.VertragsdatenBaulandComposite;
+import org.polymap.kaps.model.data.VertragsdatenErweitertComposite;
 import org.polymap.kaps.ui.NumberFormatter;
+import org.polymap.kaps.ui.form.EingangsNummerFormatter;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -64,6 +75,23 @@ import org.polymap.kaps.ui.NumberFormatter;
 public class VertragGewosExporter
         extends DefaultFeatureOperation
         implements IFeatureOperation {
+
+    public class Output {
+
+        double flaeche = 0;
+
+        int    anzahl  = 0;
+
+        int    umsatz  = 0;
+
+
+        public Output add( Output output ) {
+            flaeche += output.flaeche;
+            anzahl += output.anzahl;
+            umsatz += output.umsatz;
+            return this;
+        }
+    }
 
     private static Log          log        = LogFactory.getLog( VertragGewosExporter.class );
 
@@ -92,7 +120,7 @@ public class VertragGewosExporter
 
         // final Date now = new Date();
 
-        final File f = File.createTempFile( "Statistik_Flaeche", ".csv" );
+        final File f = File.createTempFile( "GEWOS", ".csv" );
         f.deleteOnExit();
         BufferedWriter out = new BufferedWriter( new FileWriter( f ) );
 
@@ -164,7 +192,7 @@ public class VertragGewosExporter
 
 
                         public String getFilename() {
-                            return "Statistik_Flaeche_" + fileFormat.format( new Date() ) + ".csv";
+                            return "GEWOS_" + fileFormat.format( new Date() ) + ".csv";
                         }
 
 
@@ -183,7 +211,7 @@ public class VertragGewosExporter
 
                     log.info( "TXT: download URL: " + url );
 
-                    ExternalBrowser.open( "download_window", url, ExternalBrowser.NAVIGATION_BAR
+                    ExternalBrowser.open( "download_window2", url, ExternalBrowser.NAVIGATION_BAR
                             | ExternalBrowser.STATUS );
                 }
             } );
@@ -205,14 +233,14 @@ public class VertragGewosExporter
             // reload the iterator
             it = features.features();
             int count = 0;
+            int berichtsjahr = -1;
 
-            double gesamteFlaeche = 0;
-            double groessteFlaeche = 0;
-            double kleinsteFlaeche = Double.MAX_VALUE;
-            double gesamterKaufpreis = 0;
-            double niedrigsterKaufpreis = Double.MAX_VALUE;
-            double hoechsterKaufpreis = 0;
-
+            int vertraege1 = 0;
+            int vertraegeMitKz2 = 0;
+            Map<String, Output> zeilen = new HashMap<String, Output>();
+            for (int i = 3; i <= 21; i++) {
+                zeilen.put( String.valueOf( i ), new Output() );
+            }
             while (it.hasNext()) {
                 if (monitor.isCanceled()) {
                     throw new OperationCanceledException();
@@ -224,51 +252,189 @@ public class VertragGewosExporter
                 Feature feature = it.next();
 
                 VertragComposite vertrag = repo.findEntity( VertragComposite.class, feature.getIdentifier().getID() );
-                // all properties
-                Double kaufpreis = vertrag.kaufpreis().get();
-                if (kaufpreis != null) {
-                    gesamterKaufpreis += kaufpreis;
-                    if (kaufpreis > hoechsterKaufpreis) {
-                        hoechsterKaufpreis = kaufpreis;
-                    }
-                    if (kaufpreis < niedrigsterKaufpreis) {
-                        niedrigsterKaufpreis = kaufpreis;
+                vertraege1++;
+                if (vertrag.fuerAuswertungGeeignet().get()) {
+                    vertraegeMitKz2++;
+                }
+                if (berichtsjahr == -1) {
+                    Date vertragsDatum = vertrag.vertragsDatum().get();
+                    if (vertragsDatum != null) {
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTime( vertragsDatum );
+                        berichtsjahr = calendar.get( Calendar.YEAR );
                     }
                 }
 
-                Double flaeche = calculateVerkaufteFlaeche( vertrag );
-                if (flaeche != null) {
-                    gesamteFlaeche += flaeche;
-                    if (flaeche > groessteFlaeche) {
-                        groessteFlaeche = flaeche;
+                VertragsdatenErweitertComposite ew = vertrag.erweiterteVertragsdaten().get();
+                Double preis = vertrag.vollpreis().get();
+                if (ew != null && ew.bereinigterVollpreis().get() != null) {
+                    preis = ew.bereinigterVollpreis().get();
+                }
+
+                Output current = new Output();
+                current.umsatz = preis != null ? preis.intValue() : 0;
+                current.anzahl = 1;
+
+                VertragsArtComposite vertragsArtC = vertrag.vertragsArt().get();
+                if (vertragsArtC != null) {
+                    int vertragsArt = Integer.parseInt( vertragsArtC.schl().get() );
+                    if (vertragsArt == 13) {
+                        // erbbaurecht
+                        current.flaeche = calculateVerkaufteFlaeche( vertrag );
+                        zeilen.get( "10" ).add( current );
                     }
-                    if (flaeche < kleinsteFlaeche) {
-                        kleinsteFlaeche = flaeche;
+                    else if (vertragsArt == 2 || vertragsArt == 3) {
+                        Set<String> addTo = new HashSet<String>();
+                        // mehrere flurstuecke mussen summiert werden
+                        for (FlurstueckComposite flurstueck : FlurstueckComposite.Mixin.forEntity( vertrag )) {
+                            if (flurstueck != null) {
+                                NutzungComposite nutzungC = flurstueck.nutzung().get();
+                                int nutzung = nutzungC != null ? Integer.parseInt( nutzungC.schl().get() ) : -1;
+                                GebaeudeArtComposite gebartC = flurstueck.gebaeudeArt().get();
+                                int gebArt = gebartC != null ? Integer.parseInt( gebartC.schl().get() ) : -1;
+                                double flaeche = calculateVerkaufteFlaeche( flurstueck );
+                                current.flaeche += flaeche;
+                                if (gebArt == 0 && nutzung == 16) {
+                                    addTo.add( "3" );
+                                }
+                                if (gebArt == 0 && nutzung == 17) {
+                                    addTo.add( "4" );
+                                }
+                                if (gebArt == 0 && (nutzung == 2 || nutzung == 6 || nutzung == 11)) {
+                                    addTo.add( "5" );
+                                }
+                                if (gebArt == 0 && (nutzung >= 12 && nutzung <= 15)) {
+                                    addTo.add( "6" );
+                                }
+                                if (gebArt == 0 && (nutzung == 7)) {
+                                    addTo.add( "7" );
+                                }
+                                if (gebArt == 0 && (nutzung >= 8 && nutzung <= 10)) {
+                                    addTo.add( "8" );
+                                }
+                                if (gebArt == 0 && (nutzung == 5)) {
+                                    addTo.add( "9" );
+                                }
+                                if ((gebArt == 70 || gebArt == 80) && (nutzung == 1 || nutzung == 16)) {
+                                    addTo.add( "11" );
+                                }
+                                if (((gebArt >= 71 && gebArt <= 73) || (gebArt >= 81 && gebArt <= 83))
+                                        && (nutzung == 1 || nutzung == 16)) {
+                                    addTo.add( "12" );
+                                }
+                                if (gebArt >= 70 && gebArt <= 83 && nutzung == 1) {
+                                    // baujahr check
+                                    VertragsdatenBaulandComposite vdc = VertragsdatenBaulandComposite.Mixin
+                                            .forVertrag( vertrag );
+                                    if (vdc != null) {
+                                        Integer baujahr = vdc.baujahr().get();
+                                        if (baujahr != null && baujahr == berichtsjahr) {
+                                            addTo.add( "13" );
+                                        }
+                                    }
+                                }
+                                if (((gebArt >= 120 && gebArt <= 143) || (gebArt >= 200 && gebArt <= 203))
+                                        && (nutzung == 1)) {
+                                    addTo.add( "14" );
+                                }
+                                if ((gebArt == 190 || gebArt == 210) && (nutzung == 3 || nutzung == 4)) {
+                                    addTo.add( "15" );
+                                }
+                                if ((gebArt == 240 || gebArt == 250 || gebArt == 260 || gebArt == 270
+                                        || gebArt == 300 || gebArt == 400 || gebArt == 410 || gebArt == 420)
+                                        && (nutzung == 3 || nutzung == 4)) {
+                                    addTo.add( "16" );
+                                }
+                                if ((gebArt >= 330 && gebArt <= 370) || (gebArt >= 450 && gebArt <= 890)) {
+                                    addTo.add( "17" );
+                                }
+                                if ((gebArt >= 70 && gebArt <= 203) && nutzung == 29) {
+                                    addTo.add( "18" );
+                                }
+                                if ((gebArt >= 70 && gebArt <= 203) && (nutzung >= 30 && nutzung <= 32)) {
+                                    addTo.add( "19" );
+                                }
+                                if (vertragsArt == 2 && (gebArt >= 70 && gebArt <= 203) && nutzung == 29) {
+                                    // baujahr check
+                                    VertragsdatenBaulandComposite vdc = VertragsdatenBaulandComposite.Mixin
+                                            .forVertrag( vertrag );
+                                    if (vdc != null) {
+                                        Integer baujahr = vdc.baujahr().get();
+                                        if (baujahr != null && baujahr == berichtsjahr) {
+                                            addTo.add( "20" );
+                                        }
+                                    }
+                                }
+                                if (vertragsArt == 3 && (gebArt >= 70 && gebArt <= 203) && nutzung == 29) {
+                                    addTo.add( "21" );
+                                }
+                            }
+                        }
+//                        if (addTo.isEmpty()) {
+//                            errors.add( "Vertrag " + EingangsNummerFormatter.format( vertrag.eingangsNr().get() )
+//                                    + " konnte nicht berücksichtigt werden." );
+//                        }
+                        Set<String> reduced = new HashSet<String>(addTo);
+                        // die einzigen 3 die doppelt sein duerfen
+                        reduced.remove( "13" );
+                        reduced.remove( "20" );
+                        reduced.remove( "21" );
+                        if (reduced.size() > 1) {
+                            errors.add( "Vertrag " + EingangsNummerFormatter.format( vertrag.eingangsNr().get() )
+                                    + " enthält verschiedene Nutzungs- oder Gebäudearten." );
+                        }
+                        // direkt an den 1. setzen
+                        for (String key : addTo) {
+                            zeilen.get( key ).add( current );
+                        }
                     }
                 }
             }
-            lines.add( new StringBuilder().append( "Gesamtzahl Kaufvertraege" ).append( DELIMITER ).append( count )
+
+            lines.add( new StringBuilder().append( "Geschaeftsjahr" ).append( DELIMITER ).append( berichtsjahr )
                     .toString() );
-            NumberFormat numberFormat = NumberFormatter.getFormatter( 0, true );
-            lines.add( new StringBuilder().append( "Gesamte verkaufte Flaeche" ).append( DELIMITER )
-                    .append( numberFormat.format( gesamteFlaeche ) ).append( DELIMITER ).append( "qm" ).toString() );
-            lines.add( new StringBuilder().append( "Groesste verkaufte Flaeche" ).append( DELIMITER )
-                    .append( numberFormat.format( groessteFlaeche ) ).append( DELIMITER ).append( "qm" ).toString() );
-            lines.add( new StringBuilder().append( "Kleinste verkaufte Flaeche" ).append( DELIMITER )
-                    .append( numberFormat.format( kleinsteFlaeche ) ).append( DELIMITER ).append( "qm" ).toString() );
-            lines.add( new StringBuilder().append( "Durchschnittlich verkaufte Flaeche" ).append( DELIMITER )
-                    .append( numberFormat.format( gesamteFlaeche / count ) ).append( DELIMITER ).append( "qm" )
-                    .toString() );
-            lines.add( new StringBuilder().append( "Gesamter Kaufpreis" ).append( DELIMITER )
-                    .append( numberFormat.format( gesamterKaufpreis ) ).append( DELIMITER ).append( "EUR" ).toString() );
-            lines.add( new StringBuilder().append( "Groesster Kaufpreis" ).append( DELIMITER )
-                    .append( numberFormat.format( hoechsterKaufpreis ) ).append( DELIMITER ).append( "EUR" ).toString() );
-            lines.add( new StringBuilder().append( "Kleinster Kaufpreis" ).append( DELIMITER )
-                    .append( numberFormat.format( niedrigsterKaufpreis ) ).append( DELIMITER ).append( "EUR" )
-                    .toString() );
-            lines.add( new StringBuilder().append( "Durchschnittlicher Kaufpreis" ).append( DELIMITER )
-                    .append( numberFormat.format( gesamterKaufpreis / count ) ).append( DELIMITER ).append( "EUR" )
-                    .toString() );
+            lines.add( new StringBuilder().append( "Anzahl Grundstuecksvertraege" ).append( DELIMITER )
+                    .append( vertraege1 ).toString() );
+            lines.add( new StringBuilder().append( "Vert. gewoehnlicher Geschaeftsverkehr" ).append( DELIMITER )
+                    .append( vertraegeMitKz2 ).toString() );
+            lines.add( new StringBuilder().append( DELIMITER ).append( DELIMITER ).append( DELIMITER ).toString() );
+            lines.add( new StringBuilder().append( DELIMITER ).append( "Anzahl" ).append( DELIMITER )
+                    .append( "Flaeche in qm" ).append( DELIMITER ).append( "Geldumsatz in EUR" ).toString() );
+            lines.add( createLine( "1.1 Baureifes Wohnbauland", zeilen, true, true, DELIMITER, 3 ) );
+            lines.add( createLine( "1.2 Industrie- und Gewerbeland", zeilen, true, true, DELIMITER, 4 ) );
+            lines.add( createLine( "1.3 Sonstiges Bauland", zeilen, true, true, DELIMITER, 5 ) );
+            lines.add( createLine( "                Zwischensumme Bauland", zeilen, true, true, DELIMITER, 3, 4, 5 ) );
+            lines.add( createLine( "1.4 Uebrige Flaeche", zeilen, true, true, DELIMITER, 6, 7, 8, 9 ) );
+            lines.add( createLine( "        davon Gemeinbedarfsflaechen", zeilen, true, true, DELIMITER, 7 ) );
+            lines.add( createLine( "        davon Verkehrsflaechen", zeilen, true, true, DELIMITER, 8 ) );
+            lines.add( createLine( "        davon Agrarland", zeilen, true, true, DELIMITER, 9 ) );
+            lines.add( createLine( "        davon BWL + RBL", zeilen, true, true, DELIMITER, 6 ) );
+            lines.add( createLine( "                Summe unbebaute Grundstuecke", zeilen, true, true, DELIMITER, 3, 4, 5, 6, 7, 8, 9 ) );
+            lines.add( createLine( "Erbbaurechtsvertraege", zeilen, true, false, DELIMITER, 10 ) );
+            lines.add( createLine( "2.1 EFH + ZFH", zeilen, false, true, DELIMITER, 11, 12 ) );
+            lines.add( createLine( "        davon Neubau", zeilen, false, true, DELIMITER, 13 ) );
+            lines.add( createLine( "        davon RH und DHH", zeilen, false, true, DELIMITER, 12 ) );
+            lines.add( createLine( "2.2 MFH", zeilen, false, true, DELIMITER, 14 ) );
+            lines.add( createLine( "2.3 Buero-, Verw.-,GH", zeilen, false, true, DELIMITER, 15 ) );
+            lines.add( createLine( "2.4 Ind.-, Gewerbeobjekte", zeilen, false, true, DELIMITER, 16 ) );
+            lines.add( createLine( "2.5 Sonstiges Objekte", zeilen, false, true, DELIMITER, 17 ) );
+            lines.add( createLine( "                Summe bebaute Grundstuecke", zeilen, false, true, DELIMITER, 11, 12, 14, 15, 16, 17 ) );
+            lines.add( createLine( "3. ETW/TE", zeilen, false, true, DELIMITER, 18, 19 ) );
+            lines.add( createLine( "        davon ETW", zeilen, false, true, DELIMITER, 18 ) );
+            lines.add( createLine( "Erstverkaeufe aus Neubauten", zeilen, false, true, DELIMITER, 20 ) );
+            lines.add( createLine( "Wiederverkauf", zeilen, false, true, DELIMITER, 21 ) );
+            lines.add( new StringBuilder().append( DELIMITER ).append( DELIMITER ).append( DELIMITER ).toString() );
+
+            // TODO
+            Output dpw = zeilen.get( "20" );
+             NumberFormat numberFormat = NumberFormatter.getFormatter( 2, true );
+             lines.add( new StringBuilder().append( "Durchschnittspreis in Euro/qm (Erstverkaeufe aus Neubauten)"
+             ).append( DELIMITER )
+             .append( dpw.flaeche > 0.0d ? numberFormat.format( dpw.umsatz / dpw.flaeche ) : "" ).toString() );
+             lines.add( new StringBuilder().append(
+             "Durchschnittsgroesse der WE in qm (Erstverkaeufe aus Neubauten)" ).append( DELIMITER )
+             .append( dpw.anzahl > 0.0d ? numberFormat.format( dpw.flaeche / dpw.anzahl ) : ""  ).toString() );
+
         }
         finally {
             if (it != null) {
@@ -278,20 +444,46 @@ public class VertragGewosExporter
     }
 
 
+    private String createLine( String label, Map<String, Output> zeilen, boolean withFlaeche, boolean withPreis,
+            String delimiter, int... lines ) {
+        NumberFormat numberFormat = NumberFormatter.getFormatter( 0, true );
+        Output sum = new Output();
+        for (int line : lines) {
+            sum.add( zeilen.get( String.valueOf( line ) ) );
+        }
+        return new StringBuilder().append( label ).append( DELIMITER ).append( numberFormat.format( sum.anzahl ) )
+                .append( DELIMITER ).append( withFlaeche ? numberFormat.format( sum.flaeche ) : "" ).append( DELIMITER )
+                .append( withPreis ? numberFormat.format( sum.umsatz ) : "" ).append( DELIMITER ).toString();
+
+    }
+
+
     private double calculateVerkaufteFlaeche( VertragComposite vertrag ) {
         double verkaufteFlaeche = 0;
 
         for (FlurstueckComposite flurstueck : FlurstueckComposite.Mixin.forEntity( vertrag )) {
-            if (flurstueck != null) {
-                Double flaeche = flurstueck.flaeche().get();
-                Double n = flurstueck.flaechenAnteilNenner().get();
-                Double z = flurstueck.flaechenAnteilZaehler().get();
-
-                if (flaeche != null && n != null && z != null && z != 0) {
-                    verkaufteFlaeche += flaeche * z / n;
-                }
-            }
+            verkaufteFlaeche += calculateVerkaufteFlaeche( flurstueck );
         }
         return verkaufteFlaeche;
+    }
+
+
+    private double calculateVerkaufteFlaeche( FlurstueckComposite flurstueck ) {
+        if (flurstueck != null) {
+            Double flaeche = flurstueck.flaeche().get();
+            Double n = flurstueck.flaechenAnteilNenner().get();
+            Double z = flurstueck.flaechenAnteilZaehler().get();
+
+            if (flaeche != null && n != null && z != null && z != 0) {
+                return flaeche * z / n;
+            }
+        }
+        return 0.0;
+    }
+
+
+    public static void main( String[] args ) {
+        System.out.println( new Double( 1234.56d ).intValue() );
+        System.out.println( Integer.parseInt( "000" ) );
     }
 }
