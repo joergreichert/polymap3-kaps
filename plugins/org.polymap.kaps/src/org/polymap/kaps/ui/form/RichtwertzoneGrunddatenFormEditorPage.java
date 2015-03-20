@@ -193,7 +193,7 @@ public class RichtwertzoneGrunddatenFormEditorPage
 
         Composite newLine, lastLine = null;
 
-        newLine = newFormField( "Gemeinde" ).setEnabled( richtwertzone.gemeinde().get() == null )
+        newLine = newFormField( "Gemeinde" ).setEnabled( true )//richtwertzone.gemeinde().get() == null )
                 .setProperty( new AssociationAdapter<GemeindeComposite>( richtwertzone.gemeinde() ) )
                 .setField( namedAssocationsPicklist( GemeindeComposite.class ) ).setValidator( new NotNullValidator() )
                 .setLayoutData( left().top( lastLine ).create() ).create();

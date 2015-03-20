@@ -155,7 +155,7 @@ public interface RichtwertzoneZeitraumComposite
                 // zeiträume sind nach Datum sortiert, neueste zu erst,
                 // deshalb ersten nehmen, dessen gültigkeitsbeginn vor dem zieldatum
                 // liegt
-                if (zeitraum.gueltigAb().get().compareTo( date ) <= 0) {
+                if (zeitraum.gueltigAb().get() != null && zeitraum.gueltigAb().get().compareTo( date ) <= 0) {
                     return zeitraum;
                 }
             }
