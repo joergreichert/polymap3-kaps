@@ -85,7 +85,7 @@ public class VertragsdatenBaulandAlsBRLWExporter
         result.add( new Value( "Gebaeudeart", gebaeudeArtComposite != null ? gebaeudeArtComposite.name().get() : "" ) );
 
         result.add( new Value( "Fläche 1", vdb.flaeche1().get(), 0 ) );
-        result.add( new Value( "Abgleich 1", vdb.bodenwertBereinigt1().get(), 2 ) );
+        result.add( new Value( "Abgleich 1", vdb.normierterGfzBereinigterBodenpreis().get(), 2 ) );
         result.add( new Value( "ber. Vollpreis", preis, 2 ) );
 
         result.add( new Value( "zur Richtwertermittlung geeignet", vdb.zurRichtwertermittlungGeeignet().get() ) );
