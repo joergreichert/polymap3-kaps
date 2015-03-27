@@ -41,6 +41,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
 
 import org.eclipse.rwt.widgets.ExternalBrowser;
@@ -212,10 +213,15 @@ public class RichtwertzoneAsBorisExporter
                     noHeaderYet = false;
                 }
 
-                RichtwertzoneZeitraumComposite richtwertzone = repo.findEntity( RichtwertzoneZeitraumComposite.class,
+                RichtwertzoneZeitraumComposite richtwertzoneG = repo.findEntity( RichtwertzoneZeitraumComposite.class,
                         feature.getIdentifier().getID() );
                 // all properties
-                csvWriter.write( getRow( richtwertzone ) );
+                // nur welche mit Geometrie
+                RichtwertzoneComposite richtwertzone = richtwertzoneG.zone().get();
+                Polygon geom = richtwertzone.geom().get();
+                if (geom != null) {
+                    csvWriter.write( getRow( richtwertzoneG, richtwertzone, geom ) );
+                }
 
             }
 
@@ -238,14 +244,13 @@ public class RichtwertzoneAsBorisExporter
         return new String[] { "GESL", "GENA", "GASL", "GABE", "GENU", "GEMA", "ORTST", "WNUM", "BRW", "STAG", "BRKE",
                 "BEDW", "PLZ", "BASBE", "BASMA", "YWERT", "XWERT", "BEZUG", "ENTW", "BEIT", "NUTA", "ERGNUTA", "BAUW",
                 "GEZ", "WGFZ", "GRZ", "BMZ", "FLAE", "GTIE", "GBREI", "ERVE", "VERG", "VERF", "YVERG", "XVERG", "BOD",
-                "ACZA", "GRZA", "AUFW", "WEER", "KOORWERT", "KOORVERF", "BEM", "FREI", "BRZNAME", "UMDAT", "LUMNUM" };
+                "ACZA", "GRZA", "AUFW", "WEER", "KOORWERT", "KOORVERF", "BEM", "FREI", "BRZNAME", "UMDART", "LUMNUM" };
     }
 
 
-    private List getRow( RichtwertzoneZeitraumComposite richtwertzoneG ) {
+    private List getRow( RichtwertzoneZeitraumComposite richtwertzoneG, RichtwertzoneComposite richtwertzone , Geometry geom  ) {
 
-        RichtwertzoneComposite richtwertzone = richtwertzoneG.zone().get();
-        Polygon geom = richtwertzone.geom().get();
+        
 
         List result = new ArrayList( 41 ) {
 
@@ -702,8 +707,8 @@ public class RichtwertzoneAsBorisExporter
         // Georeferenz der Beschriftung zur städtebaulichen
         // Maßnahme (Präsentationskoordinate), historisch
         // freiwillig
-        result.add( entwicklungsZusatz != null && geom != null ? Double.valueOf( geom.getCentroid().getX() )
-                .intValue() : "" );
+        result.add( entwicklungsZusatz != null && geom != null ? Double.valueOf( geom.getCentroid().getX() ).intValue()
+                : "" );
 
         // 35
         // Hochwert/Nordwert der Maßnahme
