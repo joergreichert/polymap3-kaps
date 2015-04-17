@@ -13,6 +13,7 @@
 package org.polymap.kaps.ui.form;
 
 import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.geotools.data.FeatureStore;
 import org.opengis.feature.Feature;
@@ -546,9 +547,12 @@ public class VertragsdatenAgrarBodenwertFormEditorPage
 
 
     private SortedMap<String, Object> searchZonen() {
-        System.err.println(vb.vertrag().get().richtwertZoneAgrar().get() + ": schl=" + vb.vertrag().get().richtwertZoneAgrar().get().schl().get());
-        System.err.println(vb.vertrag().get().richtwertZoneAgrar().get().gemeinde().get());
-        return RichtwertzoneProvider.findFor(vb.vertrag().get().richtwertZoneAgrar().get().gemeinde().get(), vb.vertrag().get().vertragsDatum().get());
+        // #343, ich weiss nicht wieso das null sein kann
+        if (vb.vertrag().get().richtwertZoneAgrar().get() != null) {
+            return RichtwertzoneProvider.findFor(vb.vertrag().get().richtwertZoneAgrar().get().gemeinde().get(), vb.vertrag().get().vertragsDatum().get());
+        } else {
+            return new TreeMap<String, Object>();
+        }     
     }
 
 
