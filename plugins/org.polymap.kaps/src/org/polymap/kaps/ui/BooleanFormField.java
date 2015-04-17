@@ -58,7 +58,7 @@ public class BooleanFormField
 
     private List<ModifyListener> modifyListeners = new ArrayList<ModifyListener>();
 
-    private Map<String, String> values          = new HashMap<String, String>();
+    private Map<String, String>  values          = new HashMap<String, String>();
 
 
     public BooleanFormField() {
@@ -161,7 +161,8 @@ public class BooleanFormField
 
         // find label for given value
         for (Map.Entry<String, String> entry : values.entrySet()) {
-            if ((value == null && entry.getValue().equals( "U" )) || value.equals( entry.getValue() )) {
+            if ((value == null && entry.getValue() != null && entry.getValue().equals( "U" ))
+                    || (value != null && value.equals( entry.getValue() ))) {
                 combo.setText( entry.getKey() );
                 break;
             }
