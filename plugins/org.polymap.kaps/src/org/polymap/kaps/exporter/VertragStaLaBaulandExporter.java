@@ -257,6 +257,11 @@ public class VertragStaLaBaulandExporter
     private void export( List<String> lines, VertragComposite vertrag, List<String> errors ) {
 
         VertragsdatenBaulandComposite vdc = VertragsdatenBaulandComposite.Mixin.forVertrag( vertrag );
+//        } catch (Exception e) {
+//            VertragsdatenBaulandComposite template = QueryExpressions.templateFor( VertragsdatenBaulandComposite.class );
+//            BooleanExpression expr = QueryExpressions.eq( template.vertrag(), vertrag );
+//            return KapsRepository.instance().findEntities( VertragsdatenBaulandComposite.class, expr, 0, -1 ).find();  
+//        }
         if (vdc == null) {
             errors.add( error( vertrag, "Erweiterte Vertragsdaten Bauland nicht gefunden" ) );
             return;
