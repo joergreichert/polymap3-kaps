@@ -227,10 +227,10 @@ public interface VertragComposite
     @ImportColumn("VERKAUF")
     Property<String> verkaufEingangsnr();
 
-
-    @Computed
-    @Optional
-    Association<VertragComposite> letzterVerkauf();
+//
+//    @Computed
+//    @Optional
+//    Association<VertragComposite> letzterVerkauf();
 
 
     // ANFR1 VARCHAR(60),

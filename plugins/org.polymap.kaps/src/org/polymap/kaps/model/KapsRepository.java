@@ -337,7 +337,10 @@ public class KapsRepository
 
     @Override
     public void removeEntity( final Entity entity ) {
-        if (entity instanceof WohnungComposite) {
+        if (entity instanceof VertragComposite) {
+            remove( (VertragComposite)entity );
+        }
+        else if (entity instanceof WohnungComposite) {
             remove( (WohnungComposite)entity );
         }
         else if (entity instanceof AusstattungBewertungComposite
@@ -512,8 +515,7 @@ public class KapsRepository
         // vertrag am Flurstueck, deshalb nicht zu löschen
         super.removeEntity( flurstueck );
     }
-
-
+    
     private void remove( NHK2010BewertungComposite r ) {
         for (NHK2010BewertungGebaeudeComposite g : NHK2010BewertungGebaeudeComposite.Mixin.forBewertung( r )) {
             removeEntity( g );
@@ -545,6 +547,10 @@ public class KapsRepository
         for (FlurstueckComposite flurstueck : FlurstueckComposite.Mixin.forEntity( vertrag )) {
             removeEntity( flurstueck );
         }
+        NHK2000BewertungComposite nhk2000BewertungComposite = NHK2000BewertungComposite.Mixin.forVertrag( vertrag ); 
+        if (nhk2000BewertungComposite != null) {
+            removeEntity( nhk2000BewertungComposite );
+        }
         NHK2010BewertungComposite nHK2010BewertungComposite = NHK2010BewertungComposite.Mixin.forVertrag( vertrag );
         if (nHK2010BewertungComposite != null) {
             removeEntity( nHK2010BewertungComposite );
@@ -562,6 +568,12 @@ public class KapsRepository
         VertragsdatenErweitertComposite vertragsdatenErweitertComposite = vertrag.erweiterteVertragsdaten().get();
         if (vertragsdatenErweitertComposite != null) {
             removeEntity( vertragsdatenErweitertComposite );
+        }
+        VertragComposite template = QueryExpressions.templateFor( VertragComposite.class );
+        BooleanExpression expr = QueryExpressions.eq( template.gesplittetEingangsnr(), vertrag.eingangsNr().get().toString() );
+        for (VertragComposite container : KapsRepository.instance().findEntities( VertragComposite.class, expr, 0, -1 )) {
+            container.gesplittet().set( false );
+            container.gesplittetEingangsnr().set( null );
         }
         // wohnung wird über flurstück gelöscht
         super.removeEntity( vertrag );
