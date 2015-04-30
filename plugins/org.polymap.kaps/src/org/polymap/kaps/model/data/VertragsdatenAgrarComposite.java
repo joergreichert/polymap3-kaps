@@ -520,7 +520,7 @@ public interface VertragsdatenAgrarComposite
         public static VertragsdatenAgrarComposite forVertrag( VertragComposite vertrag ) {
             VertragsdatenAgrarComposite template = QueryExpressions.templateFor( VertragsdatenAgrarComposite.class );
             BooleanExpression expr = QueryExpressions.eq( template.vertrag(), vertrag );
-            return KapsRepository.instance().findEntities( VertragsdatenAgrarComposite.class, expr, 0, -1 ).find();
+            return KapsRepository.instance().findEntities( VertragsdatenAgrarComposite.class, expr, 0, 1 ).find();
         }
 
 

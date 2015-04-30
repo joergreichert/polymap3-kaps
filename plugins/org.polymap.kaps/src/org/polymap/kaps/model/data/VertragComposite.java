@@ -487,7 +487,7 @@ public interface VertragComposite
         public static VertragComposite forErweiterteDaten( VertragsdatenErweitertComposite entity ) {
             VertragComposite template = QueryExpressions.templateFor( VertragComposite.class );
             BooleanExpression expr = QueryExpressions.eq( template.erweiterteVertragsdaten(), entity );
-            return KapsRepository.instance().findEntities( VertragComposite.class, expr, 0, -1 ).find();
+            return KapsRepository.instance().findEntities( VertragComposite.class, expr, 0, 1 ).find();
         }
     }
 
