@@ -216,8 +216,7 @@ public class KapsRepository
                             new NameImpl( KapsRepository.NAMESPACE, NHK2010AnbautenComposite.NAME ) ),
                     new SimpleEntityProvider<NHK2010BaupreisIndexComposite>( this, NHK2010BaupreisIndexComposite.class,
                             new NameImpl( KapsRepository.NAMESPACE, NHK2010BaupreisIndexComposite.NAME ) ),
-                    new NHK2010BewertungEntityProvider( this ),
-                    new NHK2000BewertungEntityProvider( this ),
+                    new NHK2010BewertungEntityProvider( this ), new NHK2000BewertungEntityProvider( this ),
                     new SimpleEntityProvider<ErmittlungModernisierungsgradComposite>( this,
                             ErmittlungModernisierungsgradComposite.class, new NameImpl( KapsRepository.NAMESPACE,
                                     ErmittlungModernisierungsgradComposite.NAME ) ),
@@ -387,7 +386,8 @@ public class KapsRepository
 
 
     private void remove( NHK2000BewertungComposite entity ) {
-        for (NHK2000BewertungGebaeudeComposite gebaeudeComposite : NHK2000BewertungGebaeudeComposite.Mixin.forBewertung( entity)) {
+        for (NHK2000BewertungGebaeudeComposite gebaeudeComposite : NHK2000BewertungGebaeudeComposite.Mixin
+                .forBewertung( entity )) {
             super.removeEntity( gebaeudeComposite );
         }
         super.removeEntity( entity );
@@ -395,6 +395,30 @@ public class KapsRepository
 
 
     private void remove( RichtwertzoneZeitraumComposite entity ) {
+        RichtwertzoneComposite richtwertzone = entity.zone().get();
+        if (richtwertzone.latestZone().get() == null || entity.equals( richtwertzone.latestZone().get() )) {
+            // do the recalculation
+            RichtwertzoneZeitraumComposite template = QueryExpressions
+                    .templateFor( RichtwertzoneZeitraumComposite.class );
+            RichtwertzoneZeitraumComposite latest = null;
+            for (RichtwertzoneZeitraumComposite current : findEntities( RichtwertzoneZeitraumComposite.class,
+                    QueryExpressions.eq( template.zone(), richtwertzone ), 0, -1 )) {
+                if (!current.equals( entity )) {
+                    if (latest == null) {
+                        latest = current;
+                    }
+                    else if (latest.gueltigAb().get() == null && current.gueltigAb().get() == null) {
+                        // do nothing
+                    }
+                    else if ((latest.gueltigAb().get() == null && current.gueltigAb().get() != null)
+                            || (current.gueltigAb().get() != null && latest.gueltigAb().get()
+                                    .before( current.gueltigAb().get() ))) {
+                        latest = current;
+                    }
+                }
+            }
+            richtwertzone.latestZone().set( latest );
+        }
         final Set<String> vertrag = new HashSet<String>();
         for (VertragsdatenBaulandComposite bauland : VertragsdatenBaulandComposite.Mixin.forRWZ( entity )) {
             vertrag.add( EingangsNummerFormatter.format( bauland.vertrag().get().eingangsNr().get() ) );
@@ -542,10 +566,10 @@ public class KapsRepository
         // wohnung wird über flurstück gelöscht
         super.removeEntity( vertrag );
     }
-//
-//
-//    public void forceRemoveEntity( final Entity entity ) {
-//        // remove without check for other references
-//        super.removeEntity( entity );
-//    }
+    //
+    //
+    // public void forceRemoveEntity( final Entity entity ) {
+    // // remove without check for other references
+    // super.removeEntity( entity );
+    // }
 }

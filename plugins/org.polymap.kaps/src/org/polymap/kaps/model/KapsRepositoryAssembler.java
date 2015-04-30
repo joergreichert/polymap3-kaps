@@ -268,7 +268,7 @@ public class KapsRepositoryAssembler
 
     private void migrateRichtwertzone( UnitOfWork uow )
             throws IOException {
-        File file = new File( createDataDir(), "migration.richtwertZoneLatest" );
+        File file = new File( createDataDir(), "migration.richtwertZoneLatest2" );
         if (!file.exists()) {
             log.info( "Migrating Richtwertzone" );
             QueryBuilder<RichtwertzoneComposite> builder = getModule().queryBuilderFactory().newQueryBuilder(
