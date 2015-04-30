@@ -12,6 +12,8 @@
  */
 package org.polymap.kaps.ui.form;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -44,6 +46,8 @@ import org.polymap.rhei.form.FormEditor;
 import org.polymap.rhei.form.IFormEditorPageSite;
 
 import org.polymap.kaps.model.data.BodennutzungComposite;
+import org.polymap.kaps.model.data.GemeindeComposite;
+import org.polymap.kaps.model.data.RichtwertzoneComposite;
 import org.polymap.kaps.model.data.RichtwertzoneZeitraumComposite;
 import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.VertragsdatenErweitertComposite;
@@ -60,74 +64,73 @@ import org.polymap.kaps.ui.NumberFormatter;
 public class VertragsdatenAgrarBodenwertFormEditorPage
         extends VertragsdatenAgrarFormEditorPage {
 
-    private static final int                          ONE   = 0;
+    private static final int              ONE   = 0;
 
-    private static final int                          TWO   = 20;
+    private static final int              TWO   = 20;
 
-    private static final int                          THREE = 40;
+    private static final int              THREE = 40;
 
-    private static final int                          FOUR  = 50;
+    private static final int              FOUR  = 50;
 
-    private static final int                          FIVE  = 64;
+    private static final int              FIVE  = 64;
 
-    private static final int                          SIX   = 74;
+    private static final int              SIX   = 74;
 
-    private static final int                          SEVEN = 90;
+    private static final int              SEVEN = 90;
 
-    private static final int                          EIGHT = 100;
+    private static final int              EIGHT = 100;
 
-    private static Log                                log   = LogFactory
-                                                                    .getLog( VertragsdatenAgrarBodenwertFormEditorPage.class );
+    private static Log                    log   = LogFactory.getLog( VertragsdatenAgrarBodenwertFormEditorPage.class );
 
-    private IFormFieldListener                        riwezone1;
+    private IFormFieldListener            riwezone1;
 
-    private FieldMultiplication                       bodenwert1;
+    private FieldMultiplication           bodenwert1;
 
-    private FieldMultiplication                       bodenwert6;
+    private FieldMultiplication           bodenwert6;
 
-    private IFormFieldListener                        riwezone6;
+    private IFormFieldListener            riwezone6;
 
-    private FieldMultiplication                       bodenwert5;
+    private FieldMultiplication           bodenwert5;
 
-    private IFormFieldListener                        riwezone5;
+    private IFormFieldListener            riwezone5;
 
-    private FieldMultiplication                       bodenwert4;
+    private FieldMultiplication           bodenwert4;
 
-    private IFormFieldListener                        riwezone4;
+    private IFormFieldListener            riwezone4;
 
-    private FieldMultiplication                       bodenwert3;
+    private FieldMultiplication           bodenwert3;
 
-    private IFormFieldListener                        riwezone3;
+    private IFormFieldListener            riwezone3;
 
-    private FieldMultiplication                       bodenwert2;
+    private FieldMultiplication           bodenwert2;
 
-    private IFormFieldListener                        riwezone2;
+    private IFormFieldListener            riwezone2;
 
-    private FieldSummation                            flaecheSummation;
+    private FieldSummation                flaecheSummation;
 
-    private FieldSummation                            wertSummation;
+    private FieldSummation                wertSummation;
 
-    private FieldListener                             fieldListener;
+    private FieldListener                 fieldListener;
 
-    private FieldSummation                            sachwertSummation;
+    private FieldSummation                sachwertSummation;
 
-    private FieldCalculation                          bereinCalculator;
+    private FieldCalculation              bereinCalculator;
 
-    private FieldMultiplication                       anteilBau;
+    private FieldMultiplication           anteilBau;
 
-    private FieldMultiplication                       anteilBoden;
+    private FieldMultiplication           anteilBoden;
 
-    private FieldMultiplication                       anteil1;
+    private FieldMultiplication           anteil1;
 
-    private FieldMultiplication                       anteil2;
+    private FieldMultiplication           anteil2;
 
-    private FieldMultiplication                       anteil3;
+    private FieldMultiplication           anteil3;
 
-    private FieldMultiplication                       anteil4;
+    private FieldMultiplication           anteil4;
 
-    private FieldMultiplication                       anteil5;
+    private FieldMultiplication           anteil5;
 
-    private FieldMultiplication                       anteil6;
+    private FieldMultiplication           anteil6;
 
     final PicklistFormField.ValueProvider zonen;
 
@@ -136,17 +139,17 @@ public class VertragsdatenAgrarBodenwertFormEditorPage
 
     public VertragsdatenAgrarBodenwertFormEditorPage( final FormEditor formEditor, Feature feature,
             FeatureStore featureStore ) {
-        super( VertragsdatenAgrarBodenwertFormEditorPage.class.getName(), "Bodenwertaufteilung", feature,
-                featureStore );
+        super( VertragsdatenAgrarBodenwertFormEditorPage.class.getName(), "Bodenwertaufteilung", feature, featureStore );
 
         // call only once for all 6 fields
         final SortedMap<String, Object> searchZonen = searchZonen();
-        zonen = new PicklistFormField.ValueProvider(){
+        zonen = new PicklistFormField.ValueProvider() {
 
             @Override
             public SortedMap<String, Object> get() {
-               return searchZonen;
-            }};
+                return searchZonen;
+            }
+        };
 
         EventManager.instance().subscribe( fieldListener = new FieldListener( vb.gesamtBauWert() ),
                 new FieldListener.EventFilter( formEditor ) );
@@ -233,7 +236,7 @@ public class VertragsdatenAgrarBodenwertFormEditorPage
         lastLine = newLine;
         newLine = newFormField( IFormFieldLabel.NO_LABEL )
                 .setProperty( new AssociationAdapter<RichtwertzoneZeitraumComposite>( vb.richtwertZone1() ) )
-                .setField( new PicklistFormField( zonen )).setLayoutData( one().top( lastLine ).create() )
+                .setField( new PicklistFormField( zonen ) ).setLayoutData( one().top( lastLine ).create() )
                 .setParent( client ).create();
         newFormField( IFormFieldLabel.NO_LABEL )
                 .setProperty( new AssociationAdapter<BodennutzungComposite>( vb.bodennutzung1() ) )
@@ -548,11 +551,17 @@ public class VertragsdatenAgrarBodenwertFormEditorPage
 
     private SortedMap<String, Object> searchZonen() {
         // #343, ich weiss nicht wieso das null sein kann
-        if (vb.vertrag().get().richtwertZoneAgrar().get() != null) {
-            return RichtwertzoneProvider.findFor(vb.vertrag().get().richtwertZoneAgrar().get().gemeinde().get(), vb.vertrag().get().vertragsDatum().get());
-        } else {
-            return new TreeMap<String, Object>();
-        }     
+        SortedMap<String, Object> ret = new TreeMap<String, Object>();
+        if (!vb.vertrag().get().richtwertZonenAgrar().isEmpty()) {
+            Set<GemeindeComposite> gemeinden = new HashSet<GemeindeComposite>();
+            for (RichtwertzoneComposite zone : vb.vertrag().get().richtwertZonenAgrar()) {
+                gemeinden.add( zone.gemeinde().get() );
+            }
+            for (GemeindeComposite gemeinde : gemeinden) {
+                ret.putAll( RichtwertzoneProvider.findFor( gemeinde, vb.vertrag().get().vertragsDatum().get() ) );
+            }
+        }
+        return ret;
     }
 
 
@@ -561,13 +570,17 @@ public class VertragsdatenAgrarBodenwertFormEditorPage
             throws Exception {
         super.afterDoLoad( monitor );
 
-        if (vb.richtwertZone1().get() == null) {
+        if (vb.richtwertZone1().get() == null && !vb.vertrag().get().richtwertZonenAgrar().isEmpty()) {
             // set the default zone from flurstueck
             RichtwertzoneZeitraumComposite zone = RichtwertzoneZeitraumComposite.Mixin.findZeitraumFor( vb.vertrag()
-                    .get().richtwertZoneAgrar().get(), vb.vertrag().get().vertragsDatum().get() );
+                    .get().richtwertZonenAgrar().iterator().next(), vb.vertrag().get().vertragsDatum().get() );
             // vb.richtwertZone1().set( zone );
             pageSite.setFieldValue( vb.richtwertZone1().qualifiedName().name(), zone );
         }
+        // if (vb.bodenrichtwert1() != null) {
+        // pageSite.setFieldValue( vb.bodenrichtwert1().qualifiedName().name(),
+        // vb.bodenrichtwert1().get() );
+        // }
         fieldListener.flush( pageSite );
     }
 }

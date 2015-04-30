@@ -620,8 +620,7 @@ public class KaufvertragFlurstueckeFormEditorPage
             public void run() {
                 VertragsdatenAgrarComposite agrar = VertragsdatenAgrarComposite.Mixin.forVertrag( kaufvertrag );
                 if (agrar == null) {
-                    RichtwertzoneComposite richtwertZone = kaufvertrag.richtwertZoneAgrar().get();
-                    if (richtwertZone != null) {
+                    if (!kaufvertrag.richtwertZonenAgrar().isEmpty()) {
                         if (site.isDirty()) {
                             MessageDialog.openInformation( PolymapWorkbench.getShellToParentOn(), "Formular speichern",
                                     "Bitte speichern Sie dieses Formular, bevor Sie die erweiterten Vertragsdaten öffnen." );

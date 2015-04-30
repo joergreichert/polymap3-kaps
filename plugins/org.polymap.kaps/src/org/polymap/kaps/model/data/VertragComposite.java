@@ -13,6 +13,8 @@
 package org.polymap.kaps.model.data;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -227,11 +229,11 @@ public interface VertragComposite
     @ImportColumn("VERKAUF")
     Property<String> verkaufEingangsnr();
 
-//
-//    @Computed
-//    @Optional
-//    Association<VertragComposite> letzterVerkauf();
 
+    //
+    // @Computed
+    // @Optional
+    // Association<VertragComposite> letzterVerkauf();
 
     // ANFR1 VARCHAR(60),
     @Optional
@@ -372,13 +374,15 @@ public interface VertragComposite
                 public String get() {
                     if (eingangsNr().get() != null) {
                         return EingangsNummerFormatter.format( eingangsNr().get() );
-                    } else {
+                    }
+                    else {
                         return "-";
                     }
                 }
             };
 
         }
+
 
         // FIXME uncomment after import
         @Override
@@ -457,30 +461,15 @@ public interface VertragComposite
 
 
         @Override
-        public Association<RichtwertzoneComposite> richtwertZoneAgrar() {
-            return new ComputedAssociationInstance<RichtwertzoneComposite>( new GenericAssociationInfo(
-                    VertragComposite.class, "richtwertZoneAgrar" ) ) {
-
-                @Override
-                public RichtwertzoneComposite get() {
-                    for (FlurstueckComposite flurstueck : FlurstueckComposite.Mixin.forEntity( vertrag )) {
-                        NutzungComposite nutzung = flurstueck.nutzung().get();
-                        if (nutzung != null && nutzung.isAgrar().get() != null
-                                && nutzung.isAgrar().get() == Boolean.TRUE) {
-                            return flurstueck.richtwertZone().get();
-                        }
-                    }
-                    return null;
-
+        public Set<RichtwertzoneComposite> richtwertZonenAgrar() {
+            Set<RichtwertzoneComposite> zonen = new HashSet<RichtwertzoneComposite>();
+            for (FlurstueckComposite flurstueck : FlurstueckComposite.Mixin.forEntity( vertrag )) {
+                NutzungComposite nutzung = flurstueck.nutzung().get();
+                if (nutzung != null && nutzung.isAgrar().get() != null && nutzung.isAgrar().get() == Boolean.TRUE) {
+                    zonen.add( flurstueck.richtwertZone().get() );
                 }
-
-
-                @Override
-                public void set( RichtwertzoneComposite vertrag )
-                        throws IllegalArgumentException, IllegalStateException {
-                    // ignore
-                }
-            };
+            }
+            return zonen;
         }
 
 
@@ -497,7 +486,5 @@ public interface VertragComposite
     Association<RichtwertzoneComposite> richtwertZoneBauland();
 
 
-    @Optional
-    @Computed
-    Association<RichtwertzoneComposite> richtwertZoneAgrar();
+    Set<RichtwertzoneComposite> richtwertZonenAgrar();
 }
