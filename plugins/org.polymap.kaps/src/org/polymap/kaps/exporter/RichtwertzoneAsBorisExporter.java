@@ -453,8 +453,9 @@ public class RichtwertzoneAsBorisExporter
         // Georeferenz der Bodenrichtwertangabe
         // (Präsentationskoordinate)
         // freiwillig
-        result.add( geom != null ? Double.valueOf( geom.getCentroid().getX() ).intValue() : "" );
-
+        result.add( "" );
+//        result.add( geom != null ? Double.valueOf( geom.getCentroid().getX() ).intValue() : "" );
+        
         // 17
         // Hochwert/Nordwert
         // nordwertBRW
@@ -465,7 +466,8 @@ public class RichtwertzoneAsBorisExporter
         // Georeferenz der Bodenrichtwertangabe
         // (Präsentationskoordinate)
         // freiwillig
-        result.add( geom != null ? Double.valueOf( geom.getCentroid().getY() ).intValue() : "" );
+        result.add( "" );
+//        result.add( geom != null ? Double.valueOf( geom.getCentroid().getY() ).intValue() : "" );
 
         // 18
         // Bezugssystem
