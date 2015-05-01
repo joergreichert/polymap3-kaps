@@ -39,7 +39,11 @@ import org.polymap.rhei.form.IFormEditorPageSite;
 
 import org.polymap.kaps.KapsPlugin;
 import org.polymap.kaps.MathUtil;
+import org.polymap.kaps.model.data.BelastungComposite;
+import org.polymap.kaps.model.data.FlurComposite;
+import org.polymap.kaps.model.data.FlurstueckComposite;
 import org.polymap.kaps.model.data.GebaeudeArtComposite;
+import org.polymap.kaps.model.data.GebaeudeComposite;
 import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.ui.ActionButton;
 import org.polymap.kaps.ui.BooleanFormField;
@@ -110,7 +114,7 @@ public class WohnungVertragsdatenFormEditorPage
                 .get() : null;
         String label = vertrag == null ? "Kein Vertrag zugewiesen" : "Vertrag "
                 + EingangsNummerFormatter.format( vertrag.eingangsNr().get() ) + " öffnen";
-        ActionButton openErweiterteDaten = new ActionButton( parent, new Action( label ) {
+        final ActionButton openErweiterteDaten = new ActionButton( parent, new Action( label ) {
 
             @Override
             public void run() {
@@ -120,6 +124,76 @@ public class WohnungVertragsdatenFormEditorPage
         openErweiterteDaten.setLayoutData( left().left( ONE ).right( TWO ).height( 25 ).create() );
         openErweiterteDaten.setEnabled( vertrag != null );
         newLine = openErweiterteDaten;
+
+        if (vertrag != null) {
+            lastLine = newLine;
+            ActionButton delete = new ActionButton( parent, new Action( "Vertrag "
+                    + EingangsNummerFormatter.format( vertrag.eingangsNr().get() ) + " entfernen" ) {
+
+                @Override
+                public void run() {
+                    queue( new UpdateCommand() {
+
+                        @Override
+                        public void execute() {
+                            // create new flurstueck ohne Vertrag
+                            // flurstueck suchen ohne vertrag, wenn es nicht
+                            // existiert, neu anlegen
+                            FlurstueckComposite current = wohnung.flurstueck().get();
+                            FlurstueckComposite ohneVertrag = null;
+                            for (FlurstueckComposite found : FlurstueckSearcher.findFlurstuecke( current.gemarkung()
+                                    .get(), current.flur().get(), current.hauptNummer().get(), current.unterNummer()
+                                    .get() )) {
+                                if (found.vertrag().get() == null) {
+                                    ohneVertrag = found;
+                                    break;
+                                }
+                            }
+                            if (ohneVertrag == null) {
+                                ohneVertrag = repository.newEntity( FlurstueckComposite.class, null );
+                                ohneVertrag.flur().set( repository.findSchlNamed( FlurComposite.class, "000" ) );
+                                // zum Gebäude ergänzen
+                                GebaeudeComposite gebaeude = GebaeudeComposite.Mixin.forKeys( wohnung.objektNummer()
+                                        .get(), wohnung.gebaeudeNummer().get() );
+                                if (gebaeude != null) {
+                                    gebaeude.flurstuecke().add( ohneVertrag );
+                                }
+                                ohneVertrag.gemarkung().set( current.gemarkung().get() );
+                                ohneVertrag.gemarkungWA().set( current.gemarkung().get().schl().get() );
+
+                                ohneVertrag.hauptNummer().set( current.hauptNummer().get() );
+                                ohneVertrag.unterNummer().set( current.unterNummer().get() );
+                                ohneVertrag.strasse().set( current.strasse().get() );
+                                ohneVertrag.hausnummer().set( current.hausnummer().get() );
+                                ohneVertrag.hausnummerZusatz().set( current.hausnummerZusatz().get() );
+                                ohneVertrag.richtwertZone().set( current.richtwertZone().get() );
+                                ohneVertrag.kartenBlatt().set( current.kartenBlatt().get() );
+                                ohneVertrag.baublock().set( current.baublock().get() );
+                                ohneVertrag.nutzung().set( current.nutzung().get() );
+                                ohneVertrag.gebaeudeArt().set( current.gebaeudeArt().get() );
+                                ohneVertrag.artDesBaugebiets().set( current.artDesBaugebiets().get() );
+                                ohneVertrag.flaeche().set( current.flaeche().get() );
+                                ohneVertrag.flaechenAnteilZaehler().set( current.flaechenAnteilZaehler().get() );
+                                ohneVertrag.flaechenAnteilNenner().set( current.flaechenAnteilNenner().get() );
+                                ohneVertrag.verkaufteFlaeche().set( current.verkaufteFlaeche().get() );
+                                ohneVertrag.erbbaurecht().set( current.erbbaurecht().get() );
+                                for (BelastungComposite belastung : current.belastungen().toList()) {
+                                    ohneVertrag.belastungen().add( belastung );
+                                }
+                            }
+                            wohnung.flurstueck().set( ohneVertrag );
+                            //
+                            openErweiterteDaten.setEnabled( false );
+                            setEnabled( false );
+                            openErweiterteDaten.setText( "Kein Vertrag zugewiesen" );
+                        }
+                    } );
+                }
+            } );
+            delete.setLayoutData( left().left( ONE ).right( TWO ).height( 25 ).top( lastLine ).create() );
+            delete.setEnabled( true );
+            newLine = delete;
+        }
 
         lastLine = newLine;
         newLine = createLabel( parent, "Vollpreis", left().right( ONE ).top( lastLine ), SWT.RIGHT );
@@ -225,7 +299,7 @@ public class WohnungVertragsdatenFormEditorPage
                         bereinigterVollpreis /= wfl;
                     }
                 }
-                return MathUtil.round(bereinigterVollpreis);
+                return MathUtil.round( bereinigterVollpreis );
             }
         } );
 

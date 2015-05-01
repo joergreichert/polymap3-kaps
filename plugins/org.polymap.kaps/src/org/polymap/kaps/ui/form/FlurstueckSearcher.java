@@ -147,7 +147,7 @@ public abstract class FlurstueckSearcher
     }
 
 
-    private Iterable<FlurstueckComposite> findFlurstuecke( GemarkungComposite gemarkung, FlurComposite flur,
+    public static Iterable<FlurstueckComposite> findFlurstuecke( GemarkungComposite gemarkung, FlurComposite flur,
             Integer flurstuecksNummer, String unternummer ) {
         FlurstueckComposite template = templateFor( FlurstueckComposite.class );
         BooleanExpression expr = null;// QueryExpressions.not( QueryExpressions.eq(
