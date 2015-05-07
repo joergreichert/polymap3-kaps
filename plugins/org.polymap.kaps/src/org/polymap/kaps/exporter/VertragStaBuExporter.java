@@ -320,7 +320,7 @@ public class VertragStaBuExporter
         FlurstueckComposite flurstueck = null;
         for (FlurstueckComposite f : FlurstueckComposite.Mixin.forEntity( vertrag )) {
             NutzungComposite nutzung = f.nutzung().get();
-            if (nutzung.isAgrar().get() != null && !nutzung.isAgrar().get().booleanValue()) {
+            if (nutzung != null && nutzung.isAgrar().get() != null && !nutzung.isAgrar().get().booleanValue()) {
                 flurstueck = f;
                 break;
             }
