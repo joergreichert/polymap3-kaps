@@ -857,7 +857,7 @@ public class RichtwertzoneAsBorisExporter
         // 0 = Dateidokumente
         // 1 = Datensatz
         // freiwillig
-        result.add( "1" );
+        result.add( "0" );
         // 47
         // Umrechnungstabellen
         // liste_umrechnungstabellen
@@ -868,7 +868,7 @@ public class RichtwertzoneAsBorisExporter
         // Liste der Nummern der Umrechnungstabellen
         // (Datensatz) oder Liste der Namen der Dateidokumente
         // Pflicht soweit wertrelevant
-        result.add( "br1400522-MS_2012_Landwirtschaft- sonstiges.pdf" );
+        result.add( "uf1400522-MS_2012.12.31_Landwirtschaft-Sonstiges.pdf" );
 
         return result;
     }
