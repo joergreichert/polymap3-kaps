@@ -399,7 +399,8 @@ public class KapsRepository
 
     private void remove( RichtwertzoneZeitraumComposite entity ) {
         RichtwertzoneComposite richtwertzone = entity.zone().get();
-        if (richtwertzone.latestZone().get() == null || entity.equals( richtwertzone.latestZone().get() )) {
+        if (richtwertzone != null
+                && (richtwertzone.latestZone().get() == null || entity.equals( richtwertzone.latestZone().get() ))) {
             // do the recalculation
             RichtwertzoneZeitraumComposite template = QueryExpressions
                     .templateFor( RichtwertzoneZeitraumComposite.class );
@@ -515,7 +516,8 @@ public class KapsRepository
         // vertrag am Flurstueck, deshalb nicht zu löschen
         super.removeEntity( flurstueck );
     }
-    
+
+
     private void remove( NHK2010BewertungComposite r ) {
         for (NHK2010BewertungGebaeudeComposite g : NHK2010BewertungGebaeudeComposite.Mixin.forBewertung( r )) {
             removeEntity( g );
@@ -547,7 +549,7 @@ public class KapsRepository
         for (FlurstueckComposite flurstueck : FlurstueckComposite.Mixin.forEntity( vertrag )) {
             removeEntity( flurstueck );
         }
-        NHK2000BewertungComposite nhk2000BewertungComposite = NHK2000BewertungComposite.Mixin.forVertrag( vertrag ); 
+        NHK2000BewertungComposite nhk2000BewertungComposite = NHK2000BewertungComposite.Mixin.forVertrag( vertrag );
         if (nhk2000BewertungComposite != null) {
             removeEntity( nhk2000BewertungComposite );
         }
@@ -570,7 +572,8 @@ public class KapsRepository
             removeEntity( vertragsdatenErweitertComposite );
         }
         VertragComposite template = QueryExpressions.templateFor( VertragComposite.class );
-        BooleanExpression expr = QueryExpressions.eq( template.gesplittetEingangsnr(), vertrag.eingangsNr().get().toString() );
+        BooleanExpression expr = QueryExpressions.eq( template.gesplittetEingangsnr(), vertrag.eingangsNr().get()
+                .toString() );
         for (VertragComposite container : KapsRepository.instance().findEntities( VertragComposite.class, expr, 0, -1 )) {
             container.gesplittet().set( false );
             container.gesplittetEingangsnr().set( null );

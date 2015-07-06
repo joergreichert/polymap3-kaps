@@ -15,6 +15,7 @@ package org.polymap.kaps.model;
 import static org.qi4j.api.query.QueryExpressions.orderBy;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 
@@ -32,6 +33,7 @@ import org.qi4j.api.query.grammar.BooleanExpression;
 import org.qi4j.api.query.grammar.OrderBy;
 import org.qi4j.api.structure.Application;
 import org.qi4j.api.structure.Module;
+import org.qi4j.api.unitofwork.NoSuchEntityException;
 import org.qi4j.api.unitofwork.UnitOfWork;
 import org.qi4j.api.unitofwork.UnitOfWorkFactory;
 import org.qi4j.bootstrap.ApplicationAssembly;
@@ -191,10 +193,13 @@ public class KapsRepositoryAssembler
         }
         migrateBelastung( uow );
         migrateRichtwertzone( uow );
-//        findEmptyRichtwertZone( uow );
+        // findEmptyRichtwertZone( uow );
         migrateBaukosten( uow );
         migrateEingangsnummern( uow );
         migrateVertragsdatenErweitert( uow );
+
+        deleteBrokenRWZ( uow );
+
         uow.complete();
         log.info( "Create Init Data Completed" );
     }
@@ -296,24 +301,28 @@ public class KapsRepositoryAssembler
         }
     }
 
-//
-//    private void findEmptyRichtwertZone( UnitOfWork uow )
-//            throws IOException {
-//        log.info( "Suche ungueltige Richtwertzone" );
-//        QueryBuilder<RichtwertzoneZeitraumComposite> builderZ = getModule().queryBuilderFactory().newQueryBuilder(
-//                RichtwertzoneZeitraumComposite.class );
-//        Iterator<RichtwertzoneZeitraumComposite> it = builderZ.newQuery( uow ).maxResults( Integer.MAX_VALUE )
-//                .iterator();
-//        int count = 0;
-//        while (it.hasNext()) {
-//            RichtwertzoneZeitraumComposite zeitraum = it.next();
-//            if (zeitraum.schl().get() == null || zeitraum.gueltigAb().get() == null) {
-//                log.info( "Zone " + zeitraum.id() + " " + (zeitraum.zone().get() != null ? zeitraum.zone().get().schl().get() : "null") + ":" + zeitraum.schl().get() + " fehlen Daten." );
-//            }
-//        }
-//        log.info( "Migration of " + count + " Richtwertzone Completed" );
-//    }
 
+    //
+    // private void findEmptyRichtwertZone( UnitOfWork uow )
+    // throws IOException {
+    // log.info( "Suche ungueltige Richtwertzone" );
+    // QueryBuilder<RichtwertzoneZeitraumComposite> builderZ =
+    // getModule().queryBuilderFactory().newQueryBuilder(
+    // RichtwertzoneZeitraumComposite.class );
+    // Iterator<RichtwertzoneZeitraumComposite> it = builderZ.newQuery( uow
+    // ).maxResults( Integer.MAX_VALUE )
+    // .iterator();
+    // int count = 0;
+    // while (it.hasNext()) {
+    // RichtwertzoneZeitraumComposite zeitraum = it.next();
+    // if (zeitraum.schl().get() == null || zeitraum.gueltigAb().get() == null) {
+    // log.info( "Zone " + zeitraum.id() + " " + (zeitraum.zone().get() != null ?
+    // zeitraum.zone().get().schl().get() : "null") + ":" + zeitraum.schl().get() +
+    // " fehlen Daten." );
+    // }
+    // }
+    // log.info( "Migration of " + count + " Richtwertzone Completed" );
+    // }
 
     private void migrateEingangsnummern( UnitOfWork uow )
             throws IOException {
@@ -378,5 +387,38 @@ public class KapsRepositoryAssembler
             file.createNewFile();
             log.info( "Migration of  Vertragsdatenerweitert Completed" );
         }
+    }
+
+
+    private void deleteBrokenRWZ( UnitOfWork uow ) {
+//        File file = new File( createDataDir(), "migration.brokenRWZ" );
+        // if (!file.exists()) {
+        log.info( "Migrating broken RWZ" );
+        QueryBuilder<RichtwertzoneZeitraumComposite> builderZ = getModule().queryBuilderFactory().newQueryBuilder(
+                RichtwertzoneZeitraumComposite.class );
+        Iterator<RichtwertzoneZeitraumComposite> it = builderZ.newQuery( uow ).maxResults( Integer.MAX_VALUE )
+                .iterator();
+        int count = 0;
+        while (it.hasNext()) {
+            RichtwertzoneZeitraumComposite zeitraum = it.next();
+            try {
+                RichtwertzoneComposite zone = zeitraum.zone().get();
+                if (zone == null) {
+                    zeitraum.schl().set( "--- Zone fehlt ---" );
+                }
+                if (zeitraum.schl().get() == null && zone != null) {
+                    zeitraum.schl().set( zone.schl().get() );
+                }
+                if (zeitraum.gueltigAb().get() == null) {
+                    zeitraum.gueltigAb().set( new Date( 0 ) );
+                }
+            }
+            catch (NoSuchEntityException nse) {
+                log.error( "zone was removed, remove zeitraum too for " + zeitraum.id() );
+                zeitraum.zone().set( null );
+            }
+        }
+        log.info( "Migration of " + count + " broken RWZ Completed" );
+        // }
     }
 }

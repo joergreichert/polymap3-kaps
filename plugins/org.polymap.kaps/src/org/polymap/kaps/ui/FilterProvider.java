@@ -38,6 +38,7 @@ import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.VertragsdatenAgrarComposite;
 import org.polymap.kaps.model.data.VertragsdatenBaulandComposite;
 import org.polymap.kaps.model.data.WohnungComposite;
+import org.polymap.kaps.ui.filter.BrokenRichtwertZoneZeitraumFilter;
 import org.polymap.kaps.ui.filter.DefaultEntityFilter;
 import org.polymap.kaps.ui.filter.EinzelneVertragsdatenAgrarFilter;
 import org.polymap.kaps.ui.filter.EinzelneVertragsdatenBaulandFilter;
@@ -92,6 +93,7 @@ public class FilterProvider
                     // result.add( new FlurstueckeStabuFilter( layer ));
                 }
                 else if (type.isAssignableFrom( RichtwertzoneZeitraumComposite.class )) {
+                    result.add( new BrokenRichtwertZoneZeitraumFilter( layer ) );
                     result.add( new DefaultEntityFilter( layer, type, repo ).exclude( "zone" ) );
                 }
                 else if (type.isAssignableFrom( VertragComposite.class )) {

@@ -187,18 +187,23 @@ public class VertragsdatenBaulandGrunddatenFormEditorPage
             zonen.put( prefix + " - " + richtwertZone.name().get(), richtwertZone );
 
             for (RichtwertzoneZeitraumComposite zeitraum : RichtwertzoneZeitraumComposite.Mixin.forZone( richtwertZone )) {
-                zeitraeume.put( KapsRepository.SHORT_DATE.format( zeitraum.gueltigAb().get() ), zeitraum );
+                if (zeitraum.gueltigAb().get() != null) {
+                    zeitraeume.put( KapsRepository.SHORT_DATE.format( zeitraum.gueltigAb().get() ), zeitraum );
+                } else {
+                    throw new RuntimeException( "Gültig ab fehlt in Richtwertzone: " + richtwertZone.schl().get() + " " );
+                }
             }
         }
 
-        newLine = newFormField( "Richtwertzone" ).setEnabled( false )
+        //log.error(vb.richtwertZone().get().schl().get() + " is set");
+        newLine = newFormField( "Richtwertzone" ).setEnabled( true )
                 .setProperty( new AssociationAdapter<RichtwertzoneComposite>( vb.richtwertZone() ) )
                 .setField( new PicklistFormField( zonen ) )
                 .setLayoutData( left().top( lastLine ).bottom( 100 ).create() ).setParent( client ).create();
 
         newFormField( "Gültig ab" )
                 .setProperty( new AssociationAdapter<RichtwertzoneZeitraumComposite>( vb.richtwertZoneG() ) )
-                .setField( new PicklistFormField( zeitraeume.descendingMap() ) ).setEnabled( false )
+                .setField( new PicklistFormField( zeitraeume.descendingMap() ) ).setEnabled( true )
                 .setLayoutData( right().top( lastLine ).create() ).setParent( client ).create();
         pageSite.addFieldListener( richtwertzone = new IFormFieldListener() {
 
@@ -555,10 +560,10 @@ public class VertragsdatenBaulandGrunddatenFormEditorPage
             }
         } ) {
         };
-        openBewertungen2000.setLayoutData( right().right(75).left( openErtragswert, 5 ).width( 25 ).height( 25 ).top( null )
-                .bottom( 100 ).create() );
+        openBewertungen2000.setLayoutData( right().right( 75 ).left( openErtragswert, 5 ).width( 25 ).height( 25 )
+                .top( null ).bottom( 100 ).create() );
         openBewertungen2000.setEnabled( NHK2000BewertungComposite.Mixin.forVertrag( vb.vertrag().get() ) != null );
-//        openBewertungen2000.setEnabled( true );
+        // openBewertungen2000.setEnabled( true );
         return formSection;
     }
 

@@ -117,7 +117,13 @@ public abstract class KapsEntityProvider<T extends Entity>
                     org.opengis.feature.Property property = feature.getProperty( association.getName() );
                     if (property != null) {
                         if (Named.class.isAssignableFrom( association.getType() )) {
-                            Named associationValue = (Named)association.getValue( entity );
+                            Named associationValue;
+                            try {
+                                associationValue = (Named)association.getValue( entity );
+                            } catch (Exception e) {
+                                System.err.println(entity + ": " + association.getName() );
+                                throw new RuntimeException( e );
+                            }
                             StringBuffer associatedCompositeName = new StringBuffer( "" );
                             if (associationValue != null) {
                                 String name = associationValue.name().get();
