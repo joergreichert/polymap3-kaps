@@ -107,9 +107,9 @@ public class KapsRepositoryAssembler
                 BodennutzungComposite.class, FlurComposite.class, GemarkungComposite.class,
                 RichtwertzoneComposite.class, RichtwertzoneZeitraumComposite.class,
                 ErschliessungsBeitragComposite.class, BodenRichtwertKennungComposite.class,
-                EntwicklungsZustandComposite.class, RichtwertZoneLageComposite.class,
-                EntwicklungsZusatzComposite.class, BauweiseComposite.class, ArtDesBaugebietsComposite.class,
-                FlurstueckComposite.class, GemeindeFaktorComposite.class, BodenwertAufteilungTextComposite.class,
+                EntwicklungsZustandComposite.class, RichtwertZoneLageComposite.class, EntwicklungsZusatzComposite.class,
+                BauweiseComposite.class, ArtDesBaugebietsComposite.class, FlurstueckComposite.class,
+                GemeindeFaktorComposite.class, BodenwertAufteilungTextComposite.class,
                 VertragsdatenBaulandComposite.class, VertragsdatenErweitertComposite.class, KellerComposite.class,
                 VertragsdatenAgrarComposite.class, BelastungComposite.class, EtageComposite.class,
                 AusstattungComposite.class, EigentumsartComposite.class, HimmelsrichtungComposite.class,
@@ -119,7 +119,7 @@ public class KapsRepositoryAssembler
                 ErwerberStalaComposite.class, GrundstuecksArtBaulandStalaComposite.class,
                 KaeuferKreisStaBuComposite.class, VeraeussererAgrarLandStalaComposite.class,
                 VeraeussererBaulandStalaComposite.class, VerwandschaftsVerhaeltnisStalaComposite.class,
-                BodenRichtwertRichtlinieErgaenzungComposite.class,
+                VertragsArtArtComposite.class, BodenRichtwertRichtlinieErgaenzungComposite.class,
                 BodenRichtwertRichtlinieArtDerNutzungComposite.class, NHK2010AnbautenComposite.class,
                 NHK2010BaupreisIndexComposite.class, NHK2010BewertungComposite.class,
                 NHK2010BewertungGebaeudeComposite.class, ErmittlungModernisierungsgradComposite.class,
@@ -163,12 +163,11 @@ public class KapsRepositoryAssembler
 
         // create the composites
         final UnitOfWork uow = uowf.newUnitOfWork();
-
+        final Impl schlCreator = new SchlNamedCreatorCallback.Impl( uow );
         if (!isDBInitialized( uow )) {
 
             log.info( "Create Init Data" );
 
-            final Impl schlCreator = new SchlNamedCreatorCallback.Impl( uow );
             ErschliessungsBeitragComposite.Mixin.createInitData( schlCreator );
             BodenRichtwertKennungComposite.Mixin.createInitData( schlCreator );
             EntwicklungsZustandComposite.Mixin.createInitData( schlCreator );
@@ -182,7 +181,7 @@ public class KapsRepositoryAssembler
         if (!isDBStaBuInitialized( uow )) {
             log.info( "Create StaBu Data" );
 
-            final Impl schlCreator = new SchlNamedCreatorCallback.Impl( uow );
+            
             GebaeudeArtStaBuComposite.Mixin.createInitData( schlCreator );
             ArtDerBauflaecheStaBuComposite.Mixin.createInitData( schlCreator );
             KaeuferKreisStaBuComposite.Mixin.createInitData( schlCreator );
@@ -199,6 +198,8 @@ public class KapsRepositoryAssembler
         migrateVertragsdatenErweitert( uow );
 
         deleteBrokenRWZ( uow );
+        
+        migrateStaBu( schlCreator, uow );
 
         uow.complete();
         log.info( "Create Init Data Completed" );
@@ -206,16 +207,16 @@ public class KapsRepositoryAssembler
 
 
     private boolean isDBInitialized( UnitOfWork uow ) {
-        QueryBuilder<ErschliessungsBeitragComposite> builder = getModule().queryBuilderFactory().newQueryBuilder(
-                ErschliessungsBeitragComposite.class );
+        QueryBuilder<ErschliessungsBeitragComposite> builder = getModule().queryBuilderFactory()
+                .newQueryBuilder( ErschliessungsBeitragComposite.class );
         Query<ErschliessungsBeitragComposite> query = builder.newQuery( uow ).maxResults( 1 ).firstResult( 0 );
         return query.iterator().hasNext();
     }
 
 
     private boolean isDBStaBuInitialized( UnitOfWork uow ) {
-        QueryBuilder<GebaeudeArtStaBuComposite> builder = getModule().queryBuilderFactory().newQueryBuilder(
-                GebaeudeArtStaBuComposite.class );
+        QueryBuilder<GebaeudeArtStaBuComposite> builder = getModule().queryBuilderFactory()
+                .newQueryBuilder( GebaeudeArtStaBuComposite.class );
         Query<GebaeudeArtStaBuComposite> query = builder.newQuery( uow ).maxResults( 1 ).firstResult( 0 );
         return query.iterator().hasNext();
     }
@@ -252,8 +253,8 @@ public class KapsRepositoryAssembler
         File file = new File( createDataDir(), "migration.manyBelastung" );
         if (!file.exists()) {
             log.info( "Migrating Belastungen" );
-            QueryBuilder<FlurstueckComposite> builder = getModule().queryBuilderFactory().newQueryBuilder(
-                    FlurstueckComposite.class );
+            QueryBuilder<FlurstueckComposite> builder = getModule().queryBuilderFactory()
+                    .newQueryBuilder( FlurstueckComposite.class );
             Query<FlurstueckComposite> query = builder.newQuery( uow ).maxResults( Integer.MAX_VALUE ).firstResult( 0 );
             Iterator<FlurstueckComposite> it = query.iterator();
             int count = 0;
@@ -276,10 +277,10 @@ public class KapsRepositoryAssembler
         File file = new File( createDataDir(), "migration.richtwertZoneLatest2" );
         if (!file.exists()) {
             log.info( "Migrating Richtwertzone" );
-            QueryBuilder<RichtwertzoneComposite> builder = getModule().queryBuilderFactory().newQueryBuilder(
-                    RichtwertzoneComposite.class );
-            QueryBuilder<RichtwertzoneZeitraumComposite> builderZ = getModule().queryBuilderFactory().newQueryBuilder(
-                    RichtwertzoneZeitraumComposite.class );
+            QueryBuilder<RichtwertzoneComposite> builder = getModule().queryBuilderFactory()
+                    .newQueryBuilder( RichtwertzoneComposite.class );
+            QueryBuilder<RichtwertzoneZeitraumComposite> builderZ = getModule().queryBuilderFactory()
+                    .newQueryBuilder( RichtwertzoneZeitraumComposite.class );
             RichtwertzoneZeitraumComposite template = QueryExpressions
                     .templateFor( RichtwertzoneZeitraumComposite.class );
             Query<RichtwertzoneComposite> query = builder.newQuery( uow ).maxResults( Integer.MAX_VALUE )
@@ -330,8 +331,8 @@ public class KapsRepositoryAssembler
         if (!file.exists()) {
             log.info( "Migrating Eingangsnummern" );
 
-            QueryBuilder<VertragComposite> builder = getModule().queryBuilderFactory().newQueryBuilder(
-                    VertragComposite.class );
+            QueryBuilder<VertragComposite> builder = getModule().queryBuilderFactory()
+                    .newQueryBuilder( VertragComposite.class );
             VertragComposite template = QueryExpressions.templateFor( VertragComposite.class );
 
             // find höchsten aus 2013
@@ -381,8 +382,8 @@ public class KapsRepositoryAssembler
         if (!file.exists()) {
             log.info( "Migrating Eingangsnummern" );
 
-            QueryBuilder<VertragComposite> builder = getModule().queryBuilderFactory().newQueryBuilder(
-                    VertragComposite.class );
+            QueryBuilder<VertragComposite> builder = getModule().queryBuilderFactory()
+                    .newQueryBuilder( VertragComposite.class );
             VertragsdatenErweitertImportFix.fix( uow, builder );
             file.createNewFile();
             log.info( "Migration of  Vertragsdatenerweitert Completed" );
@@ -391,11 +392,11 @@ public class KapsRepositoryAssembler
 
 
     private void deleteBrokenRWZ( UnitOfWork uow ) {
-//        File file = new File( createDataDir(), "migration.brokenRWZ" );
+        // File file = new File( createDataDir(), "migration.brokenRWZ" );
         // if (!file.exists()) {
         log.info( "Migrating broken RWZ" );
-        QueryBuilder<RichtwertzoneZeitraumComposite> builderZ = getModule().queryBuilderFactory().newQueryBuilder(
-                RichtwertzoneZeitraumComposite.class );
+        QueryBuilder<RichtwertzoneZeitraumComposite> builderZ = getModule().queryBuilderFactory()
+                .newQueryBuilder( RichtwertzoneZeitraumComposite.class );
         Iterator<RichtwertzoneZeitraumComposite> it = builderZ.newQuery( uow ).maxResults( Integer.MAX_VALUE )
                 .iterator();
         int count = 0;
@@ -420,5 +421,58 @@ public class KapsRepositoryAssembler
         }
         log.info( "Migration of " + count + " broken RWZ Completed" );
         // }
+    }
+
+
+    private void migrateStaBu( Impl schlCreator, UnitOfWork uow )
+            throws IOException {
+        File file = new File( createDataDir(), "migration.stabuWohnung" );
+        if (!file.exists()) {
+            log.info( "Migrating Wohnung StaBu" );
+            schlCreator.create( StockwerkStaBuComposite.class, "97", "Zweigeschossig" );
+            {
+                QueryBuilder<ImmobilienArtStaBuComposite> builder = getModule().queryBuilderFactory()
+                        .newQueryBuilder( ImmobilienArtStaBuComposite.class );
+                Query<ImmobilienArtStaBuComposite> query = builder.newQuery( uow ).maxResults( Integer.MAX_VALUE )
+                        .firstResult( 0 );
+                Iterator<ImmobilienArtStaBuComposite> it = query.iterator();
+                int count = 0;
+                while (it.hasNext()) {
+                    ImmobilienArtStaBuComposite fs = it.next();
+                    String schl = fs.schl().get();
+                    if ("N".equals( schl )) {
+                        fs.schl().set( "1" );
+                        fs.name().set( "Neubau/Erstverkauf" );
+                    }
+                    else if ("G".equals( schl )) {
+                        fs.schl().set( "2" );
+                    }
+                }
+            }
+            {
+                QueryBuilder<StockwerkStaBuComposite> builder = getModule().queryBuilderFactory()
+                        .newQueryBuilder( StockwerkStaBuComposite.class );
+                Query<StockwerkStaBuComposite> query = builder.newQuery( uow ).maxResults( Integer.MAX_VALUE )
+                        .firstResult( 0 );
+                Iterator<StockwerkStaBuComposite> it = query.iterator();
+                int count = 0;
+                while (it.hasNext()) {
+                    StockwerkStaBuComposite fs = it.next();
+                    String schl = fs.schl().get();
+                    if ("E".equals( schl )) {
+                        fs.schl().set( "0" );
+                    }
+                    else if ("K".equals( schl )) {
+                        fs.schl().set( "98" );
+                    }
+                    else if ("D".equals( schl )) {
+                        fs.schl().set( "99" );
+                    }
+                    count++;
+                }
+            }
+            file.createNewFile();
+            log.info( "Migration of Wohnung StaBu Completed" );
+        }
     }
 }

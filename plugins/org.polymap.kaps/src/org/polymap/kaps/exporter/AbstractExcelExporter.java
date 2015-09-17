@@ -100,7 +100,8 @@ public abstract class AbstractExcelExporter<T extends Entity>
 
 
         public Value( String key, Double value, int fractionDigits, boolean useGrouping ) {
-            this( key, value != null ? NumberFormatter.getFormatter( fractionDigits, useGrouping ).format( value ) : "" );
+            this( key,
+                    value != null ? NumberFormatter.getFormatter( fractionDigits, useGrouping ).format( value ) : "" );
         }
 
 
@@ -133,7 +134,10 @@ public abstract class AbstractExcelExporter<T extends Entity>
             this( entity.getLabel( property ), property.get(), useGrouping );
         }
 
-
+        public Value( String label, Property<String> property ) {
+            this( label, property.get() );
+        }
+        
         public Value( LabelSupport entity, Property<String> property ) {
             this( entity.getLabel( property ), property.get() );
         }
@@ -175,6 +179,8 @@ public abstract class AbstractExcelExporter<T extends Entity>
     protected static NumberFormat euroFormat      = NumberFormat.getNumberInstance( Locale.ENGLISH );
 
     protected static NumberFormat euroShortFormat = NumberFormat.getNumberInstance( Locale.ENGLISH );
+
+
     static {
         euroFormat.setMaximumFractionDigits( 2 );
         euroFormat.setMinimumFractionDigits( 2 );
@@ -184,17 +190,17 @@ public abstract class AbstractExcelExporter<T extends Entity>
         euroFormat.setMinimumIntegerDigits( 1 );
     }
 
-    protected static DateFormat   dateFormat      = new SimpleDateFormat( "dd.MM.yyyy" );
+    protected static DateFormat dateFormat = new SimpleDateFormat( "dd.MM.yyyy" );
 
-    protected static DateFormat   fileFormat      = new SimpleDateFormat( "yyyy_MM_dd_HH_mm_ss" );
+    protected static DateFormat fileFormat = new SimpleDateFormat( "yyyy_MM_dd_HH_mm_ss" );
 
-    private final String          typename;
+    private final String        typename;
 
-    private final Class<T>        type;
+    private final Class<T>      type;
 
-    private final String          filename;
+    private final String        filename;
 
-    private final String          messagename;
+    private final String        messagename;
 
 
     protected AbstractExcelExporter( Class<T> type, String typename, String filename, String messagename ) {
@@ -244,8 +250,8 @@ public abstract class AbstractExcelExporter<T extends Entity>
                 if (count < errors.size()) {
                     allErrors.append( "\n" ).append( "Weitere " + (errors.size() - count) + " Fehler entfernt..." );
                 }
-                allErrors.append( "\n" ).append(
-                        "Es wurden " + (size - errors.size()) + " " + messagename + " exportiert." );
+                allErrors.append( "\n" )
+                        .append( "Es wurden " + (size - errors.size()) + " " + messagename + " exportiert." );
 
                 Polymap.getSessionDisplay().asyncExec( new Runnable() {
 
@@ -353,13 +359,16 @@ public abstract class AbstractExcelExporter<T extends Entity>
                     for (List<Value> row : values) {
 
                         // header
-                        if (noHeaderYet) {
+                        if (noHeaderYet && headersEnabled()) {
                             csvWriter.writeHeader( getHeaders( row ) );
                             noHeaderYet = false;
                         }
 
                         // all properties
-                        csvWriter.write( getValues( row ) );
+                        List<String> strings = getValues( row );
+                        if (!strings.isEmpty()) {
+                            csvWriter.write( strings );
+                        }
                     }
                 }
             }
@@ -376,6 +385,11 @@ public abstract class AbstractExcelExporter<T extends Entity>
                 it.close();
             }
         }
+    }
+
+
+    protected boolean headersEnabled() {
+        return true;
     }
 
 

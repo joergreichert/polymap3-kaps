@@ -105,6 +105,7 @@ public class FormPageProvider
             result.add( new WohnungGrunddatenFormEditorPage( formEditor, feature, fs ) );
             result.add( new WohnungVertragsdatenFormEditorPage( formEditor, feature, fs ) );
             result.add( new WohnungLiegenschaftzinsFormEditorPage( formEditor, feature, fs ) );
+            result.add( new WohnungStaBuFormEditorPage(feature, fs ) );
         }
         else if (name.equalsIgnoreCase( GebaeudeArtComposite.NAME )) {
             result.add( new DefaultEntityFormEditorPage( feature, fs, GebaeudeArtComposite.class, KapsRepository

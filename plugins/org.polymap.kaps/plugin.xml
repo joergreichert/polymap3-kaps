@@ -93,6 +93,13 @@
             class="org.polymap.kaps.exporter.VertragStaBuExporter"
             icon="icons/exportas.gif"
             id="org.polymap.kaps.exporter.VertragStaBuExporter"
+            label="Exportieren für Statistisches Bundesamt (alt)"
+            tooltip="Verträge für Statistisches Bundesamt Wiesbaden exportieren (alt)">
+      </featureOperation>
+      <featureOperation
+            class="org.polymap.kaps.exporter.VertragStaBuCSVExporter"
+            icon="icons/exportas.gif"
+            id="org.polymap.kaps.exporter.VertragStaBuCSVExporter"
             label="Exportieren für Statistisches Bundesamt"
             tooltip="Verträge für Statistisches Bundesamt Wiesbaden exportieren">
       </featureOperation>
