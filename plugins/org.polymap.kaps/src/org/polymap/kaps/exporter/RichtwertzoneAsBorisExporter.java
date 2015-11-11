@@ -72,7 +72,7 @@ import org.polymap.kaps.model.data.RichtwertzoneZeitraumComposite;
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
-public class RichtwertzoneAsBorisExporter
+public abstract class RichtwertzoneAsBorisExporter
         extends DefaultFeatureOperation
         implements IFeatureOperation {
 
@@ -117,7 +117,7 @@ public class RichtwertzoneAsBorisExporter
 
         final Date now = new Date();
 
-        final File f = File.createTempFile( "polymap_boris_export_", ".csv" );
+        final File f = File.createTempFile( filename(), ".csv" );
         f.deleteOnExit();
 
         OutputStream out = new BufferedOutputStream( new FileOutputStream( f ) );
@@ -144,8 +144,10 @@ public class RichtwertzoneAsBorisExporter
 
 
                     public String getFilename() {
-                        return "boris_export_" + fileFormat.format( new Date() ) + ".csv";
+                        return filename() + fileFormat.format( new Date() ) + ".csv";
                     }
+
+
 
 
                     public InputStream getInputStream()
@@ -868,8 +870,13 @@ public class RichtwertzoneAsBorisExporter
         // Liste der Nummern der Umrechnungstabellen
         // (Datensatz) oder Liste der Namen der Dateidokumente
         // Pflicht soweit wertrelevant
-        result.add( "uf1400522-MS_2012.12.31_Landwirtschaft-Sonstiges.pdf" );
+        result.add( pdfname() );
 
         return result;
     }
+
+
+    protected abstract String filename();
+    
+    protected abstract String pdfname();
 }

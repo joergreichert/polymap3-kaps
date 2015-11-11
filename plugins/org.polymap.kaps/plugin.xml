@@ -83,11 +83,25 @@
             tooltip="Exportieren als Statistik Agrar">
       </featureOperation>
       <featureOperation
-            class="org.polymap.kaps.exporter.RichtwertzoneAsBorisExporter"
+            class="org.polymap.kaps.exporter.RichtwertzoneAsBoris12Exporter"
             icon="icons/exportas.gif"
-            id="org.polymap.kaps.exporter.RichtwertzoneAsBorisExporter"
-            label="Exportieren als BORIS für GeoSN"
-            tooltip="Richtwertzone als CSV im Format BORIS für das GeoSN exportieren.">
+            id="org.polymap.kaps.exporter.RichtwertzoneAsBoris12Exporter"
+            label="Exportieren als BORIS 2012 für GeoSN"
+            tooltip="Richtwertzone als CSV im Format BORIS 2012 für das GeoSN exportieren.">
+      </featureOperation>
+      <featureOperation
+            class="org.polymap.kaps.exporter.RichtwertzoneAsBoris14Exporter"
+            icon="icons/exportas.gif"
+            id="org.polymap.kaps.exporter.RichtwertzoneAsBoris14Exporter"
+            label="Exportieren als BORIS 2014 für GeoSN"
+            tooltip="Richtwertzone als CSV im Format BORIS 2014 für das GeoSN exportieren.">
+      </featureOperation>
+      <featureOperation
+            class="org.polymap.kaps.exporter.RichtwertzoneAsBoris16Exporter"
+            icon="icons/exportas.gif"
+            id="org.polymap.kaps.exporter.RichtwertzoneAsBoris16Exporter"
+            label="Exportieren als BORIS 2016 für GeoSN"
+            tooltip="Richtwertzone als CSV im Format BORIS 2016 für das GeoSN exportieren.">
       </featureOperation>
       <featureOperation
             class="org.polymap.kaps.exporter.VertragStaBuExporter"
