@@ -91,7 +91,7 @@ public class VertragsdatenBaulandGebaudeExporter
         result.add( new Value( "Strasse", strasse ) );
         result.add( new Value( "Flurstücksnummer", flurstueck.hauptNummer().get() + "/"
                 + flurstueck.unterNummer().get() ) );
-        result.add( new Value( "Gebäudeart", firstRow ? vdc.gebaeudeArtStaBu().get() : null ) );
+        result.add( new Value( "Gebäudeart", firstRow ? flurstueck.gebaeudeArt().get() : null ) );
         result.add( new Value( "anrechenbare Baulandfläche", firstRow ? vdc.flaeche1().get() : null, 1 ) );
         result.add( new Value( "ausgewertete Fläche", firstRow ? vdc.verkaufteFlaecheGesamt().get() : null, 1 ) );
         result.add( new Value( "Bodenpreis normiert", firstRow ? vdc.normierterGfzBereinigterBodenpreis().get() : null,
