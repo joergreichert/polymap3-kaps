@@ -14,22 +14,15 @@ package org.polymap.kaps.ui.form;
 
 import org.geotools.data.FeatureStore;
 import org.opengis.feature.Feature;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.qi4j.api.entity.Entity;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-
 import org.eclipse.ui.forms.widgets.Section;
-
 import org.eclipse.core.runtime.IProgressMonitor;
-
 import org.polymap.core.runtime.event.EventManager;
-
 import org.polymap.rhei.data.entityfeature.AssociationAdapter;
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
 import org.polymap.rhei.field.CheckboxFormField;
@@ -38,7 +31,6 @@ import org.polymap.rhei.field.IFormFieldListener;
 import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.form.FormEditor;
 import org.polymap.rhei.form.IFormEditorPageSite;
-
 import org.polymap.kaps.model.data.BodenwertAufteilungTextComposite;
 import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.VertragsdatenErweitertComposite;
@@ -93,17 +85,17 @@ public class VertragsdatenBaulandBodenwertFormEditorPage
 
     // private FaktorOhneStrassenplatzCalculator faktorStrassenplatz;
 
-    private FieldMultiplication line1multiplicator2;
+    private FieldCalculation line1multiplicator2;
 
-    private FieldMultiplication line2multiplicator2;
+    private FieldCalculation line2multiplicator2;
 
-    private FieldMultiplication line3multiplicator2;
+    private FieldCalculation line3multiplicator2;
 
-    private FieldMultiplication line4multiplicator2;
+    private FieldCalculation line4multiplicator2;
 
-    private FieldMultiplication line5multiplicator2;
+    private FieldCalculation line5multiplicator2;
 
-    private FieldMultiplication line6multiplicator2;
+    private FieldCalculation line6multiplicator2;
 
     private IFormFieldListener  bodenpreis;
 
@@ -188,8 +180,19 @@ public class VertragsdatenBaulandBodenwertFormEditorPage
         createPreisField( vb.bodenwertBereinigt1(), five().top( lastLine ), client, false );
         site.addFieldListener( line1multiplicator = new FieldMultiplication( site, 2, vb.flaeche1(),
                 vb.bodenpreisQm1(), vb.bodenwert1() ) );
-        site.addFieldListener( line1multiplicator2 = new FieldMultiplication( site, 2, vb.bodenpreisQm1(), vb
-                .faktorBereinigterKaufpreis(), vb.bodenwertBereinigt1() ) );
+        
+        site.addFieldListener( line1multiplicator2 = new FieldCalculation( site, 2, vb.bodenwertBereinigt1(), vb.bodenpreisQm1(), vb
+                .faktorBereinigterKaufpreis(), vb.flaeche1() ) {
+
+        	@Override
+        	protected Double calculate(ValueProvider values) {
+        		if(values.get(vb.flaeche1()) > 0) {
+        			return values.get(vb.bodenpreisQm1()) * values.get(vb.faktorBereinigterKaufpreis()); 
+        		} else {
+        			return 0d;
+        		}
+        	}
+        });
 
         lastLine = newLine;
         newLine = createLabel( client, "Baulandmehrfläche", one().top( lastLine, 12 ), SWT.RIGHT );
@@ -199,8 +202,18 @@ public class VertragsdatenBaulandBodenwertFormEditorPage
         createPreisField( vb.bodenwertBereinigt2(), five().top( lastLine, 12 ), client, false );
         site.addFieldListener( line2multiplicator = new FieldMultiplication( site, 2, vb.flaeche2(),
                 vb.bodenpreisQm2(), vb.bodenwert2() ) );
-        site.addFieldListener( line2multiplicator2 = new FieldMultiplication( site, 2, vb.bodenpreisQm2(), vb
-                .faktorBereinigterKaufpreis(), vb.bodenwertBereinigt2() ) );
+        site.addFieldListener( line2multiplicator2 = new FieldCalculation( site, 2, vb.bodenwertBereinigt2(), vb.bodenpreisQm2(), vb
+                .faktorBereinigterKaufpreis(), vb.flaeche2() ) {
+
+        	@Override
+        	protected Double calculate(ValueProvider values) {
+        		if(values.get(vb.flaeche2()) > 0) {
+        			return values.get(vb.bodenpreisQm2()) * values.get(vb.faktorBereinigterKaufpreis()); 
+        		} else {
+        			return 0d;
+        		}
+        	}
+        });
 
         lastLine = newLine;
         newLine = newFormField( IFormFieldLabel.NO_LABEL ).setEnabled( true )
@@ -213,8 +226,18 @@ public class VertragsdatenBaulandBodenwertFormEditorPage
         createPreisField( vb.bodenwertBereinigt3(), five().top( lastLine, 12 ), client, false );
         site.addFieldListener( line3multiplicator = new FieldMultiplication( site, 2, vb.flaeche3(),
                 vb.bodenpreisQm3(), vb.bodenwert3() ) );
-        site.addFieldListener( line3multiplicator2 = new FieldMultiplication( site, 2, vb.bodenpreisQm3(), vb
-                .faktorBereinigterKaufpreis(), vb.bodenwertBereinigt3() ) );
+        site.addFieldListener( line3multiplicator = new FieldCalculation( site, 2, vb.bodenwertBereinigt3(), vb.bodenpreisQm3(), vb
+                .faktorBereinigterKaufpreis(), vb.flaeche3() ) {
+
+        	@Override
+        	protected Double calculate(ValueProvider values) {
+        		if(values.get(vb.flaeche3()) > 0) {
+        			return values.get(vb.bodenpreisQm3()) * values.get(vb.faktorBereinigterKaufpreis()); 
+        		} else {
+        			return 0d;
+        		}
+        	}
+        });
 
         lastLine = newLine;
         newLine = newFormField( IFormFieldLabel.NO_LABEL ).setEnabled( true )
@@ -227,8 +250,18 @@ public class VertragsdatenBaulandBodenwertFormEditorPage
         createPreisField( vb.bodenwertBereinigt4(), five().top( lastLine ), client, false );
         site.addFieldListener( line4multiplicator = new FieldMultiplication( site, 2, vb.flaeche4(),
                 vb.bodenpreisQm4(), vb.bodenwert4() ) );
-        site.addFieldListener( line4multiplicator2 = new FieldMultiplication( site, 2, vb.bodenpreisQm4(), vb
-                .faktorBereinigterKaufpreis(), vb.bodenwertBereinigt4() ) );
+        site.addFieldListener( line4multiplicator2 = new FieldCalculation( site, 2, vb.bodenwertBereinigt4(), vb.bodenpreisQm4(), vb
+                .faktorBereinigterKaufpreis(), vb.flaeche4() ) {
+
+        	@Override
+        	protected Double calculate(ValueProvider values) {
+        		if(values.get(vb.flaeche4()) > 0) {
+        			return values.get(vb.bodenpreisQm4()) * values.get(vb.faktorBereinigterKaufpreis()); 
+        		} else {
+        			return 0d;
+        		}
+        	}
+        });
 
         lastLine = newLine;
         newLine = newFormField( IFormFieldLabel.NO_LABEL ).setEnabled( true )
@@ -241,8 +274,18 @@ public class VertragsdatenBaulandBodenwertFormEditorPage
         createPreisField( vb.bodenwertBereinigt5(), five().top( lastLine ), client, false );
         site.addFieldListener( line5multiplicator = new FieldMultiplication( site, 2, vb.flaeche5(),
                 vb.bodenpreisQm5(), vb.bodenwert5() ) );
-        site.addFieldListener( line5multiplicator2 = new FieldMultiplication( site, 2, vb.bodenpreisQm5(), vb
-                .faktorBereinigterKaufpreis(), vb.bodenwertBereinigt5() ) );
+        site.addFieldListener( line5multiplicator2 = new FieldCalculation( site, 2, vb.bodenwertBereinigt5(), vb.bodenpreisQm5(), vb
+                .faktorBereinigterKaufpreis(), vb.flaeche5() ) {
+
+        	@Override
+        	protected Double calculate(ValueProvider values) {
+        		if(values.get(vb.flaeche5()) > 0) {
+        			return values.get(vb.bodenpreisQm5()) * values.get(vb.faktorBereinigterKaufpreis()); 
+        		} else {
+        			return 0d;
+        		}
+        	}
+        });
 
         lastLine = newLine;
         newLine = newFormField( IFormFieldLabel.NO_LABEL ).setEnabled( true )
@@ -254,8 +297,18 @@ public class VertragsdatenBaulandBodenwertFormEditorPage
         createPreisField( vb.bodenwertBereinigt6(), five().top( lastLine ), client, false );
         site.addFieldListener( line6multiplicator = new FieldMultiplication( site, 2, vb.flaeche6(),
                 vb.bodenpreisQm6(), vb.bodenwert6() ) );
-        site.addFieldListener( line6multiplicator2 = new FieldMultiplication( site, 2, vb.bodenpreisQm6(), vb
-                .faktorBereinigterKaufpreis(), vb.bodenwertBereinigt6() ) );
+        site.addFieldListener( line6multiplicator2 = new FieldCalculation( site, 2, vb.bodenwertBereinigt6(), vb.bodenpreisQm6(), vb
+                .faktorBereinigterKaufpreis(), vb.flaeche6() ) {
+
+        	@Override
+        	protected Double calculate(ValueProvider values) {
+        		if(values.get(vb.flaeche6()) > 0) {
+        			return values.get(vb.bodenpreisQm6()) * values.get(vb.faktorBereinigterKaufpreis()); 
+        		} else {
+        			return 0d;
+        		}
+        	}
+        });
 
         lastLine = newLine;
         newLine = createFlaecheField( vb.verkaufteFlaecheGesamt(), two().top( lastLine ), client, false );
