@@ -112,7 +112,8 @@ public class WohnungVertragsdatenFormEditorPage
 
         final VertragComposite vertrag = wohnung.flurstueck().get() != null ? wohnung.flurstueck().get().vertrag()
                 .get() : null;
-        String label = vertrag == null ? "Kein Vertrag zugewiesen" : "Vertrag "
+        final boolean keinVertragZugeordnet = vertrag == null;         
+        String label = keinVertragZugeordnet ? "Kein Vertrag zugewiesen" : "Vertrag "
                 + EingangsNummerFormatter.format( vertrag.eingangsNr().get() ) + " öffnen";
         final ActionButton openErweiterteDaten = new ActionButton( parent, new Action( label ) {
 
@@ -197,7 +198,7 @@ public class WohnungVertragsdatenFormEditorPage
 
         lastLine = newLine;
         newLine = createLabel( parent, "Vollpreis", left().right( ONE ).top( lastLine ), SWT.RIGHT );
-        createPreisField( wohnung.kaufpreis(), left().left( ONE ).right( TWO ).top( lastLine ), parent, false );
+        createPreisField( wohnung.kaufpreis(), left().left( ONE ).right( TWO ).top( lastLine ), parent, keinVertragZugeordnet );
 
         lastLine = newLine;
         newLine = createLabel( parent, "Abschlag in €", left().right( TWO ).top( lastLine, 22 ), SWT.CENTER );
@@ -258,7 +259,7 @@ public class WohnungVertragsdatenFormEditorPage
         lastLine = newLine;
         newLine = createLabel( parent, "bereinigter Vollpreis", left().right( ONE ).top( lastLine, 12 ), SWT.RIGHT );
         createPreisField( wohnung.bereinigterVollpreis(), left().left( ONE ).right( TWO ).top( lastLine ), parent,
-                false );
+        		keinVertragZugeordnet );
         site.addFieldListener( vollpreis = new FieldCalculation( pageSite, 2, wohnung.bereinigterVollpreis(), wohnung
                 .kaufpreis(), wohnung.abschlagGarage(), wohnung.abschlagStellplatz(), wohnung.abschlagAnderes() ) {
 
@@ -286,7 +287,7 @@ public class WohnungVertragsdatenFormEditorPage
         lastLine = newLine;
         newLine = createLabel( parent, "Vollpreis Wohnfläche", left().right( ONE ).top( lastLine ), SWT.RIGHT );
         createPreisField( wohnung.vollpreisWohnflaeche(), left().left( ONE ).right( TWO ).top( lastLine ), parent,
-                false );
+        		keinVertragZugeordnet );
         site.addFieldListener( vollpreisWohnflaeche = new FieldCalculation( pageSite, 2,
                 wohnung.vollpreisWohnflaeche(), wohnung.bereinigterVollpreis(), wohnung.wohnflaeche() ) {
 
