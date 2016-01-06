@@ -198,7 +198,10 @@ public class WohnungVertragsdatenFormEditorPage
 
         lastLine = newLine;
         newLine = createLabel( parent, "Vollpreis", left().right( ONE ).top( lastLine ), SWT.RIGHT );
-        createPreisField( wohnung.kaufpreis(), left().left( ONE ).right( TWO ).top( lastLine ), parent, keinVertragZugeordnet );
+        if(keinVertragZugeordnet) {
+        	wohnung.kaufpreis().set(0d);
+        }
+        createPreisField( wohnung.kaufpreis(), left().left( ONE ).right( TWO ).top( lastLine ), parent, false );
 
         lastLine = newLine;
         newLine = createLabel( parent, "Abschlag in €", left().right( TWO ).top( lastLine, 22 ), SWT.CENTER );
@@ -258,8 +261,11 @@ public class WohnungVertragsdatenFormEditorPage
 
         lastLine = newLine;
         newLine = createLabel( parent, "bereinigter Vollpreis", left().right( ONE ).top( lastLine, 12 ), SWT.RIGHT );
+        if(keinVertragZugeordnet) {
+        	wohnung.bereinigterVollpreis().set(0d);
+        }
         createPreisField( wohnung.bereinigterVollpreis(), left().left( ONE ).right( TWO ).top( lastLine ), parent,
-        		keinVertragZugeordnet );
+        		false );
         site.addFieldListener( vollpreis = new FieldCalculation( pageSite, 2, wohnung.bereinigterVollpreis(), wohnung
                 .kaufpreis(), wohnung.abschlagGarage(), wohnung.abschlagStellplatz(), wohnung.abschlagAnderes() ) {
 
@@ -286,8 +292,11 @@ public class WohnungVertragsdatenFormEditorPage
 
         lastLine = newLine;
         newLine = createLabel( parent, "Vollpreis Wohnfläche", left().right( ONE ).top( lastLine ), SWT.RIGHT );
+        if(keinVertragZugeordnet) {
+        	wohnung.vollpreisWohnflaeche().set(0d);
+        }
         createPreisField( wohnung.vollpreisWohnflaeche(), left().left( ONE ).right( TWO ).top( lastLine ), parent,
-        		keinVertragZugeordnet );
+        		false );
         site.addFieldListener( vollpreisWohnflaeche = new FieldCalculation( pageSite, 2,
                 wohnung.vollpreisWohnflaeche(), wohnung.bereinigterVollpreis(), wohnung.wohnflaeche() ) {
 
