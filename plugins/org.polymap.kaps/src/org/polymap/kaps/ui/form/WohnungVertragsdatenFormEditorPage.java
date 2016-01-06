@@ -195,12 +195,31 @@ public class WohnungVertragsdatenFormEditorPage
             delete.setEnabled( true );
             newLine = delete;
         }
+        
+        if(keinVertragZugeordnet) {
+        	wohnung.kaufpreis().set(0d);
+        	wohnung.vollpreisWohnflaeche().set(0d);
+        	wohnung.bereinigterVollpreis().set(0d);
+    		wohnung.abschlagGarage().set(null);
+    		wohnung.abschlagStellplatz().set(null);
+    		wohnung.abschlagAnderes().set(null);
+    		wohnung.schaetzungGarage().set(null);
+    		wohnung.schaetzungStellplatz().set(null);
+    		wohnung.schaetzungAnderes().set(null);
+    		wohnung.gebaeudeArtGarage().set(null);
+    		wohnung.gebaeudeArtStellplatz().set(null);
+    		wohnung.gebaeudeArtAnderes().set(null);
+    		wohnung.anzahlGaragen().set(null);
+    		wohnung.anzahlStellplatz().set(null);
+    		wohnung.anzahlAnderes().set(null);
+    		wohnung.vermietet().set("unbekannt");
+    		wohnung.zurAuswertungGeeignet().set(null);
+    		wohnung.gewichtung().set(null);
+    		wohnung.bemerkungVertragsdaten().set(null);
+        }
 
         lastLine = newLine;
         newLine = createLabel( parent, "Vollpreis", left().right( ONE ).top( lastLine ), SWT.RIGHT );
-        if(keinVertragZugeordnet) {
-        	wohnung.kaufpreis().set(0d);
-        }
         createPreisField( wohnung.kaufpreis(), left().left( ONE ).right( TWO ).top( lastLine ), parent, false );
 
         lastLine = newLine;
@@ -261,9 +280,6 @@ public class WohnungVertragsdatenFormEditorPage
 
         lastLine = newLine;
         newLine = createLabel( parent, "bereinigter Vollpreis", left().right( ONE ).top( lastLine, 12 ), SWT.RIGHT );
-        if(keinVertragZugeordnet) {
-        	wohnung.bereinigterVollpreis().set(0d);
-        }
         createPreisField( wohnung.bereinigterVollpreis(), left().left( ONE ).right( TWO ).top( lastLine ), parent,
         		false );
         site.addFieldListener( vollpreis = new FieldCalculation( pageSite, 2, wohnung.bereinigterVollpreis(), wohnung
@@ -292,9 +308,6 @@ public class WohnungVertragsdatenFormEditorPage
 
         lastLine = newLine;
         newLine = createLabel( parent, "Vollpreis Wohnfläche", left().right( ONE ).top( lastLine ), SWT.RIGHT );
-        if(keinVertragZugeordnet) {
-        	wohnung.vollpreisWohnflaeche().set(0d);
-        }
         createPreisField( wohnung.vollpreisWohnflaeche(), left().left( ONE ).right( TWO ).top( lastLine ), parent,
         		false );
         site.addFieldListener( vollpreisWohnflaeche = new FieldCalculation( pageSite, 2,

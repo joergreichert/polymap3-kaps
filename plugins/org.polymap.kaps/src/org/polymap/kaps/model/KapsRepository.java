@@ -537,13 +537,31 @@ public class KapsRepository
     private void remove( VertragComposite vertrag ) {
     	for (WohnungComposite wohnung : WohnungComposite.Mixin.findWohnungenFor( vertrag )) {
     		// nicht editierbar in Wohnungsformular
-    		wohnung.kaufpreis().set(0d);
-    		wohnung.bereinigterVollpreis().set(0d);
-    		wohnung.vollpreisWohnflaeche().set(0d);
+    		wohnung.kaufpreis().set(null);
+    		wohnung.bereinigterVollpreis().set(null);
+    		wohnung.vollpreisWohnflaeche().set(null);
     		// editierbar in Wohnungsformular
-    		wohnung.abschlagGarage().set(0d);
-    		wohnung.abschlagStellplatz().set(0d);
-    		wohnung.abschlagAnderes().set(0d);
+    		wohnung.abschlagGarage().set(null);
+    		wohnung.abschlagStellplatz().set(null);
+    		wohnung.abschlagAnderes().set(null);
+    		
+    		wohnung.schaetzungGarage().set(null);
+    		wohnung.schaetzungStellplatz().set(null);
+    		wohnung.schaetzungAnderes().set(null);
+    		
+    		wohnung.gebaeudeArtGarage().set(null);
+    		wohnung.gebaeudeArtStellplatz().set(null);
+    		wohnung.gebaeudeArtAnderes().set(null);
+    		
+    		wohnung.anzahlGaragen().set(null);
+    		wohnung.anzahlStellplatz().set(null);
+    		wohnung.anzahlAnderes().set(null);
+    		
+    		wohnung.vermietet().set("unbekannt");
+    		wohnung.zurAuswertungGeeignet().set(null);
+    		
+    		wohnung.gewichtung().set(null);
+    		wohnung.bemerkungVertragsdaten().set(null);
     	}
     	
         ErmittlungModernisierungsgradComposite ermittlungModernisierungsgradComposite = ErmittlungModernisierungsgradComposite.Mixin
