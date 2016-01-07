@@ -140,7 +140,7 @@ public class RichtwertzoneProvider {
 
             // find zeitraum
             RichtwertzoneZeitraumComposite zeitraum = RichtwertzoneZeitraumComposite.Mixin.findZeitraumFor( zone, date );
-            if (zeitraum != null) {
+            if (zeitraum != null && zeitraum.gueltigAb().get() != null) {
                 zonen.put(
                         prefix + " - " + zone.name().get() + " ("
                                 + KapsRepository.SHORT_DATE.format( zeitraum.gueltigAb().get() ) + ")", zeitraum );
