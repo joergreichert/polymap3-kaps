@@ -75,6 +75,12 @@ public class VertragsdatenBaulandGebaudeExporter
             errors.add( error( flurstueck, "Keine Strasse gefunden!" ) );
             return result;
         }
+        String hausNummer = flurstueck.hausnummer().get();
+        if (hausNummer == null) {
+            errors.add( error( flurstueck, "Keine Hausnummer gefunden!" ) );
+            return result;
+        }
+        String hausNummerZusatz = flurstueck.hausnummerZusatz().get();
         VertragsdatenErweitertComposite ew = vertrag.erweiterteVertragsdaten().get();
         Double preis = vertrag.vollpreis().get();
         if (ew != null && ew.bereinigterVollpreis().get() != null) {
@@ -89,6 +95,8 @@ public class VertragsdatenBaulandGebaudeExporter
         result.add( new Value( "Gemeinde", gemeinde ) );
         result.add( new Value( "Gemarkung", gemarkung ) );
         result.add( new Value( "Strasse", strasse ) );
+        result.add( new Value( "Haus-Nr.", hausNummer ) );
+        result.add( new Value( "Haus-Nr. Zusatz", hausNummerZusatz == null ? "" : hausNummerZusatz ) );
         result.add( new Value( "Flurstücksnummer", flurstueck.hauptNummer().get() + "/"
                 + flurstueck.unterNummer().get() ) );
         result.add( new Value( "Gebäudeart", firstRow ? vdc.gebaeudeArtStaBu().get() : null ) );
