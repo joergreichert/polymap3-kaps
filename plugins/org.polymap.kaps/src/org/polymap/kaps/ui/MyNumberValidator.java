@@ -122,7 +122,7 @@ public class MyNumberValidator
                 return Float.valueOf( result.floatValue() );
             }
             else if (Double.class.isAssignableFrom( targetClass )) {
-                return Double.valueOf( result.floatValue() );
+                return Double.valueOf( result.doubleValue() );
             }
             else if (Integer.class.isAssignableFrom( targetClass )) {
                 return Integer.valueOf( result.intValue() );

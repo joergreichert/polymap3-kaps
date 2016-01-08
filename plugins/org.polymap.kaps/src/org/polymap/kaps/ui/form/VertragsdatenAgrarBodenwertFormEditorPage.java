@@ -259,9 +259,11 @@ public class VertragsdatenAgrarBodenwertFormEditorPage
                 if (ev.getEventCode() == IFormFieldListener.VALUE_CHANGE
                         && ev.getFieldName().equals( vb.richtwertZone1().qualifiedName().name() )) {
                     RichtwertzoneZeitraumComposite zone = (RichtwertzoneZeitraumComposite)ev.getNewValue();
-                    Double wert = zone != null ? zone.euroQm().get() : null;
-                    site.setFieldValue( vb.bodenrichtwert1().qualifiedName().name(), wert != null ? NumberFormatter
-                            .getFormatter( 2 ).format( wert ) : null );
+                    if(zone != null && !zone.equals(vb.richtwertZone1().get())) {
+	                    Double wert = zone != null ? zone.euroQm().get() : null;
+	                    site.setFieldValue( vb.bodenrichtwert1().qualifiedName().name(), wert != null ? NumberFormatter
+	                            .getFormatter( 2 ).format( wert ) : null );
+                    }
                 }
             }
         } );
@@ -295,9 +297,11 @@ public class VertragsdatenAgrarBodenwertFormEditorPage
                 if (ev.getEventCode() == IFormFieldListener.VALUE_CHANGE
                         && ev.getFieldName().equals( vb.richtwertZone2().qualifiedName().name() )) {
                     RichtwertzoneZeitraumComposite zone = (RichtwertzoneZeitraumComposite)ev.getNewValue();
-                    Double wert = zone.euroQm().get();
-                    site.setFieldValue( vb.bodenrichtwert2().qualifiedName().name(), wert != null ? NumberFormatter
-                            .getFormatter( 2 ).format( wert ) : null );
+                    if(zone != null && !zone.equals(vb.richtwertZone2().get())) {
+	                    Double wert = zone.euroQm().get();
+	                    site.setFieldValue( vb.bodenrichtwert2().qualifiedName().name(), wert != null ? NumberFormatter
+	                            .getFormatter( 2 ).format( wert ) : null );
+                    }
                 }
             }
         } );
@@ -331,9 +335,11 @@ public class VertragsdatenAgrarBodenwertFormEditorPage
                 if (ev.getEventCode() == IFormFieldListener.VALUE_CHANGE
                         && ev.getFieldName().equals( vb.richtwertZone3().qualifiedName().name() )) {
                     RichtwertzoneZeitraumComposite zone = (RichtwertzoneZeitraumComposite)ev.getNewValue();
-                    Double wert = zone.euroQm().get();
-                    site.setFieldValue( vb.bodenrichtwert3().qualifiedName().name(), wert != null ? NumberFormatter
-                            .getFormatter( 2 ).format( wert ) : null );
+                    if(zone != null && !zone.equals(vb.richtwertZone3().get())) {
+	                    Double wert = zone.euroQm().get();
+	                    site.setFieldValue( vb.bodenrichtwert3().qualifiedName().name(), wert != null ? NumberFormatter
+	                            .getFormatter( 2 ).format( wert ) : null );
+                    }
                 }
             }
         } );
@@ -367,9 +373,11 @@ public class VertragsdatenAgrarBodenwertFormEditorPage
                 if (ev.getEventCode() == IFormFieldListener.VALUE_CHANGE
                         && ev.getFieldName().equals( vb.richtwertZone4().qualifiedName().name() )) {
                     RichtwertzoneZeitraumComposite zone = (RichtwertzoneZeitraumComposite)ev.getNewValue();
-                    Double wert = zone.euroQm().get();
-                    site.setFieldValue( vb.bodenrichtwert4().qualifiedName().name(), wert != null ? NumberFormatter
-                            .getFormatter( 2 ).format( wert ) : null );
+                    if(zone != null && !zone.equals(vb.richtwertZone4().get())) {
+	                    Double wert = zone.euroQm().get();
+	                    site.setFieldValue( vb.bodenrichtwert4().qualifiedName().name(), wert != null ? NumberFormatter
+	                            .getFormatter( 2 ).format( wert ) : null );
+                    }
                 }
             }
         } );
@@ -401,9 +409,11 @@ public class VertragsdatenAgrarBodenwertFormEditorPage
                 if (ev.getEventCode() == IFormFieldListener.VALUE_CHANGE
                         && ev.getFieldName().equals( vb.richtwertZone5().qualifiedName().name() )) {
                     RichtwertzoneZeitraumComposite zone = (RichtwertzoneZeitraumComposite)ev.getNewValue();
-                    Double wert = zone.euroQm().get();
-                    site.setFieldValue( vb.bodenrichtwert5().qualifiedName().name(), wert != null ? NumberFormatter
-                            .getFormatter( 2 ).format( wert ) : null );
+                    if(zone != null && !zone.equals(vb.richtwertZone5().get())) {
+                    	Double wert = zone.euroQm().get();
+                    	site.setFieldValue( vb.bodenrichtwert5().qualifiedName().name(), wert != null ? NumberFormatter
+                    			.getFormatter( 2 ).format( wert ) : null );
+                    }
                 }
             }
         } );
@@ -435,9 +445,11 @@ public class VertragsdatenAgrarBodenwertFormEditorPage
                 if (ev.getEventCode() == IFormFieldListener.VALUE_CHANGE
                         && ev.getFieldName().equals( vb.richtwertZone6().qualifiedName().name() )) {
                     RichtwertzoneZeitraumComposite zone = (RichtwertzoneZeitraumComposite)ev.getNewValue();
-                    Double wert = zone.euroQm().get();
-                    site.setFieldValue( vb.bodenrichtwert6().qualifiedName().name(), wert != null ? NumberFormatter
-                            .getFormatter( 2 ).format( wert ) : null );
+                    if(zone != null && !zone.equals(vb.richtwertZone6().get())) {
+	                    Double wert = zone.euroQm().get();
+	                    site.setFieldValue( vb.bodenrichtwert6().qualifiedName().name(), wert != null ? NumberFormatter
+	                            .getFormatter( 2 ).format( wert ) : null );
+                    }
                 }
             }
         } );
