@@ -19,14 +19,7 @@ import net.refractions.udig.catalog.IGeoResource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.polymap.core.project.ILayer;
-
-import org.polymap.rhei.data.entityfeature.EntityProvider;
-import org.polymap.rhei.data.entityfeature.catalog.EntityGeoResourceImpl;
-import org.polymap.rhei.filter.IFilter;
-import org.polymap.rhei.filter.IFilterProvider;
-
 import org.polymap.kaps.model.KapsEntityProvider;
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.FlurstueckComposite;
@@ -50,6 +43,7 @@ import org.polymap.kaps.ui.filter.RichtwertZoneFilter;
 import org.polymap.kaps.ui.filter.RichtwertZoneZeitraumFilter;
 import org.polymap.kaps.ui.filter.VertraegeFuerBaujahrUndGebaeudeartFilter;
 import org.polymap.kaps.ui.filter.VertraegeFuerFlurstueckeFilter;
+import org.polymap.kaps.ui.filter.VertraegeFuerRWZFilter;
 import org.polymap.kaps.ui.filter.VertraegeNutzungsartenFilter;
 import org.polymap.kaps.ui.filter.VertraegeStabuFilter;
 import org.polymap.kaps.ui.filter.VertraegeStalaAgrarFilter;
@@ -57,6 +51,10 @@ import org.polymap.kaps.ui.filter.VertraegeStalaBaulandFilter;
 import org.polymap.kaps.ui.filter.VertragsdatenAgrarAgrarFilter;
 import org.polymap.kaps.ui.filter.VertragsdatenBaulandBRLFilter;
 import org.polymap.kaps.ui.filter.WohnungETWFilter;
+import org.polymap.rhei.data.entityfeature.EntityProvider;
+import org.polymap.rhei.data.entityfeature.catalog.EntityGeoResourceImpl;
+import org.polymap.rhei.filter.IFilter;
+import org.polymap.rhei.filter.IFilterProvider;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -105,6 +103,7 @@ public class FilterProvider
                     result.add( new VertraegeStalaAgrarFilter( layer ) );
                     result.add( new VertraegeStalaBaulandFilter( layer ) );
                     result.add( new VertraegeNutzungsartenFilter( layer ) );
+                    result.add( new VertraegeFuerRWZFilter( layer ) );
                 }
                 else if (type.isAssignableFrom( VertragsdatenBaulandComposite.class )) {
                     result.add( new EinzelneVertragsdatenBaulandFilter( layer ) );
