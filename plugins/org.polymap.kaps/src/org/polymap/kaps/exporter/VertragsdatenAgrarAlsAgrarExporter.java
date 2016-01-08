@@ -81,17 +81,20 @@ public class VertragsdatenAgrarAlsAgrarExporter
                 }
         	}
         }
+        boolean firstFlurstueckOfGemarkung = true;
         for(Entry<GemeindeComposite, List<GemarkungComposite>> gemeindeGemarkungEntry : gemeindeGemarkung.entrySet()) {
         	for(GemarkungComposite gemarkung : gemeindeGemarkungEntry.getValue()) {
+        		firstFlurstueckOfGemarkung = true;
             	for(FlurstueckComposite fs : gemarkungFlurstuecke.get(gemarkung)) {
                     NutzungComposite nutzung = fs.nutzung().get();
                     if (nutzung != null && nutzung.isAgrar().get() != null && nutzung.isAgrar().get() == Boolean.TRUE) {
                         Double flaeche = fs.verkaufteFlaeche().get();
                         if (flaeche != null) {
-                            List<Value> createValues = createValues( vertrag, vdc, fs, gemarkung, gemeindeGemarkungEntry.getKey(), errors, firstRow );
+                            List<Value> createValues = createValues( vertrag, vdc, fs, gemarkung, gemeindeGemarkungEntry.getKey(), errors, firstRow, firstFlurstueckOfGemarkung );
                             if (!createValues.isEmpty()) {
                             	result.add( createValues );
                             	firstRow = false;
+                            	firstFlurstueckOfGemarkung = false;
                             }
                         }
                     }
@@ -103,7 +106,7 @@ public class VertragsdatenAgrarAlsAgrarExporter
     
 
     protected List<Value> createValues( VertragComposite vertrag, VertragsdatenAgrarComposite vdb, FlurstueckComposite fs, GemarkungComposite gemarkung, GemeindeComposite gemeinde, 
-    		List<String> errors, boolean firstRow ) {
+    		List<String> errors, boolean firstRow, boolean firstFlurstueckOfGemarkung ) {
         List<Value> result = new ArrayList<Value>();
         RichtwertzoneComposite zone = fs.richtwertZone().get();
         if (zone == null) {
@@ -122,7 +125,7 @@ public class VertragsdatenAgrarAlsAgrarExporter
         result.add( new Value( "Bebaut", vdb.istBebaut().get() ) );
 
         
-        boolean matches1 = vdb.richtwertZone1().get() != null && vdb.richtwertZone1().get().name().get().equals(zone.name().get());
+        boolean matches1 = firstFlurstueckOfGemarkung && vdb.richtwertZone1().get() != null && vdb.richtwertZone1().get().name().get().equals(zone.name().get());
     	result.add( new Value( "Bodennutzung 1", matches1 && vdb.bodennutzung1().get() != null ? vdb.bodennutzung1().get().name()
     			.get() : "" ) );
     	result.add( new Value( "Fläche 1", matches1 ? vdb.ackerzahl1().get() : null ) );
@@ -130,7 +133,7 @@ public class VertragsdatenAgrarAlsAgrarExporter
     	result.add( new Value( "Abgleich 1", matches1 ? vdb.abgleichAufKaufpreis1().get() : null, 2 ) );
     	result.add( new Value( "Preis 1", matches1 ? vdb.bodenwert1().get() * faktorBereinigterKaufpreis : null, 2 ) );
         
-        boolean matches2 = vdb.richtwertZone2().get() != null && vdb.richtwertZone2().get().name().get().equals(zone.name().get());
+        boolean matches2 = firstFlurstueckOfGemarkung && vdb.richtwertZone2().get() != null && vdb.richtwertZone2().get().name().get().equals(zone.name().get());
         result.add( new Value( "Bodennutzung 2", matches2 && vdb.bodennutzung2().get() != null ? vdb.bodennutzung2().get().name()
                 .get() : "" ) );
         result.add( new Value( "Fläche 2", matches2 ? vdb.ackerzahl2().get() : null ) );
@@ -138,7 +141,7 @@ public class VertragsdatenAgrarAlsAgrarExporter
         result.add( new Value( "Abgleich 2", matches2 ? vdb.abgleichAufKaufpreis2().get() : null, 2 ) );
     	result.add( new Value( "Preis 2", matches2 ? vdb.bodenwert2().get() * faktorBereinigterKaufpreis : null, 2 ) );
 
-        boolean matches3 = vdb.richtwertZone3().get() != null && vdb.richtwertZone3().get().name().get().equals(zone.name().get());
+        boolean matches3 = firstFlurstueckOfGemarkung && vdb.richtwertZone3().get() != null && vdb.richtwertZone3().get().name().get().equals(zone.name().get());
         result.add( new Value( "Bodennutzung 3", matches3 && vdb.bodennutzung3().get() != null ? vdb.bodennutzung3().get().name()
                 .get() : "" ) );
         result.add( new Value( "Fläche 3", matches3 ? vdb.ackerzahl3().get() : null ) );
@@ -146,7 +149,7 @@ public class VertragsdatenAgrarAlsAgrarExporter
         result.add( new Value( "Abgleich 3", matches3 ? vdb.abgleichAufKaufpreis3().get() : null, 2 ) );
     	result.add( new Value( "Preis 3", matches3 ? vdb.bodenwert3().get() * faktorBereinigterKaufpreis : null, 2 ) );
         
-        boolean matches4 = vdb.richtwertZone4().get() != null && vdb.richtwertZone4().get().name().get().equals(zone.name().get());
+        boolean matches4 = firstFlurstueckOfGemarkung && vdb.richtwertZone4().get() != null && vdb.richtwertZone4().get().name().get().equals(zone.name().get());
         result.add( new Value( "Bodennutzung 4", matches4 && vdb.bodennutzung4().get() != null ? vdb.bodennutzung4().get().name()
                 .get() : "" ) );
         result.add( new Value( "Fläche 4", matches4 ? vdb.ackerzahl4().get() : null ) );
@@ -154,7 +157,7 @@ public class VertragsdatenAgrarAlsAgrarExporter
         result.add( new Value( "Abgleich 4", matches4 ? vdb.abgleichAufKaufpreis4().get() : null, 2 ) );
     	result.add( new Value( "Preis 4", matches4 ? vdb.bodenwert4().get() * faktorBereinigterKaufpreis : null, 2 ) );
 
-        boolean matches5 = vdb.richtwertZone5().get() != null && vdb.richtwertZone5().get().name().get().equals(zone.name().get());
+        boolean matches5 = firstFlurstueckOfGemarkung && vdb.richtwertZone5().get() != null && vdb.richtwertZone5().get().name().get().equals(zone.name().get());
         result.add( new Value( "Bodennutzung 5", matches5 && vdb.bodennutzung5().get() != null ? vdb.bodennutzung5().get().name()
                 .get() : "" ) );
         result.add( new Value( "Fläche 5", matches5 ? vdb.ackerzahl5().get() : null ) );
@@ -162,7 +165,7 @@ public class VertragsdatenAgrarAlsAgrarExporter
         result.add( new Value( "Abgleich 5", matches5 ? vdb.abgleichAufKaufpreis5().get() : null, 2 ) );
     	result.add( new Value( "Preis 5", matches5 ? vdb.bodenwert5().get() * faktorBereinigterKaufpreis : null, 2 ) );
 
-        boolean matches6 = vdb.richtwertZone6().get() != null && vdb.richtwertZone6().get().name().get().equals(zone.name().get());
+        boolean matches6 = firstFlurstueckOfGemarkung && vdb.richtwertZone6().get() != null && vdb.richtwertZone6().get().name().get().equals(zone.name().get());
         result.add( new Value( "Bodennutzung 6", matches6 && vdb.bodennutzung6().get() != null ? vdb.bodennutzung6().get().name()
                 .get() : "" ) );
         result.add( new Value( "Fläche 6", matches6 ? vdb.ackerzahl6().get() : null ) );
