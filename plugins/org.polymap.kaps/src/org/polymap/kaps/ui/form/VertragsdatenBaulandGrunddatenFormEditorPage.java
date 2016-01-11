@@ -13,28 +13,20 @@
 package org.polymap.kaps.ui.form;
 
 import java.util.TreeMap;
-
 import java.beans.PropertyChangeListener;
 
 import org.geotools.data.FeatureStore;
 import org.opengis.feature.Feature;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.eclipse.swt.widgets.Composite;
-
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
-
 import org.eclipse.ui.forms.widgets.Section;
-
 import org.eclipse.core.runtime.IProgressMonitor;
-
 import org.polymap.core.project.ui.util.SimpleFormData;
 import org.polymap.core.runtime.event.EventManager;
 import org.polymap.core.workbench.PolymapWorkbench;
-
 import org.polymap.rhei.data.entityfeature.AssociationAdapter;
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
 import org.polymap.rhei.field.CheckboxFormField;
@@ -45,7 +37,6 @@ import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.field.TextFormField;
 import org.polymap.rhei.form.FormEditor;
 import org.polymap.rhei.form.IFormEditorPageSite;
-
 import org.polymap.kaps.KapsPlugin;
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.BodennutzungComposite;
@@ -53,6 +44,7 @@ import org.polymap.kaps.model.data.ErschliessungsBeitragComposite;
 import org.polymap.kaps.model.data.ErtragswertverfahrenComposite;
 import org.polymap.kaps.model.data.NHK2000BewertungComposite;
 import org.polymap.kaps.model.data.NHK2010BewertungComposite;
+import org.polymap.kaps.model.data.NHK2010BewertungGebaeudeComposite;
 import org.polymap.kaps.model.data.RichtwertzoneComposite;
 import org.polymap.kaps.model.data.RichtwertzoneZeitraumComposite;
 import org.polymap.kaps.model.data.VertragComposite;
@@ -167,6 +159,24 @@ public class VertragsdatenBaulandGrunddatenFormEditorPage
                 .setLayoutData( right().top( lastLine ).create() ).setParent( client ).create();
 
         lastLine = newLine;
+        
+        Double tatsächlichesBaujahr = null;
+        Double bereinigtesBaujahr = null;
+        NHK2010BewertungComposite bewertung2010 = NHK2010BewertungComposite.Mixin.forVertrag(vb.vertrag().get());
+        if(bewertung2010 != null) {
+        	Iterable<NHK2010BewertungGebaeudeComposite> bewertungenGebaeude2010 = NHK2010BewertungGebaeudeComposite.Mixin.forBewertung(bewertung2010);
+        	for(NHK2010BewertungGebaeudeComposite bewertungGebaeude2010 : bewertungenGebaeude2010) {
+        		tatsächlichesBaujahr = bewertungGebaeude2010.tatsaechlichesBaujahr().get();
+        		bereinigtesBaujahr = bewertungGebaeude2010.bereinigtesBaujahr().get();
+        	}
+        }
+        if(bereinigtesBaujahr != null) {
+        	vb.baujahrBereinigt().set(bereinigtesBaujahr.intValue());
+        }
+        if(tatsächlichesBaujahr != null) {
+        	vb.baujahr().set(tatsächlichesBaujahr.intValue());
+        }
+        
         newLine = newFormField( "Baujahr tatsächlich" ).setProperty( new PropertyAdapter( vb.baujahr() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setValidator( new MyNumberValidator( Integer.class ) ).setLayoutData( left().top( lastLine ).create() )
