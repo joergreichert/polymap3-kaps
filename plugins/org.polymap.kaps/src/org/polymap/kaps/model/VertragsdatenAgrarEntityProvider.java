@@ -12,7 +12,6 @@
  */
 package org.polymap.kaps.model;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -97,17 +96,11 @@ public class VertragsdatenAgrarEntityProvider
             for (RichtwertzoneComposite zone : vb.vertrag().get().richtwertZonenAgrar()) {
                 gemeinden.add( zone.gemeinde().get() );
             }
+            boolean exists = false;
             for (GemeindeComposite gemeinde : gemeinden) {
-        		Collection<Object> ret = RichtwertzoneProvider.findFor( gemeinde, vb.vertrag().get().vertragsDatum().get() ).values();
-        		for(RichtwertzoneZeitraumComposite aktuell : aktuelle) {
-        			if(aktuell != null) {
-        				if(!ret.contains(aktuell)) {
-        					return false;
-        				}
-        			}
-        		}
+            	exists = exists | RichtwertzoneProvider.exists( gemeinde, vb.vertrag().get().vertragsDatum().get(), aktuelle);
             }
-            return true;
+            return exists;
         }
 		return false;
     }    
