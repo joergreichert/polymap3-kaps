@@ -21,31 +21,29 @@ import java.util.TreeMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.qi4j.api.query.Query;
 import org.qi4j.api.query.QueryExpressions;
 import org.qi4j.api.query.grammar.BooleanExpression;
+import org.qi4j.api.query.grammar.GreaterOrEqualPredicate;
+import org.qi4j.api.query.grammar.LessOrEqualPredicate;
 
 import com.google.common.collect.Sets;
 
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
-
 import org.eclipse.jface.dialogs.MessageDialog;
-
 import org.polymap.core.project.ILayer;
 import org.polymap.core.runtime.Polymap;
 import org.polymap.core.workbench.PolymapWorkbench;
-
 import org.polymap.rhei.field.BetweenFormField;
 import org.polymap.rhei.field.BetweenValidator;
 import org.polymap.rhei.field.DateTimeFormField;
 import org.polymap.rhei.field.FormFieldEvent;
 import org.polymap.rhei.field.IFormFieldListener;
 import org.polymap.rhei.field.SelectlistFormField;
+import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.filter.FilterEditor;
 import org.polymap.rhei.filter.IFilterEditorSite;
-
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.BodennutzungComposite;
 import org.polymap.kaps.model.data.FlurstueckComposite;
@@ -54,6 +52,7 @@ import org.polymap.kaps.model.data.GemeindeComposite;
 import org.polymap.kaps.model.data.NutzungComposite;
 import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.VertragsdatenAgrarComposite;
+import org.polymap.kaps.ui.MyNumberValidator;
 import org.polymap.kaps.ui.NotNullValidator;
 
 /**
@@ -146,6 +145,16 @@ public class VertragsdatenAgrarAgrarFilter
         site.addStandardLayout( formField );
         ((FormData)formField.getLayoutData()).height = 200;
         ((FormData)formField.getLayoutData()).width = 100;
+        
+        StringFormField from = new StringFormField();
+        Composite fromField = site.newFormField( result, "nutzungsGroesseMin", Integer.class, 
+        		from, new MyNumberValidator( Integer.class ), "Min Fläche m²" );
+        site.addStandardLayout( fromField );
+
+        StringFormField to = new StringFormField();
+        Composite toField = site.newFormField( result, "nutzungsGroesseMax", Integer.class, 
+        		to, new MyNumberValidator( Integer.class ), "Max Fläche m²" );
+        site.addStandardLayout( toField );
 
         return result;
     }
@@ -157,6 +166,8 @@ public class VertragsdatenAgrarAgrarFilter
         List<NutzungComposite> nutzungen = (List<NutzungComposite>)site.getFieldValue( "nutzung" );
         List<BodennutzungComposite> bodennutzungen = (List<BodennutzungComposite>)site.getFieldValue( "bodennutzung" );
         List<GemeindeComposite> gemeinden = (List<GemeindeComposite>)site.getFieldValue( "gemeinde" );
+        Integer nutzungsGroesseMin = (Integer) site.getFieldValue( "nutzungsGroesseMin" );
+        Integer nutzungsGroesseMax = (Integer) site.getFieldValue( "nutzungsGroesseMax" );
 
         Object[] vertragsDatum = (Object[])site.getFieldValue( "datum" );
         BooleanExpression vertragsDatumExpr = null;
@@ -258,6 +269,29 @@ public class VertragsdatenAgrarAgrarFilter
         else {
             nExpr = gExpr;
         }
+
+        GreaterOrEqualPredicate<Double> greaterEquals = null;
+        if(nutzungsGroesseMin != null) {
+        	greaterEquals = QueryExpressions.ge(flurTemplate.flaeche(), Double.valueOf(nutzungsGroesseMin));
+        }
+        BooleanExpression flaecheExpression = null;
+        LessOrEqualPredicate<Double> lowerEquals = null;
+        if(nutzungsGroesseMax != null) {
+        	lowerEquals = QueryExpressions.le(flurTemplate.flaeche(), Double.valueOf(nutzungsGroesseMax));
+        }
+        if(greaterEquals != null) {
+        	if(lowerEquals != null) {
+        		flaecheExpression = QueryExpressions.and(greaterEquals, lowerEquals);
+        	} else {
+        		flaecheExpression = greaterEquals;
+        	}
+        } else if(lowerEquals != null) {
+    		flaecheExpression = lowerEquals;
+        }
+        if (nExpr != null && flaecheExpression != null) {
+            nExpr = QueryExpressions.and( nExpr, flaecheExpression );
+        }
+        
         Set<VertragComposite> vertraegeNachDatumUndFlurstueck = new HashSet<VertragComposite>();
 
         if (nExpr != null) {
@@ -268,7 +302,7 @@ public class VertragsdatenAgrarAgrarFilter
                 // mehrere Flurstücke können einem Vertrag angehören
                 VertragComposite vertrag = fc.vertrag().get();
                 if (vertrag != null) {
-                    if (vertraegeNachDatum == null || vertraegeNachDatum.contains( vertrag )) {
+                    if ((vertraegeNachDatum == null || vertraegeNachDatum.contains( vertrag ))) {
                         vertraegeNachDatumUndFlurstueck.add( vertrag );
                     }
                 }
@@ -321,7 +355,7 @@ public class VertragsdatenAgrarAgrarFilter
         if (bExpr != null) {
             fExpr = QueryExpressions.and( bExpr, fExpr );
         }
-
+        
         return KapsRepository.instance().findEntities( VertragsdatenAgrarComposite.class, fExpr, 0, getMaxResults() );
     }
 }
