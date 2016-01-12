@@ -309,15 +309,14 @@ public class KapsRepository
         return schluessel;
     }
 
-
-    public <T extends Named> SortedMap<String, T> entitiesWithNames( Class<T> entityClass ) {
+    public <T extends Named> SortedMap<String, T> entitiesWithNames( Class<T> entityClass, int maxResult ) {
         Property nameProperty = entityType( entityClass ).getProperty( "name" );
         Property schlProperty = entityType( entityClass ).getProperty( "schl" );
         if (nameProperty == null) {
             throw new IllegalStateException( entityClass + " doesnt have an 'name' Property" );
         }
 
-        Query<T> entities = findEntities( entityClass, null, 0, 100000 );
+        Query<T> entities = findEntities( entityClass, null, 0, maxResult );
         SortedMap<String, T> namen = new TreeMap<String, T>();
         for (T entity : entities) {
             try {
@@ -332,6 +331,10 @@ public class KapsRepository
             }
         }
         return namen;
+    }
+    
+    public <T extends Named> SortedMap<String, T> entitiesWithNames( Class<T> entityClass ) {
+    	return entitiesWithNames( entityClass, 100000 );
     }
 
 

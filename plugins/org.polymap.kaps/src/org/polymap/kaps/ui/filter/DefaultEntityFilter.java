@@ -180,7 +180,13 @@ public class DefaultEntityFilter<T extends Entity>
 
 
     protected Map<String, ? extends Object> valuesFor( Class propertyType ) {
-        return ((KapsRepository)module).entitiesWithNames( propertyType );
+    	// TODO: when testing with an attribute having 4500 values, the filter form never gets build,
+    	// as this seems to be too many entries for SelectlistFormField
+    	// using plain strings instead of real Vertrag objects doesn't help as there are still
+    	// many entries in the list
+    	// only proper solution could be something like pagination - this solution here
+    	// only restricts the result to max 200 values
+        return ((KapsRepository)module).entitiesWithNames( propertyType, 200 );
     }
 
 
