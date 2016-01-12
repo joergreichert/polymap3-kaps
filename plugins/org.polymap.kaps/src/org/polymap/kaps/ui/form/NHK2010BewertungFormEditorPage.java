@@ -12,37 +12,32 @@
  */
 package org.polymap.kaps.ui.form;
 
+import java.awt.Checkbox;
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.text.DecimalFormat;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import java.math.BigDecimal;
-import java.math.MathContext;
-import java.text.DecimalFormat;
-
-import org.geotools.data.FeatureStore;
-import org.opengis.feature.Feature;
-import org.opengis.feature.type.PropertyDescriptor;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.qi4j.api.entity.Entity;
-import org.qi4j.api.property.Property;
-
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
-
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.dialogs.MessageDialog;
-
 import org.eclipse.ui.forms.widgets.Section;
-
-import org.eclipse.core.runtime.IProgressMonitor;
-
+import org.geotools.data.FeatureStore;
+import org.opengis.feature.Feature;
+import org.opengis.feature.type.PropertyDescriptor;
 import org.polymap.core.data.ui.featuretable.DefaultFeatureTableColumn;
 import org.polymap.core.data.ui.featuretable.FeatureTableViewer;
 import org.polymap.core.model.EntityType;
@@ -51,24 +46,12 @@ import org.polymap.core.qi4j.QiModule.EntityCreator;
 import org.polymap.core.runtime.event.EventFilter;
 import org.polymap.core.runtime.event.EventManager;
 import org.polymap.core.workbench.PolymapWorkbench;
-
-import org.polymap.rhei.data.entityfeature.PropertyDescriptorAdapter;
-import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter;
-import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter.PropertyCallback;
-import org.polymap.rhei.field.CheckboxFormField;
-import org.polymap.rhei.field.FormFieldEvent;
-import org.polymap.rhei.field.IFormFieldLabel;
-import org.polymap.rhei.field.IFormFieldListener;
-import org.polymap.rhei.field.PicklistFormField;
-import org.polymap.rhei.field.StringFormField;
-import org.polymap.rhei.form.FormEditor;
-import org.polymap.rhei.form.IFormEditorPageSite;
-
 import org.polymap.kaps.KapsPlugin;
 import org.polymap.kaps.MathUtil;
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.NHK2010GebaeudeArtProvider;
 import org.polymap.kaps.model.data.ErmittlungModernisierungsgradComposite;
+import org.polymap.kaps.model.data.NHK2010AnbautenComposite;
 import org.polymap.kaps.model.data.NHK2010BaupreisIndexComposite;
 import org.polymap.kaps.model.data.NHK2010BaupreisIndexComposite.Values;
 import org.polymap.kaps.model.data.NHK2010BewertungComposite;
@@ -83,6 +66,22 @@ import org.polymap.kaps.ui.InterEditorPropertyChangeEvent;
 import org.polymap.kaps.ui.KapsDefaultFormEditorPageWithFeatureTable;
 import org.polymap.kaps.ui.MyNumberValidator;
 import org.polymap.kaps.ui.NumberFormatter;
+import org.polymap.rhei.data.entityfeature.ManyAssociationAdapter;
+import org.polymap.rhei.data.entityfeature.PropertyDescriptorAdapter;
+import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter;
+import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter.PropertyCallback;
+import org.polymap.rhei.field.CheckboxFormField;
+import org.polymap.rhei.field.FormFieldEvent;
+import org.polymap.rhei.field.IFormFieldLabel;
+import org.polymap.rhei.field.IFormFieldListener;
+import org.polymap.rhei.field.PicklistFormField;
+import org.polymap.rhei.field.SelectlistFormField;
+import org.polymap.rhei.field.StringFormField;
+import org.polymap.rhei.form.FormEditor;
+import org.polymap.rhei.form.IFormEditorPageSite;
+import org.polymap.rhei.form.IFormEditorToolkit;
+import org.qi4j.api.entity.Entity;
+import org.qi4j.api.property.Property;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -289,7 +288,7 @@ public class NHK2010BewertungFormEditorPage
 
         Composite parent = site.getPageBody();
         String label = vertragComposite == null ? "Kein Vertrag zugewiesen" : "Vertrag " + nummer + " öffnen";
-        ActionButton openVertrag = new ActionButton( parent, new Action( label ) {
+        final ActionButton openVertrag = new ActionButton( parent, new Action( label ) {
 
             @Override
             public void run() {
@@ -298,14 +297,45 @@ public class NHK2010BewertungFormEditorPage
         } );
         openVertrag.setLayoutData( left().height( 25 ).create() );
         openVertrag.setEnabled( vertragComposite != null );
+        
+        final Button anbautenVorhanden = pageSite.getToolkit().createButton(parent, "", SWT.CHECK);
+        anbautenVorhanden.setSelection(bewertung.anbauten().count() > 0);
+        anbautenVorhanden.setLayoutData( new SimpleFormData( SECTION_SPACING ).left( 0 ).top( openVertrag ).create() );
 
+        SortedMap<String, NHK2010AnbautenComposite> anbauten = KapsRepository.instance().entitiesWithNames(NHK2010AnbautenComposite.class);
+        final SelectlistFormField field = new SelectlistFormField( anbauten ) {
+      	
+        	@Override
+            public Control createControl( Composite parent, IFormEditorToolkit toolkit ) {
+            	Control control = super.createControl(parent, toolkit);
+            	control.setLayoutData(new SimpleFormData( SECTION_SPACING ).left( 0 ).top( openVertrag ).right(50).width(100).height(100).create());
+            	return control;
+            }
+        };
+        field.setIsMultiple( true );
+        final Composite anbautenList = newFormField( "Anbauten" ).setProperty( new ManyAssociationAdapter<NHK2010AnbautenComposite>( bewertung.anbauten() ) )
+        		.setLayoutData( new SimpleFormData( SECTION_SPACING ).left( anbautenVorhanden, 10 ).top( openVertrag ).right(50).width(100).height(100).create() )
+        		.setToolTipText( "Anbauten" ).setField( field ).setParent( parent ).setEnabled( true ).create();
+        anbautenList.setEnabled(anbautenVorhanden.getSelection());
+        
+        anbautenVorhanden.addSelectionListener(new SelectionAdapter() {
+        	
+        	@Override
+        	public void widgetSelected(SelectionEvent e) {
+        		anbautenList.setEnabled(anbautenVorhanden.getSelection());
+        		if(!anbautenVorhanden.getSelection()) {
+        			field.setValue(Collections.EMPTY_MAP);
+        		}
+        	}
+		});
+        
         Section tableSection = newSection( parent, "Auswahl Gebäude" );
-        tableSection.setLayoutData( new SimpleFormData( SECTION_SPACING ).left( 0 ).right( 50 ).top( openVertrag )
+        tableSection.setLayoutData( new SimpleFormData( SECTION_SPACING ).left( 0 ).right( 50 ).top( anbautenList )
                 .create() );
         createTableForm( (Composite)tableSection.getClient(), parent, true );
 
         Section sumSection = newSection( parent, "Summen" );
-        sumSection.setLayoutData( new SimpleFormData( SECTION_SPACING ).left( tableSection, 0 ).top( openVertrag )
+        sumSection.setLayoutData( new SimpleFormData( SECTION_SPACING ).left( tableSection, 0 ).top( anbautenList )
                 .right( 100 ).create() );
         createSumForm( site, sumSection );
 
@@ -644,7 +674,7 @@ public class NHK2010BewertungFormEditorPage
                             }
                         } ) ).setField( reloadable( new CheckboxFormField() ) ).setEnabled( false )
                 .setLayoutData( four().top( lastLine ).create() ).create();
-
+        
         lastLine = newLine;
 
         pageSite.addFieldListener( gebaeudeArtListener = new IFormFieldListener() {
