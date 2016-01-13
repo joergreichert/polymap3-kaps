@@ -15,48 +15,23 @@ package org.polymap.kaps.ui.form;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.ui.forms.widgets.Section;
 import org.geotools.data.FeatureStore;
 import org.opengis.feature.Feature;
 import org.opengis.feature.type.PropertyDescriptor;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import org.qi4j.api.entity.association.Association;
-import org.qi4j.api.entity.association.ManyAssociation;
-import org.qi4j.api.property.Property;
-
-import com.google.common.collect.Maps;
-
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.dialogs.MessageDialog;
-
-import org.eclipse.ui.forms.widgets.Section;
-
-import org.eclipse.core.runtime.IProgressMonitor;
-
 import org.polymap.core.data.ui.featuretable.DefaultFeatureTableColumn;
 import org.polymap.core.data.ui.featuretable.FeatureTableViewer;
 import org.polymap.core.model.EntityType;
 import org.polymap.core.qi4j.QiModule.EntityCreator;
 import org.polymap.core.runtime.event.EventManager;
 import org.polymap.core.workbench.PolymapWorkbench;
-
-import org.polymap.rhei.data.entityfeature.PropertyDescriptorAdapter;
-import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter;
-import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter.AssociationCallback;
-import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter.ManyAssociationCallback;
-import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter.PropertyCallback;
-import org.polymap.rhei.field.FormFieldEvent;
-import org.polymap.rhei.field.IFormFieldListener;
-import org.polymap.rhei.field.PicklistFormField;
-import org.polymap.rhei.field.StringFormField;
-import org.polymap.rhei.form.FormEditor;
-import org.polymap.rhei.form.IFormEditorPageSite;
-
 import org.polymap.kaps.KapsPlugin;
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.ArtDesBaugebietsComposite;
@@ -86,6 +61,26 @@ import org.polymap.kaps.ui.NotNullMyNumberValidator;
 import org.polymap.kaps.ui.NotNullValidator;
 import org.polymap.kaps.ui.NumberFormatter;
 import org.polymap.kaps.ui.SimplePickList;
+import org.polymap.rhei.data.entityfeature.PropertyDescriptorAdapter;
+import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter;
+import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter.AssociationCallback;
+import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter.ManyAssociationCallback;
+import org.polymap.rhei.data.entityfeature.ReloadablePropertyAdapter.PropertyCallback;
+import org.polymap.rhei.field.FormFieldEvent;
+import org.polymap.rhei.field.IFormFieldListener;
+import org.polymap.rhei.field.PicklistFormField;
+import org.polymap.rhei.field.StringFormField;
+import org.polymap.rhei.form.FormEditor;
+import org.polymap.rhei.form.IFormEditorPageSite;
+import org.qi4j.api.entity.association.Association;
+import org.qi4j.api.entity.association.ManyAssociation;
+import org.qi4j.api.property.Property;
+import org.qi4j.api.query.Query;
+import org.qi4j.api.query.QueryExpressions;
+import org.qi4j.api.query.grammar.BooleanExpression;
+import org.qi4j.api.query.grammar.EqualsPredicate;
+
+import com.google.common.collect.Maps;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -122,6 +117,8 @@ public class KaufvertragFlurstueckeFormEditorPage
     private final FormEditor          formEditor;
 
     private FieldListener             fieldListener;
+
+	private DuplicateFlurstueckValidator duplicateFlurstueckValidator;
 
 
     public KaufvertragFlurstueckeFormEditorPage( FormEditor formEditor, Feature feature, FeatureStore featureStore ) {
@@ -180,6 +177,10 @@ public class KaufvertragFlurstueckeFormEditorPage
     protected void refreshReloadables()
             throws Exception {
         FlurstueckComposite composite = selectedComposite.get();
+        
+        duplicateFlurstueckValidator = new DuplicateFlurstueckValidator();
+    	duplicateFlurstueckValidator.setLastModified(composite._lastModified().get());
+        
         selectedGemarkung = composite != null ? composite.gemarkung().get() : null;
         if (composite != null && selectedGemarkung == null) {
             String gId = composite.gemarkungWA().get();
@@ -209,12 +210,111 @@ public class KaufvertragFlurstueckeFormEditorPage
         }
     }
 
+    private class DuplicateFlurstueckValidator {
+    	private Long lastModified = null;
+    	private GemarkungComposite gemarkung = null;
+		private Integer hauptNummer = null;
+		private String unterNummer = null;
+		
+		void setLastModified(Long lastModified) {
+			this.lastModified = lastModified;
+		}
+
+		public boolean isDuplicate(String propertyName, Object value) {
+			boolean isGemarkung = false, isHauptNummer = false, isUnterNummer = false;
+			String oldGemarkungId = null;
+			Integer oldHauptNummer = null;
+			String oldUnterNummer = null;
+    		if(propertyName.equals("gemarkung")) {
+    			isGemarkung = true;
+    			oldGemarkungId = gemarkung == null ? null : gemarkung.id();
+    			gemarkung = KapsRepository.instance().findEntity(GemarkungComposite.class, String.valueOf(value));
+    		} else if(propertyName.equals("hauptNummer")) {
+    			isHauptNummer = true;
+    			oldHauptNummer = hauptNummer;
+    			hauptNummer = Integer.valueOf(String.valueOf(value));
+    		} else if(propertyName.equals("unterNummer")) {
+    			isUnterNummer = true;
+    			oldUnterNummer = unterNummer;
+    			unterNummer = String.valueOf(value);
+    		}
+    		if(lastModified == null && gemarkung != null && hauptNummer != null && unterNummer != null) {
+				FlurstueckComposite flurstueckTemplate = QueryExpressions.templateFor(FlurstueckComposite.class);
+				EqualsPredicate<String> gemarkungExpr = QueryExpressions.eq(flurstueckTemplate.gemarkung(), gemarkung);
+				EqualsPredicate<Integer> hauptNummerExpr = QueryExpressions.eq(flurstueckTemplate.hauptNummer(), hauptNummer);
+				EqualsPredicate<String> unterNummerExpr = QueryExpressions.eq(flurstueckTemplate.unterNummer(), unterNummer);
+				BooleanExpression expression = QueryExpressions.and(gemarkungExpr, QueryExpressions.and(hauptNummerExpr, unterNummerExpr));
+				Query<FlurstueckComposite> result = KapsRepository.instance().findEntities(FlurstueckComposite.class, expression, 0, 1);
+				if(gemarkung != null && isGemarkung && !gemarkung.id().equals(oldGemarkungId)) {
+        			getPageSite().setFieldValue(prefix + "hauptNummer", hauptNummer);
+        			getPageSite().setFieldValue(prefix + "unterNummer", unterNummer);
+				}
+				if(hauptNummer != null && isHauptNummer && !(hauptNummer.equals(oldHauptNummer))) {
+					getPageSite().setFieldValue(prefix + "gemarkung", gemarkung);
+					getPageSite().setFieldValue(prefix + "unterNummer", unterNummer);
+				}
+				if(unterNummer != null && isUnterNummer  && !unterNummer.equals(oldUnterNummer)) {
+					getPageSite().setFieldValue(prefix + "gemarkung", gemarkung);
+        			getPageSite().setFieldValue(prefix + "hauptNummer", hauptNummer);
+        		}
+				return result.count() > 0;
+    		}
+    		return false;
+    	}
+    }
+    
+    private class DuplicateValidator extends NotNullValidator {
+    	private final String propertyName;
+    	
+    	public DuplicateValidator(String propertyName) {
+			this.propertyName = propertyName;
+		}
+
+        public String validate( Object value ) {
+        	String result = super.validate(value);
+           if (result != null) {
+               return result;
+           }
+           if(duplicateFlurstueckValidator.isDuplicate(propertyName, value)) {
+        	   return "Es gibt bereits ein Flurstück für die Kombination Gemarkung, Hauptnummer, Unternummer.";
+           }
+           return null;
+       }
+   }
+    
+    private class DuplicateNumberValidator extends NotNullMyNumberValidator {
+    	private final String propertyName;
+
+        public DuplicateNumberValidator(Class<? extends Number> targetClass, 
+        		String propertyName) {
+			super(targetClass);
+			this.propertyName = propertyName;
+		}
+
+
+		public String validate( Object value ) {
+		   String result = super.validate(value);
+		   if(result != null) {
+			   return result;
+           }
+		   if(duplicateFlurstueckValidator.isDuplicate(propertyName, value)) {
+        	   return "Es gibt bereits ein Flurstück für die Kombination Gemarkung, Hauptnummer, Unternummer.";
+           }
+           return null;
+       }
+   }  
+
 
     private Composite createFlurstueckForm( Composite parent ) {
 
         Section formSection = newSection( parent, "Vertragsdaten" );
         parent = (Composite)formSection.getClient();
-
+        
+        duplicateFlurstueckValidator = new DuplicateFlurstueckValidator();
+        if(selectedComposite.get() != null) {
+        	duplicateFlurstueckValidator.setLastModified(selectedComposite.get()._lastModified().get());
+        }
+        
         Composite line0 = newFormField( "Gemarkung" )
                 .setParent( parent )
                 .setProperty(
@@ -224,11 +324,12 @@ public class KaufvertragFlurstueckeFormEditorPage
                                     public Association<GemarkungComposite> get( FlurstueckComposite entity ) {
                                         // log.info( "gemarkungComposite " +
                                         // entity.gemarkung());
+                                    	duplicateFlurstueckValidator.setLastModified(entity._lastModified().get());
                                         return entity.gemarkung();
                                     }
                                 } ) )
                 .setField( reloadable( namedAssocationsPicklist( GemarkungComposite.class, true ) ) )
-                .setValidator( new NotNullValidator() ).setLayoutData( left().create() ).create();
+                .setValidator( new DuplicateValidator("gemarkung") ).setLayoutData( left().create() ).create();
 
         // newFormField( "Flur" )
         // .setParent( parent )
@@ -251,11 +352,12 @@ public class KaufvertragFlurstueckeFormEditorPage
                                 new PropertyCallback<FlurstueckComposite>() {
 
                                     public Property get( FlurstueckComposite entity ) {
+                                    	duplicateFlurstueckValidator.setLastModified(entity._lastModified().get());
                                         return entity.hauptNummer();
                                     }
-                                } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
+                                } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )  )
                 .setLayoutData( right().right( 75 ).create() )
-                .setValidator( new NotNullMyNumberValidator( Integer.class ) ).create();
+                .setValidator( new DuplicateNumberValidator( Integer.class, "hauptNummer" ) ).create();
 
         newFormField( "Unternummer" )
                 .setParent( parent )
@@ -264,9 +366,10 @@ public class KaufvertragFlurstueckeFormEditorPage
                                 new PropertyCallback<FlurstueckComposite>() {
 
                                     public Property get( FlurstueckComposite entity ) {
+                                    	duplicateFlurstueckValidator.setLastModified(entity._lastModified().get());
                                         return entity.unterNummer();
                                     }
-                                } ) ).setValidator( new NotNullValidator() )
+                                } ) ).setValidator( new DuplicateValidator("unterNummer") )
                 .setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) ) )
                 .setLayoutData( right().left( 75 ).create() ).create();
 
