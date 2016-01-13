@@ -29,31 +29,46 @@ import org.polymap.kaps.ui.form.EingangsNummerFormatter;
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
  */
 public class VertragsdatenBaulandAlsBRLWExporter
-        extends AbstractSingleRowExcelExporter<VertragsdatenBaulandComposite> {
+    extends AbstractExcelExporter<VertragsdatenBaulandComposite> {
 
+	
     public VertragsdatenBaulandAlsBRLWExporter() {
         super( VertragsdatenBaulandComposite.class, VertragsdatenBaulandComposite.NAME, "statistik_brlw", "Verträge" );
     }
 
 
-    protected List<Value> createValues( VertragsdatenBaulandComposite vdb, List<String> errors ) {
+	@Override
+	protected List<List<Value>> createMultiRowValues( VertragsdatenBaulandComposite vdc, List<String> errors ) {
+	    List<List<Value>> result = new ArrayList<List<Value>>();
+	
+	    VertragComposite vertrag = vdc.vertrag().get();
+	    if (vertrag == null) {
+	        errors.add( "Keinen Vertrag gefunden!" );
+	        return result;
+	    }
+	    Iterable<FlurstueckComposite> fses = FlurstueckComposite.Mixin.forEntity( vertrag );
+	    if (!fses.iterator().hasNext()) {
+	        errors.add( error( vertrag, "Kein Flurstück gefunden!" ) );
+	        return result;
+	    }
+	    boolean firstRow = true;
+	    for(FlurstueckComposite flurstueck : fses) {
+	        List<Value> createValues = createValues( vdc, flurstueck, errors, firstRow );
+	        firstRow = false;
+	        if (!createValues.isEmpty()) {
+	        	result.add( createValues );
+	        }
+	    }
+	    return result;
+	}	
+
+
+    protected List<Value> createValues( VertragsdatenBaulandComposite vdb, FlurstueckComposite flurstueck, List<String> errors, boolean firstRow ) {
 
         List<Value> result = new ArrayList<Value>();
         VertragComposite vertrag = vdb.vertrag().get();
         if (vertrag == null) {
             errors.add( "Keinen Vertrag gefunden!" );
-            return result;
-        }
-        FlurstueckComposite flurstueck = null;
-        for (FlurstueckComposite fs : FlurstueckComposite.Mixin.forEntity( vertrag )) {
-            NutzungComposite nutzung = fs.nutzung().get();
-            if (nutzung != null && (nutzung.isAgrar().get() == null || nutzung.isAgrar().get() == Boolean.FALSE)) {
-                flurstueck = fs;
-                break;
-            }
-        }
-        if (flurstueck == null) {
-            errors.add( error( vertrag, "Kein Flurstück gefunden!" ) );
             return result;
         }
         RichtwertzoneComposite zone = flurstueck.richtwertZone().get();
@@ -67,7 +82,7 @@ public class VertragsdatenBaulandAlsBRLWExporter
             preis = ew.bereinigterVollpreis().get();
         }
 
-        result.add( new Value( "Eingangsnummer", EingangsNummerFormatter.format( vertrag.eingangsNr().get() ) ) );
+        result.add( new Value( "Eingangsnummer", firstRow ? EingangsNummerFormatter.format( vertrag.eingangsNr().get() ) : "") );
         result.add( new Value( "Flst.-zaehler", flurstueck.hauptNummer().get() ) );
         result.add( new Value( "Flst.-nenner", flurstueck.unterNummer().get() ) );
 
@@ -84,11 +99,11 @@ public class VertragsdatenBaulandAlsBRLWExporter
         GebaeudeArtComposite gebaeudeArtComposite = flurstueck.gebaeudeArt().get();
         result.add( new Value( "Gebaeudeart", gebaeudeArtComposite != null ? gebaeudeArtComposite.name().get() : "" ) );
 
-        result.add( new Value( "Fläche 1", vdb.flaeche1().get(), 0 ) );
-        result.add( new Value( "Abgleich 1", vdb.normierterGfzBereinigterBodenpreis().get(), 2 ) );
-        result.add( new Value( "ber. Vollpreis", preis, 2 ) );
+        result.add( new Value( "Fläche 1", firstRow ? vdb.flaeche1().get() : null, 0 ) );
+        result.add( new Value( "Abgleich 1", firstRow ? vdb.normierterGfzBereinigterBodenpreis().get() : null, 2 ) );
+        result.add( new Value( "ber. Vollpreis", firstRow ? preis : null, 2 ) );
 
-        result.add( new Value( "zur Richtwertermittlung geeignet", vdb.zurRichtwertermittlungGeeignet().get() ) );
+        result.add( new Value( "zur Richtwertermittlung geeignet", firstRow ? vdb.zurRichtwertermittlungGeeignet().get() : null ) );
 
         return result;
     }
