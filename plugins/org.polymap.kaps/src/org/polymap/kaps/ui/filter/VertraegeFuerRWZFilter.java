@@ -18,9 +18,15 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.polymap.core.project.ILayer;
 import org.polymap.core.runtime.Polymap;
+import org.polymap.core.ui.FormDataFactory;
+import org.polymap.core.ui.FormLayoutFactory;
 import org.polymap.core.workbench.PolymapWorkbench;
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.FlurstueckComposite;
@@ -40,6 +46,8 @@ public class VertraegeFuerRWZFilter
         extends KapsEntityFilter<VertragComposite> {
 
     private static Log log = LogFactory.getLog( VertraegeFuerRWZFilter.class );
+	private Button schlSel;
+	private Button nameSel;
 
 
     public VertraegeFuerRWZFilter( ILayer layer ) {
@@ -56,23 +64,89 @@ public class VertraegeFuerRWZFilter
     public Composite createControl( Composite parent, IFilterEditorSite site ) {
         Composite result = site.createStandardLayout( parent );
 
-        site.addStandardLayout( site.newFormField( result, "schl", String.class, new StringFormField(), null, "RWZ-Schlüssel" ) );
+        Composite row1 = site.getToolkit().createComposite(result);
+        FormLayoutFactory.defaults().applyTo(row1);
+        Composite row2 = site.getToolkit().createComposite(result);
+        FormLayoutFactory.defaults().applyTo(row2);
 
+        schlSel = new Button(row1, SWT.RADIO);
+        schlSel.setSelection(true);
+        
+        FormDataFactory.defaults().left(0).right(10).applyTo(schlSel);
+        
+        final Composite schlField = site.newFormField( row1, "schl", String.class, new StringFormField(), null, "RWZ-Schlüssel" );
+        FormDataFactory.defaults().left(schlSel, 10).right(100).applyTo(schlField);
+
+        nameSel = new Button(row2, SWT.RADIO);
+        FormDataFactory.defaults().left(0).right(10).applyTo(nameSel);
+        
+        final Composite nameField = site.newFormField( row2, "name", String.class, new StringFormField(), null, "RWZ-Name" );
+        FormDataFactory.defaults().top(30).left(nameSel, 10).right(100).applyTo(nameField);
+
+        FormDataFactory.defaults().left(0).right(100).bottom(row2).applyTo(row1);
+        FormDataFactory.defaults().top(row1).left(0).right(100).bottom(10).applyTo(row2);
+        
+        schlSel.addSelectionListener(new SelectionAdapter() {
+
+        	@Override
+        	public void widgetSelected(SelectionEvent e) {
+        		nameSel.setSelection(false);
+        		schlField.setEnabled(true);
+        		nameField.setEnabled(false);
+        	}
+		});
+        nameSel.addSelectionListener(new SelectionAdapter() {
+
+        	@Override
+        	public void widgetSelected(SelectionEvent e) {
+        		schlSel.setSelection(false);
+        		nameField.setEnabled(true);
+        		schlField.setEnabled(false);
+        	}
+		});
         return result;
     }
 
 
     protected Query<VertragComposite> createQuery( IFilterEditorSite site ) {
-
-        String schl = (String) site.getFieldValue( "schl" );
+    	
+    	String wert = null;
+    	if(schlSel.getSelection()) {
+    		wert = (String) site.getFieldValue( "schl" );
+    	} else {
+    		wert = (String) site.getFieldValue( "name" );
+    	}
         
         VertragComposite template = QueryExpressions.templateFor( VertragComposite.class );
         BooleanExpression fExpr = null;
 
-        if(schl == null || schl.length() == 0) {
+        if(wert == null || wert.length() == 0) {
             fExpr = QueryExpressions.eq( template.identity(), "unknown" );
         } else {
-	        RichtwertzoneComposite rwz = KapsRepository.instance().findSchlNamed(RichtwertzoneComposite.class, schl);
+        	RichtwertzoneComposite rwz = null;
+        	if(schlSel.getSelection()) {
+        		rwz = KapsRepository.instance().findSchlNamed(RichtwertzoneComposite.class, wert);
+        	} else {
+        		RichtwertzoneComposite rwzTemplate = QueryExpressions.templateFor(RichtwertzoneComposite.class);
+        		Query<RichtwertzoneComposite> rwzs = KapsRepository.instance().findEntities(RichtwertzoneComposite.class, QueryExpressions.eq(rwzTemplate.name(), wert), 0, 1);
+        		if(rwzs.count() > 1) {
+    	            Polymap.getSessionDisplay().asyncExec( new Runnable() {
+    	            	
+    	                public void run() {
+    	                	MessageDialog.openError( PolymapWorkbench.getShellToParentOn(), "Zu viele RWZ",
+    	                			"Es wurde mehr als eine RWZ für den gegegbenen Namen gefunden." );
+    	                }
+    	            } );
+    	            return KapsRepository.instance().findEntities( VertragComposite.class,
+    	                    QueryExpressions.eq( template.identity(), "unknown" ), 0, -1 );
+        		} else if(rwzs.count() == 1) {
+        			rwz = rwzs.iterator().next();
+        		}
+        	}
+        	if(rwz == null) {
+	            return KapsRepository.instance().findEntities( VertragComposite.class,
+	                    QueryExpressions.eq( template.identity(), "unknown" ), 0, -1 );
+        	}
 	
 	        FlurstueckComposite fstTemplate = QueryExpressions.templateFor( FlurstueckComposite.class );
 	        BooleanExpression rwzFstExpr = QueryExpressions.eq(fstTemplate.richtwertZone(), rwz);
