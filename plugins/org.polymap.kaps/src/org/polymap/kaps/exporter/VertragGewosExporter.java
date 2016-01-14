@@ -286,8 +286,10 @@ public class VertragGewosExporter
                     else if (vertragsArt == 2 || vertragsArt == 3) {
                         Set<String> addTo = new HashSet<String>();
                         // mehrere flurstuecke mussen summiert werden
+                        current.anzahl = 0;
                         for (FlurstueckComposite flurstueck : FlurstueckComposite.Mixin.forEntity( vertrag )) {
                             if (flurstueck != null) {
+                                current.anzahl++;
                                 NutzungComposite nutzungC = flurstueck.nutzung().get();
                                 int nutzung = nutzungC != null ? Integer.parseInt( nutzungC.schl().get() ) : -1;
                                 GebaeudeArtComposite gebartC = flurstueck.gebaeudeArt().get();
