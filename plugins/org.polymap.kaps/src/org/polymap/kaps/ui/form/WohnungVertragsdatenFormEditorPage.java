@@ -197,25 +197,10 @@ public class WohnungVertragsdatenFormEditorPage
         }
         
         if(keinVertragZugeordnet) {
-        	wohnung.kaufpreis().set(0d);
-        	wohnung.vollpreisWohnflaeche().set(0d);
-        	wohnung.bereinigterVollpreis().set(0d);
-    		wohnung.abschlagGarage().set(null);
-    		wohnung.abschlagStellplatz().set(null);
-    		wohnung.abschlagAnderes().set(null);
-    		wohnung.schaetzungGarage().set(null);
-    		wohnung.schaetzungStellplatz().set(null);
-    		wohnung.schaetzungAnderes().set(null);
-    		wohnung.gebaeudeArtGarage().set(null);
-    		wohnung.gebaeudeArtStellplatz().set(null);
-    		wohnung.gebaeudeArtAnderes().set(null);
-    		wohnung.anzahlGaragen().set(null);
-    		wohnung.anzahlStellplatz().set(null);
-    		wohnung.anzahlAnderes().set(null);
-    		wohnung.vermietet().set("unbekannt");
-    		wohnung.zurAuswertungGeeignet().set(null);
-    		wohnung.gewichtung().set(null);
-    		wohnung.bemerkungVertragsdaten().set(null);
+        	wohnung.kaufpreis().set(null);
+    		wohnung.bereinigterVollpreis().set(null);
+    		wohnung.vollpreisWohnflaeche().set(null);
+    		wohnung.bodenpreis().set(null);
         }
 
         lastLine = newLine;
