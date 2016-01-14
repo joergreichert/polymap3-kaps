@@ -160,23 +160,6 @@ public class VertragsdatenBaulandGrunddatenFormEditorPage
 
         lastLine = newLine;
         
-        Double tatsächlichesBaujahr = null;
-        Double bereinigtesBaujahr = null;
-        NHK2010BewertungComposite bewertung2010 = NHK2010BewertungComposite.Mixin.forVertrag(vb.vertrag().get());
-        if(bewertung2010 != null) {
-        	Iterable<NHK2010BewertungGebaeudeComposite> bewertungenGebaeude2010 = NHK2010BewertungGebaeudeComposite.Mixin.forBewertung(bewertung2010);
-        	for(NHK2010BewertungGebaeudeComposite bewertungGebaeude2010 : bewertungenGebaeude2010) {
-        		tatsächlichesBaujahr = bewertungGebaeude2010.tatsaechlichesBaujahr().get();
-        		bereinigtesBaujahr = bewertungGebaeude2010.bereinigtesBaujahr().get();
-        	}
-        }
-        if(bereinigtesBaujahr != null) {
-        	vb.baujahrBereinigt().set(bereinigtesBaujahr.intValue());
-        }
-        if(tatsächlichesBaujahr != null) {
-        	vb.baujahr().set(tatsächlichesBaujahr.intValue());
-        }
-        
         newLine = newFormField( "Baujahr tatsächlich" ).setProperty( new PropertyAdapter( vb.baujahr() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setValidator( new MyNumberValidator( Integer.class ) ).setLayoutData( left().top( lastLine ).create() )
@@ -600,5 +583,27 @@ public class VertragsdatenBaulandGrunddatenFormEditorPage
             pageSite.fireEvent( this, vb.richtwertZoneG().qualifiedName().name(), IFormFieldListener.VALUE_CHANGE, vb
                     .richtwertZoneG().get() );
         }
+        
+        setBaujahre();
     }
+    
+    
+	private void setBaujahre() {
+		Double tatsaechlichesBaujahr = null;
+        Double bereinigtesBaujahr = null;
+        NHK2010BewertungComposite bewertung2010 = NHK2010BewertungComposite.Mixin.forVertrag(vb.vertrag().get());
+        if(bewertung2010 != null) {
+        	Iterable<NHK2010BewertungGebaeudeComposite> bewertungenGebaeude2010 = NHK2010BewertungGebaeudeComposite.Mixin.forBewertung(bewertung2010);
+        	for(NHK2010BewertungGebaeudeComposite bewertungGebaeude2010 : bewertungenGebaeude2010) {
+        		tatsaechlichesBaujahr = bewertungGebaeude2010.tatsaechlichesBaujahr().get();
+        		bereinigtesBaujahr = bewertungGebaeude2010.bereinigtesBaujahr().get();
+        	}
+        }
+        if(bereinigtesBaujahr != null) {
+            pageSite.setFieldValue( vb.baujahrBereinigt().qualifiedName().name(), bereinigtesBaujahr.intValue() );
+        }
+        if(tatsaechlichesBaujahr != null) {
+            pageSite.setFieldValue( vb.baujahr().qualifiedName().name(), tatsaechlichesBaujahr.intValue() );
+        }
+	}    
 }
