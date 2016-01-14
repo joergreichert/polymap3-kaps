@@ -13,29 +13,20 @@
 package org.polymap.kaps.ui.form;
 
 import java.util.TreeMap;
-
 import java.beans.PropertyChangeListener;
 
 import org.geotools.data.FeatureStore;
 import org.opengis.feature.Feature;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.qi4j.api.entity.Entity;
-
 import org.eclipse.swt.widgets.Composite;
-
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
-
 import org.eclipse.ui.forms.widgets.Section;
-
 import org.eclipse.core.runtime.IProgressMonitor;
-
 import org.polymap.core.runtime.event.EventManager;
 import org.polymap.core.workbench.PolymapWorkbench;
-
 import org.polymap.rhei.data.entityfeature.AssociationAdapter;
 import org.polymap.rhei.data.entityfeature.PropertyAdapter;
 import org.polymap.rhei.field.FormFieldEvent;
@@ -46,14 +37,15 @@ import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.field.TextFormField;
 import org.polymap.rhei.form.FormEditor;
 import org.polymap.rhei.form.IFormEditorPageSite;
-
 import org.polymap.kaps.KapsPlugin;
+import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.AusstattungBewertungComposite;
 import org.polymap.kaps.model.data.AusstattungComposite;
 import org.polymap.kaps.model.data.EigentumsartComposite;
 import org.polymap.kaps.model.data.ErmittlungModernisierungsgradComposite;
 import org.polymap.kaps.model.data.EtageComposite;
 import org.polymap.kaps.model.data.FlurstueckComposite;
+import org.polymap.kaps.model.data.GebaeudeComposite;
 import org.polymap.kaps.model.data.HimmelsrichtungComposite;
 import org.polymap.kaps.model.data.ImmobilienArtStaBuComposite;
 import org.polymap.kaps.model.data.RichtwertzoneComposite;
@@ -218,12 +210,25 @@ public class WohnungGrunddatenFormEditorPage
                 .setLayoutData( left().left( 0 ).right( 15 ).create() ).create();
 
         lastLine = newLine;
-        newLine = newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Gebäudenummer" )
+        Composite gebaeudeNummer = newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Gebäudenummer" )
                 .setProperty( new PropertyAdapter( wohnung.gebaeudeNummer() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setValidator( new NotNullMyNumberValidator( Integer.class ) )
                 .setEnabled( wohnung.objektNummer().get() == null )
                 .setLayoutData( left().left( 16 ).right( 31 ).create() ).create();
+        
+        final ActionButton openGebaeude = new ActionButton( parent, new Action( "Gebäude bearbeiten" ) {
+
+            @Override
+            public void run() {
+            	GebaeudeComposite gebaeude = GebaeudeComposite.Mixin.forKeys(wohnung.objektNummer().get(), wohnung.gebaeudeNummer().get());
+                if (gebaeude != null) {
+                    KapsPlugin.openEditor( fs, GebaeudeComposite.NAME, gebaeude );
+                }
+            }
+        } );
+        openGebaeude.setLayoutData( left().left( 32 ).right( 63 ).height(25).create() );
+        openGebaeude.setEnabled( wohnung.objektNummer().get() != null && wohnung.objektNummer().get() != null );
 
         lastLine = newLine;
         newLine = newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Wohnungsnummer" )
@@ -231,14 +236,14 @@ public class WohnungGrunddatenFormEditorPage
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setValidator( new NotNullMyNumberValidator( Integer.class ) )
                 // .setEnabled( wohnung.wohnungsNummer().get() == null )
-                .setLayoutData( left().left( 32 ).right( 47 ).create() ).create();
+                .setLayoutData( left().left( 64 ).right( 79 ).create() ).create();
 
         newFormField( IFormFieldLabel.NO_LABEL ).setToolTipText( "Fortführung" )
                 .setProperty( new PropertyAdapter( wohnung.wohnungsFortfuehrung() ) )
                 .setField( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )
                 .setValidator( new NotNullMyNumberValidator( Integer.class ) )
                 .setEnabled( wohnung.wohnungsNummer().get() == null )
-                .setLayoutData( left().left( 48 ).right( 63 ).create() ).create();
+                .setLayoutData( left().left( 80 ).right( 95 ).create() ).create();
 
         // flurstücke
         lastLine = newLine;
