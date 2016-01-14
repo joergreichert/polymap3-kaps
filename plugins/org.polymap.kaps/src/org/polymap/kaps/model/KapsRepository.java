@@ -19,25 +19,20 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
 import java.text.SimpleDateFormat;
 
 import org.geotools.feature.NameImpl;
 import org.opengis.feature.type.Name;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.qi4j.api.query.Query;
 import org.qi4j.api.query.QueryExpressions;
 import org.qi4j.api.query.grammar.BooleanExpression;
 import org.qi4j.api.service.ServiceReference;
-
 import org.eclipse.jface.dialogs.MessageDialog;
-
+import org.eclipse.rwt.RWT;
 import org.eclipse.core.runtime.NullProgressMonitor;
-
 import org.polymap.core.catalog.model.CatalogRepository;
 import org.polymap.core.model.Entity;
 import org.polymap.core.model.EntityType;
@@ -48,9 +43,10 @@ import org.polymap.core.qi4j.Qi4jPlugin;
 import org.polymap.core.qi4j.Qi4jPlugin.Session;
 import org.polymap.core.qi4j.QiModule;
 import org.polymap.core.qi4j.QiModuleAssembler;
+import org.polymap.core.runtime.ISessionListener;
 import org.polymap.core.runtime.Polymap;
+import org.polymap.core.runtime.SessionContext;
 import org.polymap.core.workbench.PolymapWorkbench;
-
 import org.polymap.kaps.model.data.*;
 import org.polymap.kaps.model.idgen.EingangsNummerGeneratorService;
 import org.polymap.kaps.model.idgen.GebaeudeNummerGeneratorService;
@@ -149,6 +145,9 @@ public class KapsRepository
         // is no request context
         if (Polymap.getSessionDisplay() != null) {
             OperationSupport.instance().addOperationSaveListener( operationListener );
+            if(RWT.getRequest() != null && RWT.getRequest().getSession() != null) {
+            	RWT.getRequest().getSession().setMaxInactiveInterval(5400); // 90min timeout
+            }
         }
         eingangsNummern = assembler.getModule().serviceFinder().findService( EingangsNummerGeneratorService.class );
         objektnummern = assembler.getModule().serviceFinder().findService( ObjektNummerGeneratorService.class );
