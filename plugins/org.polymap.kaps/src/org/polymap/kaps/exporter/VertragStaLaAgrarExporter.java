@@ -395,23 +395,23 @@ public class VertragStaLaAgrarExporter
 
         // String hypotheken =
         Double h = vdc.hypothekStala().get();
-        if (h == null) {
-            errors.add( error( vertrag, "Hypotheken nicht gefunden, nutze 0" ) );
-        }
+//        if (h == null) {
+//            errors.add( error( vertrag, "Hypotheken nicht gefunden, nutze 0" ) );
+//        }
         contents.add( String.format( "%08d", h != null ? h.intValue() : 0 ) );
 
         // String tauschgrundstück =
         h = vdc.wertTauschStala().get();
-        if (h == null) {
-            errors.add( error( vertrag, "Wert des Tauschgrundstückes nicht gefunden, nutze 0" ) );
-        }
+//        if (h == null) {
+//            errors.add( error( vertrag, "Wert des Tauschgrundstückes nicht gefunden, nutze 0" ) );
+//        }
         contents.add( String.format( "%08d", h != null ? h.intValue() : 0 ) );
 
         // String sonstiges =
         h = vdc.wertSonstigesStala().get();
-        if (h == null) {
-            errors.add( error( vertrag, "Wert sonstige Leistungen nicht gefunden, nutze 0" ) );
-        }
+//        if (h == null) {
+//            errors.add( error( vertrag, "Wert sonstige Leistungen nicht gefunden, nutze 0" ) );
+//        }
         contents.add( String.format( "%08d", h != null ? h.intValue() : 0 ) );
 
         String b = vdc.bemerkungStala().get();
