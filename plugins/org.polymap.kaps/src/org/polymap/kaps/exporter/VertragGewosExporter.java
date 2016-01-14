@@ -20,7 +20,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -35,7 +34,6 @@ import java.text.SimpleDateFormat;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.opengis.feature.Feature;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -43,12 +41,9 @@ import org.apache.commons.logging.LogFactory;
 import com.google.common.base.Charsets;
 
 import org.eclipse.rwt.widgets.ExternalBrowser;
-
 import org.eclipse.jface.dialogs.MessageDialog;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
-
 import org.polymap.core.data.operation.DefaultFeatureOperation;
 import org.polymap.core.data.operation.DownloadServiceHandler;
 import org.polymap.core.data.operation.DownloadServiceHandler.ContentProvider;
@@ -57,7 +52,6 @@ import org.polymap.core.data.operation.IFeatureOperation;
 import org.polymap.core.data.operation.IFeatureOperationContext;
 import org.polymap.core.runtime.Polymap;
 import org.polymap.core.workbench.PolymapWorkbench;
-
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.FlurstueckComposite;
 import org.polymap.kaps.model.data.GebaeudeArtComposite;
@@ -66,6 +60,7 @@ import org.polymap.kaps.model.data.VertragComposite;
 import org.polymap.kaps.model.data.VertragsArtComposite;
 import org.polymap.kaps.model.data.VertragsdatenBaulandComposite;
 import org.polymap.kaps.model.data.VertragsdatenErweitertComposite;
+import org.polymap.kaps.model.data.WohnungComposite;
 import org.polymap.kaps.ui.NumberFormatter;
 import org.polymap.kaps.ui.form.EingangsNummerFormatter;
 
@@ -265,37 +260,28 @@ public class VertragGewosExporter
                     }
                 }
 
-                VertragsdatenErweitertComposite ew = vertrag.erweiterteVertragsdaten().get();
-                Double preis = vertrag.vollpreis().get();
-                if (ew != null && ew.bereinigterVollpreis().get() != null) {
-                    preis = ew.bereinigterVollpreis().get();
-                }
-
                 Output current = new Output();
-                current.umsatz = preis != null ? preis.intValue() : 0;
-                current.anzahl = 1;
+//                current.umsatz = preis != null ? preis.intValue() : 0;
+                current.anzahl = 0;
 
                 VertragsArtComposite vertragsArtC = vertrag.vertragsArt().get();
                 if (vertragsArtC != null) {
                     int vertragsArt = Integer.parseInt( vertragsArtC.schl().get() );
                     if (vertragsArt == 13) {
                         // erbbaurecht
-                        current.flaeche = calculateVerkaufteFlaeche( vertrag );
+                    	calculateFlaecheAndUmsatz( vertrag, current );
                         zeilen.get( "10" ).add( current );
                     }
                     else if (vertragsArt == 2 || vertragsArt == 3) {
                         Set<String> addTo = new HashSet<String>();
                         // mehrere flurstuecke mussen summiert werden
-                        current.anzahl = 0;
                         for (FlurstueckComposite flurstueck : FlurstueckComposite.Mixin.forEntity( vertrag )) {
                             if (flurstueck != null) {
-                                current.anzahl++;
                                 NutzungComposite nutzungC = flurstueck.nutzung().get();
                                 int nutzung = nutzungC != null ? Integer.parseInt( nutzungC.schl().get() ) : -1;
                                 GebaeudeArtComposite gebartC = flurstueck.gebaeudeArt().get();
                                 int gebArt = gebartC != null ? Integer.parseInt( gebartC.schl().get() ) : -1;
-                                double flaeche = calculateVerkaufteFlaeche( flurstueck );
-                                current.flaeche += flaeche;
+                                calculateFlaecheAndUmsatz( flurstueck, current );
                                 if (gebArt == 0 && nutzung == 16) {
                                     addTo.add( "3" );
                                 }
@@ -460,27 +446,36 @@ public class VertragGewosExporter
     }
 
 
-    private double calculateVerkaufteFlaeche( VertragComposite vertrag ) {
-        double verkaufteFlaeche = 0;
-
+    private void calculateFlaecheAndUmsatz( VertragComposite vertrag, Output output ) {
         for (FlurstueckComposite flurstueck : FlurstueckComposite.Mixin.forEntity( vertrag )) {
-            verkaufteFlaeche += calculateVerkaufteFlaeche( flurstueck );
+            calculateFlaecheAndUmsatz( flurstueck, output );
         }
-        return verkaufteFlaeche;
     }
 
 
-    private double calculateVerkaufteFlaeche( FlurstueckComposite flurstueck ) {
+    private void calculateFlaecheAndUmsatz( FlurstueckComposite flurstueck, Output output ) {
         if (flurstueck != null) {
-            Double flaeche = flurstueck.flaeche().get();
-            Double n = flurstueck.flaechenAnteilNenner().get();
-            Double z = flurstueck.flaechenAnteilZaehler().get();
-
-            if (flaeche != null && n != null && z != null && z != 0) {
-                return flaeche * z / n;
+            Iterable<WohnungComposite> wohnungen = WohnungComposite.Mixin.findWohnungenFor(flurstueck);
+            Double flaecheWohnung = 0d;
+            Double preisWohnung = 0d;
+            int wohnungsAnzahl = 0;
+            for(WohnungComposite wohnung : wohnungen) {
+            	wohnungsAnzahl++;
+            	if(wohnung.wohnflaeche().get() != null) {
+            		flaecheWohnung += wohnung.wohnflaeche().get();
+            	}
+            	if(wohnung.bereinigterVollpreis().get() != null) {
+                	preisWohnung += wohnung.bereinigterVollpreis().get();
+            	} else {
+                	preisWohnung += wohnung.vollpreisWohnflaeche().get();
+            	}
+            }
+            if(wohnungsAnzahl > 0) {
+            	output.anzahl++;
+            	output.flaeche += flaecheWohnung / wohnungsAnzahl;
+            	output.umsatz += preisWohnung / wohnungsAnzahl;
             }
         }
-        return 0.0;
     }
 
 
