@@ -36,12 +36,15 @@ public class VertragsdatenBaulandSonstigesFormEditorPage
         extends VertragsdatenBaulandFormEditorPage {
 
     private static Log log = LogFactory.getLog( VertragsdatenBaulandSonstigesFormEditorPage.class );
+    
+    
+    private final static String PREFIX = KaufvertragFlurstueckeFormEditorPage.class.getSimpleName();
 
 
     public VertragsdatenBaulandSonstigesFormEditorPage( Feature feature, FeatureStore featureStore ) {
         super( VertragsdatenBaulandSonstigesFormEditorPage.class.getName(), "Sonstiges", feature, featureStore );
     }
-
+    
 
     @SuppressWarnings("unchecked")
     @Override
@@ -97,9 +100,33 @@ public class VertragsdatenBaulandSonstigesFormEditorPage
         newLine = createFlaecheField( "Grundstückstiefe (m²)", vb.grundstuecksTiefe(), left().top( lastLine ), client,
                 true );
         createFlaecheField( "Grundstücksbreite (m²)", vb.grundstuecksBreite(), right().top( lastLine ), client, true );
-
         
-        ErtragswertverfahrenComposite ertragswertverfahren = ErtragswertverfahrenComposite.Mixin.forVertrag(vb.vertrag().get());
+        lastLine = newLine;
+        newLine = createFlaecheField( "Wohnfläche (m²)", vb.wohnflaeche(), left().top( lastLine ), client, true );
+        createFlaecheField( "Gewerbefläche (m²)", vb.gewerbeflaeche(), right().top( lastLine ), client, true );
+
+        lastLine = newLine;
+        newLine = createFlaecheField( "Bruttogrundfläche (m²)", vb.bruttoGrundflaeche(), left().top( lastLine ),
+                client, true );
+        createFlaecheField( "Geschossfläche (m²)", vb.geschossFlaeche(), right().top( lastLine ), client, true );
+
+        lastLine = newLine;
+        newLine = createFlaecheField( "Bruttorauminhalt (m³)", vb.bruttoRaumInhalt(), left().top( lastLine ), client,
+                true );
+
+        // lastLine = newLine;
+        // newLine = newFormField( "Keller" )
+        // .setProperty( new AssociationAdapter<KellerComposite>( vb.keller() ) )
+        // .setField( namedAssocationsPicklist( KellerComposite.class ) )
+        // .setLayoutData( left().top( lastLine ).bottom( 100 ).create() ).setParent(
+        // client ).create();
+        
+        berechneGesamtWohnFlaeche();
+    }
+
+
+	private void berechneGesamtWohnFlaeche() {
+		ErtragswertverfahrenComposite ertragswertverfahren = ErtragswertverfahrenComposite.Mixin.forVertrag(vb.vertrag().get());
         Double gesamtFlaeche = null;
         if(ertragswertverfahren != null) {
         	gesamtFlaeche = sum(
@@ -121,34 +148,15 @@ public class VertragsdatenBaulandSonstigesFormEditorPage
         	);
         }
         if(gesamtFlaeche != null) {
-        	vb.wohnflaeche().set(gesamtFlaeche);
+        	getPageSite().setFieldValue(PREFIX + "wohnflaeche", gesamtFlaeche);
         }
-        
-        lastLine = newLine;
-        newLine = createFlaecheField( "Wohnfläche (m²)", vb.wohnflaeche(), left().top( lastLine ), client, true );
-        createFlaecheField( "Gewerbefläche (m²)", vb.gewerbeflaeche(), right().top( lastLine ), client, true );
-
-        lastLine = newLine;
-        newLine = createFlaecheField( "Bruttogrundfläche (m²)", vb.bruttoGrundflaeche(), left().top( lastLine ),
-                client, true );
-        createFlaecheField( "Geschossfläche (m²)", vb.geschossFlaeche(), right().top( lastLine ), client, true );
-
-        lastLine = newLine;
-        newLine = createFlaecheField( "Bruttorauminhalt (m³)", vb.bruttoRaumInhalt(), left().top( lastLine ), client,
-                true );
-
-        // lastLine = newLine;
-        // newLine = newFormField( "Keller" )
-        // .setProperty( new AssociationAdapter<KellerComposite>( vb.keller() ) )
-        // .setField( namedAssocationsPicklist( KellerComposite.class ) )
-        // .setLayoutData( left().top( lastLine ).bottom( 100 ).create() ).setParent(
-        // client ).create();
-    }
+	}
 
 
 	private Double sum(Object[]... pairs) {
 		Double sum = 0d;
 		for(Object [] pair : pairs) {
+			@SuppressWarnings("unchecked")
 			Property<Double> flaeche = (Property<Double>) pair[0];
 			if((boolean) pair[1] && flaeche.get() != null) {
 				sum += flaeche.get();
