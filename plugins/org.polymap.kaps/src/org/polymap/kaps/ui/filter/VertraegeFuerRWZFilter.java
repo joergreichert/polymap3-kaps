@@ -64,58 +64,15 @@ public class VertraegeFuerRWZFilter
     public Composite createControl( Composite parent, IFilterEditorSite site ) {
         Composite result = site.createStandardLayout( parent );
 
-        Composite row1 = site.getToolkit().createComposite(result);
-        FormLayoutFactory.defaults().applyTo(row1);
-        Composite row2 = site.getToolkit().createComposite(result);
-        FormLayoutFactory.defaults().applyTo(row2);
+        site.addStandardLayout( site.newFormField( result, "rwz", String.class, new StringFormField(), null, "RWZ" ) );
 
-        schlSel = new Button(row1, SWT.RADIO);
-        schlSel.setSelection(true);
-        
-        FormDataFactory.defaults().left(0).right(10).applyTo(schlSel);
-        
-        final Composite schlField = site.newFormField( row1, "schl", String.class, new StringFormField(), null, "RWZ-Schlüssel" );
-        FormDataFactory.defaults().left(schlSel, 10).right(100).applyTo(schlField);
-
-        nameSel = new Button(row2, SWT.RADIO);
-        FormDataFactory.defaults().left(0).right(10).applyTo(nameSel);
-        
-        final Composite nameField = site.newFormField( row2, "name", String.class, new StringFormField(), null, "RWZ-Name" );
-        FormDataFactory.defaults().top(30).left(nameSel, 10).right(100).applyTo(nameField);
-
-        FormDataFactory.defaults().left(0).right(100).bottom(row2).applyTo(row1);
-        FormDataFactory.defaults().top(row1).left(0).right(100).bottom(10).applyTo(row2);
-        
-        schlSel.addSelectionListener(new SelectionAdapter() {
-
-        	@Override
-        	public void widgetSelected(SelectionEvent e) {
-        		nameSel.setSelection(false);
-        		schlField.setEnabled(true);
-        		nameField.setEnabled(false);
-        	}
-		});
-        nameSel.addSelectionListener(new SelectionAdapter() {
-
-        	@Override
-        	public void widgetSelected(SelectionEvent e) {
-        		schlSel.setSelection(false);
-        		nameField.setEnabled(true);
-        		schlField.setEnabled(false);
-        	}
-		});
         return result;
     }
 
 
     protected Query<VertragComposite> createQuery( IFilterEditorSite site ) {
     	
-    	String wert = null;
-    	if(schlSel.getSelection()) {
-    		wert = (String) site.getFieldValue( "schl" );
-    	} else {
-    		wert = (String) site.getFieldValue( "name" );
-    	}
+        String wert = (String) site.getFieldValue( "rwz" );
         
         VertragComposite template = QueryExpressions.templateFor( VertragComposite.class );
         BooleanExpression fExpr = null;
@@ -124,25 +81,24 @@ public class VertraegeFuerRWZFilter
             fExpr = QueryExpressions.eq( template.identity(), "unknown" );
         } else {
         	RichtwertzoneComposite rwz = null;
-        	if(schlSel.getSelection()) {
-        		rwz = KapsRepository.instance().findSchlNamed(RichtwertzoneComposite.class, wert);
-        	} else {
-        		RichtwertzoneComposite rwzTemplate = QueryExpressions.templateFor(RichtwertzoneComposite.class);
-        		Query<RichtwertzoneComposite> rwzs = KapsRepository.instance().findEntities(RichtwertzoneComposite.class, QueryExpressions.eq(rwzTemplate.name(), wert), 0, 1);
-        		if(rwzs.count() > 1) {
-    	            Polymap.getSessionDisplay().asyncExec( new Runnable() {
-    	            	
-    	                public void run() {
-    	                	MessageDialog.openError( PolymapWorkbench.getShellToParentOn(), "Zu viele RWZ",
-    	                			"Es wurde mehr als eine RWZ für den gegegbenen Namen gefunden." );
-    	                }
-    	            } );
-    	            return KapsRepository.instance().findEntities( VertragComposite.class,
-    	                    QueryExpressions.eq( template.identity(), "unknown" ), 0, -1 );
-        		} else if(rwzs.count() == 1) {
-        			rwz = rwzs.iterator().next();
-        		}
-        	}
+    		RichtwertzoneComposite rwzTemplate = QueryExpressions.templateFor(RichtwertzoneComposite.class);
+    		BooleanExpression schlExpression = QueryExpressions.eq(rwzTemplate.schl(), wert);
+    		BooleanExpression nameExpression = QueryExpressions.eq(rwzTemplate.name(), wert);
+    		BooleanExpression searchExpression = QueryExpressions.or(schlExpression, nameExpression);
+    		Query<RichtwertzoneComposite> rwzs = KapsRepository.instance().findEntities(RichtwertzoneComposite.class, searchExpression, 0, 1);
+    		if(rwzs.count() > 1) {
+	            Polymap.getSessionDisplay().asyncExec( new Runnable() {
+	            	
+	                public void run() {
+	                	MessageDialog.openError( PolymapWorkbench.getShellToParentOn(), "Zu viele RWZ",
+	                			"Es wurde mehr als eine RWZ gefunden, die den gegebenen Wert als Schlüssel oder Name verwendet." );
+	                }
+	            } );
+	            return KapsRepository.instance().findEntities( VertragComposite.class,
+	                    QueryExpressions.eq( template.identity(), "unknown" ), 0, -1 );
+    		} else if(rwzs.count() == 1) {
+    			rwz = rwzs.iterator().next();
+    		}
         	if(rwz == null) {
 	            return KapsRepository.instance().findEntities( VertragComposite.class,
 	                    QueryExpressions.eq( template.identity(), "unknown" ), 0, -1 );
