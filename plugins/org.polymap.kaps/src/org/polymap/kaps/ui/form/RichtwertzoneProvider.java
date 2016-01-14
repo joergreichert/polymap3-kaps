@@ -15,7 +15,9 @@ package org.polymap.kaps.ui.form;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.ExecutionException;
@@ -23,15 +25,14 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.GemeindeComposite;
 import org.polymap.kaps.model.data.RichtwertzoneComposite;
 import org.polymap.kaps.model.data.RichtwertzoneZeitraumComposite;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -140,7 +141,7 @@ public class RichtwertzoneProvider {
 
             // find zeitraum
             RichtwertzoneZeitraumComposite zeitraum = RichtwertzoneZeitraumComposite.Mixin.findZeitraumFor( zone, date );
-            if (zeitraum != null) {
+            if (zeitraum != null && zeitraum.gueltigAb().get() != null) {
                 zonen.put(
                         prefix + " - " + zone.name().get() + " ("
                                 + KapsRepository.SHORT_DATE.format( zeitraum.gueltigAb().get() ) + ")", zeitraum );
@@ -151,6 +152,35 @@ public class RichtwertzoneProvider {
 //      log.info( "findFor: " + gemeinde.schl().get() + " needed " + (System.currentTimeMillis() - start) + "ms" );
 
         return sorted.descendingMap();
+    }
+    
+    public static boolean exists( GemeindeComposite gemeinde, Date date, RichtwertzoneZeitraumComposite... gegebene ) {
+//      long start = System.currentTimeMillis();
+
+//        log.info( "findFor: " + gemeinde.schl().get() + ", " + date.getDate() );
+        if (gemeinde == null) {
+            throw new IllegalArgumentException( "gemeinde must not be null" );
+        }
+        int found = 0;
+        Set<RichtwertzoneZeitraumComposite> gegebeneNonNull = new HashSet<RichtwertzoneZeitraumComposite>();
+        for(RichtwertzoneZeitraumComposite aktuell : gegebene) {
+        	if(aktuell != null) {
+        		gegebeneNonNull.add(aktuell);
+        	}
+        }
+        Iterable<RichtwertzoneComposite> iterable = RichtwertzoneComposite.Mixin.findZoneIn( gemeinde );
+        for (RichtwertzoneComposite zone : iterable) {
+        	for(RichtwertzoneZeitraumComposite aktuell : gegebene) {
+        		if(aktuell != null && aktuell.name().get().equals(zone.name().get()) && aktuell.schl().get().equals(zone.schl().get())) {
+                	RichtwertzoneZeitraumComposite zeitraum = RichtwertzoneZeitraumComposite.Mixin.findZeitraumFor( zone, date );
+                    if (zeitraum != null && zeitraum.gueltigAb().get() != null) {
+                    	found++;
+                    	break;
+                    }
+        		}
+        	}
+        }
+        return gegebeneNonNull.size() == found;
     }
 
 

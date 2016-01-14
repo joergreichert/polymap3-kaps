@@ -13,22 +13,24 @@
 package org.polymap.kaps.model;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.geotools.feature.NameImpl;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.FeatureType;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.polymap.core.qi4j.QiModule;
-
-import org.polymap.rhei.data.entityfeature.EntitySourceProcessor;
-
+import org.polymap.kaps.model.data.GemeindeComposite;
+import org.polymap.kaps.model.data.RichtwertzoneComposite;
+import org.polymap.kaps.model.data.RichtwertzoneZeitraumComposite;
 import org.polymap.kaps.model.data.VertragsdatenAgrarComposite;
 import org.polymap.kaps.ui.form.EingangsNummerFormatter;
+import org.polymap.kaps.ui.form.RichtwertzoneProvider;
+import org.polymap.rhei.data.entityfeature.EntitySourceProcessor;
 
 public class VertragsdatenAgrarEntityProvider
         extends KapsEntityProvider<VertragsdatenAgrarComposite> {
@@ -52,11 +54,12 @@ public class VertragsdatenAgrarEntityProvider
         // builder.remove( "vertrag" );
         builder.add( "vertragsDatum", Date.class );
         builder.add( "eingangsNr", String.class );
+        builder.add( "leereRWT", String.class );
         type = builder.buildFeatureType();
 
         // aussortieren für die Tabelle
         SimpleFeatureType filtered = SimpleFeatureTypeBuilder.retype( (SimpleFeatureType)type,
-                new String[] { "vertragsDatum","eingangsNr" } );
+                new String[] { "vertragsDatum","eingangsNr","leereRWT" } );
         return filtered;
     }
 
@@ -74,7 +77,31 @@ public class VertragsdatenAgrarEntityProvider
         if (entity.vertrag().get() != null && entity.vertrag().get().vertragsDatum().get() != null) {
             feature.getProperty( "vertragsDatum" ).setValue( entity.vertrag().get().vertragsDatum().get() );
         }
+        
+        if (entity.vertrag().get() != null) {
+            feature.getProperty( "leereRWT" ).setValue( existsEntryWithEmptyRichtwertzone(entity) ? "ja" : "nein" );
+        }
 
         return feature;
     }
+    
+    private boolean existsEntryWithEmptyRichtwertzone(VertragsdatenAgrarComposite entity) {
+    	return !isInValidRWTs(entity, entity.richtwertZone1().get(), entity.richtwertZone2().get(), entity.richtwertZone3().get(), 
+    			entity.richtwertZone4().get(), entity.richtwertZone5().get(), entity.richtwertZone6().get());
+    }
+    
+    private boolean isInValidRWTs(VertragsdatenAgrarComposite vb, RichtwertzoneZeitraumComposite... aktuelle) {
+        if (!vb.vertrag().get().richtwertZonenAgrar().isEmpty()) {
+            Set<GemeindeComposite> gemeinden = new HashSet<GemeindeComposite>();
+            for (RichtwertzoneComposite zone : vb.vertrag().get().richtwertZonenAgrar()) {
+                gemeinden.add( zone.gemeinde().get() );
+            }
+            boolean exists = false;
+            for (GemeindeComposite gemeinde : gemeinden) {
+            	exists = exists | RichtwertzoneProvider.exists( gemeinde, vb.vertrag().get().vertragsDatum().get(), aktuelle);
+            }
+            return exists;
+        }
+		return false;
+    }    
 }
