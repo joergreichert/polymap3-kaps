@@ -21,6 +21,7 @@ import java.util.TreeMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.qi4j.api.query.Query;
 import org.qi4j.api.query.QueryExpressions;
 import org.qi4j.api.query.grammar.BooleanExpression;
@@ -31,10 +32,13 @@ import com.google.common.collect.Sets;
 
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
+
 import org.eclipse.jface.dialogs.MessageDialog;
+
 import org.polymap.core.project.ILayer;
 import org.polymap.core.runtime.Polymap;
 import org.polymap.core.workbench.PolymapWorkbench;
+
 import org.polymap.rhei.field.BetweenFormField;
 import org.polymap.rhei.field.BetweenValidator;
 import org.polymap.rhei.field.DateTimeFormField;
@@ -44,6 +48,7 @@ import org.polymap.rhei.field.SelectlistFormField;
 import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.filter.FilterEditor;
 import org.polymap.rhei.filter.IFilterEditorSite;
+
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.BodennutzungComposite;
 import org.polymap.kaps.model.data.FlurstueckComposite;
@@ -285,11 +290,16 @@ public class VertragsdatenAgrarAgrarFilter
         	} else {
         		flaecheExpression = greaterEquals;
         	}
-        } else if(lowerEquals != null) {
+        } else {
     		flaecheExpression = lowerEquals;
         }
-        if (nExpr != null && flaecheExpression != null) {
-            nExpr = QueryExpressions.and( nExpr, flaecheExpression );
+        
+        if (flaecheExpression != null) {
+            if (nExpr != null) {
+                nExpr = QueryExpressions.and( nExpr, flaecheExpression );
+            } else {
+                nExpr = flaecheExpression;
+            }
         }
         
         Set<VertragComposite> vertraegeNachDatumUndFlurstueck = new HashSet<VertragComposite>();
