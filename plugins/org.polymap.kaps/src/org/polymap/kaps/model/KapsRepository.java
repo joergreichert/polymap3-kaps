@@ -535,6 +535,14 @@ public class KapsRepository
 
 
     private void remove( VertragComposite vertrag ) {
+    	for (WohnungComposite wohnung : WohnungComposite.Mixin.findWohnungenFor( vertrag )) {
+    		// nicht editierbar in Wohnungsformular
+    		wohnung.kaufpreis().set(null);
+    		wohnung.bereinigterVollpreis().set(null);
+    		wohnung.vollpreisWohnflaeche().set(null);
+    		wohnung.bodenpreis().set(null);
+    	}
+    	
         ErmittlungModernisierungsgradComposite ermittlungModernisierungsgradComposite = ErmittlungModernisierungsgradComposite.Mixin
                 .forVertrag( vertrag );
         if (ermittlungModernisierungsgradComposite != null) {
