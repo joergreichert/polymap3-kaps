@@ -12,17 +12,11 @@
  */
 package org.polymap.kaps.exporter;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,27 +26,27 @@ import java.io.Writer;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-
-import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureIterator;
-import org.opengis.feature.Feature;
-import org.supercsv.io.CsvListWriter;
-import org.supercsv.prefs.CsvPreference;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Locale;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.qi4j.api.entity.association.Association;
-import org.qi4j.api.property.Property;
-
-import org.eclipse.rwt.widgets.ExternalBrowser;
-
-import org.eclipse.jface.dialogs.MessageDialog;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
-
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.rwt.RWT;
+import org.eclipse.rwt.internal.service.SessionStoreImpl;
+import org.eclipse.rwt.service.ISessionStore;
+import org.eclipse.rwt.widgets.ExternalBrowser;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
+import org.opengis.feature.Feature;
 import org.polymap.core.data.operation.DefaultFeatureOperation;
 import org.polymap.core.data.operation.DownloadServiceHandler;
 import org.polymap.core.data.operation.DownloadServiceHandler.ContentProvider;
@@ -62,12 +56,15 @@ import org.polymap.core.data.operation.IFeatureOperationContext;
 import org.polymap.core.model.Entity;
 import org.polymap.core.runtime.Polymap;
 import org.polymap.core.workbench.PolymapWorkbench;
-
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.LabelSupport;
 import org.polymap.kaps.model.Named;
 import org.polymap.kaps.model.SchlNamed;
 import org.polymap.kaps.ui.NumberFormatter;
+import org.qi4j.api.entity.association.Association;
+import org.qi4j.api.property.Property;
+import org.supercsv.io.CsvListWriter;
+import org.supercsv.prefs.CsvPreference;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -232,8 +229,9 @@ public abstract class AbstractExcelExporter<T extends Entity>
         final File f = File.createTempFile( filename, ".csv" );
         f.deleteOnExit();
 
-        OutputStream out = new BufferedOutputStream( new FileOutputStream( f ) );
         List<String> errors = new ArrayList<String>();
+        writeHeader(f, errors);
+        OutputStream out = new BufferedOutputStream( new FileOutputStream( f, true ) );
         try {
             final int size = context.features().size();
             write( context.features(), out, monitor, errors );
@@ -316,7 +314,21 @@ public abstract class AbstractExcelExporter<T extends Entity>
     }
 
 
-    private void write( FeatureCollection features, OutputStream out, IProgressMonitor monitor, List<String> errors )
+    private void writeHeader(File file, List<String> errors) throws FileNotFoundException {
+        OutputStream out = new BufferedOutputStream( new FileOutputStream( file ) );
+    	try(OutputStreamWriter writer = new OutputStreamWriter( out, "ISO-8859-1" )) {
+    		SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+    		writer.write("\"Datum:\";\"" + df.format(new Date()) + "\"\r\n");
+    		String sessionUser = String.valueOf(RWT.getSessionStore().getAttribute("user"));
+    		String user = sessionUser != null ? sessionUser : System.getProperty("user.name");
+    		writer.write("\"Benutzer:\";\"" + user + "\"\r\n\r\n");
+    	} catch(IOException ioe) {
+    		errors.add("Konnte Kopfdaten nicht schreiben.");
+    	}
+	}
+
+
+	private void write( FeatureCollection features, OutputStream out, IProgressMonitor monitor, List<String> errors )
             throws IOException {
         FeatureIterator it = null;
         Writer writer = null;
