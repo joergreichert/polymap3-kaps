@@ -179,7 +179,9 @@ public class KaufvertragFlurstueckeFormEditorPage
         FlurstueckComposite composite = selectedComposite.get();
         
         duplicateFlurstueckValidator = new DuplicateFlurstueckValidator();
-    	duplicateFlurstueckValidator.setLastModified(composite._lastModified().get());
+        if(composite != null) {
+        	duplicateFlurstueckValidator.setLastModified(composite._lastModified().get());
+        }
         
         selectedGemarkung = composite != null ? composite.gemarkung().get() : null;
         if (composite != null && selectedGemarkung == null) {
