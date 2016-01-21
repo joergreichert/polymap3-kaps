@@ -59,7 +59,7 @@ public class VertragsdatenAgrarAlsAgrarExporter
         for(FlurstueckComposite flurstueck : fses) {
         	GemarkungComposite gemarkung = flurstueck.gemarkung().get();
         	if (gemarkung == null) {
-        		errors.add( error( vertrag, String.format("Keine Gemarkung für Flurstück %d gefunden!", flurstueck.name()) ) );
+        		errors.add( error( vertrag, String.format("Keine Gemarkung für Flurstück %s gefunden!", flurstueck.name().get()) ) );
         		return result;
         	} else {
         		if(!gemarkungFlurstuecke.containsKey(gemarkung)) {
