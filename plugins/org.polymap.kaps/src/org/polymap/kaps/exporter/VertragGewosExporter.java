@@ -12,14 +12,6 @@
  */
 package org.polymap.kaps.exporter;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -30,20 +22,25 @@ import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureIterator;
-import org.opengis.feature.Feature;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import com.google.common.base.Charsets;
-
-import org.eclipse.rwt.widgets.ExternalBrowser;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.rwt.widgets.ExternalBrowser;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
+import org.opengis.feature.Feature;
 import org.polymap.core.data.operation.DefaultFeatureOperation;
 import org.polymap.core.data.operation.DownloadServiceHandler;
 import org.polymap.core.data.operation.DownloadServiceHandler.ContentProvider;
@@ -63,6 +60,8 @@ import org.polymap.kaps.model.data.VertragsdatenErweitertComposite;
 import org.polymap.kaps.model.data.WohnungComposite;
 import org.polymap.kaps.ui.NumberFormatter;
 import org.polymap.kaps.ui.form.EingangsNummerFormatter;
+
+import com.google.common.base.Charsets;
 
 /**
  * @author <a href="http://www.polymap.de">Steffen Stundzig</a>
@@ -260,16 +259,22 @@ public class VertragGewosExporter
                     }
                 }
 
+                VertragsdatenErweitertComposite ew = vertrag.erweiterteVertragsdaten().get();
+                Double preis = vertrag.vollpreis().get();
+                if (ew != null && ew.bereinigterVollpreis().get() != null) {
+                    preis = ew.bereinigterVollpreis().get();
+                }
+
                 Output current = new Output();
-//                current.umsatz = preis != null ? preis.intValue() : 0;
-                current.anzahl = 0;
+                current.umsatz = preis != null ? preis.intValue() : 0;
+                current.anzahl = 1;
 
                 VertragsArtComposite vertragsArtC = vertrag.vertragsArt().get();
                 if (vertragsArtC != null) {
                     int vertragsArt = Integer.parseInt( vertragsArtC.schl().get() );
                     if (vertragsArt == 13) {
                         // erbbaurecht
-                    	calculateFlaecheAndUmsatz( vertrag, current );
+                        current.flaeche = calculateVerkaufteFlaeche( vertrag );
                         zeilen.get( "10" ).add( current );
                     }
                     else if (vertragsArt == 2 || vertragsArt == 3) {
@@ -281,7 +286,15 @@ public class VertragGewosExporter
                                 int nutzung = nutzungC != null ? Integer.parseInt( nutzungC.schl().get() ) : -1;
                                 GebaeudeArtComposite gebartC = flurstueck.gebaeudeArt().get();
                                 int gebArt = gebartC != null ? Integer.parseInt( gebartC.schl().get() ) : -1;
-                                calculateFlaecheAndUmsatz( flurstueck, current );
+                                
+                                double flaeche = 0d;
+                                if (((gebArt >= 70 && gebArt <= 203) && nutzung == 29) || ((gebArt >= 70 && gebArt <= 203) && (nutzung >= 30 && nutzung <= 32))) {
+                                	calculateVerkaufteFlaecheEigentumswohnung( flurstueck, current );
+                                } else {
+                                	flaeche = calculateVerkaufteFlaeche( flurstueck );
+                                	current.flaeche += flaeche;
+                                }
+                                
                                 if (gebArt == 0 && nutzung == 16) {
                                     addTo.add( "3" );
                                 }
@@ -446,14 +459,30 @@ public class VertragGewosExporter
     }
 
 
-    private void calculateFlaecheAndUmsatz( VertragComposite vertrag, Output output ) {
+    private double calculateVerkaufteFlaeche( VertragComposite vertrag ) {
+        double verkaufteFlaeche = 0;
+
         for (FlurstueckComposite flurstueck : FlurstueckComposite.Mixin.forEntity( vertrag )) {
-            calculateFlaecheAndUmsatz( flurstueck, output );
+            verkaufteFlaeche += calculateVerkaufteFlaeche( flurstueck );
         }
+        return verkaufteFlaeche;
     }
 
 
-    private void calculateFlaecheAndUmsatz( FlurstueckComposite flurstueck, Output output ) {
+    private double calculateVerkaufteFlaeche( FlurstueckComposite flurstueck ) {
+        if (flurstueck != null) {
+            Double flaeche = flurstueck.flaeche().get();
+            Double n = flurstueck.flaechenAnteilNenner().get();
+            Double z = flurstueck.flaechenAnteilZaehler().get();
+
+            if (flaeche != null && n != null && z != null && z != 0) {
+                return flaeche * z / n;
+            }
+        }
+        return 0.0;
+    }
+    
+    private void calculateVerkaufteFlaecheEigentumswohnung( FlurstueckComposite flurstueck, Output output ) {
         if (flurstueck != null) {
             Iterable<WohnungComposite> wohnungen = WohnungComposite.Mixin.findWohnungenFor(flurstueck);
             Double flaecheWohnung = 0d;
@@ -466,18 +495,16 @@ public class VertragGewosExporter
             	}
             	if(wohnung.bereinigterVollpreis().get() != null) {
                 	preisWohnung += wohnung.bereinigterVollpreis().get();
-            	} else {
+            	} else if(wohnung.vollpreisWohnflaeche().get() != null) {
                 	preisWohnung += wohnung.vollpreisWohnflaeche().get();
             	}
             }
             if(wohnungsAnzahl > 0) {
-            	output.anzahl++;
             	output.flaeche += flaecheWohnung / wohnungsAnzahl;
-            	output.umsatz += preisWohnung / wohnungsAnzahl;
+//            	output.umsatz += preisWohnung / wohnungsAnzahl;
             }
         }
     }
-
 
     public static void main( String[] args ) {
         System.out.println( new Double( 1234.56d ).intValue() );

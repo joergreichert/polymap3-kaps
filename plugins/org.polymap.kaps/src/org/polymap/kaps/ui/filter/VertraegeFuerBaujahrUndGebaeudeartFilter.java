@@ -21,7 +21,7 @@ import java.util.TreeMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.apache.lucene.search.BooleanQuery;
 import org.qi4j.api.query.Query;
 import org.qi4j.api.query.QueryExpressions;
 import org.qi4j.api.query.grammar.BooleanExpression;
@@ -30,13 +30,10 @@ import com.google.common.collect.Sets;
 
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
-
 import org.eclipse.jface.dialogs.MessageDialog;
-
 import org.polymap.core.project.ILayer;
 import org.polymap.core.runtime.Polymap;
 import org.polymap.core.workbench.PolymapWorkbench;
-
 import org.polymap.rhei.field.BetweenFormField;
 import org.polymap.rhei.field.BetweenValidator;
 import org.polymap.rhei.field.DateTimeFormField;
@@ -47,7 +44,6 @@ import org.polymap.rhei.field.SelectlistFormField;
 import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.filter.FilterEditor;
 import org.polymap.rhei.filter.IFilterEditorSite;
-
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.FlurstueckComposite;
 import org.polymap.kaps.model.data.GebaeudeArtComposite;
@@ -359,6 +355,12 @@ public class VertraegeFuerBaujahrUndGebaeudeartFilter
             fExpr = QueryExpressions.eq( template.identity(), "unknown" );
         }
 
-        return KapsRepository.instance().findEntities( VertragComposite.class, fExpr, 0, getMaxResults() );
+        int oldMax = BooleanQuery.getMaxClauseCount();
+        try {
+        	BooleanQuery.setMaxClauseCount(Integer.MAX_VALUE);
+        	return KapsRepository.instance().findEntities( VertragComposite.class, fExpr, 0, getMaxResults() );
+        } finally {
+        	BooleanQuery.setMaxClauseCount(oldMax);
+        }
     }
 }
