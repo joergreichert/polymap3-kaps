@@ -75,10 +75,6 @@ import org.polymap.rhei.form.IFormEditorPageSite;
 import org.qi4j.api.entity.association.Association;
 import org.qi4j.api.entity.association.ManyAssociation;
 import org.qi4j.api.property.Property;
-import org.qi4j.api.query.Query;
-import org.qi4j.api.query.QueryExpressions;
-import org.qi4j.api.query.grammar.BooleanExpression;
-import org.qi4j.api.query.grammar.EqualsPredicate;
 
 import com.google.common.collect.Maps;
 
@@ -179,9 +175,6 @@ public class KaufvertragFlurstueckeFormEditorPage
         FlurstueckComposite composite = selectedComposite.get();
         
         duplicateFlurstueckValidator = new DuplicateFlurstueckValidator();
-        if(composite != null) {
-        	duplicateFlurstueckValidator.setLastModified(composite._lastModified().get());
-        }
         
         selectedGemarkung = composite != null ? composite.gemarkung().get() : null;
         if (composite != null && selectedGemarkung == null) {
@@ -213,15 +206,10 @@ public class KaufvertragFlurstueckeFormEditorPage
     }
 
     private class DuplicateFlurstueckValidator {
-    	private Long lastModified = null;
     	private GemarkungComposite gemarkung = null;
 		private Integer hauptNummer = null;
 		private String unterNummer = null;
 		
-		void setLastModified(Long lastModified) {
-			this.lastModified = lastModified;
-		}
-
 		public boolean isDuplicate(String propertyName, Object value) {
 			boolean isGemarkung = false, isHauptNummer = false, isUnterNummer = false;
 			String oldGemarkungId = null;
@@ -240,13 +228,16 @@ public class KaufvertragFlurstueckeFormEditorPage
     			oldUnterNummer = unterNummer;
     			unterNummer = String.valueOf(value);
     		}
-    		if(lastModified == null && gemarkung != null && hauptNummer != null && unterNummer != null) {
-				FlurstueckComposite flurstueckTemplate = QueryExpressions.templateFor(FlurstueckComposite.class);
-				EqualsPredicate<String> gemarkungExpr = QueryExpressions.eq(flurstueckTemplate.gemarkung(), gemarkung);
-				EqualsPredicate<Integer> hauptNummerExpr = QueryExpressions.eq(flurstueckTemplate.hauptNummer(), hauptNummer);
-				EqualsPredicate<String> unterNummerExpr = QueryExpressions.eq(flurstueckTemplate.unterNummer(), unterNummer);
-				BooleanExpression expression = QueryExpressions.and(gemarkungExpr, QueryExpressions.and(hauptNummerExpr, unterNummerExpr));
-				Query<FlurstueckComposite> result = KapsRepository.instance().findEntities(FlurstueckComposite.class, expression, 0, 1);
+    		if(selectedComposite.get() != null && gemarkung != null && hauptNummer != null && unterNummer != null) {
+				boolean found = false;
+				for (FlurstueckComposite elem : KaufvertragFlurstueckeFormEditorPage.this.getModel()) {
+					if(elem != selectedComposite.get() && gemarkung.identity().get() != null && elem.gemarkung().get().identity().get() != null && 
+							gemarkung.identity().get().equals(elem.gemarkung().get().identity().get()) && 
+							hauptNummer.equals(elem.hauptNummer().get()) && unterNummer.equals(elem.unterNummer().get())) {
+						found = true;
+						break;
+					}
+				}
 				if(gemarkung != null && isGemarkung && !gemarkung.id().equals(oldGemarkungId)) {
         			getPageSite().setFieldValue(prefix + "hauptNummer", hauptNummer);
         			getPageSite().setFieldValue(prefix + "unterNummer", unterNummer);
@@ -259,7 +250,7 @@ public class KaufvertragFlurstueckeFormEditorPage
 					getPageSite().setFieldValue(prefix + "gemarkung", gemarkung);
         			getPageSite().setFieldValue(prefix + "hauptNummer", hauptNummer);
         		}
-				return result.count() > 0;
+				return found;
     		}
     		return false;
     	}
@@ -313,9 +304,6 @@ public class KaufvertragFlurstueckeFormEditorPage
         parent = (Composite)formSection.getClient();
         
         duplicateFlurstueckValidator = new DuplicateFlurstueckValidator();
-        if(selectedComposite.get() != null) {
-        	duplicateFlurstueckValidator.setLastModified(selectedComposite.get()._lastModified().get());
-        }
         
         Composite line0 = newFormField( "Gemarkung" )
                 .setParent( parent )
@@ -326,7 +314,6 @@ public class KaufvertragFlurstueckeFormEditorPage
                                     public Association<GemarkungComposite> get( FlurstueckComposite entity ) {
                                         // log.info( "gemarkungComposite " +
                                         // entity.gemarkung());
-                                    	duplicateFlurstueckValidator.setLastModified(entity._lastModified().get());
                                         return entity.gemarkung();
                                     }
                                 } ) )
@@ -354,7 +341,6 @@ public class KaufvertragFlurstueckeFormEditorPage
                                 new PropertyCallback<FlurstueckComposite>() {
 
                                     public Property get( FlurstueckComposite entity ) {
-                                    	duplicateFlurstueckValidator.setLastModified(entity._lastModified().get());
                                         return entity.hauptNummer();
                                     }
                                 } ) ).setField( reloadable( new StringFormField( StringFormField.Style.ALIGN_RIGHT ) )  )
@@ -368,7 +354,6 @@ public class KaufvertragFlurstueckeFormEditorPage
                                 new PropertyCallback<FlurstueckComposite>() {
 
                                     public Property get( FlurstueckComposite entity ) {
-                                    	duplicateFlurstueckValidator.setLastModified(entity._lastModified().get());
                                         return entity.unterNummer();
                                     }
                                 } ) ).setValidator( new DuplicateValidator("unterNummer") )
@@ -500,7 +485,8 @@ public class KaufvertragFlurstueckeFormEditorPage
 
             @Override
             public void fieldChange( FormFieldEvent ev ) {
-                if (ev.getEventCode() == VALUE_CHANGE && ev.getFieldName().equalsIgnoreCase( prefix + "gemarkung" )) {
+                if (ev.getEventCode() == VALUE_CHANGE && ev.getFieldName().equalsIgnoreCase( prefix + "gemarkung" ) 
+                		&& selectedGemarkung != ev.getNewValue() && ev.getNewValue() != null) {
                     // log.info( "gemarkungListener: " + ev);
                     // if ((ev.getNewValue() == null && selectedGemarkung != null)
                     // || (ev.getNewValue() != null && !ev.getNewValue().equals(
