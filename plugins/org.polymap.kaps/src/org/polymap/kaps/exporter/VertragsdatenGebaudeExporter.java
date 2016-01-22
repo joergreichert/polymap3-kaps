@@ -15,6 +15,7 @@ package org.polymap.kaps.exporter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.polymap.kaps.exporter.AbstractExcelExporter.Value;
 import org.polymap.kaps.model.data.FlurstueckComposite;
 import org.polymap.kaps.model.data.GemarkungComposite;
 import org.polymap.kaps.model.data.GemeindeComposite;
@@ -75,6 +76,8 @@ public class VertragsdatenGebaudeExporter
             errors.add( error( flurstueck, "Keine Strasse gefunden!" ) );
             return result;
         }
+        String hausNummer = flurstueck.hausnummer().get();
+        String hausNummerZusatz = flurstueck.hausnummerZusatz().get();
         VertragsdatenErweitertComposite ew = vertrag.erweiterteVertragsdaten().get();
         Double preis = vertrag.vollpreis().get();
         if (ew != null && ew.bereinigterVollpreis().get() != null) {
@@ -89,6 +92,8 @@ public class VertragsdatenGebaudeExporter
         result.add( new Value( "Gemeinde", gemeinde ) );
         result.add( new Value( "Gemarkung", gemarkung ) );
         result.add( new Value( "Strasse", strasse ) );
+        result.add( new Value( "Haus-Nr.", hausNummer == null ? "" : hausNummer ) );
+        result.add( new Value( "Haus-Nr. Zusatz", hausNummerZusatz == null ? "" : hausNummerZusatz ) );
         result.add( new Value( "Flurstücksnummer", flurstueck.hauptNummer().get() + "/"
                 + flurstueck.unterNummer().get() ) );
         result.add( new Value( "Gebäudeart", firstRow ? flurstueck.gebaeudeArt().get() : null ) );
