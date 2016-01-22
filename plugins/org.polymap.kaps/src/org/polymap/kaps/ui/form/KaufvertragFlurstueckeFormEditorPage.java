@@ -485,8 +485,7 @@ public class KaufvertragFlurstueckeFormEditorPage
 
             @Override
             public void fieldChange( FormFieldEvent ev ) {
-                if (ev.getEventCode() == VALUE_CHANGE && ev.getFieldName().equalsIgnoreCase( prefix + "gemarkung" ) 
-                		&& selectedGemarkung != ev.getNewValue() && ev.getNewValue() != null) {
+                if (ev.getEventCode() == VALUE_CHANGE && ev.getFieldName().equalsIgnoreCase( prefix + "gemarkung" )) {
                     // log.info( "gemarkungListener: " + ev);
                     // if ((ev.getNewValue() == null && selectedGemarkung != null)
                     // || (ev.getNewValue() != null && !ev.getNewValue().equals(
