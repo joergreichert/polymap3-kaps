@@ -405,4 +405,8 @@ public abstract class KapsDefaultFormEditorPageWithFeatureTable<T extends Entity
         }
         // viewer.dispose();
     }
+    
+    public List<T> getModel() {
+    	return model;
+    }
 }
