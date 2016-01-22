@@ -113,6 +113,14 @@ public class VertragsdatenAgrarAlsAgrarExporter
             errors.add( error( vertrag, "Keine Richtwertzone gefunden!" ) );
             return result;
         }
+        if(vdb.kaufpreisAnteilBodenwert().get() == null) {
+            errors.add( error( vertrag, "Kaufpreis Anteil Bodenwert (KPANTGRU) ist nicht gesetzt." ) );
+            return result;
+        }
+        if(vdb.bodenwertGesamt().get() == null) {
+            errors.add( error( vertrag, "Bodenwert Gesamt (GESBOWERT) ist nicht gesetzt." ) );
+            return result;
+        }
         double faktorBereinigterKaufpreis = vdb.kaufpreisAnteilBodenwert().get() / vdb.bodenwertGesamt().get(); 
         
         result.add( new Value( "Eingangsnummer", EingangsNummerFormatter.format( vertrag.eingangsNr().get() ) ) );
