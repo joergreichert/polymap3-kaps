@@ -186,7 +186,10 @@ public class VertragsdatenBaulandBodenwertFormEditorPage
 
         	@Override
         	protected Double calculate(ValueProvider values) {
-        		if(values.get(vb.flaeche1()) > 0) {
+        		Double value = values.get(vb.flaeche1());
+        		if(value == null) {
+        			return null;
+        		} else if(value > 0) {
         			return values.get(vb.bodenpreisQm1()) * values.get(vb.faktorBereinigterKaufpreis()); 
         		} else {
         			return 0d;
@@ -207,7 +210,10 @@ public class VertragsdatenBaulandBodenwertFormEditorPage
 
         	@Override
         	protected Double calculate(ValueProvider values) {
-        		if(values.get(vb.flaeche2()) > 0) {
+        		Double value = values.get(vb.flaeche2());
+        		if(value == null) {
+        			return null;
+        		} else if(value > 0) {
         			return values.get(vb.bodenpreisQm2()) * values.get(vb.faktorBereinigterKaufpreis()); 
         		} else {
         			return 0d;
@@ -226,12 +232,15 @@ public class VertragsdatenBaulandBodenwertFormEditorPage
         createPreisField( vb.bodenwertBereinigt3(), five().top( lastLine, 12 ), client, false );
         site.addFieldListener( line3multiplicator = new FieldMultiplication( site, 2, vb.flaeche3(),
                 vb.bodenpreisQm3(), vb.bodenwert3() ) );
-        site.addFieldListener( line3multiplicator = new FieldCalculation( site, 2, vb.bodenwertBereinigt3(), vb.bodenpreisQm3(), vb
+        site.addFieldListener( line3multiplicator2 = new FieldCalculation( site, 2, vb.bodenwertBereinigt3(), vb.bodenpreisQm3(), vb
                 .faktorBereinigterKaufpreis(), vb.flaeche3() ) {
 
         	@Override
         	protected Double calculate(ValueProvider values) {
-        		if(values.get(vb.flaeche3()) > 0) {
+        		Double value = values.get(vb.flaeche3());
+        		if(value == null) {
+        			return null;
+        		} else if(value > 0) {
         			return values.get(vb.bodenpreisQm3()) * values.get(vb.faktorBereinigterKaufpreis()); 
         		} else {
         			return 0d;
@@ -255,7 +264,10 @@ public class VertragsdatenBaulandBodenwertFormEditorPage
 
         	@Override
         	protected Double calculate(ValueProvider values) {
-        		if(values.get(vb.flaeche4()) > 0) {
+        		Double value = values.get(vb.flaeche4());
+        		if(value == null) {
+        			return null;
+        		} else if(value > 0) {
         			return values.get(vb.bodenpreisQm4()) * values.get(vb.faktorBereinigterKaufpreis()); 
         		} else {
         			return 0d;
@@ -279,7 +291,10 @@ public class VertragsdatenBaulandBodenwertFormEditorPage
 
         	@Override
         	protected Double calculate(ValueProvider values) {
-        		if(values.get(vb.flaeche5()) > 0) {
+        		Double value = values.get(vb.flaeche5());
+        		if(value == null) {
+        			return null;
+        		} else if(value > 0) {
         			return values.get(vb.bodenpreisQm5()) * values.get(vb.faktorBereinigterKaufpreis()); 
         		} else {
         			return 0d;
@@ -302,7 +317,8 @@ public class VertragsdatenBaulandBodenwertFormEditorPage
 
         	@Override
         	protected Double calculate(ValueProvider values) {
-        		if(values.get(vb.flaeche6()) > 0) {
+        		Double value = values.get(vb.flaeche6());
+        		if(value != null && value > 0) {
         			return values.get(vb.bodenpreisQm6()) * values.get(vb.faktorBereinigterKaufpreis()); 
         		} else {
         			return 0d;
