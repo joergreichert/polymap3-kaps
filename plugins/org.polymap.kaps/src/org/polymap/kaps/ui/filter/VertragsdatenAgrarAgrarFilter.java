@@ -21,7 +21,8 @@ import java.util.TreeMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.apache.lucene.search.BooleanQuery;
+import org.qi4j.api.entity.association.Association;
 import org.qi4j.api.query.Query;
 import org.qi4j.api.query.QueryExpressions;
 import org.qi4j.api.query.grammar.BooleanExpression;
@@ -32,13 +33,10 @@ import com.google.common.collect.Sets;
 
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
-
 import org.eclipse.jface.dialogs.MessageDialog;
-
 import org.polymap.core.project.ILayer;
 import org.polymap.core.runtime.Polymap;
 import org.polymap.core.workbench.PolymapWorkbench;
-
 import org.polymap.rhei.field.BetweenFormField;
 import org.polymap.rhei.field.BetweenValidator;
 import org.polymap.rhei.field.DateTimeFormField;
@@ -48,7 +46,6 @@ import org.polymap.rhei.field.SelectlistFormField;
 import org.polymap.rhei.field.StringFormField;
 import org.polymap.rhei.filter.FilterEditor;
 import org.polymap.rhei.filter.IFilterEditorSite;
-
 import org.polymap.kaps.model.KapsRepository;
 import org.polymap.kaps.model.data.BodennutzungComposite;
 import org.polymap.kaps.model.data.FlurstueckComposite;
@@ -274,33 +271,6 @@ public class VertragsdatenAgrarAgrarFilter
         else {
             nExpr = gExpr;
         }
-
-        GreaterOrEqualPredicate<Double> greaterEquals = null;
-        if(nutzungsGroesseMin != null) {
-        	greaterEquals = QueryExpressions.ge(flurTemplate.flaeche(), Double.valueOf(nutzungsGroesseMin));
-        }
-        BooleanExpression flaecheExpression = null;
-        LessOrEqualPredicate<Double> lowerEquals = null;
-        if(nutzungsGroesseMax != null) {
-        	lowerEquals = QueryExpressions.le(flurTemplate.flaeche(), Double.valueOf(nutzungsGroesseMax));
-        }
-        if(greaterEquals != null) {
-        	if(lowerEquals != null) {
-        		flaecheExpression = QueryExpressions.and(greaterEquals, lowerEquals);
-        	} else {
-        		flaecheExpression = greaterEquals;
-        	}
-        } else {
-    		flaecheExpression = lowerEquals;
-        }
-        
-        if (flaecheExpression != null) {
-            if (nExpr != null) {
-                nExpr = QueryExpressions.and( nExpr, flaecheExpression );
-            } else {
-                nExpr = flaecheExpression;
-            }
-        }
         
         Set<VertragComposite> vertraegeNachDatumUndFlurstueck = new HashSet<VertragComposite>();
 
@@ -366,6 +336,84 @@ public class VertragsdatenAgrarAgrarFilter
             fExpr = QueryExpressions.and( bExpr, fExpr );
         }
         
-        return KapsRepository.instance().findEntities( VertragsdatenAgrarComposite.class, fExpr, 0, getMaxResults() );
+        BooleanExpression bodenExp1 = getBodennutzungExpression(template.bodennutzung1(), bodennutzungen);
+        BooleanExpression bodenExp2 = getBodennutzungExpression(template.bodennutzung2(), bodennutzungen);
+        BooleanExpression bodenExp3 = getBodennutzungExpression(template.bodennutzung3(), bodennutzungen);
+        BooleanExpression bodenExp4 = getBodennutzungExpression(template.bodennutzung4(), bodennutzungen);
+        BooleanExpression bodenExp5 = getBodennutzungExpression(template.bodennutzung5(), bodennutzungen);
+        BooleanExpression bodenExp6 = getBodennutzungExpression(template.bodennutzung6(), bodennutzungen);
+
+        BooleanExpression greaterEquals = null;
+        if(nutzungsGroesseMin != null) {
+        	BooleanExpression nutzungExp1 = QueryExpressions.ge(template.flaechenAnteil1(), Double.valueOf(nutzungsGroesseMin));
+        	BooleanExpression nutzungExp2 = QueryExpressions.ge(template.flaechenAnteil2(), Double.valueOf(nutzungsGroesseMin));
+        	BooleanExpression nutzungExp3 = QueryExpressions.ge(template.flaechenAnteil3(), Double.valueOf(nutzungsGroesseMin));
+        	BooleanExpression nutzungExp4 = QueryExpressions.ge(template.flaechenAnteil4(), Double.valueOf(nutzungsGroesseMin));
+        	BooleanExpression nutzungExp5 = QueryExpressions.ge(template.flaechenAnteil5(), Double.valueOf(nutzungsGroesseMin));
+        	BooleanExpression nutzungExp6 = QueryExpressions.ge(template.flaechenAnteil6(), Double.valueOf(nutzungsGroesseMin));
+        	
+        	greaterEquals = QueryExpressions.or(
+        		(bodenExp1 != null ? QueryExpressions.and(nutzungExp1, bodenExp1) : nutzungExp1),
+       			(bodenExp2 != null ? QueryExpressions.and(nutzungExp2, bodenExp2) : nutzungExp2),
+       			(bodenExp3 != null ? QueryExpressions.and(nutzungExp3, bodenExp3) : nutzungExp3),
+       			(bodenExp4 != null ? QueryExpressions.and(nutzungExp4, bodenExp4) : nutzungExp4),
+       			(bodenExp5 != null ? QueryExpressions.and(nutzungExp5, bodenExp5) : nutzungExp5),
+       			(bodenExp6 != null ? QueryExpressions.and(nutzungExp6, bodenExp6) : nutzungExp6)
+        	);
+        }
+        
+        BooleanExpression flaecheExpression = null;
+        BooleanExpression lowerEquals = null;
+        if(nutzungsGroesseMax != null) {
+        	BooleanExpression nutzungExp1 = QueryExpressions.le(template.flaechenAnteil1(), Double.valueOf(nutzungsGroesseMax));
+        	BooleanExpression nutzungExp2 = QueryExpressions.le(template.flaechenAnteil2(), Double.valueOf(nutzungsGroesseMax));
+        	BooleanExpression nutzungExp3 = QueryExpressions.le(template.flaechenAnteil3(), Double.valueOf(nutzungsGroesseMax));
+        	BooleanExpression nutzungExp4 = QueryExpressions.le(template.flaechenAnteil4(), Double.valueOf(nutzungsGroesseMax));
+        	BooleanExpression nutzungExp5 = QueryExpressions.le(template.flaechenAnteil5(), Double.valueOf(nutzungsGroesseMax));
+        	BooleanExpression nutzungExp6 = QueryExpressions.le(template.flaechenAnteil6(), Double.valueOf(nutzungsGroesseMax));
+        	
+        	lowerEquals = QueryExpressions.or(
+       			(bodenExp1 != null ? QueryExpressions.and(nutzungExp1, bodenExp1) : nutzungExp1),
+       			(bodenExp2 != null ? QueryExpressions.and(nutzungExp2, bodenExp2) : nutzungExp2),
+       			(bodenExp3 != null ? QueryExpressions.and(nutzungExp3, bodenExp3) : nutzungExp3),
+       			(bodenExp4 != null ? QueryExpressions.and(nutzungExp4, bodenExp4) : nutzungExp4),
+       			(bodenExp5 != null ? QueryExpressions.and(nutzungExp5, bodenExp5) : nutzungExp5),
+       			(bodenExp6 != null ? QueryExpressions.and(nutzungExp6, bodenExp6) : nutzungExp6)
+        	);
+        }
+        if(greaterEquals != null) {
+        	if(lowerEquals != null) {
+        		flaecheExpression = QueryExpressions.and(greaterEquals, lowerEquals);
+        	} else {
+        		flaecheExpression = greaterEquals;
+        	}
+        } else {
+    		flaecheExpression = lowerEquals;
+        }
+        
+        if (flaecheExpression != null) {
+            fExpr = QueryExpressions.and( flaecheExpression, fExpr );
+        }
+        
+        int oldMax = BooleanQuery.getMaxClauseCount();
+        try {
+        	BooleanQuery.setMaxClauseCount(Integer.MAX_VALUE);
+            return KapsRepository.instance().findEntities( VertragsdatenAgrarComposite.class, fExpr, 0, getMaxResults() );
+        } finally {
+        	BooleanQuery.setMaxClauseCount(oldMax);
+        }
     }
+
+
+	private BooleanExpression getBodennutzungExpression(
+			Association<BodennutzungComposite> bodennutzung,
+			List<BodennutzungComposite> bodennutzungen) {
+		BooleanExpression newExpr = null;
+		if(bodennutzungen != null) {
+			for (BodennutzungComposite nutzung : bodennutzungen) {
+				newExpr = QueryExpressions.eq( bodennutzung, nutzung );
+			}
+		}
+		return newExpr;
+	}
 }
