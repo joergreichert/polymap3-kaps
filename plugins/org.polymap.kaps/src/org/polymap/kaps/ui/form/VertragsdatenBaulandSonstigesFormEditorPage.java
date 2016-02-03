@@ -156,10 +156,26 @@ public class VertragsdatenBaulandSonstigesFormEditorPage
 	private Double sum(Object[]... pairs) {
 		Double sum = 0d;
 		for(Object [] pair : pairs) {
-			@SuppressWarnings("unchecked")
-			Property<Double> flaeche = (Property<Double>) pair[0];
-			if((boolean) pair[1] && flaeche.get() != null) {
-				sum += flaeche.get();
+			if((!(pair[0] instanceof Property<?>))) {
+				continue;
+			}
+			Property<?> flaecheProp = (Property<?>) pair[0];
+			Object flaecheObj = flaecheProp.get();
+			if(!(flaecheObj instanceof Double)) {
+				continue;
+			}
+			Double flaeche = (Double) flaecheObj;
+			if(!(pair[1] instanceof Property<?>)) {
+				continue;
+			}
+			Property<?> isWohnflaecheProp = (Property<?>) pair[1];
+			Object isWohnflaecheObj = isWohnflaecheProp.get();
+			if(!(isWohnflaecheObj instanceof Boolean)) {
+				continue;
+			}
+			Boolean isWohnflaeche = (Boolean) isWohnflaecheObj;
+			if(isWohnflaeche != null && isWohnflaeche && flaeche != null) {
+				sum += flaeche;
 			}
 		}
 		return sum;
